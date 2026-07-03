@@ -28,14 +28,11 @@ STRICT RULES:
 2. Second line MUST be: .subckt <name> <ports...>
 3. Last line MUST be: .ends
 4. ONLY use these models: nfet_03v3 (NMOS) and pfet_03v3 (PMOS).
-5. Format EXACTLY: M<name> <drain> <gate> <source> <body> <model> W=<w>u L=<l>u ng=<fingers>
-6. WIDTH RULE: if total W > 10um, MUST split into fingers using ng=N.
-   RULE: W = W_total / ng  (W is per-finger width, W_total is total device width).
-   Example: total 20u -> W=10u ng=2. Single-finger: W=8u ng=1.
-   NEVER use multiplier (m). DILARANG PAKAI m=.
-7. PMOS body MUST connect to vdd. NMOS body MUST connect to vss.
-8. NO empty lines between devices. NO markdown fences. NO other text.
-9. Choose net names that reflect circuit function (e.g., n1, n2 for internal, vin/vout for I/O)."""
+5. Format EXACTLY: M<name> <drain> <gate> <source> <body> <model> W=<w>u L=<l>u
+6. SUPPLY: Use VDD=1.8V. Connect PMOS body to vdd, NMOS body to vss.
+7. NO empty lines between devices. NO markdown fences. NO other text.
+8. Choose net names that reflect circuit function (e.g., n1, n2 for internal, vin/vout for I/O).
+9. Keep W between 1u and 50u. Keep L=1u for analog. Use ng=1 (no multi-finger)."""
 
     payload = _json.dumps({
         "model": model,

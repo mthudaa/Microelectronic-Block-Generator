@@ -147,7 +147,7 @@ def _normalise_subckt(netlist_content, cell_name, standard_pins):
 
 
 def _generate_ota_testbench(netlist_content, cell_name, workdir,
-                            vdd=3.3, vss=0.0, vcm=1.65, vbias=0.75,
+                            vdd=1.8, vss=0.0, vcm=0.9, vbias=0.55,
                             cload=1e-12, fstart=1, fstop=1e9, ac_dec=20):
     cleaned = _sanitize_netlist(netlist_content)
     cleaned = _normalise_subckt(cleaned, cell_name, _OTA_PINS)
@@ -212,7 +212,7 @@ wrdata {workdir}/{cell_name}_ac.dat vdb(n_vout) vp(n_vout)*180/pi
 
 
 def run_ota_ac(netlist_content, cell_name,
-               vdd=3.3, vss=0.0, vcm=1.65, vbias=0.75,
+               vdd=1.8, vss=0.0, vcm=0.9, vbias=0.55,
                cload=1e-12, fstart=1, fstop=1e9, ac_dec=20,
                workdir=None, timeout=120):
     """Run OTA AC simulation via ngspice.
@@ -270,7 +270,7 @@ def run_ota_ac(netlist_content, cell_name,
 
 
 def _generate_comparator_testbench(netlist_content, cell_name, workdir,
-                                   vdd=3.3, vss=0.0, vcm=1.65,
+                                   vdd=1.8, vss=0.0, vcm=0.9,
                                    clk_period=20e-9, clk_rise=0.1e-9,
                                    tstop=50e-9, tstep=10e-12,
                                    measure_offset=False):
@@ -351,7 +351,7 @@ wrdata {workdir}/{cell_name}_tran.dat v(n_clk) v(n_vin_p) v(n_vin_n) v(n_vout_p)
 
 
 def run_comparator_tran(netlist_content, cell_name,
-                        vdd=3.3, vcm=1.65, vdelta=0.01,
+                        vdd=1.8, vcm=0.9, vdelta=0.01,
                         clk_period=20e-9, tstop=50e-9,
                         measure_offset=False,
                         workdir=None, timeout=120):
@@ -539,8 +539,8 @@ def compare_pre_post(schematic_netlist, pex_path, cell_name, **kwargs):
         pex_content = f.read()
 
     auto_cload = kwargs.pop("cload", None)
-    vcm = kwargs.pop("vcm", 1.65)
-    vbias = kwargs.pop("vbias", 0.75)
+    vcm = kwargs.pop("vcm", 0.9)
+    vbias = kwargs.pop("vbias", 0.55)
 
     pre = run_ota_ac(schematic_netlist, cell_name,
                      cload=auto_cload or 1e-12, vcm=vcm, vbias=vbias,
@@ -570,8 +570,8 @@ def compare_comp_pre_post(schematic_netlist, pex_path, cell_name, **kwargs):
     with open(pex_path) as f:
         pex_content = f.read()
 
-    vcm = kwargs.pop("vcm", 1.65)
-    vdd = kwargs.pop("vdd", 3.3)
+    vcm = kwargs.pop("vcm", 0.9)
+    vdd = kwargs.pop("vdd", 1.8)
     clk_period = kwargs.pop("clk_period", 20e-9)
     tstop = kwargs.pop("tstop", 50e-9)
 
