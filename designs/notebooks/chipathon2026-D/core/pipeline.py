@@ -17,9 +17,30 @@ from core.power import add_power_strips
 from core.checks import run_drc, run_lvs, run_pex
 
 
+def _load_api_key():
+    """Load DeepSeek API key from env or .env file."""
+    key = os.environ.get("DEEPSEEK_API_KEY")
+    if key:
+        return key
+    env_path = os.path.join(os.path.dirname(__file__), "..", ".env")
+    if os.path.isfile(env_path):
+        with open(env_path) as f:
+            for line in f:
+                line = line.strip()
+                if line.startswith("DEEPSEEK_API_KEY="):
+                    return line.split("=", 1)[1].strip().strip("\"'")
+    return None
+
+
 def generate_netlist_from_prompt(user_prompt, model="deepseek-chat",
-                                 api_key="sk-b83faa5cb0b141fdbe57a6c3437b4c78",
+                                 api_key=None,
                                  api_url="https://api.deepseek.com/v1/chat/completions"):
+    api_key = api_key or _load_api_key()
+    if not api_key:
+        raise RuntimeError(
+            "DEEPSEEK_API_KEY not set. "
+            "Export it or create .env file with DEEPSEEK_API_KEY=sk-..."
+        )
     context = """You are an analog IC design expert. Generate ONLY a SPICE subcircuit netlist.
 Respond with NOTHING except the netlist -- no explanations, no markdown, no comments.
 
@@ -273,7 +294,7 @@ def _run_post_processing(top_level, gds_path, netlist_input, pdk_name):
 
 
 def llm_to_gds(user_prompt, model="deepseek-chat",
-               api_key="sk-b83faa5cb0b141fdbe57a6c3437b4c78",
+               api_key=None,
                mode="analog"):
     print(f"[LLM] Generating netlist for: {user_prompt[:80]}...")
     netlist = generate_netlist_from_prompt(user_prompt, model=model, api_key=api_key)
