@@ -1,0 +1,378 @@
+╔══════════════════════════════════════════════════════════════════════════╗
+║                  SPICE-TO-GDS DESIGN FLOW                                ║
+║                  Chipathon 2026-D — Automated Analog Layout              ║
+╚══════════════════════════════════════════════════════════════════════════╝
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│                           INPUT: SPICE NETLIST                          │
+│  .subckt ota_simple vin_p vin_n vout vbias vdd vss                       │
+│  M1 n1 vin_p ntail vss nfet_03v3 W=10u L=1u                             │
+│  M2 vout vin_n ntail vss nfet_03v3 W=10u L=1u                            │
+│  ...                                                                     │
+└────────────────────────────────┬────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│  1. NETLIST PARSING  (spice2net/parser.py)                               │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │ • Auto-detect PDK (gf180 / sky130) from .lib line                │   │
+│  │ • Regex parse MOSFET params: W, L, M, fingers                    │   │
+│  │ • Extract nodes: drain, gate, source, body                        │   │
+│  │ • Device classification: PMOS vs NMOS                             │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │  PLACEMENT ENGINE                                                 │   │
+│  │  • PMOS → top row     (Y = nmos_row_height)                       │   │
+│  │  • NMOS → bottom row  (Y = 0)                                     │   │
+│  │  • Cell sizing: width = 15.0×L, height = 2.0×W                    │   │
+│  │  • Connectivity-driven ordering (ALIGN-inspired)                  │   │
+│  │  • Center alignment                                               │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
+└────────────────────────────────┬────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│  2. PDK ACTIVATION                                                       │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │ • pdk = gf180 / sky130                                           │   │
+│  │ • pdk.activate()                                                 │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
+└────────────────────────────────┬────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│  3. DEVICE GENERATION  (placement function)                              │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │  For each device:                                                │   │
+│  │    PMOS → glayout.pmos(pdk, W, L, fingers, multipliers,          │   │
+│  │                        with_substrate_tap=False, with_tie=True)   │   │
+│  │    NMOS → glayout.nmos(pdk, W, L, fingers, multipliers,          │   │
+│  │                        with_substrate_tap=False, with_tie=True,   │   │
+│  │                        with_dnwell=False)                         │   │
+│  │                                                                   │   │
+│  │  Port mapping: drain/gate/source/body → port_map[dev][term][dir]  │   │
+│  │    Body → tie_{N/S/E/W}_top_met_{N/S/E/W} (from tapring)          │   │
+│  │         → source (fallback)                                       │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
+└────────────────────────────────┬────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│  4. POWER STRIPS                                                         │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │  ═══════════════════════════════════ VDD (Metal5, 1µm) ═══════   │   │
+│  │  │  via_stack(met2→met5) @ left edge                            │   │
+│  │  │                                                               │   │
+│  │  │              DEVICE AREA (PMOS top, NMOS bottom)              │   │
+│  │  │                                                               │   │
+│  │  │  via_stack(met2→met5) @ right edge                           │   │
+│  │  ═══════════════════════════════════ VSS (Metal5, 1µm) ═══════   │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
+│  • Power strips registered in port_map: "VDD_STRIP", "VSS_STRIP"        │
+│  • Injected into connection mapping: VDD→VDD_STRIP, VSS→VSS_STRIP       │
+└────────────────────────────────┬────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│  5. CONNECTION MAPPING                                                   │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │  peta_koneksi[net] = [{device: M1, terminal: drain}, ...]        │   │
+│  │                                                                   │   │
+│  │  buat_daftar_koneksi():                                           │   │
+│  │    • _get_all_ports() — scan N,S,E,W semua arah                  │   │
+│  │    • Skip body terminals (handled by tie routing)                 │   │
+│  │    • daftar_koneksi_final = [(net_name, [port_list]), ...]        │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
+└────────────────────────────────┬────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│  6. AUTO-ROUTER  (PathFinder Negotiated Congestion Routing)              │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │                                                                   │   │
+│  │  ┌─────────────────────────────────────────────────────────────┐ │   │
+│  │  │  MST DECOMPOSITION                                           │ │   │
+│  │  │  • decompose_mst() — Prim's algorithm                        │ │   │
+│  │  │  • Multi-pin nets → minimum spanning tree edges              │ │   │
+│  │  └─────────────────────────────────────────────────────────────┘ │   │
+│  │                              │                                    │   │
+│  │                              ▼                                    │   │
+│  │  ┌─────────────────────────────────────────────────────────────┐ │   │
+│  │  │  EDGE ORDERING                                               │ │   │
+│  │  │  • Sort by Manhattan distance (shortest first)               │ │   │
+│  │  └─────────────────────────────────────────────────────────────┘ │   │
+│  │                              │                                    │   │
+│  │                              ▼                                    │   │
+│  │  ┌─────────────────────────────────────────────────────────────┐ │   │
+│  │  │  PATHFINDER OUTER LOOP  (max 10 iterations)                  │ │   │
+│  │  │  penalty_threshold = max(0, 100 - iter × 15)                 │ │   │
+│  │  │  ┌─────────────────────────────────────────────────────────┐ │ │   │
+│  │  │  │  INNER ROUTING LOOP  (max 10 rip-up retries)            │ │ │   │
+│  │  │  │                                                          │ │ │   │
+│  │  │  │  For each edge:                                          │ │ │   │
+│  │  │  │    1. Sort port combos by distance (shortest first)      │ │ │   │
+│  │  │  │    2. Midpoint N-S/E-W ports for center connections     │ │ │   │
+│  │  │  │    3. Try patterns in order:                             │ │ │   │
+│  │  │  │       ┌─────────────────────────────────────────────┐    │ │ │   │
+│  │  │  │       │ I-ROUTE  → straight single-layer (2 vias)   │    │ │ │   │
+│  │  │  │       │ L-ROUTE  → one turn (3 vias)                │    │ │ │   │
+│  │  │  │       │ Z-ROUTE  → midpoint sweep (4 vias)          │    │ │ │   │
+│  │  │  │       │ U-ROUTE  → detour around obstacles (5 vias) │    │ │ │   │
+│  │  │  │       └─────────────────────────────────────────────┘    │ │ │   │
+│  │  │  │                                                          │ │ │   │
+│  │  │  │  Layer priority: M3 → M5 fallback                        │ │ │   │
+│  │  │  │  Trace width: 0.5µm uniform                              │ │ │   │
+│  │  │  │  Via offset: w/2 opposite port direction                 │ │ │   │
+│  │  │  │  Trace extend: w/2 at both ends (overlap via)            │ │ │   │
+│  │  │  └─────────────────────────────────────────────────────────┘ │ │   │
+│  │  └─────────────────────────────────────────────────────────────┘ │   │
+│  │                              │                                    │   │
+│  │                              ▼                                    │   │
+│  │  ┌─────────────────────────────────────────────────────────────┐ │   │
+│  │  │  CONGESTION COMMIT                                           │ │   │
+│  │  │  • memory.commit_iteration() — akumulasi history             │ │   │
+│  │  │  • Nets dipaksa cari jalur alternatif tiap iterasi           │ │   │
+│  │  └─────────────────────────────────────────────────────────────┘ │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
+│                                                                          │
+│  MemoryMap (Collision Engine):                                           │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │  • Obstacle tracking: M3 (42), M4 (46), M5 (81)                  │   │
+│  │  • Device geometry: permanent hard blocks                         │   │
+│  │  • Congestion history: grid-based (3µm buckets)                   │   │
+│  │  • is_clear() penalty-based (soft block if below threshold)      │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
+└────────────────────────────────┬────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│  7. PORT & LABEL                                                         │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │  • add_ports() — device ports with P_/N_ prefix                   │   │
+│  │  • add_ports_perimeter() — boundary ports                         │   │
+│  │  • rename_ports_by_orientation() — standardize to N/S/E/W        │   │
+│  │  • component_snap_to_grid() — 5nm grid                            │   │
+│  │  • Pin labels: rectangle(met3_pin) + add_label(met3_label)        │   │
+│  │  • align_comp_to_port() — precise label placement                │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
+└────────────────────────────────┬────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│  8. FLATTEN + SNAP                                                       │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │  • top_level.flatten()                                           │   │
+│  │  • component_snap_to_grid() — 5nm grid                           │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
+└────────────────────────────────┬────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                           OUTPUT: GDSII                                  │
+│                    /foss/designs/chipathon2026-D/out.gds                  │
+└────────────────────────────────┬────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│  9. DRC / LVS / PEX  (POST-LAYOUT VERIFICATION)                          │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │  Optional: run_checks=True in spice_to_gds()                     │   │
+│  │                                                                   │   │
+│  │  ┌─────────────────────────────────────────────────────────────┐ │   │
+│  │  │  DRC (Design Rule Check)                                     │ │   │
+│  │  │  • Engine: Magic 8.3                                         │ │   │
+│  │  │  • PDK: gf180mcuD / sky130                                   │ │   │
+│  │  │  • Rules: magicrc + DRC.tcl (from PDK)                       │ │   │
+│  │  │  • Output: {cell}.magic.drc.rpt                              │ │   │
+│  │  │  • KLayout DRC available via engine='klayout'                │ │   │
+│  │  └─────────────────────────────────────────────────────────────┘ │   │
+│  │                              │                                    │   │
+│  │                              ▼                                    │   │
+│  │  ┌─────────────────────────────────────────────────────────────┐ │   │
+│  │  │  LVS (Layout vs. Schematic)                                  │ │   │
+│  │  │  • Layout extraction: Magic (extract all → ext2spice lvs)    │ │   │
+│  │  │  • Comparator: netgen 1.5                                    │ │   │
+│  │  │  • Setup: {PDK}_setup.tcl (permutes, equates, parallel)     │ │   │
+│  │  │  • Inputs: GDS layout + SPICE schematic (same subcircuit)    │ │   │
+│  │  │  • Output: {cell}.lvs.out                                    │ │   │
+│  │  └─────────────────────────────────────────────────────────────┘ │   │
+│  │                              │                                    │   │
+│  │                              ▼                                    │   │
+│  │  ┌─────────────────────────────────────────────────────────────┐ │   │
+│  │  │  PEX (Parasitic Extraction)                                  │ │   │
+│  │  │  • Engine: Magic (extract all → ext2spice)                   │ │   │
+│  │  │  • Modes: 1=C-decoupled, 2=C-coupled (default), 3=full-RC   │ │   │
+│  │  │  • Format: ngspice                                           │ │   │
+│  │  │  • Output: {cell}.pex.spice (with parasitic caps)            │ │   │
+│  │  └─────────────────────────────────────────────────────────────┘ │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
+│                                                                          │
+│  CHECK return values:                                                    │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │  run_drc()  → {"clean": bool, "report_path": str, "log": str}     │   │
+│  │  run_lvs()  → {"match": bool, "report_path": str, "log": str}     │   │
+│  │  run_pex()  → {"pex_path": str, "mode": str, "log": str}          │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
+└────────────────────────────────┬────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│ 10. SIMULATION (PRE / POST)                                              │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │  AC Analysis via ngspice-46                                      │   │
+│  │                                                                   │   │
+│  │  ┌─────────────────────────────────────────────────────────────┐ │   │
+│  │  │  PRE-SIM (Schematic)                                        │ │   │
+│  │  │  • run_ota_ac(netlist, cell_name, vdd, vcm, vbias, cload)   │ │   │
+│  │  │  • Strips .lib / ng= / .option scale from netlist           │ │   │
+│  │  │  • Auto-detects subcircuit pin order from .subckt line      │ │   │
+│  │  │  • Generates testbench with .control / meas block           │ │   │
+│  │  │  • Measures: DC gain (max vdb), GBW (when 0 dB),            │ │   │
+│  │  │    Phase margin (vp+180° at GBW), f_-3dB                    │ │   │
+│  │  └─────────────────────────────────────────────────────────────┘ │   │
+│  │                              │                                    │   │
+│  │                              ▼                                    │   │
+│  │  ┌─────────────────────────────────────────────────────────────┐ │   │
+│  │  │  POST-SIM (PEX)                                             │ │   │
+│  │  │  • compare_pre_post(schematic, pex_path, cell_name)         │ │   │
+│  │  │  • Converts PEX .option scale=5n → explicit µm W/L          │ │   │
+│  │  │  • Same testbench, auto-pin-mapping for PEX port order       │ │   │
+│  │  │  • Returns delta: ΔDCgain, ΔGBW, ΔPM, Δf-3dB               │ │   │
+│  │  └─────────────────────────────────────────────────────────────┘ │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
+│                                                                          │
+│  SIMULATION return values:                                               │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │  run_ota_ac()  → {dc_gain_db, gbw_hz, phase_margin_deg,          │   │
+│  │                   f_3db_hz, ac_data: [{freq,vdb,vp},...], log}    │   │
+│  │  compare_pre_post() → {pre: {...}, post: {...}, delta: {...}}     │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────────────┘
+
+
+╔══════════════════════════════════════════════════════════════════════════╗
+║                        KEY ALGORITHMS                                    ║
+╠══════════════════════════════════════════════════════════════════════════╣
+║                                                                          ║
+║  PATHFINDER NCR (Negotiated Congestion Routing)                          ║
+║  ─────────────────────────────────────────                               ║
+║  Reference: "Analog IC Routing Techniques — An Extensive Review"         ║
+║  IEEE Access, 2023                                                        ║
+║  • Iterative rip-up & reroute with congestion history                    ║
+║  • Penalty threshold decreases each iteration (100 → 0)                  ║
+║  • Device geometry as permanent hard blocks                              ║
+║                                                                          ║
+║  ALIGN-INSPIRED PLACEMENT                                                 ║
+║  ─────────────────────────                                               ║
+║  Reference: "ALIGN: A System for Automating Analog Layout"               ║
+║  IEEE Design & Test, 2021                                                 ║
+║  • PMOS always top row, NMOS bottom row                                  ║
+║  • Connectivity-driven column ordering                                   ║
+║  • Bipartite PMOS-NMOS edge weighting                                    ║
+║  • Center alignment for symmetry                                         ║
+║                                                                          ║
+║  MST DECOMPOSITION                                                        ║
+║  ─────────────────                                                       ║
+║  • Prim's algorithm for minimum spanning tree                            ║
+║  • Multi-pin nets → optimal edge pairs                                   ║
+║                                                                          ║
+║  PATTERN-BASED ROUTING                                                    ║
+║  ───────────────────────                                                  ║
+║  • I-route: straight single-layer (fewest vias)                          ║
+║  • L-route: one corner turn                                              ║
+║  • Z-route: midpoint sweep with dynamic clearance                        ║
+║  • U-route: detour around obstacles                                      ║
+║  • Layer: M3 (horizontal) → M4 (vertical) → M5 (overpass)                ║
+║                                                                          ║
+╚══════════════════════════════════════════════════════════════════════════╝
+
+
+╔══════════════════════════════════════════════════════════════════════════╗
+║                      FILE STRUCTURE                                      ║
+╠══════════════════════════════════════════════════════════════════════════╣
+║                                                                          ║
+║  inverter.ipynb                   Main entry-point notebook (4 cells)    ║
+║  ├── Cell 0: Title                                                       ║
+║  ├── Cell 1: All imports (core.*, glayout, gdsfactory)                   ║
+║  ├── Cell 2: SPICE netlist input                                         ║
+║  └── Cell 3: Pipeline call + optional DRC/LVS/PEX demo                  ║
+║                                                                          ║
+║  core/                           Modular library (6 files)               ║
+║  ├── __init__.py                 Re-exports all public functions          ║
+║  ├── utils.py                    display_gds(), display_component(),     ║
+║  │                               clean_param(), GDS_PATH, SVG_PATH       ║
+║  ├── routing.py                  MemoryMap (collision engine)            ║
+║  │                               draw_trace(), place_via()               ║
+║  │                               find_clear_midpoint()                   ║
+║  │                               decompose_mst() (Prim's MST)            ║
+║  │                               route_I/L/Z/U (pattern routing)        ║
+║  │                               auto_router() (PathFinder NCR)          ║
+║  │                               set_pdk(), get_pdk()                    ║
+║  ├── placement.py                placement() (device gen + port map)     ║
+║  │                               petakan_koneksi_net()                   ║
+║  │                               buat_daftar_koneksi()                   ║
+║  ├── power.py                    add_power_strips()                      ║
+║  │                               add_double_guardring()                  ║
+║  ├── pipeline.py                 spice_to_gds() (master pipeline)        ║
+║  │                               llm_to_gds() (LLM→netlist→GDS)         ║
+║  │                               generate_netlist_from_prompt()          ║
+║  └── checks.py                   run_drc(), run_lvs(), run_pex()         ║
+║                                                                          ║
+║  spice2net/parser.py             SPICE parsing + PDK detection            ║
+║  routefinder/core.py             Standalone 3D A* router (not used)      ║
+║                                                                          ║
+║  Shell scripts (IIC@JKU)         DRC/LVS/PEX execution                    ║
+║  ├── iic-drc.sh                  Magic + KLayout DRC                     ║
+║  ├── iic-lvs.sh                  Magic extraction + netgen               ║
+║  └── iic-pex.sh                  Magic parasitic extraction              ║
+║                                                                          ║
+╚══════════════════════════════════════════════════════════════════════════╝
+
+
+╔══════════════════════════════════════════════════════════════════════════╗
+║                      ROUTING PATTERNS VISUAL                             ║
+╠══════════════════════════════════════════════════════════════════════════╣
+║                                                                          ║
+║  I-ROUTE (straight):                                                     ║
+║    Port1 ●────────────────────● Port2      (same layer, 2 vias)          ║
+║                                                                          ║
+║  L-ROUTE (one turn):                                                     ║
+║    Port1 ●──────────┐                                                     ║
+║                     │                                                    ║
+║                     ● Port2              (one corner, 3 vias)            ║
+║                                                                          ║
+║  Z-ROUTE (midpoint sweep):                                               ║
+║    Port1 ●──────┐                                                        ║
+║                 │                                                        ║
+║                 ├──────● Port2          (three segments, 4 vias)         ║
+║                                                                          ║
+║  U-ROUTE (detour):                                                       ║
+║    Port1 ●──┐            ┌──● Port2                                      ║
+║             │            │                                               ║
+║             └────────────┘               (detour around block, 5 vias)   ║
+║                                                                          ║
+╚══════════════════════════════════════════════════════════════════════════╝
+
+
+╔══════════════════════════════════════════════════════════════════════════╗
+║                      LAYER STACK                                         ║
+╠══════════════════════════════════════════════════════════════════════════╣
+║                                                                          ║
+║  Layer ID    Name    Direction    Usage                                   ║
+║  ───────────────────────────────────────────                              ║
+║  (40, 0)     met2    —           Device ports (bottom connection)        ║
+║  (42, 0)     met3    Horizontal  Primary routing (preferred)             ║
+║  (46, 0)     met4    Vertical    Vertical routing segments               ║
+║  (81, 0)     met5    Horizontal  Power strips + overflow routing         ║
+║                                                                          ║
+║  Via stack: met2 ↔ met3 ↔ met4 ↔ met5 (auto-generated by glayout)        ║
+║                                                                          ║
+╚══════════════════════════════════════════════════════════════════════════╝
+║                                                                          ║
+║  SUPPORTED PDKS                                                          ║
+║  ──────────────                                                          ║
+║  • gf180mcuD   (GlobalFoundries 180nm CMOS, mixed-signal)               ║
+║  • gf180mcuC   (GlobalFoundries 180nm CMOS, digital-optimised)          ║
+║  • sky130      (SkyWater 130nm)                                          ║
+║                                                                          ║
+╚══════════════════════════════════════════════════════════════════════════╝
