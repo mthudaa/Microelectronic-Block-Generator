@@ -16,6 +16,11 @@ export PDK=gf180mcuD
 export PDKPATH=/foss/pdks/gf180mcuD
 export STD_CELL_LIBRARY=gf180mcu_fd_sc_mcu7t5v0
 
+# LLM API key (for generate_netlist_from_prompt)
+cp .env.example .env    # lalu isi DEEPSEEK_API_KEY=sk-...
+# atau:
+export DEEPSEEK_API_KEY=sk-...
+
 # Run
 jupyter notebook inverter.ipynb
 ```
