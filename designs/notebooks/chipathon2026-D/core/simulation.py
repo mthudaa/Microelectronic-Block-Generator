@@ -395,16 +395,25 @@ def run_comparator_tran(netlist_content, cell_name,
     )
 
     try:
+        with open(tb_path, "r") as f:
+            tb_content = f.read()
+    except Exception:
+        tb_content = ""
+
+    try:
         result = subprocess.run(
             ["ngspice", "-b", tb_path],
             capture_output=True, text=True, timeout=timeout, cwd=wd,
         )
     except subprocess.TimeoutExpired:
+        if not workdir:
+            import shutil
+            shutil.rmtree(wd, ignore_errors=True)
         return {
             "vout_high": None, "vout_low": None, "tdelay": None,
             "vos": None, "tran_data": [], "log": "Simulation timed out",
             "corner": corner, "temperature": temperature,
-            "llm_feedback": "CRITICAL ERROR: Simulation timed out. The circuit may have severe convergence issues or positive feedback causing infinite loops.",
+            "llm_feedback": f"CRITICAL ERROR: Simulation timed out. The circuit may have severe convergence issues or positive feedback causing infinite loops.\n\nHere is the Testbench used:\n```spice\n{tb_content}\n```",
             "finetune": True,
         }
 
@@ -413,11 +422,14 @@ def run_comparator_tran(netlist_content, cell_name,
     if result.returncode != 0:
         error_lines = [line for line in log.split("\n") if "error" in line.lower() or "warning" in line.lower() or "fatal" in line.lower()]
         error_summary = "\n".join(error_lines[:10])
+        if not workdir:
+            import shutil
+            shutil.rmtree(wd, ignore_errors=True)
         return {
             "vout_high": None, "vout_low": None, "tdelay": None,
             "vos": None, "tran_data": [], "log": log.strip(),
             "corner": corner, "temperature": temperature,
-            "llm_feedback": f"CRITICAL ERROR: Simulation failed (ngspice exit code {result.returncode}).\nThis usually means incorrect pin connections, missing models, or syntax errors.\n\nError Log snippet:\n{error_summary}\n\nPlease fix the netlist syntax or pin connections based on these errors.",
+            "llm_feedback": f"CRITICAL ERROR: Simulation failed (ngspice exit code {result.returncode}).\nThis usually means incorrect pin connections, missing models, or syntax errors.\n\nError Log snippet:\n{error_summary}\n\nHere is the Testbench used for simulation so you can check pin orders and signals:\n```spice\n{tb_content}\n```\n\nPlease fix the netlist syntax or pin connections based on these errors.",
             "finetune": True,
         }
 
