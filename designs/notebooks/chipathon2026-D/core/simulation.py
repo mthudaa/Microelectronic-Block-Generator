@@ -461,12 +461,12 @@ def run_comparator_tran(netlist_content, cell_name,
 
     functional = True
     if measure_offset:
-        if vos_val is None or abs(vos_val) > 0.02:
+        if vos_val is None or abs(vos_val) > 0.01:
             functional = False
         llm_feedback = (
             f"Offset Simulation Result ({corner.upper()}, {temperature}C, VDD={vdd}V):\n"
             f"- Input Offset Voltage (Vos): {_fmt_v(vos_val, 'V')}\n"
-            f"If Vos is N/A, the comparator failed to resolve. Check for sizing issues or topology errors."
+            f"If Vos is N/A or > 10mV, the comparator failed to resolve properly."
         )
     else:
         if tdelay_val is None or vout_high is None or vout_low is None:
@@ -599,7 +599,7 @@ def run_comparator_pvt(netlist_content, cell_name,
     functional = True
     if summary.get('tdelay_typ') is None or summary.get('tdelay_max') is None:
         functional = False
-    elif summary.get('vos') is None or abs(summary.get('vos')) > 0.02:
+    elif summary.get('vos') is None or abs(summary.get('vos')) > 0.01:
         functional = False
 
     feedback_lines = []
@@ -622,7 +622,7 @@ def run_comparator_pvt(netlist_content, cell_name,
             
     feedback_lines.append("\nContext for LLM:")
     feedback_lines.append("If any delay is 'N/A', the comparator failed in that specific PVT corner. "
-                          "If the offset is > 20mV, the design suffers from high mismatch sensitivity. "
+                          "If the offset is > 10mV, the design suffers from high mismatch sensitivity. "
                           "Please fix the circuit topology or transistor sizing based on these metrics.")
                           
     if error_logs:
