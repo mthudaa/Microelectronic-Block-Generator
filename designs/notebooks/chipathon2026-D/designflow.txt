@@ -217,34 +217,33 @@
                                  │
                                  ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│ 10. SIMULATION (PRE / POST)                                              │
+│ 10. SIMULATION & SPICE-IN-THE-LOOP FINETUNING                            │
 │  ┌──────────────────────────────────────────────────────────────────┐   │
-│  │  AC Analysis via ngspice-46                                      │   │
-│  │                                                                   │   │
-│  │  ┌─────────────────────────────────────────────────────────────┐ │   │
-│  │  │  PRE-SIM (Schematic)                                        │ │   │
-│  │  │  • run_ota_ac(netlist, cell_name, vdd, vcm, vbias, cload)   │ │   │
-│  │  │  • Strips .lib / ng= / .option scale from netlist           │ │   │
-│  │  │  • Auto-detects subcircuit pin order from .subckt line      │ │   │
-│  │  │  • Generates testbench with .control / meas block           │ │   │
-│  │  │  • Measures: DC gain (max vdb), GBW (when 0 dB),            │ │   │
-│  │  │    Phase margin (vp+180° at GBW), f_-3dB                    │ │   │
-│  │  └─────────────────────────────────────────────────────────────┘ │   │
-│  │                              │                                    │   │
-│  │                              ▼                                    │   │
-│  │  ┌─────────────────────────────────────────────────────────────┐ │   │
-│  │  │  POST-SIM (PEX)                                             │ │   │
-│  │  │  • compare_pre_post(schematic, pex_path, cell_name)         │ │   │
-│  │  │  • Converts PEX .option scale=5n → explicit µm W/L          │ │   │
-│  │  │  • Same testbench, auto-pin-mapping for PEX port order       │ │   │
-│  │  │  • Returns delta: ΔDCgain, ΔGBW, ΔPM, Δf-3dB               │ │   │
-│  │  └─────────────────────────────────────────────────────────────┘ │   │
+│  │  AC Analysis via ngspice-46 (OTA)                                │   │
+│  │  • run_ota_ac(netlist, cell_name, vdd, vcm, vbias, cload)        │   │
+│  │  • Auto-generates testbench, measures DC gain, GBW, PM, f-3dB    │   │
+│  │                                                                  │   │
+│  │  Transient & PVT Analysis (Comparator)                           │   │
+│  │  • run_comparator_tran() — Delay, VOH/VOL, Input Offset          │   │
+│  │  • run_comparator_pvt() — Tests across corners (TT,SS,FF,FS,SF)  │   │
+│  │    and temp (-40 to 125C).                                       │   │
+│  │                                                                  │   │
+│  │  LLM Finetuning (SPICE-in-the-Loop)                              │   │
+│  │  • Extracts `finetune=True` flag if circuit is non-functional    │   │
+│  │    (e.g., Vos > 10mV, no rail-to-rail swing, or crash/syntax).   │   │
+│  │  • Generates `llm_feedback` containing error logs, testbench     │   │
+│  │    context, and performance metrics to guide LLM iterations.     │   │
+│  │                                                                  │   │
+│  │  POST-SIM (PEX)                                                  │   │
+│  │  • compare_pre_post(schematic, pex_path, cell_name)              │   │
+│  │  • Compares parasitic effects against ideal pre-layout schematic │   │
 │  └──────────────────────────────────────────────────────────────────┘   │
 │                                                                          │
 │  SIMULATION return values:                                               │
 │  ┌──────────────────────────────────────────────────────────────────┐   │
-│  │  run_ota_ac()  → {dc_gain_db, gbw_hz, phase_margin_deg,          │   │
-│  │                   f_3db_hz, ac_data: [{freq,vdb,vp},...], log}    │   │
+│  │  run_ota_ac()  → {dc_gain_db, gbw_hz, phase_margin_deg, ...}      │   │
+│  │  run_comparator_tran() → {tdelay, vout_high, vout_low, vos,       │   │
+│  │                           finetune: bool, llm_feedback: str}      │   │
 │  │  compare_pre_post() → {pre: {...}, post: {...}, delta: {...}}     │   │
 │  └──────────────────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────────────────┘
@@ -291,31 +290,21 @@
 ║                      FILE STRUCTURE                                      ║
 ╠══════════════════════════════════════════════════════════════════════════╣
 ║                                                                          ║
-║  inverter.ipynb                   Main entry-point notebook (4 cells)    ║
-║  ├── Cell 0: Title                                                       ║
-║  ├── Cell 1: All imports (core.*, glayout, gdsfactory)                   ║
-║  ├── Cell 2: SPICE netlist input                                         ║
-║  └── Cell 3: Pipeline call + optional DRC/LVS/PEX demo                  ║
+║  inverter.ipynb                   Basic entry-point / usage notebook     ║
+║  llm_to_gds.ipynb                 Full NLP-to-GDS generation pipeline    ║
+║  test_comparator_loop.ipynb       LLM SPICE-in-the-loop finetune loop    ║
 ║                                                                          ║
-║  core/                           Modular library (6 files)               ║
+║  core/                           Modular library                         ║
 ║  ├── __init__.py                 Re-exports all public functions          ║
 ║  ├── utils.py                    display_gds(), display_component(),     ║
 ║  │                               clean_param(), GDS_PATH, SVG_PATH       ║
-║  ├── routing.py                  MemoryMap (collision engine)            ║
-║  │                               draw_trace(), place_via()               ║
-║  │                               find_clear_midpoint()                   ║
-║  │                               decompose_mst() (Prim's MST)            ║
-║  │                               route_I/L/Z/U (pattern routing)        ║
-║  │                               auto_router() (PathFinder NCR)          ║
-║  │                               set_pdk(), get_pdk()                    ║
+║  ├── routing.py                  MemoryMap (collision engine), NCR, MST  ║
 ║  ├── placement.py                placement() (device gen + port map)     ║
-║  │                               petakan_koneksi_net()                   ║
-║  │                               buat_daftar_koneksi()                   ║
 ║  ├── power.py                    add_power_strips()                      ║
-║  │                               add_double_guardring()                  ║
 ║  ├── pipeline.py                 spice_to_gds() (master pipeline)        ║
-║  │                               llm_to_gds() (LLM→netlist→GDS)         ║
-║  │                               generate_netlist_from_prompt()          ║
+║  │                               llm_to_gds(), generate_netlist...       ║
+║  ├── simulation.py               run_ota_ac(), run_comparator_tran(),    ║
+║  │                               run_comparator_pvt(), check_finetune    ║
 ║  └── checks.py                   run_drc(), run_lvs(), run_pex()         ║
 ║                                                                          ║
 ║  spice2net/parser.py             SPICE parsing + PDK detection            ║
