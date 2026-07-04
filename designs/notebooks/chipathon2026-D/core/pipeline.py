@@ -10,7 +10,7 @@ from glayout.util.port_utils import add_ports_perimeter
 from glayout.util.comp_utils import align_comp_to_port
 from gdsfactory.components import rectangle
 
-from spice2net import parse_netlist_with_pdk
+from core.spice_parser import parse_netlist_with_pdk
 from core.placement import placement, petakan_koneksi_net, buat_daftar_koneksi, _get_first_port
 from core.routing import auto_router, set_pdk
 from core.power import add_power_strips
@@ -85,7 +85,7 @@ STRICT RULES:
     )
 
     try:
-        with urllib.request.urlopen(req, timeout=120) as resp:
+        with urllib.request.urlopen(req, timeout=None) as resp:
             raw = resp.read()
             print(f"[LLM] Response: {len(raw)} bytes")
             result = _json.loads(raw)

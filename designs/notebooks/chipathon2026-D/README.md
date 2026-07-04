@@ -114,22 +114,28 @@ SPICE Netlist
 
 ```
 chipathon2026-D/
-├── inverter.ipynb        # Main entry-point notebook
-├── designflow.txt         # Detailed design flow documentation
-├── core/                  # Modular Python library
-│   ├── utils.py           # Display helpers, paths
-│   ├── routing.py         # PathFinder NCR auto-router
-│   ├── placement.py       # Device placement & port mapping
-│   ├── power.py           # Power strips, guard rings
-│   ├── pipeline.py        # spice_to_gds() master pipeline
-│   ├── checks.py          # run_drc(), run_lvs(), run_pex()
-│   ├── simulation.py      # run_ota_ac(), run_comparator_tran()
+├── spice_to_gds.ipynb     # Main SPICE → GDS notebook
+├── llm_to_gds.ipynb       # LLM → netlist → GDS pipeline
+├── test_comparator_loop.ipynb  # SPICE-in-the-loop finetuning
+├── designflow.txt          # Detailed design flow documentation
+├── core/                   # All-in-one Python library
+│   ├── pipeline.py         # spice_to_gds(), llm_to_gds()
+│   ├── simulation.py       # run_ota_ac(), run_comparator_tran(), run_comparator_pvt()
+│   ├── checks.py           # run_drc(), run_lvs(), run_pex()
+│   ├── placement.py        # Device placement & port mapping
+│   ├── routing.py          # PathFinder NCR auto-router
+│   ├── power.py            # Power strips, guard rings
+│   ├── spice_parser.py     # SPICE netlist parser
+│   ├── utils.py            # Display helpers, paths
 │   └── __init__.py
-├── spice2net/             # SPICE netlist parser
-├── routefinder/           # Standalone A* 3D router
-├── iic-drc.sh             # Magic/KLayout DRC script
-├── iic-lvs.sh             # netgen LVS script
-└── iic-pex.sh             # Magic PEX script
+├── scripts/                # Verification shell scripts
+│   ├── iic-drc.sh          # Magic/KLayout DRC
+│   ├── iic-lvs.sh          # netgen LVS
+│   └── iic-pex.sh          # Magic PEX
+├── outputs/                # Generated output files
+│   ├── gds/                # GDSII layout files
+│   └── reports/            # DRC reports, SVGs
+└── examples/               # Example SPICE netlists
 ```
 
 ## AI Agentic Interface

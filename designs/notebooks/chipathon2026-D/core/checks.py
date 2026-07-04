@@ -2,7 +2,7 @@ import os
 import subprocess
 import shutil
 
-SCRIPT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+SCRIPT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "scripts"))
 
 IIC_DRC = os.path.join(SCRIPT_DIR, "iic-drc.sh")
 IIC_LVS = os.path.join(SCRIPT_DIR, "iic-lvs.sh")

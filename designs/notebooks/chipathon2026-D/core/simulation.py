@@ -283,8 +283,8 @@ def run_ota_ac(netlist_content, cell_name,
 
 def _generate_comparator_testbench(netlist_content, cell_name, workdir,
                                    vdd=1.8, vss=0.0, vcm=0.9,
-                                   clk_period=20e-9, clk_rise=0.1e-9,
-                                   tstop=50e-9, tstep=10e-12,
+                                   clk_period=1e-6, clk_rise=0.1e-9,
+                                   tstop=5e-6, tstep=100e-12,
                                    measure_offset=False,
                                    corner="typical", temperature=None):
     cleaned = _sanitize_netlist(netlist_content)
@@ -302,7 +302,7 @@ def _generate_comparator_testbench(netlist_content, cell_name, workdir,
     xcmp_line = f"Xcmp n_vin_p n_vin_n n_clk n_vout_p n_vout_n n_vdd n_vss {cell_name}"
 
     if measure_offset:
-        ramp_end = tstop * 0.7
+        ramp_end = tstop * 0.9
         vin_p_line = f"Vin_p n_vin_p 0 PWL(0 {{VCM-0.05}}  {ramp_end:.2e} {{VCM+0.05}})"
         meas_block = f"""meas tran VOUT_H max v(n_vout_p)
 meas tran VOUT_L min v(n_vout_p)
@@ -368,7 +368,7 @@ wrdata {workdir}/{cell_name}_tran.dat v(n_clk) v(n_vin_p) v(n_vin_n) v(n_vout_p)
 
 def run_comparator_tran(netlist_content, cell_name,
                         vdd=1.8, vcm=0.9, vdelta=0.01,
-                        clk_period=20e-9, tstop=50e-9,
+                        clk_period=1e-6, tstop=5e-6,
                         measure_offset=False,
                         corner="typical", temperature=None,
                         workdir=None, timeout=120):
@@ -461,7 +461,7 @@ def run_comparator_tran(netlist_content, cell_name,
 
     functional = True
     if measure_offset:
-        if vos_val is None or abs(vos_val) > 0.01:
+        if vos_val is None or abs(vos_val) > 0.001:
             functional = False
         llm_feedback = (
             f"Offset Simulation Result ({corner.upper()}, {temperature}C, VDD={vdd}V):\n"
@@ -530,7 +530,7 @@ def _compute_offset(tran_data, vdd):
 
 def run_comparator_pvt(netlist_content, cell_name,
                        vdd=1.8, vcm=0.9,
-                       clk_period=20e-9, tstop=50e-9,
+                       clk_period=1e-6, tstop=5e-6,
                        workdir=None, timeout=120):
     """Run comparator across PVT corners: delay + offset per corner.
 
@@ -771,8 +771,8 @@ def compare_comp_pre_post(schematic_netlist, pex_path, cell_name, **kwargs):
 
     vcm = kwargs.pop("vcm", 0.9)
     vdd = kwargs.pop("vdd", 1.8)
-    clk_period = kwargs.pop("clk_period", 20e-9)
-    tstop = kwargs.pop("tstop", 50e-9)
+    clk_period = kwargs.pop("clk_period", 1e-6)
+    tstop = kwargs.pop("tstop", 5e-6)
 
     pre = run_comparator_tran(schematic_netlist, cell_name,
                               vdd=vdd, vcm=vcm,

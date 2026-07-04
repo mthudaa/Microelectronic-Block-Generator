@@ -3,7 +3,7 @@ from gdsfactory import Component
 from gdsfactory import port
 import gdsfactory as gf
 from glayout import nmos, pmos
-from spice2net import matrix_port_init
+from core.spice_parser import matrix_port_init
 from core.utils import clean_param
 
 

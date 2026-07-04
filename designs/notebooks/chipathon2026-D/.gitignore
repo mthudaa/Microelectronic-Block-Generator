@@ -1,1 +1,12 @@
 deepseek-4/
+.venv/
+dataset/
+outputs/gds/*
+outputs/reports/*
+outputs/pex/*
+*.gds
+*.gds.svg
+*.magic.drc.rpt
+.env
+__pycache__/
+*.pyc

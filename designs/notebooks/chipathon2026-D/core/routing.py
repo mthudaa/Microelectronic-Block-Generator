@@ -479,16 +479,18 @@ def auto_router(component, connection_goals):
                     w_ports = [p for p, _ in opts if p.orientation == 180]
                     if n_ports and s_ports:
                         pn, ps = n_ports[0], s_ports[0]
-                        mx, my = (pn.center[0] + ps.center[0]) / 2, (pn.center[1] + ps.center[1]) / 2
-                        mid_port = gf.Port(name=f"{pn.name}_midNS", center=(mx, my),
-                                           width=ps.width, orientation=0, layer=pn.layer)
-                        result.insert(0, (mid_port, 0))
+                        for frac in (0.25, 0.50, 0.75):
+                            mx, my = (pn.center[0] + ps.center[0]) / 2, pn.center[1] * (1 - frac) + ps.center[1] * frac
+                            mid_port = gf.Port(name=f"{pn.name}_midNS{frac:.2f}", center=(mx, my),
+                                               width=ps.width, orientation=0, layer=pn.layer)
+                            result.insert(0, (mid_port, 0))
                     if e_ports and w_ports:
                         pe, pw = e_ports[0], w_ports[0]
-                        mx, my = (pe.center[0] + pw.center[0]) / 2, (pe.center[1] + pw.center[1]) / 2
-                        mid_port = gf.Port(name=f"{pe.name}_midEW", center=(mx, my),
-                                           width=pw.width, orientation=90, layer=pe.layer)
-                        result.insert(0, (mid_port, 0))
+                        for frac in (0.25, 0.50, 0.75):
+                            mx, my = pe.center[0] * (1 - frac) + pw.center[0] * frac, (pe.center[1] + pw.center[1]) / 2
+                            mid_port = gf.Port(name=f"{pe.name}_midEW{frac:.2f}", center=(mx, my),
+                                               width=pw.width, orientation=90, layer=pe.layer)
+                            result.insert(0, (mid_port, 0))
                     return result
 
                 p1_opts_mid = _add_midpoint_ports(p1_opts)

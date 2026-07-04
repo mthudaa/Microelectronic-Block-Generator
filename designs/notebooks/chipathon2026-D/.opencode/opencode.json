@@ -1,0 +1,24 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": ["README.md", "designflow.txt"],
+  "permission": {
+    "edit": "allow",
+    "bash": {
+      "ngspice *": "allow",
+      "magic *": "allow",
+      "netgen *": "allow",
+      "python *": "allow",
+      "pip *": "ask",
+      "rm *": "ask",
+      "*": "allow"
+    },
+    "external_directory": {
+      "/foss/**": "allow",
+      "/home/huda/.volare/**": "allow",
+      "/tmp/**": "allow"
+    }
+  },
+  "skills": {
+    "paths": [".opencode/skills"]
+  }
+}
