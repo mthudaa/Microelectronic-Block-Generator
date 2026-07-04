@@ -13,4 +13,5 @@ from core.placement import (
 from core.power import add_power_strips, add_double_guardring
 from core.pipeline import spice_to_gds, llm_to_gds, generate_netlist_from_prompt
 from core.checks import run_drc, run_lvs, run_pex
-from core.simulation import run_ota_ac, run_comparator_tran, compare_pre_post, compare_comp_pre_post
+from core.simulation import (run_ota_ac, run_comparator_tran, run_comparator_pvt,
+                             compare_pre_post, compare_comp_pre_post)

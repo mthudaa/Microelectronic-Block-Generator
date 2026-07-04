@@ -3,7 +3,11 @@ import re
 import subprocess
 import tempfile
 
-_MODEL_PATH = "/foss/pdks/gf180mcuD/libs.tech/ngspice/sm141064.ngspice"
+_MODEL_PATH = os.path.join(
+    os.environ.get("PDK_ROOT", os.path.expanduser("~/.volare")),
+    os.environ.get("PDK", "gf180mcuD"),
+    "libs.tech", "ngspice", "sm141064.ngspice",
+)
 
 
 def _parse_subckt_pins(netlist_content, cell_name):
@@ -242,6 +246,14 @@ def run_ota_ac(netlist_content, cell_name,
         }
 
     log = result.stdout + "\n" + result.stderr
+
+    if result.returncode != 0:
+        return {
+            "dc_gain_db": None, "gbw_hz": None, "phase_margin_deg": None,
+            "f_3db_hz": None, "ac_data": [], "log": log.strip(),
+            "tb_path": tb_path,
+        }
+
     parsed = _parse_meas(log)
 
     ac_data = []
@@ -273,7 +285,8 @@ def _generate_comparator_testbench(netlist_content, cell_name, workdir,
                                    vdd=1.8, vss=0.0, vcm=0.9,
                                    clk_period=20e-9, clk_rise=0.1e-9,
                                    tstop=50e-9, tstep=10e-12,
-                                   measure_offset=False):
+                                   measure_offset=False,
+                                   corner="typical", temperature=None):
     cleaned = _sanitize_netlist(netlist_content)
     cleaned = _normalise_subckt(cleaned, cell_name, _COMP_PINS)
     cleaned = _fix_pex_pin_connections(cleaned, cell_name, _COMP_PINS)
@@ -306,11 +319,14 @@ echo MEAS_START
 print VOUT_H VOUT_L TDELAY
 echo MEAS_END"""
 
+    temp_line = f".temp {temperature}" if temperature is not None else ""
+
     tb = f"""
 * Comparator Transient Testbench — {cell_name}
 .param fnoicor=0 sw_stat_global=0 sw_stat_mismatch=0
-.lib "{_MODEL_PATH}" typical
+.lib "{_MODEL_PATH}" {corner}
 .include "{dut_path}"
+{temp_line}
 
 .param VDD_VAL={vdd}
 .param VCM={vcm}
@@ -354,12 +370,15 @@ def run_comparator_tran(netlist_content, cell_name,
                         vdd=1.8, vcm=0.9, vdelta=0.01,
                         clk_period=20e-9, tstop=50e-9,
                         measure_offset=False,
+                        corner="typical", temperature=None,
                         workdir=None, timeout=120):
     """Run comparator transient simulation via ngspice.
 
     Args:
         measure_offset: If True, use slow ramp on vin_p to measure
             input offset. Returns 'vos' in result dict.
+        corner: 'typical', 'slow', or 'fast'
+        temperature: Celsius (e.g. -40, 25, 125), or None
 
     Returns dict with: vout_high, vout_low, tdelay, vos (if offset mode),
     tran_data (list of {time, clk, vin_p, vin_n, vout_p, vout_n}), log.
@@ -372,6 +391,7 @@ def run_comparator_tran(netlist_content, cell_name,
         vdd=vdd, vss=0.0, vcm=vcm,
         clk_period=clk_period, tstop=tstop,
         measure_offset=measure_offset,
+        corner=corner, temperature=temperature,
     )
 
     try:
@@ -383,9 +403,24 @@ def run_comparator_tran(netlist_content, cell_name,
         return {
             "vout_high": None, "vout_low": None, "tdelay": None,
             "vos": None, "tran_data": [], "log": "Simulation timed out",
+            "corner": corner, "temperature": temperature,
+            "llm_feedback": "CRITICAL ERROR: Simulation timed out. The circuit may have severe convergence issues or positive feedback causing infinite loops.",
+            "finetune": True,
         }
 
     log = result.stdout + "\n" + result.stderr
+
+    if result.returncode != 0:
+        error_lines = [line for line in log.split("\n") if "error" in line.lower() or "warning" in line.lower() or "fatal" in line.lower()]
+        error_summary = "\n".join(error_lines[:10])
+        return {
+            "vout_high": None, "vout_low": None, "tdelay": None,
+            "vos": None, "tran_data": [], "log": log.strip(),
+            "corner": corner, "temperature": temperature,
+            "llm_feedback": f"CRITICAL ERROR: Simulation failed (ngspice exit code {result.returncode}).\nThis usually means incorrect pin connections, missing models, or syntax errors.\n\nError Log snippet:\n{error_summary}\n\nPlease fix the netlist syntax or pin connections based on these errors.",
+            "finetune": True,
+        }
+
     parsed = _parse_tran_meas(log)
 
     tran_data = []
@@ -409,6 +444,32 @@ def run_comparator_tran(netlist_content, cell_name,
         vout_low  = min(pt["vout_p"] for pt in tran_data)
         tdelay_val = _compute_tdelay(tran_data, vdd)
 
+    def _fmt_v(v, unit=""):
+        return f"{v:.3g} {unit}" if v is not None else "N/A"
+
+    functional = True
+    if measure_offset:
+        if vos_val is None or abs(vos_val) > 0.02:
+            functional = False
+        llm_feedback = (
+            f"Offset Simulation Result ({corner.upper()}, {temperature}C, VDD={vdd}V):\n"
+            f"- Input Offset Voltage (Vos): {_fmt_v(vos_val, 'V')}\n"
+            f"If Vos is N/A, the comparator failed to resolve. Check for sizing issues or topology errors."
+        )
+    else:
+        if tdelay_val is None or vout_high is None or vout_low is None:
+            functional = False
+        elif vout_high < vdd * 0.8 or vout_low > vdd * 0.2:
+            functional = False
+            
+        llm_feedback = (
+            f"Delay Simulation Result ({corner.upper()}, {temperature}C, VDD={vdd}V):\n"
+            f"- Propagation Delay: {_fmt_v(tdelay_val or parsed.get('tdelay'), 's')}\n"
+            f"- Output High Voltage (VOH): {_fmt_v(vout_high, 'V')}\n"
+            f"- Output Low Voltage (VOL): {_fmt_v(vout_low, 'V')}\n"
+            f"If Delay is N/A or VOH/VOL do not swing rail-to-rail, the comparator is non-functional."
+        )
+
     return {
         "vout_high": vout_high,
         "vout_low": vout_low,
@@ -416,32 +477,158 @@ def run_comparator_tran(netlist_content, cell_name,
         "vos": vos_val,
         "tran_data": tran_data,
         "log": log.strip(),
+        "corner": corner,
+        "temperature": temperature,
+        "llm_feedback": llm_feedback,
+        "finetune": not functional,
     }
 
 
 def _compute_tdelay(tran_data, vdd):
     vth = vdd / 2
-    trig_time = None
-    for pt in tran_data:
-        if pt["clk"] > vth:
-            trig_time = pt["time"]
-            break
-    if trig_time is None:
-        return None
-    for pt in tran_data:
-        if pt["time"] > trig_time and pt["vout_p"] < vth:
-            return pt["time"] - trig_time
+    # Find the clock cycle where vout_p crosses vth (either up or down)
+    for i in range(1, len(tran_data)):
+        prev = tran_data[i-1]
+        curr = tran_data[i]
+        
+        # Check if vout_p crossed vth
+        if (prev["vout_p"] <= vth < curr["vout_p"]) or (prev["vout_p"] > vth >= curr["vout_p"]):
+            cross_time = curr["time"]
+            # Look back to find the most recent clock rising edge
+            for j in range(i, 0, -1):
+                if tran_data[j-1]["clk"] <= vth < tran_data[j]["clk"]:
+                    return cross_time - tran_data[j]["time"]
     return None
 
 
 def _compute_offset(tran_data, vdd):
     vth = vdd / 2
+    if not tran_data:
+        return None
     for i in range(1, len(tran_data)):
         prev = tran_data[i - 1]
         curr = tran_data[i]
-        if prev["vout_p"] > vth and curr["vout_p"] <= vth:
+        # Look for vout_p crossing vth (either upwards or downwards)
+        if (prev["vout_p"] <= vth < curr["vout_p"]) or (prev["vout_p"] > vth >= curr["vout_p"]):
+            # Depending on if it's the reset edge or the evaluate edge,
+            # we just return the diff of inputs. The slow ramp ensures vin_p - vin_n is the offset.
             return curr["vin_p"] - curr["vin_n"]
     return None
+
+
+def run_comparator_pvt(netlist_content, cell_name,
+                       vdd=1.8, vcm=0.9,
+                       clk_period=20e-9, tstop=50e-9,
+                       workdir=None, timeout=120):
+    """Run comparator across PVT corners: delay + offset per corner.
+
+    PVT matrix: 3 process × 3 temperature × 2 voltage = up to 18 corners.
+    Default runs 5 key corners (TT/SS/FF × min/max temp × VDD±10%).
+
+    Returns dict with:
+        corners: [{corner, temp, vdd, tdelay, vos, vout_high, vout_low, log}, ...]
+        summary: {tdelay_min, tdelay_max, tdelay_typ, vos_min, vos_max, vos_typ}
+    """
+    _PVT_CORNERS = [
+        ("typical", 25,  1.0, "TT, 25°C, 1.80V"),
+        ("ss",      125, 0.9, "SS, 125°C, 1.62V"),
+        ("ss",      -40, 0.9, "SS, -40°C, 1.62V"),
+        ("ff",      -40, 1.1, "FF, -40°C, 1.98V"),
+        ("ff",      125, 1.1, "FF, 125°C, 1.98V"),
+        ("sf",      25,  1.0, "SF, 25°C, 1.80V"),
+        ("fs",      25,  1.0, "FS, 25°C, 1.80V"),
+    ]
+
+    corners_results = []
+    for corner, temp, vscale, desc in _PVT_CORNERS:
+        vdd_scaled = round(vdd * vscale, 3)
+        print(f"  [PVT] {desc} ...")
+
+        res = run_comparator_tran(
+            netlist_content, cell_name,
+            vdd=vdd_scaled, vcm=vcm,
+            clk_period=clk_period, tstop=tstop,
+            measure_offset=False,
+            corner=corner, temperature=temp,
+            workdir=workdir, timeout=timeout,
+        )
+        corners_results.append({
+            "description": desc,
+            "corner": corner,
+            "temperature": temp,
+            "vdd": vdd_scaled,
+            "tdelay": res.get("tdelay"),
+            "vout_high": res.get("vout_high"),
+            "vout_low": res.get("vout_low"),
+            "log": res.get("log", ""),
+        })
+
+    print(f"  [PVT] Offset measurement (TT, 25°C, 1.80V)...")
+    offset_res = run_comparator_tran(
+        netlist_content, cell_name,
+        vdd=vdd, vcm=vcm,
+        clk_period=clk_period, tstop=tstop * 2,
+        measure_offset=True,
+        corner="typical", temperature=25,
+        workdir=workdir, timeout=timeout,
+    )
+
+    delays = [c["tdelay"] for c in corners_results if c["tdelay"] is not None]
+    summary = {
+        "tdelay_typ": delays[0] if len(delays) > 0 else None,
+        "tdelay_min": min(delays) if delays else None,
+        "tdelay_max": max(delays) if delays else None,
+        "vos": offset_res.get("vos"),
+    }
+
+    def _fmt_v(v, unit=""):
+        return f"{v:.3g} {unit}" if v is not None else "N/A"
+
+    functional = True
+    if summary.get('tdelay_typ') is None or summary.get('tdelay_max') is None:
+        functional = False
+    elif summary.get('vos') is None or abs(summary.get('vos')) > 0.02:
+        functional = False
+
+    feedback_lines = []
+    feedback_lines.append(f"PVT Simulation Summary (Temperature: -40C to 125C, VDD: {vdd*0.9:.2f}V to {vdd*1.1:.2f}V):")
+    feedback_lines.append(f"- Min Propagation Delay: {_fmt_v(summary.get('tdelay_min'), 's')}")
+    feedback_lines.append(f"- Max Propagation Delay: {_fmt_v(summary.get('tdelay_max'), 's')}")
+    feedback_lines.append(f"- Typical Delay: {_fmt_v(summary.get('tdelay_typ'), 's')}")
+    feedback_lines.append(f"- Input Offset Voltage: {_fmt_v(summary.get('vos'), 'V')}")
+    
+    feedback_lines.append("\nDetailed Corners (TT, SS, FF, SF, FS):")
+    error_logs = []
+    for c in corners_results:
+        td = _fmt_v(c.get('tdelay'), 's')
+        feedback_lines.append(f"  {c['description']:<25} ({c['temperature']:>3}C, {c['vdd']:.2f}V) -> Delay: {td}")
+        if c.get('tdelay') is None:
+            functional = False
+        if c.get("log") and ("error" in c.get("log").lower() or "fatal" in c.get("log").lower()):
+            if c.get("log") not in error_logs:
+                error_logs.append(c.get("log"))
+            
+    feedback_lines.append("\nContext for LLM:")
+    feedback_lines.append("If any delay is 'N/A', the comparator failed in that specific PVT corner. "
+                          "If the offset is > 20mV, the design suffers from high mismatch sensitivity. "
+                          "Please fix the circuit topology or transistor sizing based on these metrics.")
+                          
+    if error_logs:
+        feedback_lines.append("\nCRITICAL ERRORS DETECTED IN SIMULATION:")
+        # Just grab the first unique error log to avoid spamming the LLM
+        err_lines = [line for line in error_logs[0].split("\n") if "error" in line.lower() or "warning" in line.lower() or "fatal" in line.lower()]
+        feedback_lines.append("\n".join(err_lines[:15]))
+        feedback_lines.append("Please fix the SPICE netlist syntax, pin connections, or models to resolve the above errors.")
+    
+    llm_feedback = "\n".join(feedback_lines)
+
+    return {
+        "corners": corners_results, 
+        "offset": offset_res, 
+        "summary": summary,
+        "llm_feedback": llm_feedback,
+        "finetune": not functional,
+    }
 
 
 def _parse_tran_meas(log):

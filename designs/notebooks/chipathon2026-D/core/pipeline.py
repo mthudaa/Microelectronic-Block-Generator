@@ -32,9 +32,10 @@ def _load_api_key():
     return None
 
 
-def generate_netlist_from_prompt(user_prompt, model="deepseek-chat",
+def generate_netlist_from_prompt(user_prompt, model="deepseek-v4-flash",
                                  api_key=None,
-                                 api_url="https://api.deepseek.com/v1/chat/completions"):
+                                 api_url="https://api.deepseek.com/v1/chat/completions",
+                                 llm_feedback=None):
     api_key = api_key or _load_api_key()
     if not api_key:
         raise RuntimeError(
@@ -55,12 +56,20 @@ STRICT RULES:
 8. Choose net names that reflect circuit function (e.g., n1, n2 for internal, vin/vout for I/O).
 9. Keep W between 1u and 50u. Keep L=1u for analog. Use ng=1 (no multi-finger)."""
 
+    messages = [
+        {"role": "system", "content": context},
+        {"role": "user", "content": user_prompt}
+    ]
+    
+    if llm_feedback:
+        messages.append({
+            "role": "user", 
+            "content": f"Here is the feedback from the previous simulation:\n{llm_feedback}\n\nPlease revise and output the new corrected SPICE netlist based on this feedback."
+        })
+
     payload = _json.dumps({
         "model": model,
-        "messages": [
-            {"role": "system", "content": context},
-            {"role": "user", "content": user_prompt}
-        ],
+        "messages": messages,
         "temperature": 0.1,
         "max_tokens": 2000,
         "stream": False
@@ -246,7 +255,7 @@ def _run_post_processing(top_level, gds_path, netlist_input, pdk_name):
         os.environ.setdefault("PDK", "sky130A")
         os.environ.setdefault("STD_CELL_LIBRARY", "sky130_fd_sc_hd")
 
-    os.environ.setdefault("PDK_ROOT", "/foss/pdks")
+    os.environ.setdefault("PDK_ROOT", os.path.expanduser("~/.volare"))
     os.environ.setdefault("PDKPATH", f"{os.environ['PDK_ROOT']}/{os.environ['PDK']}")
 
     print("=" * 60)
@@ -293,7 +302,7 @@ def _run_post_processing(top_level, gds_path, netlist_input, pdk_name):
         print(f"[CHECKS] PEX skipped: {e}")
 
 
-def llm_to_gds(user_prompt, model="deepseek-chat",
+def llm_to_gds(user_prompt, model="deepseek-v4-flash",
                api_key=None,
                mode="analog"):
     print(f"[LLM] Generating netlist for: {user_prompt[:80]}...")
