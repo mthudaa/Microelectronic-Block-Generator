@@ -15,6 +15,16 @@ This project is developed by a 3-person team with the following module breakdown
 - **Ahmad Jabar Ilmi (Physical Verification & Automation Engineer)**: Manages the automated integration system for DRC, LVS, PEX, and environment setup. Main modules: `checks.py`, `utils.py`, and all bash scripts in `scripts/`.
 - **Moh. Jabir Mubarok (AI/LLM Integration & Software Architect)**: Integrates the AI model (DeepSeek) into the pipeline and performs prompt engineering to ensure stable SPICE netlist generation. Main modules: `pipeline.py`, and the `llm_to_gds.ipynb` notebook.
 
+## Git Workflow & Contribution
+
+> [!IMPORTANT]
+> **Branching is Mandatory:** Do not push directly to the `main` branch. 
+> 
+> If you are developing a new feature, fixing a bug, or doing an AI experiment:
+> 1. Create a new branch first (e.g., `git checkout -b feature/huda-ota-layout` or `fix/jabir-prompt-error`).
+> 2. Commit your changes and ensure they are tested and working correctly.
+> 3. Create a **Pull Request (PR)** for review before merging into `main`.
+
 ## Quick Start
 
 ```bash
