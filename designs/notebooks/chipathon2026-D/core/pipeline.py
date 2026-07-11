@@ -1,3 +1,8 @@
+"""
+@Owner: Moh. Jabir Mubarok (AI/LLM Integration & Software Architect)
+@Role: AI/LLM & Backend Engineer
+@Responsibility: End-to-end pipeline (llm_to_gds), prompt engineering, and LLM API integration (DeepSeek) for spec-to-netlist conversion.
+"""
 import os
 import urllib.request
 import json as _json

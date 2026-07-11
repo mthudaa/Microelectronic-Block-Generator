@@ -7,6 +7,14 @@ Converts SPICE subcircuit netlists to DRC-clean GDSII layout using
 Supports AC/transient simulation, DRC/LVS/PEX verification, and
 pre/post-layout comparison.
 
+## Team Roles & Ownership
+
+This project is developed by a 3-person team with the following module breakdown:
+
+- **Huda (Lead Analog / Mixed-Signal Designer)**: Responsible for the logic and structure of the analog layout, power strips, routing, and pre/post-layout simulation. Main modules: `placement.py`, `routing.py`, `power.py`, `simulation.py`, `spice_parser.py`.
+- **Ahmad Jabar Ilmi (Physical Verification & Automation Engineer)**: Manages the automated integration system for DRC, LVS, PEX, and environment setup. Main modules: `checks.py`, `utils.py`, and all bash scripts in `scripts/`.
+- **Moh. Jabir Mubarok (AI/LLM Integration & Software Architect)**: Integrates the AI model (DeepSeek) into the pipeline and performs prompt engineering to ensure stable SPICE netlist generation. Main modules: `pipeline.py`, and the `llm_to_gds.ipynb` notebook.
+
 ## Quick Start
 
 ```bash

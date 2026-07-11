@@ -1,3 +1,8 @@
+"""
+@Owner: Huda (Lead Analog / Mixed-Signal Designer)
+@Role: Analog Layout Strategist
+@Responsibility: Pre-layout and post-layout simulation module (ngspice) to verify specifications (Gain, GBW, PM, Offset).
+"""
 import os
 import re
 import subprocess

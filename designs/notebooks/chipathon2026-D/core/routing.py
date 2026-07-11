@@ -1,3 +1,8 @@
+"""
+@Owner: Huda (Lead Analog / Mixed-Signal Designer)
+@Role: Analog Layout Strategist
+@Responsibility: Auto-routing algorithm (PathFinder NCR) and optimal net connections with parasitic considerations.
+"""
 import math
 from glayout import via_stack
 import gdsfactory as gf

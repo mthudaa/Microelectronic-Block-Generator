@@ -1,3 +1,8 @@
+"""
+@Owner: Huda (Lead Analog / Mixed-Signal Designer)
+@Role: Analog Layout Strategist
+@Responsibility: Component placement logic for GDSII layout to meet analog design principles (matching, symmetry).
+"""
 from collections import defaultdict
 from gdsfactory import Component
 from gdsfactory import port

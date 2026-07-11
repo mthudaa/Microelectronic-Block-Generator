@@ -1,3 +1,8 @@
+"""
+@Owner: Huda (Lead Analog / Mixed-Signal Designer)
+@Role: Analog Layout Strategist
+@Responsibility: Parsing SPICE netlists into a data structure understood by the layout generator.
+"""
 import re
 import json
 from collections import defaultdict

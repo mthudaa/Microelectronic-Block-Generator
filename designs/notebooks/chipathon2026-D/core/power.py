@@ -1,3 +1,8 @@
+"""
+@Owner: Huda (Lead Analog / Mixed-Signal Designer)
+@Role: Analog Layout Strategist
+@Responsibility: Generation of power strips (VDD/VSS) and guard rings to minimize noise in analog circuits.
+"""
 from glayout import via_stack, tapring
 
 

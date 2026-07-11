@@ -1,3 +1,8 @@
+"""
+@Owner: Ahmad Jabar Ilmi (Physical Verification & Automation Engineer)
+@Role: Physical Verification Engineer
+@Responsibility: Python wrapper for executing DRC, LVS, and PEX using Magic and netgen.
+"""
 import os
 import subprocess
 import shutil

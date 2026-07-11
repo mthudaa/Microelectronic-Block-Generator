@@ -1,3 +1,8 @@
+"""
+@Owner: Ahmad Jabar Ilmi (Physical Verification & Automation Engineer)
+@Role: Automation & Integration Engineer
+@Responsibility: Utility functions, path management, environment setup, and helper scripts.
+"""
 import os
 import IPython.display
 import svgutils.transform as sg
