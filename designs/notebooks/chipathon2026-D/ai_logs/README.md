@@ -9,6 +9,10 @@ Since our team members use different LLM providers, maintaining a synchronized r
 3. **Troubleshooting:** If an AI agent introduces a bug or a subtle design flaw, the conversation history can help trace the root cause and the AI's reasoning.
 
 ## File Naming Convention
+
+> [!IMPORTANT]
+> **REMINDER:** All files in this directory **MUST** follow the standardized naming convention below. If you migrate or upload an old log (e.g., `2026-18.06.md`), please rename it immediately to match the format.
+
 Please save your conversation logs as Markdown (`.md`), text (`.txt`), or JSON files using the following naming convention:
 `YYYY-MM-DD_[TeamMember]_[Task-or-Module]_[LLM-Provider].md`
 
