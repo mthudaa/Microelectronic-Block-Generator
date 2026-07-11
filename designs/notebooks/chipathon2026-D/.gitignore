@@ -10,3 +10,7 @@ outputs/pex/*
 .env
 __pycache__/
 *.pyc
+
+# AI Logs & Datasets
+ai_logs/*
+!ai_logs/README.md
