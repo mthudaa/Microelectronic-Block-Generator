@@ -4,7 +4,6 @@
 @Responsibility: Parsing SPICE netlists into a data structure understood by the layout generator.
 """
 import re
-import json
 from collections import defaultdict
 from gdsfactory import port
 
@@ -51,8 +50,9 @@ def parse_netlist_with_pdk(file_content, manual_pdk="Tidak Terdeteksi", mode="an
         parts = line_str.split()
         device_name = parts[0]
         device_type = device_name[0].upper()
+        device_type_linear_dev = device_name.upper()[:2]  # Untuk menangani XC and XR (MIM Capacitor dan Resistor)
         
-        params = {"w": "-", "l": "-", "m": "-", "ng": "-"}
+        params = {"w": "-", "l": "-", "m": "-", "ng": "-", "c_width": "-", "c_length": "-", "r_width": "-", "r_length": "-"}
         param_dict = None
         model_name = "-"
         nodes_dict = {}
@@ -68,9 +68,9 @@ def parse_netlist_with_pdk(file_content, manual_pdk="Tidak Terdeteksi", mode="an
             if len(parts) > 5:
                 model_name = parts[5]
             remaining = " ".join(parts[6:])
-            
-        # R, C, L, dll
-        elif device_type in ['R', 'C', 'L', 'V', 'I', 'D']: 
+
+        # CAPACITOR MIM (XC)
+        elif device_type_linear_dev == 'XC':
             pre_params = []
             param_start_idx = len(parts)
             for i, p in enumerate(parts[1:], 1):
@@ -78,7 +78,7 @@ def parse_netlist_with_pdk(file_content, manual_pdk="Tidak Terdeteksi", mode="an
                     param_start_idx = i
                     break
                 pre_params.append(p)
-            
+
             remaining = " ".join(parts[param_start_idx:])
             
             if len(pre_params) > 0:
@@ -92,7 +92,31 @@ def parse_netlist_with_pdk(file_content, manual_pdk="Tidak Terdeteksi", mode="an
                 "n": raw_nodes[1] if len(raw_nodes) > 1 else "-",
                 "body": raw_nodes[2] if len(raw_nodes) > 2 else "-"
             }
+
+        # RESISTOR (XR)
+        elif device_type_linear_dev == 'XR':
+            pre_params = []
+            param_start_idx = len(parts)
+            for i, p in enumerate(parts[1:], 1):
+                if '=' in p:
+                    param_start_idx = i
+                    break
+                pre_params.append(p)
+
+            remaining = " ".join(parts[param_start_idx:])
             
+            if len(pre_params) > 0:
+                model_name = pre_params[-1]
+                raw_nodes = pre_params[:-1]
+            else:
+                raw_nodes = []
+                
+            nodes_dict = {
+                "p": raw_nodes[0] if len(raw_nodes) > 0 else "-",
+                "n": raw_nodes[1] if len(raw_nodes) > 1 else "-",
+                "body": raw_nodes[2] if len(raw_nodes) > 2 else "-"
+            }
+
         # SUBCIRCUIT (X)
         elif device_type == 'X': 
             nodes_and_name = [p for p in parts[1:] if '=' not in p]
@@ -119,6 +143,10 @@ def parse_netlist_with_pdk(file_content, manual_pdk="Tidak Terdeteksi", mode="an
 
             if device_type == 'M':
                 param_dict = { "w": params['w'], "l": params['l'], "m": params['m'], "ng": params['ng'] }
+            elif device_type_linear_dev == 'XC':
+                param_dict = { "c_width": params['c_width'], "c_length": params['c_length'] }
+            elif device_type_linear_dev == 'XR':
+                param_dict = { "r_width": params['r_width'], "r_length": params['r_length'] }
             else:
                 param_dict = { "w": params['w'], "l": params['l'], "m": params['m'] }
             
