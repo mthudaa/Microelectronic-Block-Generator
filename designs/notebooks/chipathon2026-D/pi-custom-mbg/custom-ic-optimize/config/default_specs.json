@@ -1,0 +1,8 @@
+{
+  "dc_gain_db": {"target": 70, "min": 60},
+  "gbw_mhz": {"target": 5, "min": 1},
+  "phase_margin_deg": {"target": 60, "min": 45},
+  "power_mw": {"max": 0.5},
+  "output_swing_v": {"min": 1.0},
+  "slew_rate_v_us": {"min": 0.5}
+}

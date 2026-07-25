@@ -10,3 +10,4 @@ outputs/pex/*
 .env
 __pycache__/
 *.pyc
+gf180mcuD/

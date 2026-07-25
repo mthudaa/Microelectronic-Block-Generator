@@ -1,12 +1,14 @@
 ---
 name: ic-verify
-description: Runs DRC, LVS, and PEX verification for GDSII layouts using Magic/netgen. Use when the user asks to "run DRC", "check LVS", "extract parasitics", "verify layout", "run pex", or wants post-layout verification. Supports gf180mcuD and sky130 PDKs via iic-drc.sh, iic-lvs.sh, iic-pex.sh shell scripts.
+description: >
+  Runs DRC, LVS, and PEX verification for GDSII layouts using Magic/netgen.
+  Auto-fixes port order in extracted layout netlists so LVS passes without
+  manual intervention. Use when user asks to "run DRC", "check LVS",
+  "extract parasitics", "verify layout", "run pex", or wants post-layout
+  verification. Supports gf180mcuD and sky130 PDKs.
 ---
 
 # IC Layout Verification (DRC/LVS/PEX)
-
-Run Design Rule Check (DRC), Layout-vs-Schematic (LVS), and Parasitic
-Extraction (PEX) on GDSII layouts using Magic VLSI and netgen.
 
 ## Prerequisites
 
@@ -17,97 +19,148 @@ export PDKPATH=/home/huda/.volare/gf180mcuD
 export STD_CELL_LIBRARY=gf180mcu_fd_sc_mcu7t5v0
 ```
 
-Magic and netgen must be installed and in PATH.
+Magic and netgen must be in PATH.
 
-## Quick start
+## Quick Start
 
 ```python
 import sys, os
-sys.path.insert(0, os.path.dirname(os.path.abspath(".")))
-from core import run_drc, run_lvs, run_pex
+sys.path.insert(0, "/foss/designs/chipathon2026-D")
+from core import run_drc, run_lvs, run_pex, extract_layout_netlist
 
-# DRC (Magic engine)
-drc = run_drc("out.gds", cell_name="comp_strongarm")
-print("DRC clean:", drc["clean"])
+# DRC
+drc = run_drc("out.gds", cell_name="opa_tuned3")
+print(drc["summary"])   # "DRC: CLEAN" or "DRC: N ERRORS"
 
-# LVS (compare layout vs schematic)
-lvs = run_lvs("out.gds", netlist_content=netlist, cell_name="comp_strongarm")
-print("LVS match:", lvs["match"])
+# LVS (auto-fixes port order)
+lvs = run_lvs("out.gds", netlist_content=netlist, cell_name="opa_tuned3")
+print(lvs["summary"]["message"])  # "LVS OK" or "LVS MISMATCH"
+if not lvs["match"]:
+    print("Port swaps:", lvs["summary"]["port_swaps"])
+    print("Missing:", lvs["summary"]["missing_devices"])
 
-# PEX (mode 2 = C-coupled parasitics)
-pex = run_pex("out.gds", cell_name="comp_strongarm", mode=2)
-print("PEX output:", pex["pex_path"])
+# PEX
+pex = run_pex("out.gds", cell_name="opa_tuned3", mode=2)
+print(pex["summary"])   # "PEX: OK (C-coupled)"
 ```
 
-## DRC — `run_drc(gds_path, **kwargs)`
+## Functions
 
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `gds_path` | required | Path to GDSII file |
+### `extract_layout_netlist(gds_path, cell_name, workdir)`
+
+Extracts a SPICE netlist from GDS using Magic (no-RC / LVS mode).
+
+| Param | Default | Description |
+|-------|---------|-------------|
+| `gds_path` | required | Path to GDS file |
 | `cell_name` | auto | Top cell name |
-| `engine` | `"magic"` | `"magic"` or `"klayout"` |
-| `workdir` | cwd | Working directory for temp files |
+| `workdir` | temp dir | Working directory |
 
-Returns: `{clean: bool, report_path: str|None, log: str}`
+Returns: `{netlist_path, raw_ports, log}`
 
-The wrapper calls `iic-drc.sh -m <workdir> <gds> <cell>`.
+### `fix_port_order(extracted_path, correct_order, out_path)`
 
-## LVS — `run_lvs(gds_path, **kwargs)`
+Rewrites the `.subckt` line of an extracted netlist to match the
+schematic's port order.
 
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `gds_path` | required | Path to GDSII file |
-| `netlist_path` | - | Path to .spice file (or pass `netlist_content`) |
+| Param | Default | Description |
+|-------|---------|-------------|
+| `extracted_path` | required | Path to extracted .spice |
+| `correct_order` | required | List of port names in correct order |
+| `out_path` | same as input | Output path |
+
+Returns: path to fixed netlist.
+
+### `run_drc(gds_path, **kwargs)`
+
+Runs DRC via `iic-drc.sh`.
+
+| Param | Default | Description |
+|-------|---------|-------------|
+| `gds_path` | required | Path to GDS file |
 | `cell_name` | auto | Top cell name |
+| `engine` | `"magic"` | `"magic"`, `"klayout"`, or `"both"` |
 | `workdir` | cwd | Working directory |
+| `clean` | `False` | Remove previous result files |
+| `timeout` | `600` | Max seconds |
 
-Returns: `{match: bool, report_path: str, log: str}`
+Returns: `{clean, report_path, log, summary}` — `summary` is a
+1-line string for AI parsing (e.g. `"DRC: CLEAN"`).
 
-The wrapper calls `iic-lvs.sh -s <spice> -l <gds> -c <cell> -w <workdir>`.
+### `run_lvs(gds_path, **kwargs)`
 
-## PEX — `run_pex(gds_path, **kwargs)`
+Runs LVS via `iic-lvs.sh`. **Automatically** extracts the layout
+netlist and reorders its ports to match the schematic before comparison.
 
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `gds_path` | required | Path to GDSII file |
+| Param | Default | Description |
+|-------|---------|-------------|
+| `gds_path` | required | Path to GDS file |
+| `netlist_path` | — | Path to schematic .spice file |
+| `netlist_content` | — | SPICE netlist as a string |
 | `cell_name` | auto | Top cell name |
-| `mode` | `2` | 1=C-decoupled, 2=C-coupled, 3=full-RC |
-| `subcircuit` | True | Extract as .subckt block |
-| `pex_name` | auto | Output name prefix |
+| `workdir` | temp dir | Working directory |
+| `auto_fix_ports` | `True` | Fix port order in extracted netlist |
+| `timeout` | `600` | Max seconds |
 
-Returns: `{pex_path: str|None, mode: str, log: str}`
-
-The wrapper calls `iic-pex.sh -m <mode> -s -n <name> -w <workdir> <gds> <cell>`.
-
-## Post-PEX simulation fix
-
-PEX-extracted netlists often have floating pins. The simulation module
-includes automatic fixes:
-- `_fix_pex_pin_connections()` — shorts PEX pins to 1-hop capacitor neighbors
-- `_fix_pex_supplies()` — shorts vdd/vss to well/substrate body nodes
-
-These are applied automatically by `compare_comp_pre_post()` and
-`compare_pre_post()`.
-
-## Full flow (layout → verify → simulate)
+Returns: `{match, report_path, log, summary}` — `summary` is a dict
+with parsed LVS results for AI consumption:
 
 ```python
-from core import spice_to_gds, run_drc, run_lvs, run_pex, compare_comp_pre_post
-
-# Generate layout + run checks in one call
-result = spice_to_gds(netlist, mode="analog", run_checks=True)
-
-# Or step by step:
-drc = run_drc("out.gds", cell_name="comp_strongarm")
-if drc["clean"]:
-    lvs = run_lvs("out.gds", netlist_content=netlist, cell_name="comp_strongarm")
-    if lvs["match"]:
-        pex = run_pex("out.gds", cell_name="comp_strongarm")
-        cmp = compare_comp_pre_post(netlist, pex["pex_path"], "comp_strongarm")
+{
+  "match": True|False,
+  "device_mismatch": "8vs8",
+  "net_mismatch": "9vs9",
+  "port_swaps": [("vip", "vin")],
+  "missing_devices": ["pfet_03v3:M2"],
+  "message": "LVS OK"|"LVS MISMATCH"
+}
 ```
 
-## Script locations
+### `run_pex(gds_path, **kwargs)`
 
-- `iic-drc.sh` — DRC script (408 lines, supports Magic and KLayout)
-- `iic-lvs.sh` — LVS script (417 lines, netgen-based)
-- `iic-pex.sh` — PEX script (306 lines, Magic parasitic extraction)
+Runs PEX via `iic-pex.sh`.
+
+| Param | Default | Description |
+|-------|---------|-------------|
+| `gds_path` | required | Path to GDS file |
+| `cell_name` | auto | Top cell name |
+| `mode` | `2` | 1=C-decoupled, 2=C-coupled, 3=full-RC |
+| `subcircuit` | `True` | Extract as .subckt block |
+| `pex_name` | auto | Output subcircuit name |
+| `workdir` | cwd | Working directory |
+| `timeout` | `600` | Max seconds |
+
+Returns: `{pex_path, mode, log, summary}`
+
+## AI Agent Usage Pattern
+
+```python
+# 1. Generate layout
+result = spice_to_gds(netlist, mode="analog", add_labels=True)
+result.write_gds("out.gds")
+
+# 2. Extract + verify in one call
+lvs = run_lvs("out.gds", netlist_content=netlist, cell_name="opa_tuned3")
+if lvs["match"]:
+    pex = run_pex("out.gds", cell_name="opa_tuned3", mode=2)
+    # Use pex["pex_path"] for post-layout simulation
+else:
+    s = lvs["summary"]
+    if s["port_swaps"]:
+        print(f"Ports swapped: {s['port_swaps']}")
+    if s["missing_devices"]:
+        print(f"Missing: {s['missing_devices']}")
+```
+
+## LVS Port-Order Auto-Fix
+
+Magic extracts top-level ports in spatial order (left→right, bottom→top),
+which rarely matches the schematic's `.subckt` order. The `run_lvs`
+function now:
+
+1. Calls `extract_layout_netlist()` to get the raw extracted netlist
+2. Parses the schematic's `.subckt` line for the correct port order
+3. Calls `fix_port_order()` to rewrite the extracted netlist
+4. Feeds the fixed netlist to netgen for comparison
+
+This eliminates `vin↔vip` and `vdd↔vss` swap errors automatically.
