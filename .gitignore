@@ -42,3 +42,8 @@ tools/
 context/
 
 *.gds.backup
+
+# Keep project-level OpenCode tools under version control
+!.opencode/
+!.opencode/tools/
+!.opencode/tools/**
