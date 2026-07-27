@@ -354,3 +354,107 @@ def llm_to_gds(user_prompt, model="deepseek-v4-flash",
         raise RuntimeError("LLM gagal menghasilkan netlist")
     print(f"[LLM] Netlist generated:\n{netlist}")
     return spice_to_gds(netlist, mode=mode)
+
+
+def spice_to_gds_with_checks(netlist_input, gds_path=None,
+                             mode="analog", add_labels=True):
+    """Full flow: SPICE → GDS + DRC + LVS + PEX.
+
+    All output files are placed in a directory named after the cell
+    (e.g. ``ota_5t/``).
+
+    Args:
+        netlist_input: SPICE subcircuit netlist string.
+        gds_path: Output GDS path (default: ``<cell_name>/<cell_name>.gds``).
+        mode: Layout mode (default "analog").
+        add_labels: Add pin labels (default True).
+
+    Returns:
+        dict: {
+            "outdir": str,       output directory path
+            "gds_path": str,     GDS file path
+            "svg_path": str,     SVG preview path
+            "cell_name": str,
+            "drc": dict from run_drc(),
+            "lvs": dict from run_lvs(),
+            "pex": dict from run_pex(),
+            "all_pass": bool   (True if DRC+LVS+PEX all pass)
+        }
+    """
+    import re
+    cell = re.search(r'\.subckt\s+(\S+)', netlist_input)
+    cell_name = cell.group(1) if cell else "top"
+
+    outdir = os.path.join(os.getcwd(), cell_name)
+    os.makedirs(outdir, exist_ok=True)
+
+    gds_path = gds_path or os.path.join(outdir, f"{cell_name}.gds")
+    svg_path = os.path.join(outdir, f"{cell_name}.svg")
+
+    # 1. Generate layout
+    result = spice_to_gds(netlist_input, mode=mode, add_labels=add_labels)
+    result.write_gds(gds_path)
+
+    # SVG preview
+    try:
+        import gdstk
+        lib = gdstk.read_gds(gds_path)
+        lib.top_level()[0].write_svg(svg_path)
+        bb = lib.top_level()[0].bounding_box()
+        print(f"  Size: {bb[1][0]-bb[0][0]:.0f} x {bb[1][1]-bb[0][1]:.0f} um")
+    except Exception:
+        svg_path = None
+    print(f"[PIPELINE] Output: {outdir}/")
+
+    # 2. DRC
+    print("=" * 60)
+    print("[CHECKS] DRC...")
+    print("=" * 60)
+    try:
+        drc = run_drc(gds_path, cell_name=cell_name, workdir=outdir)
+    except Exception as e:
+        drc = {"clean": False, "summary": f"DRC ERROR: {e}"}
+    print(f"  {drc.get('summary', '?')}")
+
+    # 3. LVS
+    print("=" * 60)
+    print("[CHECKS] LVS...")
+    print("=" * 60)
+    try:
+        lvs = run_lvs(gds_path, netlist_content=netlist_input,
+                      cell_name=cell_name, workdir=outdir)
+    except Exception as e:
+        lvs = {"match": False, "summary": {"message": f"LVS ERROR: {e}"}}
+    lvs_msg = "MATCH" if lvs.get("match") else "MISMATCH"
+    print(f"  LVS: {lvs_msg}")
+
+    # 4. PEX
+    print("=" * 60)
+    print("[CHECKS] PEX...")
+    print("=" * 60)
+    try:
+        pex = run_pex(gds_path, cell_name=cell_name, mode=2, workdir=outdir)
+    except Exception as e:
+        pex = {"pex_path": None, "summary": f"PEX ERROR: {e}"}
+    pex_msg = "OK" if pex.get("pex_path") else "FAILED"
+    print(f"  PEX: {pex.get('summary', '?')}")
+
+    all_pass = (
+        drc.get("clean", False)
+        and lvs.get("match", False)
+        and pex.get("pex_path") is not None
+    )
+    print(f"\n{'='*60}")
+    print(f"  RESULT: {'ALL PASS' if all_pass else 'SOME CHECKS FAILED'}")
+    print(f"{'='*60}")
+
+    return {
+        "outdir": outdir,
+        "gds_path": gds_path,
+        "svg_path": svg_path,
+        "cell_name": cell_name,
+        "drc": drc,
+        "lvs": lvs,
+        "pex": pex,
+        "all_pass": all_pass,
+    }

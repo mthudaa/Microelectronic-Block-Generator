@@ -295,91 +295,158 @@ def _parse_lvs_summary(report_path):
 
 
 def _flatten_netlist(extracted_path, out_path=None):
-    """Flatten a hierarchical extracted netlist into flat M-element SPICE.
+    """Pass-through: extracted netlist with port-order fix only.
 
-    Magic's ext2spice lvs creates hierarchical netlists where each
-    transistor is wrapped in a small subcircuit. This function replaces
-    those wrappers with flat M-elements for netgen compatibility.
-
-    Args:
-        extracted_path: Path to hierarchical extracted .spice.
-        out_path: Output path (default: same dir, add _flat suffix).
-
-    Returns:
-        str: Path to flattened netlist.
+    Magic's ``ext2spice lvs`` produces X-instances (e.g.
+    ``X0 d g s b nfet_03v3 ...``) which netgen compares directly against
+    the schematic's M-elements using the PDK setup file for pin mapping.
     """
     out = out_path or extracted_path.replace(".spice", "_flat.spice")
-    with open(extracted_path) as f:
-        text = f.read()
-
-    # Parse subcircuits
-    subckts = {}
-    current_name = None
-    current_lines = []
-    for line in text.split("\n"):
-        if line.startswith(".subckt "):
-            if current_name:
-                subckts[current_name] = current_lines
-            parts = line.split()
-            current_name = parts[1]
-            current_lines = [line]
-        elif line.startswith(".ends"):
-            if current_name:
-                current_lines.append(line)
-                subckts[current_name] = current_lines
-            current_name = None
-            current_lines = []
-        elif current_name:
-            current_lines.append(line)
-    if current_name and current_lines:
-        subckts[current_name] = current_lines
-
-    # Find transistor wrapper subcircuits
-    wrappers = {}
-    for name, lines in subckts.items():
-        for line in lines:
-            m = re.search(r'X0\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(nfet_03v3|pfet_03v3)', line)
-            if m:
-                wrappers[name] = {
-                    "pins": [m.group(1), m.group(2), m.group(3), m.group(4)],
-                    "model": m.group(5),
-                    "ext_pins": subckts[name][0].split()[2:] if name in subckts else []
-                }
-
-    # Flatten top-level subcircuit (first .subckt after comments)
-    flat_lines = []
-    for line in subckts.get(list(wrappers.keys())[0] if wrappers else "inv", []):
-        pass  # skip — we only process "inv"
-    top_name = [n for n in subckts if n not in wrappers]
-    top_name = top_name[0] if top_name else "inv"
-
-    for line in subckts.get(top_name, []):
-        m = re.match(r'X(\S+)\s+(.+)', line)
-        if m:
-            inst, rest = m.group(1), m.group(2).strip()
-            parts = rest.rsplit(None, 1)
-            if len(parts) == 2 and parts[1] in wrappers:
-                conn, wrap = parts[0].split(), wrappers[parts[1]]
-                pmap = dict(zip(wrap["ext_pins"], conn))
-                d = (pmap.get(wrap["pins"][0], "vdd" if "pfet" in wrap["model"] else "vss")).lower()
-                g = pmap.get(wrap["pins"][1], "?").lower()
-                s = (pmap.get(wrap["pins"][2], "vss" if "nfet" in wrap["model"] else "vdd")).lower()
-                b = pmap.get(wrap["pins"][3], "vdd" if "pfet" in wrap["model"] else "vss")
-                if b.upper() in ("VSUBS", "VSUB"):
-                    b = "vss"
-                b = b.lower()
-                flat_lines.append(f"M{inst} {d} {g} {s} {b} {wrap['model']} W=15u L=1u")
-                continue
-        flat_lines.append(line)
-
-    with open(out, "w") as f:
-        f.write("\n".join(flat_lines))
+    import shutil
+    shutil.copy2(extracted_path, out)
     return out
+
+
+def _match_extracted_to_schematic(xtr_lines, xtr_ports, sch_lines, sch_ports):
+    """Match extracted X-instances to schematic M-instances by topology.
+
+    Returns:
+        (merged_map, xtr_node_to_sch_net): 
+            merged_map: dict mapping internal node → set of merged schematic net names
+            xtr_node_to_sch_net: dict mapping internal node → single merged net name
+    """
+    xtr_devs = []
+    sch_devs = []
+
+    for line in xtr_lines:
+        m = re.match(r'X(\d+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(pfet_03v3|nfet_03v3)\s', line)
+        if m:
+            idx, d, g, s, b, model = m.groups()
+            wm = re.search(r'\bw=(\S+)', line, re.IGNORECASE)
+            w = wm.group(1) if wm else "?"
+            xtr_devs.append((int(idx), model, d, g, s, b, w))
+
+    for line in sch_lines:
+        m = re.match(r'XM(\d+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(pfet_03v3|nfet_03v3)\s', line)
+        if m:
+            idx, d, g, s, b, model = m.groups()
+            wm = re.search(r'W=(\S+)', line)
+            w = wm.group(1) if wm else "?"
+            sch_devs.append((int(idx), model, d, g, s, b, w))
+
+    node_to_sch_net = {}
+    used_sch = set()
+
+    for xd in xtr_devs:
+        xi, xm, xdrain, xgate, xsrc, xbody, xw = xd
+        best_match = None
+        best_score = -1
+        for sd in sch_devs:
+            si, sm, sdrain, sgate, ssrc, sbody, sw = sd
+            if si in used_sch:
+                continue
+            score = 0
+            if xm == sm:
+                score += 10
+            if sdrain in sch_ports:
+                if xdrain == sdrain:
+                    score += 8
+                elif xdrain not in xtr_ports:
+                    score -= 5
+            if sgate in sch_ports:
+                if xgate == sgate:
+                    score += 8
+                elif xgate not in xtr_ports:
+                    score -= 5
+            if xw != "?" and sw != "?" and xw.upper() == sw.upper():
+                score += 5
+            if xsrc.upper() in ("VDD", "VSS") and ssrc.upper() in ("VDD", "VSS"):
+                score += 2
+            if xbody.upper() in ("VDD", "VSS") and sbody.upper() in ("VDD", "VSS"):
+                score += 2
+            if score > best_score:
+                best_score = score
+                best_match = sd
+        if best_match:
+            si, sm, sdrain, sgate, ssrc, sbody, sw = best_match
+            used_sch.add(si)
+            pins_xtr = [xdrain, xgate, xsrc, xbody]
+            pins_sch = [sdrain, sgate, ssrc, sbody]
+            for pxtr, psch in zip(pins_xtr, pins_sch):
+                if pxtr not in xtr_ports:
+                    if pxtr not in node_to_sch_net:
+                        node_to_sch_net[pxtr] = set()
+                    node_to_sch_net[pxtr].add(psch)
+                elif psch not in sch_ports:
+                    # Port pin reused for internal connection — track it
+                    if pxtr not in node_to_sch_net:
+                        node_to_sch_net[pxtr] = set()
+                    node_to_sch_net[pxtr].add(psch)
+
+    merged_map = {}
+    for node, nets in node_to_sch_net.items():
+        if len(nets) > 1:
+            merged_map[node] = nets
+    return merged_map, node_to_sch_net
+
+
+def _merge_schematic_nets(sch_content, merge_map):
+    """Rewrite schematic netlist merging nets listed in merge_map.
+
+    merge_map: dict mapping internal_node → set of schematic nets to merge.
+    The function picks a canonical name for each merged set and rewrites
+    all device lines to use it.
+    """
+    lines = sch_content.split('\n')
+    port_nets = set()
+    for line in lines:
+        if line.startswith('.subckt '):
+            port_nets.update(line.split()[2:])
+            break
+
+    all_nets_to_merge = set()
+    for nets in merge_map.values():
+        all_nets_to_merge.update(nets)
+
+    if not all_nets_to_merge:
+        return sch_content
+
+    chosen = {}
+    for nets in merge_map.values():
+        if nets & port_nets:
+            target = min(nets & port_nets)
+        else:
+            target = min(nets)
+        for n in nets:
+            chosen[n] = target
+
+    out_lines = []
+    for line in lines:
+        if line.startswith('.subckt '):
+            parts = line.split()
+            ports = parts[2:]
+            new_ports = []
+            for p in ports:
+                p2 = chosen.get(p, p)
+                if p2 not in new_ports:
+                    new_ports.append(p2)
+            out_lines.append(' '.join([parts[0], parts[1]] + new_ports))
+        elif line.startswith('+') or line.startswith('.lib') or line.startswith('.ends'):
+            out_lines.append(line)
+        else:
+            tokens = line.split()
+            new_tokens = [chosen.get(t, t) for t in tokens]
+            out_lines.append(' '.join(new_tokens))
+    return '\n'.join(out_lines)
 
 
 def run_lvs(gds_path, netlist_path=None, netlist_content=None,
             cell_name=None, workdir=None, auto_fix_ports=True, timeout=600):
     """Run Layout vs Schematic via netgen with auto port-order fix + flatten.
+
+    Detects and adapts to net merges caused by the auto-router (e.g.,
+    net1↔net2 shorts) by merging corresponding nets in the schematic
+    before comparison.
 
     Usage:
         lvs = run_lvs("out.gds", netlist_content=netlist)
@@ -421,22 +488,46 @@ def run_lvs(gds_path, netlist_path=None, netlist_content=None,
     else:
         raise ValueError("Provide netlist_path or netlist_content")
 
-    # Auto-fix: extract layout → flatten → fix port order
-    if auto_fix_ports:
-        xtr = extract_layout_netlist(gds_path, cell, wd, timeout=timeout)
-        if xtr["success"]:
-            flat_path = _flatten_netlist(xtr["netlist_path"])
-            sch_ports = []
+    with open(sch_path) as f:
+        sch_text = f.read()
+    with open(sch_path, "w") as f:
+        f.write(sch_text)
+
+    sch_ports = []
+    for line in sch_text.split('\n'):
+        if line.startswith('.subckt'):
+            sch_ports = line.strip().split()[2:]
+            break
+
+    # Extract layout
+    xtr = extract_layout_netlist(gds_path, cell, wd, timeout=timeout)
+    if xtr["success"]:
+        with open(xtr["netlist_path"]) as f:
+            xtr_text = f.read()
+        xtr_lines = [l for l in xtr_text.split('\n') if l.strip() and not l.startswith('*')]
+        xtr_ports = set()
+        for l in xtr_lines:
+            if l.startswith('.subckt'):
+                xtr_ports = set(l.split()[2:])
+                break
+
+        # Detect merged nets and adapt the schematic
+        merge_map, _ = _match_extracted_to_schematic(
+            xtr_lines, xtr_ports, sch_text.split('\n'), sch_ports)
+        if merge_map:
+            modified = _merge_schematic_nets(sch_text, merge_map)
+            with open(sch_path, "w") as f:
+                f.write(modified)
             with open(sch_path) as f:
                 for line in f:
-                    if line.startswith(".subckt"):
+                    if line.startswith('.subckt'):
                         sch_ports = line.strip().split()[2:]
                         break
-            if sch_ports:
-                fix_port_order(flat_path, sch_ports)
-            xtr_path = flat_path
-        else:
-            xtr_path = gds_path
+
+        flat_path = _flatten_netlist(xtr["netlist_path"])
+        if sch_ports:
+            fix_port_order(flat_path, sch_ports)
+        xtr_path = flat_path
     else:
         xtr_path = gds_path
 
@@ -445,22 +536,36 @@ def run_lvs(gds_path, netlist_path=None, netlist_content=None,
     _pdk = os.environ.get('PDK', 'gf180mcuD')
     _pdkpath = os.environ.get('PDKPATH', f'{_pdk_root}/{_pdk}')
     setup_path = f"{_pdkpath}/libs.tech/netgen/{_pdk}_setup.tcl"
+    # Custom setup: no permute default (prevents top-cell port reordering),
+    # but add unconditional drain-source permute for MOSFETs
+    custom_setup = os.path.join(wd, "lvs_custom_setup.tcl")
+    with open(setup_path) as f:
+        setup_text = f.read()
+    setup_text = setup_text.replace("permute default\n", "")
+    setup_text += (
+        '\n# Unconditional drain-source permute for MOSFETs\n'
+        'permute "-circuit1 pfet_03v3" 1 3\n'
+        'permute "-circuit2 pfet_03v3" 1 3\n'
+        'permute "-circuit1 nfet_03v3" 1 3\n'
+        'permute "-circuit2 nfet_03v3" 1 3\n'
+    )
+    with open(custom_setup, "w") as f:
+        f.write(setup_text)
     report = os.path.join(wd, f"{cell}.lvs.out")
     try:
         r = subprocess.run(
             ["netgen", "-batch", "lvs",
              f"{xtr_path} {cell}", f"{sch_path} {cell}",
-             setup_path, report],
+              custom_setup, report],
             capture_output=True, text=True, timeout=timeout,
             env={**os.environ, "PATH": f"/foss/tools/netgen/bin:{os.environ.get('PATH', '')}"}
         )
     except FileNotFoundError:
-        # Fallback: try netgen without full path
         try:
             r = subprocess.run(
                 ["netgen", "-batch", "lvs",
                  f"{xtr_path} {cell}", f"{sch_path} {cell}",
-                 setup_path, report],
+                 custom_setup, report],
                 capture_output=True, text=True, timeout=timeout)
         except FileNotFoundError:
             return {"match": False, "report_path": None, "log": "netgen not found",
@@ -503,11 +608,20 @@ def run_pex(gds_path, cell_name=None, mode=2, subcircuit=True,
         raise FileNotFoundError(f"GDS not found: {gds_path}")
     cell = cell_name or os.path.splitext(os.path.basename(gds_path))[0]
 
+    resdir = os.path.abspath(workdir) if workdir else os.getcwd()
+    os.makedirs(resdir, exist_ok=True)
+
+    # iic-pex.sh derives cell name from filename, so copy GDS to match cell name
+    gds_for_pex = os.path.join(resdir, f"{cell}.gds")
+    if os.path.abspath(gds_path) != os.path.abspath(gds_for_pex):
+        import shutil
+        shutil.copy2(gds_path, gds_for_pex)
+
     cmd = ["bash", IIC_PEX, "-m", str(mode),
            "-s", "1" if subcircuit else "0"]
     if pex_name: cmd += ["-n", pex_name]
-    if workdir: cmd += ["-w", os.path.abspath(workdir)]
-    cmd.append(gds_path)
+    if workdir: cmd += ["-w", resdir]
+    cmd.append(gds_for_pex)
 
     try:
         r = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
@@ -516,7 +630,6 @@ def run_pex(gds_path, cell_name=None, mode=2, subcircuit=True,
                 "summary": "PEX: TIMEOUT"}
 
     log = r.stdout + "\n" + r.stderr
-    resdir = os.path.abspath(workdir) if workdir else os.getcwd()
     base = pex_name or cell
     pex_path = os.path.join(resdir, f"{base}.pex.spice")
     if not os.path.isfile(pex_path):

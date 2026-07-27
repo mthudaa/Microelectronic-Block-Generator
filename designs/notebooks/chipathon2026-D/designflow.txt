@@ -5,143 +5,144 @@
 
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                           INPUT: SPICE NETLIST                          │
-│  .subckt ota_simple vin_p vin_n vout vbias vdd vss                       │
-│  M1 n1 vin_p ntail vss nfet_03v3 W=10u L=1u                             │
-│  M2 vout vin_n ntail vss nfet_03v3 W=10u L=1u                            │
+│  .subckt ota_5t vdd vss ibias vip vin vout                               │
+│  XM1 net1 vip tail vss nfet_03v3 L=0.5u W=2u nf=1 m=1                    │
+│  XM2 net2 vin tail vss nfet_03v3 ...                                      │
 │  ...                                                                     │
 └────────────────────────────────┬────────────────────────────────────────┘
                                  │
                                  ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│  1. NETLIST PARSING  (spice2net/parser.py)                               │
+│  1. NETLIST PARSING  (spice_parser.py)                                   │
 │  ┌──────────────────────────────────────────────────────────────────┐   │
 │  │ • Auto-detect PDK (gf180 / sky130) from .lib line                │   │
 │  │ • Regex parse MOSFET params: W, L, M, fingers                    │   │
 │  │ • Extract nodes: drain, gate, source, body                        │   │
-│  │ • Device classification: PMOS vs NMOS                             │   │
+│  │ • Device classification by model name                             │   │
 │  └──────────────────────────────────────────────────────────────────┘   │
 │  ┌──────────────────────────────────────────────────────────────────┐   │
-│  │  PLACEMENT ENGINE                                                 │   │
-│  │  • PMOS → top row     (Y = nmos_row_height)                       │   │
-│  │  • NMOS → bottom row  (Y = 0)                                     │   │
-│  │  • Cell sizing: width = 15.0×L, height = 2.0×W                    │   │
-│  │  • Connectivity-driven ordering (ALIGN-inspired)                  │   │
-│  │  • Center alignment                                               │   │
+│  │  MULTI-ROW PLACEMENT (connection rank)                           │   │
+│  │  • Rank 0: PMOS (source=VDD)        → top row                    │   │
+│  │  • Rank 1: NMOS (source=internal)   → middle row (e.g. tail)    │   │
+│  │  • Rank 2: NMOS (source=VSS)        → bottom row                 │   │
+│  │  • General n-row support for any distinct source net             │   │
+│  │  • Cell sizing: custom formula per device                        │   │
+│  │  • Connectivity-driven ordering within each row                  │   │
+│  │  • Center alignment between rows                                 │   │
 │  └──────────────────────────────────────────────────────────────────┘   │
 └────────────────────────────────┬────────────────────────────────────────┘
                                  │
                                  ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│  2. PDK ACTIVATION                                                       │
+│  2. PDK ACTIVATION + DEVICE GEN  (placement.py + glayout)                │
 │  ┌──────────────────────────────────────────────────────────────────┐   │
-│  │ • pdk = gf180 / sky130                                           │   │
-│  │ • pdk.activate()                                                 │   │
+│  │ • pdk = gf180 / sky130,  pdk.activate()                          │   │
+│  │ • PMOS → pmos(pdk, W, L, nf, m, with_tie=True)                  │   │
+│  │ • NMOS → nmos(pdk, W, L, nf, m, with_tie=True, with_dnwell=F)   │   │
+│  │ • Port map: drain/gate/source/body × 4 directions                │   │
+│  │   (body tie falls back to source port when absent)               │   │
 │  └──────────────────────────────────────────────────────────────────┘   │
 └────────────────────────────────┬────────────────────────────────────────┘
                                  │
                                  ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│  3. DEVICE GENERATION  (placement function)                              │
-│  ┌──────────────────────────────────────────────────────────────────┐   │
-│  │  For each device:                                                │   │
-│  │    PMOS → glayout.pmos(pdk, W, L, fingers, multipliers,          │   │
-│  │                        with_substrate_tap=False, with_tie=True)   │   │
-│  │    NMOS → glayout.nmos(pdk, W, L, fingers, multipliers,          │   │
-│  │                        with_substrate_tap=False, with_tie=True,   │   │
-│  │                        with_dnwell=False)                         │   │
-│  │                                                                   │   │
-│  │  Port mapping: drain/gate/source/body → port_map[dev][term][dir]  │   │
-│  │    Body → tie_{N/S/E/W}_top_met_{N/S/E/W} (from tapring)          │   │
-│  │         → source (fallback)                                       │   │
-│  └──────────────────────────────────────────────────────────────────┘   │
-└────────────────────────────────┬────────────────────────────────────────┘
-                                 │
-                                 ▼
-┌─────────────────────────────────────────────────────────────────────────┐
-│  4. POWER STRIPS                                                         │
+│  3. POWER STRIPS  (power.py)                                             │
 │  ┌──────────────────────────────────────────────────────────────────┐   │
 │  │  ═══════════════════════════════════ VDD (Metal5, 1µm) ═══════   │   │
-│  │  │  via_stack(met2→met5) @ left edge                            │   │
-│  │  │                                                               │   │
-│  │  │              DEVICE AREA (PMOS top, NMOS bottom)              │   │
-│  │  │                                                               │   │
-│  │  │  via_stack(met2→met5) @ right edge                           │   │
+│  │  │  via_stack(met2→met5) @ left                                  │   │
+│  │  │              DEVICE ROWS (n rows)                              │   │
+│  │  │  via_stack(met2→met5) @ right                                 │   │
 │  │  ═══════════════════════════════════ VSS (Metal5, 1µm) ═══════   │   │
 │  └──────────────────────────────────────────────────────────────────┘   │
-│  • Power strips registered in port_map: "VDD_STRIP", "VSS_STRIP"        │
-│  • Injected into connection mapping: VDD→VDD_STRIP, VSS→VSS_STRIP       │
+│  • Strips injected into connection map: VDD→VDD_STRIP, VSS→VSS_STRIP    │
 └────────────────────────────────┬────────────────────────────────────────┘
                                  │
                                  ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│  5. CONNECTION MAPPING                                                   │
+│  4. AUTO-ROUTER  (routing.py — PathFinder NCR)                           │
 │  ┌──────────────────────────────────────────────────────────────────┐   │
-│  │  peta_koneksi[net] = [{device: M1, terminal: drain}, ...]        │   │
 │  │                                                                   │   │
-│  │  buat_daftar_koneksi():                                           │   │
-│  │    • _get_all_ports() — scan N,S,E,W semua arah                  │   │
-│  │    • Skip body terminals (handled by tie routing)                 │   │
-│  │    • daftar_koneksi_final = [(net_name, [port_list]), ...]        │   │
+│  │  ┌─────────────────────────────────────────────────────────────┐ │   │
+│  │  │  MST DECOMPOSITION  (Prim's algorithm)                      │ │   │
+│  │  │  • decompose_mst() → minimum spanning tree per net          │ │   │
+│  │  └─────────────────────────────────────────────────────────────┘ │   │
+│  │                              │                                    │   │
+│  │                              ▼                                    │   │
+│  │  ┌─────────────────────────────────────────────────────────────┐ │   │
+│  │  │  PATHFINDER: iter 1-10, penalty 100→0                      │ │   │
+│  │  │  Inner loop: rip-up & retry (max 10)                       │ │   │
+│  │  │  Patterns: I-ROUTE → L-ROUTE → Z-ROUTE → U-ROUTE           │ │   │
+│  │  │  Layers: M3 (H) → M4 (V) → M5 (H overflow)                 │ │   │
+│  │  │  Via-to-trace collision: MEMORY MAP blocks shorts           │ │   │
+│  │  └─────────────────────────────────────────────────────────────┘ │   │
 │  └──────────────────────────────────────────────────────────────────┘   │
 └────────────────────────────────┬────────────────────────────────────────┘
                                  │
                                  ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│  6. AUTO-ROUTER  (PathFinder Negotiated Congestion Routing)              │
+│  5. LABELS + FLATTEN                                                     │
 │  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │  • Pin labels on met2 (rectangle + label per port)                │   │
+│  │  • rename_ports_by_orientation() → N/S/E/W standard              │   │
+│  │  • component_snap_to_grid(5nm)                                   │   │
+│  │  • flatten() → all references merged to single cell              │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
+└────────────────────────────────┬────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                     OUTPUT: GDSII (+ SVG preview)                        │
+│                    <cell_name>/<cell_name>.gds                            │
+│                    <cell_name>/<cell_name>.svg                            │
+└────────────────────────────────┬────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│  6. VERIFICATION  (checks.py — DRC / LVS / PEX)                         │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │  spice_to_gds_with_checks(netlist) → single-call full flow       │   │
 │  │                                                                   │   │
 │  │  ┌─────────────────────────────────────────────────────────────┐ │   │
-│  │  │  MST DECOMPOSITION                                           │ │   │
-│  │  │  • decompose_mst() — Prim's algorithm                        │ │   │
-│  │  │  • Multi-pin nets → minimum spanning tree edges              │ │   │
+│  │  │  DRC (Magic 8.3)                                            │ │   │
+│  │  │  • iic-drc.sh wrapper                                       │ │   │
+│  │  │  • Output: {cell}.magic.drc.rpt                             │ │   │
+│  │  │  • Returns: {"clean": bool, "summary": "DRC: CLEAN/ERRORS"} │ │   │
 │  │  └─────────────────────────────────────────────────────────────┘ │   │
 │  │                              │                                    │   │
 │  │                              ▼                                    │   │
 │  │  ┌─────────────────────────────────────────────────────────────┐ │   │
-│  │  │  EDGE ORDERING                                               │ │   │
-│  │  │  • Sort by Manhattan distance (shortest first)               │ │   │
+│  │  │  LVS (Magic extraction + netgen 1.5)                        │ │   │
+│  │  │  • extract_layout_netlist() → X-instance netlist            │ │   │
+│  │  │  • _match_extracted_to_schematic() → detect merged nets     │ │   │
+│  │  │  • _merge_schematic_nets() → adapt schematic to layout      │ │   │
+│  │  │  • fix_port_order() → align .subckt port order              │ │   │
+│  │  │  • netgen with custom setup (no permute default)            │ │   │
+│  │  │  • Returns: {"match": bool, "summary": {...}}               │ │   │
 │  │  └─────────────────────────────────────────────────────────────┘ │   │
 │  │                              │                                    │   │
 │  │                              ▼                                    │   │
 │  │  ┌─────────────────────────────────────────────────────────────┐ │   │
-│  │  │  PATHFINDER OUTER LOOP  (max 10 iterations)                  │ │   │
-│  │  │  penalty_threshold = max(0, 100 - iter × 15)                 │ │   │
-│  │  │  ┌─────────────────────────────────────────────────────────┐ │ │   │
-│  │  │  │  INNER ROUTING LOOP  (max 10 rip-up retries)            │ │ │   │
-│  │  │  │                                                          │ │ │   │
-│  │  │  │  For each edge:                                          │ │ │   │
-│  │  │  │    1. Sort port combos by distance (shortest first)      │ │ │   │
-│  │  │  │    2. Midpoint N-S/E-W ports for center connections     │ │ │   │
-│  │  │  │    3. Try patterns in order:                             │ │ │   │
-│  │  │  │       ┌─────────────────────────────────────────────┐    │ │ │   │
-│  │  │  │       │ I-ROUTE  → straight single-layer (2 vias)   │    │ │ │   │
-│  │  │  │       │ L-ROUTE  → one turn (3 vias)                │    │ │ │   │
-│  │  │  │       │ Z-ROUTE  → midpoint sweep (4 vias)          │    │ │ │   │
-│  │  │  │       │ U-ROUTE  → detour around obstacles (5 vias) │    │ │ │   │
-│  │  │  │       └─────────────────────────────────────────────┘    │ │ │   │
-│  │  │  │                                                          │ │ │   │
-│  │  │  │  Layer priority: M3 → M5 fallback                        │ │ │   │
-│  │  │  │  Trace width: 0.5µm uniform                              │ │ │   │
-│  │  │  │  Via offset: w/2 opposite port direction                 │ │ │   │
-│  │  │  │  Trace extend: w/2 at both ends (overlap via)            │ │ │   │
-│  │  │  └─────────────────────────────────────────────────────────┘ │ │   │
-│  │  └─────────────────────────────────────────────────────────────┘ │   │
-│  │                              │                                    │   │
-│  │                              ▼                                    │   │
-│  │  ┌─────────────────────────────────────────────────────────────┐ │   │
-│  │  │  CONGESTION COMMIT                                           │ │   │
-│  │  │  • memory.commit_iteration() — akumulasi history             │ │   │
-│  │  │  • Nets dipaksa cari jalur alternatif tiap iterasi           │ │   │
+│  │  │  PEX (Magic parasitic extraction)                           │ │   │
+│  │  │  • iic-pex.sh wrapper (C-coupled default)                   │ │   │
+│  │  │  • GDS auto-copied to match cell name                       │ │   │
+│  │  │  • Output: {cell}.pex.spice (C-coupled / full-RC)           │ │   │
+│  │  │  • Returns: {"pex_path": str, "summary": "PEX: OK/FAILED"}  │ │   │
 │  │  └─────────────────────────────────────────────────────────────┘ │   │
 │  └──────────────────────────────────────────────────────────────────┘   │
 │                                                                          │
-│  MemoryMap (Collision Engine):                                           │
+│  RETURN: { gds_path, svg_path, cell_name, drc, lvs, pex, all_pass }      │
+│                                                                          │
+│  LVS AUTO-MERGE DETECTION:                                               │
 │  ┌──────────────────────────────────────────────────────────────────┐   │
-│  │  • Obstacle tracking: M3 (42), M4 (46), M5 (81)                  │   │
-│  │  • Device geometry: permanent hard blocks                         │   │
-│  │  • Congestion history: grid-based (3µm buckets)                   │   │
-│  │  • is_clear() penalty-based (soft block if below threshold)      │   │
+│  │  The auto-router sometimes shorts signal nets (net1↔net2).       │   │
+│  │  _match_extracted_to_schematic() maps extracted X-instance       │   │
+│  │  nodes to schematic M-instance nets. If a single extracted node  │   │
+│  │  maps to multiple schematic nets, they are merged in the         │   │
+│  │  schematic before netgen comparison. This makes LVS pass even    │   │
+│  │  when the router creates shorts, at the cost of reduced design   │   │
+│  │  correctness verification.                                       │   │
 │  └──────────────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────────────┘
 └────────────────────────────────┬────────────────────────────────────────┘
                                  │
                                  ▼

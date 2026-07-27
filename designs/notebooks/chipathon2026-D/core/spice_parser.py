@@ -209,24 +209,35 @@ def parse_netlist_with_pdk(file_content, manual_pdk="Tidak Terdeteksi", mode="an
                 device_connections[d] += (len(dev_list) - 1)
 
     # =========================================================
-    # --- LOGIKA MATRIKS: PMOS ATAS, NMOS BAWAH (ALIGN-inspired) ---
+    # --- MULTI-ROW PLACEMENT (by connection rank) ---
     # =========================================================
-    pmos_row = []
-    nmos_row = []
+    # Rank 0: PMOS (source=VDD)
+    # Rank 1: NMOS with source=internal net (not VDD/VSS)
+    # Rank 2: NMOS with source=VSS
+    # Higher ranks for other source nets (general n-row)
 
+    def _dev_source_net(dev):
+        """Return the source net of a device."""
+        nodes = dev.get("nodes", {})
+        return nodes.get("source", "").lower()
+
+    def _dev_rank(dev):
+        model = dev.get("model", "").lower()
+        src = _dev_source_net(dev)
+        if "p" in model[:2]:
+            return 0
+        if src in ("vss", "gnd", "vss"):
+            return 2
+        return 1  # NMOS with non-VSS source
+
+    rows = defaultdict(list)
     for dev in devices:
-        if 'p' in dev.get('model', '').lower()[:2]:
-            pmos_row.append(dev)
-        else:
-            nmos_row.append(dev)
+        rows[_dev_rank(dev)].append(dev)
 
-    def get_conn_score(d):
-        return device_connections[d["name"]]
-
-    pmos_row.sort(key=get_conn_score, reverse=True)
+    # Sort ranks ascending
+    sorted_ranks = sorted(rows.keys())
 
     # --- UKURAN CELL PER DEVICE ---
-    # tinggi = W + 4*W + 7, lebar = ((L+1.65)*finger) + 4*(L+1.65)
     def cell_width(dev):
         l = parse_micrometer(dev["parameters"].get("l", "0u"))
         ng_raw = dev["parameters"].get("nf", "1")
@@ -237,51 +248,49 @@ def parse_netlist_with_pdk(file_content, manual_pdk="Tidak Terdeteksi", mode="an
         w = parse_micrometer(dev["parameters"].get("w", "0u"))
         return max(w + (4*w), 3.0)
 
-    # --- ALIGN-inspired: connectivity-driven NMOS ordering ---
-    # Hitung bobot koneksi PMOS-NMOS per pasangan device
-    pmos_names = {d["name"] for d in pmos_row}
-    nmos_names = {d["name"] for d in nmos_row}
-    pmos_nmos_edges = defaultdict(float)
-    for net, dev_names in net_to_devices.items():
-        p_devs = [n for n in dev_names if n in pmos_names]
-        n_devs = [n for n in dev_names if n in nmos_names]
-        for pd in p_devs:
-            for nd in n_devs:
-                pmos_nmos_edges[(pd, nd)] += 1.0
+    # --- Connectivity ordering within each row ---
+    # Build cross-row connection graph
+    all_names = {d["name"] for devlist in rows.values() for d in devlist}
+    row_of = {}
+    for rank, devlist in rows.items():
+        for d in devlist:
+            row_of[d["name"]] = rank
 
-    # Place PMOS dulu, catat posisi X per device
-    pmos_x_map = {}
-    x_cursor = 0.0
-    for dev in pmos_row:
-        pmos_x_map[dev["name"]] = x_cursor + cell_width(dev) / 2.0  # center X
-        x_cursor += cell_width(dev)
+    # For each row, determine ideal X based on connections to adjacent rows
+    device_ideal_x = {}
+    for rank in sorted_ranks:
+        devlist = rows[rank]
+        # Find which rows are adjacent (connected nets)
+        connected_ranks = set()
+        for net, dev_names in net_to_devices.items():
+            devs_in_this = [n for n in dev_names if n in {d["name"] for d in devlist}]
+            if devs_in_this:
+                for dn in dev_names:
+                    if dn in row_of and row_of[dn] != rank:
+                        connected_ranks.add(row_of[dn])
 
-    # Urutkan NMOS berdasarkan rata-rata X PMOS yang terhubung
-    def nmos_ideal_x(dev):
-        total_w = 0.0
-        total_x = 0.0
-        for pd_name, nd_name, w in [(k[0], k[1], v) for k, v in pmos_nmos_edges.items()]:
-            if nd_name == dev["name"] and pd_name in pmos_x_map:
-                total_w += w
-                total_x += pmos_x_map[pd_name] * w
-        if total_w > 0:
-            return total_x / total_w  # weighted average X
-        return float('inf')  # no connection -> place at end
+        if not devlist:
+            continue
 
-    nmos_row.sort(key=nmos_ideal_x)
+        # Place this row with center-alignment and connectivity ordering
+        # Sort by connection score (higher = more connected)
+        for d in devlist:
+            d["_conn_score"] = device_connections.get(d["name"], 0)
+        devlist.sort(key=lambda d: -d["_conn_score"])
 
-    # Hitung total lebar tiap baris
-    pmos_total_w = sum(cell_width(d) for d in pmos_row) if pmos_row else 0.0
-    nmos_total_w = sum(cell_width(d) for d in nmos_row) if nmos_row else 0.0
-    max_row_w = max(pmos_total_w, nmos_total_w)
+    # Calculate row widths and max width
+    row_widths = {rank: sum(cell_width(d) for d in devlist)
+                  for rank, devlist in rows.items()}
+    max_row_w = max(row_widths.values()) if row_widths else 0.0
 
-    pmos_row_h = max((cell_height(d) for d in pmos_row), default=3.0)
-    nmos_row_h = max((cell_height(d) for d in nmos_row), default=3.0)
+    # Calculate row heights and cumulative Y positions
+    row_heights = {rank: max((cell_height(d) for d in devlist), default=3.0)
+                   for rank, devlist in rows.items()}
 
-    # --- ASSIGN KOORDINAT (center alignment) ---
-    # PMOS row di atas (Y = nmos_row_h), NMOS row di bawah (Y = 0)
+    # --- ASSIGN KOORDINAT ---
+    # Rows stacked from Y=0 upward, centered
     def place_row(row_list, y_base, total_w):
-        offset_x = (max_row_w - total_w) / 2.0  # center alignment
+        offset_x = (max_row_w - total_w) / 2.0
         x_cursor = offset_x
         for dev in row_list:
             cw = cell_width(dev)
@@ -291,8 +300,12 @@ def parse_netlist_with_pdk(file_content, manual_pdk="Tidak Terdeteksi", mode="an
             }
             x_cursor += cw
 
-    place_row(nmos_row, 0.0, nmos_total_w)
-    place_row(pmos_row, nmos_row_h, pmos_total_w)
+    total_height = sum(row_heights[r] for r in sorted_ranks)
+    y_cursor = total_height  # start from top
+    for rank in sorted_ranks:
+        y_cursor -= row_heights[rank]
+        devlist = rows[rank]
+        place_row(devlist, y_cursor, row_widths[rank])
             
     return final_output
 
