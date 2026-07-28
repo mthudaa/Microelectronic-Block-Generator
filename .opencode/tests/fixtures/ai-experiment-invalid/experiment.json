@@ -1,0 +1,22 @@
+{
+  "experiment_id": "fixture-invalid-001",
+  "model": "synthetic-test-model",
+  "pdk": "gf180mcuC",
+  "prompt_level": "detailed",
+  "api_calls": 1,
+  "refinement_iterations": 3,
+  "max_refinement_iterations": 2,
+  "netlist_valid": false,
+  "pre_simulation_status": "NOT RUN",
+  "gds_generated": false,
+  "drc_status": "NOT RUN",
+  "lvs_status": "FAIL",
+  "pex_status": "NOT RUN",
+  "post_simulation_status": "NOT RUN",
+  "llm_runtime_seconds": 4.0,
+  "total_runtime_seconds": 2.0,
+  "final_status": "PASS",
+  "artifacts": {
+    "prompt": "missing-prompt.txt"
+  }
+}

@@ -1,0 +1,6 @@
+* Synthetic OpenCode validator fixture
+* This fixture tests metadata and artifact handling only.
+.subckt fixture_rc in out vss
+R1 in out 1k
+C1 out vss 1p
+.ends fixture_rc

@@ -1,0 +1,24 @@
+{
+  "experiment_id": "fixture-minimal-001",
+  "model": "synthetic-test-model",
+  "pdk": "gf180mcuD",
+  "prompt_level": "minimal",
+  "api_calls": 1,
+  "refinement_iterations": 0,
+  "max_refinement_iterations": 2,
+  "netlist_valid": true,
+  "pre_simulation_status": "NOT RUN",
+  "gds_generated": false,
+  "drc_status": "NOT RUN",
+  "lvs_status": "NOT RUN",
+  "pex_status": "NOT RUN",
+  "post_simulation_status": "NOT RUN",
+  "llm_runtime_seconds": 1.2,
+  "total_runtime_seconds": 1.5,
+  "final_status": "PARTIAL",
+  "artifacts": {
+    "prompt": "prompt.txt",
+    "netlist": "generated_netlist.spice",
+    "circuit_graph": "circuit_graph.svg"
+  }
+}

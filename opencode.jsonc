@@ -55,7 +55,8 @@
   "rm -rf *": "deny"
 },
 
-"mbg-validate-extension": "allow"
+"mbg-validate-ai-experiment": "allow",
+    "mbg-validate-extension": "allow"
 
 
 }
