@@ -1,0 +1,16 @@
+* NGSPICE file created from strongarm.ext - technology: gf180mcuD
+
+.subckt strongarm vdd vss clk inn inp outn outp
+X0 a_2430_1719# clk vdd vdd pfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=1u
+X1 a_2430_1719# inp a_6725_n281# vss nfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=1u
+X2 a_2430_1719# clk vdd vdd pfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=1u
+X3 a_6725_n281# clk vss vss nfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=1u
+X4 outp clk vdd vdd pfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=1u
+X5 a_2430_1719# inn a_6725_n281# vss nfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=1u
+X6 outn clk vdd vdd pfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=1u
+X7 outn outp vdd vdd pfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=1u
+X8 outp outn vdd vdd pfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=1u
+X9 outp outn a_2430_1719# vss nfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=1u
+X10 outn outp a_2430_1719# vss nfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=1u
+.ends
+
