@@ -1,0 +1,2 @@
+Generate a simple GF180MCU-compatible RC subcircuit using PDK gf180mcuD.
+Return a valid SPICE subcircuit.

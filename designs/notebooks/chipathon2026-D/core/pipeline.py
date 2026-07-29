@@ -458,3 +458,211 @@ def spice_to_gds_with_checks(netlist_input, gds_path=None,
         "pex": pex,
         "all_pass": all_pass,
     }
+def llm_to_gds_with_manifest(
+    user_prompt,
+    model="deepseek-v4-flash",
+    api_key=None,
+    mode="analog",
+    output_root="outputs",
+    circuit_name="llm-design",
+    prompt_level=PromptLevel.MINIMAL,
+    max_api_attempts=3,
+    experiment_id=None,
+):
+    """Run prompt-to-GDS and write a reproducible experiment manifest.
+
+    This wrapper records only the AI/netlist/layout stages. Simulation,
+    DRC, LVS, PEX, and post-layout simulation remain ``NOT RUN`` until
+    their owning workflows provide evidence.
+
+    API retries are recorded as API calls. This wrapper does not yet
+    perform feedback-driven semantic refinement, so its refinement
+    iteration count remains zero.
+    """
+    if not isinstance(user_prompt, str) or not user_prompt.strip():
+        raise ValueError("user_prompt must be a non-empty string")
+
+    if (
+        not isinstance(max_api_attempts, int)
+        or isinstance(max_api_attempts, bool)
+        or max_api_attempts < 1
+    ):
+        raise ValueError(
+            "max_api_attempts must be an integer "
+            "greater than zero"
+        )
+
+    level = (
+        prompt_level
+        if isinstance(prompt_level, PromptLevel)
+        else PromptLevel(prompt_level)
+    )
+
+    project_root = Path(__file__).resolve().parents[1]
+    configured_output_root = Path(output_root)
+
+    if not configured_output_root.is_absolute():
+        configured_output_root = (
+            project_root / configured_output_root
+        )
+
+    resolved_output_root = configured_output_root.resolve()
+
+    ensure_inside_repository(
+        repository=project_root,
+        target=resolved_output_root,
+    )
+
+    resolved_experiment_id = (
+        experiment_id
+        or make_experiment_id(circuit_name, level)
+    )
+
+    experiment_directory = (
+        resolved_output_root / resolved_experiment_id
+    ).resolve()
+
+    ensure_inside_repository(
+        repository=project_root,
+        target=experiment_directory,
+    )
+
+    experiment_directory.mkdir(
+        parents=True,
+        exist_ok=False,
+    )
+
+    prompt_path = experiment_directory / "prompt.txt"
+    netlist_path = (
+        experiment_directory / "generated_netlist.spice"
+    )
+    gds_path = (
+        experiment_directory / "generated_layout.gds"
+    )
+
+    prompt_path.write_text(
+        user_prompt.rstrip() + "\n",
+        encoding="utf-8",
+    )
+
+    manifest = ExperimentManifest(
+        experiment_id=resolved_experiment_id,
+        model=model,
+        prompt_level=level,
+        # This wrapper currently performs no semantic
+        # feedback-driven refinement. Transport and validation
+        # retries are recorded only as API calls.
+        max_refinement_iterations=0,
+    )
+    manifest.metadata["api_attempt_limit"] = (
+        max_api_attempts
+    )
+    manifest.set_artifact("prompt", "prompt.txt")
+
+    total_started = perf_counter()
+    llm_started = perf_counter()
+    failure_stage = "llm"
+
+    def record_attempt(_attempt_number):
+        # Retrying an HTTP request or invalid response is not
+        # equivalent to feedback-driven LLM refinement.
+        manifest.record_llm_call(refinement=False)
+
+    try:
+        print(
+            "[LLM] Generating netlist with manifest: "
+            f"{resolved_experiment_id}"
+        )
+
+        netlist = generate_netlist_from_prompt(
+            user_prompt,
+            model=model,
+            api_key=api_key,
+            max_retries=max_api_attempts,
+            attempt_callback=record_attempt,
+        )
+
+        manifest.llm_runtime_seconds = (
+            perf_counter() - llm_started
+        )
+        manifest.touch()
+
+        if netlist is None:
+            raise RuntimeError(
+                "LLM failed to generate a valid netlist"
+            )
+
+        netlist_path.write_text(
+            netlist.rstrip() + "\n",
+            encoding="utf-8",
+        )
+
+        manifest.mark_netlist(
+            valid=True,
+            artifact_path="generated_netlist.spice",
+        )
+
+        failure_stage = "layout"
+
+        top_level = spice_to_gds(
+            netlist,
+            mode=mode,
+            run_checks=False,
+        )
+
+        top_level.write_gds(str(gds_path))
+
+        if not gds_path.is_file():
+            raise RuntimeError(
+                "GDS writer did not create generated_layout.gds"
+            )
+
+        manifest.mark_gds(
+            generated=True,
+            artifact_path="generated_layout.gds",
+        )
+
+        manifest.finalize(
+            total_runtime_seconds=(
+                perf_counter() - total_started
+            )
+        )
+
+        manifest_path = manifest.write(
+            experiment_directory,
+            repository_root=project_root,
+        )
+
+        print(
+            f"[EXPERIMENT] Manifest written: {manifest_path}"
+        )
+
+        return top_level, manifest_path
+
+    except Exception as error:
+        if manifest.llm_runtime_seconds is None:
+            manifest.llm_runtime_seconds = (
+                perf_counter() - llm_started
+            )
+
+        manifest.total_runtime_seconds = (
+            perf_counter() - total_started
+        )
+        manifest.final_status = ExperimentStatus.FAIL
+        manifest.metadata["failure_stage"] = failure_stage
+        manifest.metadata["error_type"] = (
+            type(error).__name__
+        )
+        manifest.touch()
+
+        manifest_path = manifest.write(
+            experiment_directory,
+            repository_root=project_root,
+        )
+
+        print(
+            "[EXPERIMENT] Failed manifest written: "
+            f"{manifest_path}"
+        )
+
+        raise
