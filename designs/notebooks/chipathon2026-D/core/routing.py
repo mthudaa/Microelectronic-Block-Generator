@@ -6,6 +6,7 @@
 import math
 from glayout import via_stack
 import gdsfactory as gf
+import numpy as np
 
 _pdk = None
 
@@ -75,8 +76,8 @@ class MemoryMap:
             if obs_net_idx == current_net_idx:
                 continue
             if not (max_x <= ox1 or min_x >= ox2 or max_y <= oy1 or min_y >= oy2):
-                bx1, by1 = self._bucket(ox1, oy1)
-                bx2, by2 = self._bucket(ox2, oy2)
+                bx1, by1 = self._bucket(min_x, min_y)
+                bx2, by2 = self._bucket(max_x, max_y)
                 for bx in range(bx1, bx2 + 1):
                     for by in range(by1, by2 + 1):
                         penalty += self.history.get(layer_id, {}).get((bx, by), 1)
@@ -101,8 +102,8 @@ class MemoryMap:
             bbox = poly.bounding_box()
             self.device_obs[lyr].append((bbox[0][0], bbox[1][0], bbox[0][1], bbox[1][1]))
 
-    def get_penalty(self, layer_id, x1, y1, x2, y2, current_net_idx):
-        hw = self.spacing / 2.0
+    def get_penalty(self, layer_id, x1, y1, x2, y2, width, current_net_idx):
+        hw = width / 2.0 + self.spacing / 2.0
         min_x = min(x1, x2) - hw
         max_x = max(x1, x2) + hw
         min_y = min(y1, y2) - hw
@@ -154,10 +155,15 @@ def draw_trace(c, layer, x1, y1, x2, y2, width, memory, net_idx):
     memory.add_trace(layer[0], x1, y1, x2, y2, width, net_idx)
 
 
+_via_cache = {}
+
 def place_via(c, x, y, l_bot, l_top, width, memory, net_idx, orientation=None):
     if l_bot == l_top:
         return
-    via_ref = c.add_ref(via_stack(_pdk, l_bot, l_top, centered=True))
+    key = (l_bot, l_top)
+    if key not in _via_cache:
+        _via_cache[key] = via_stack(_pdk, l_bot, l_top, centered=True)
+    via_ref = c.add_ref(_via_cache[key])
     hw = width / 2
     if orientation == 0:
         via_ref.move((x - hw, y))

@@ -211,24 +211,50 @@ def parse_netlist_with_pdk(file_content, manual_pdk="Tidak Terdeteksi", mode="an
     # =========================================================
     # --- MULTI-ROW PLACEMENT (by connection rank) ---
     # =========================================================
-    # Rank 0: PMOS (source=VDD)
-    # Rank 1: NMOS with source=internal net (not VDD/VSS)
-    # Rank 2: NMOS with source=VSS
-    # Higher ranks for other source nets (general n-row)
+    # Rank 0: PMOS, VDD-connected resistors
+    # Rank 1: NMOS (non-VSS source), general resistors
+    # Rank 2: NMOS (VSS source), VSS-connected resistors
+    # Rank 3: Capacitors (MIM, large devices at bottom)
+
+    def _dev_terminals(dev):
+        """Return all terminal net names for a device."""
+        nodes = dev.get("nodes", {})
+        return [n.lower() for n in nodes.values() if n != "-"]
+
+    def _dev_has_net(dev, net_name):
+        """Check if device connects to a specific net (case-insensitive)."""
+        return net_name.lower() in _dev_terminals(dev)
 
     def _dev_source_net(dev):
-        """Return the source net of a device."""
+        """Return the source net of a MOSFET device."""
         nodes = dev.get("nodes", {})
         return nodes.get("source", "").lower()
 
     def _dev_rank(dev):
         model = dev.get("model", "").lower()
+        dev_name = dev.get("name", "").upper()
+
+        # --- Capacitors (XC) ---
+        if dev_name.startswith("XC") or model.startswith("cap"):
+            # Large devices — place at bottom row
+            return 3
+
+        # --- Resistors (XR) ---
+        if dev_name.startswith("XR") or model.startswith("rm") or model.startswith("r"):
+            # Place near their strongest supply connection
+            if _dev_has_net(dev, "vdd") or _dev_has_net(dev, "vpwr"):
+                return 0  # with PMOS row
+            if _dev_has_net(dev, "vss") or _dev_has_net(dev, "gnd"):
+                return 2  # with NMOS row
+            return 1  # middle row
+
+        # --- MOSFETs (M / XM) ---
         src = _dev_source_net(dev)
         if "p" in model[:2]:
-            return 0
-        if src in ("vss", "gnd", "vss"):
-            return 2
-        return 1  # NMOS with non-VSS source
+            return 0  # PMOS row
+        if src in ("vss", "gnd"):
+            return 2  # NMOS row
+        return 1  # NMOS with internal source
 
     rows = defaultdict(list)
     for dev in devices:
@@ -239,13 +265,44 @@ def parse_netlist_with_pdk(file_content, manual_pdk="Tidak Terdeteksi", mode="an
 
     # --- UKURAN CELL PER DEVICE ---
     def cell_width(dev):
-        l = parse_micrometer(dev["parameters"].get("l", "0u"))
-        ng_raw = dev["parameters"].get("nf", "1")
+        params = dev.get("parameters", {})
+        dev_name = dev.get("name", "").upper()
+        model = dev.get("model", "").lower()
+
+        # Capacitor: width from c_width or w parameter
+        if dev_name.startswith("XC") or model.startswith("cap"):
+            cw = parse_micrometer(params.get("c_width", params.get("w", "10u")))
+            cl = parse_micrometer(params.get("c_length", params.get("l", "10u")))
+            return max(cl + 4.0, 6.0)  # capacitor oriented: length = horizontal
+
+        # Resistor: length = horizontal span
+        if dev_name.startswith("XR") or model.startswith("rm"):
+            rl = parse_micrometer(params.get("r_length", params.get("l", "10u")))
+            return max(rl + 4.0, 6.0)
+
+        # MOSFET
+        l = parse_micrometer(params.get("l", "0u"))
+        ng_raw = params.get("nf", "1")
         ng = int(parse_micrometer(ng_raw)) if ng_raw not in ("-", "", None) else 1
         return max(((l + 1.65) * ng) + (4 * (l + 1.65)), 3.0)
 
     def cell_height(dev):
-        w = parse_micrometer(dev["parameters"].get("w", "0u"))
+        params = dev.get("parameters", {})
+        dev_name = dev.get("name", "").upper()
+        model = dev.get("model", "").lower()
+
+        # Capacitor: height from c_length or l parameter
+        if dev_name.startswith("XC") or model.startswith("cap"):
+            cl = parse_micrometer(params.get("c_length", params.get("l", "10u")))
+            return max(cl + 4.0, 6.0)
+
+        # Resistor: height = width of resistor strip
+        if dev_name.startswith("XR") or model.startswith("rm"):
+            rw = parse_micrometer(params.get("r_width", params.get("w", "2u")))
+            return max(rw + 4.0, 4.0)
+
+        # MOSFET
+        w = parse_micrometer(params.get("w", "0u"))
         return max(w + (4*w), 3.0)
 
     # --- Connectivity ordering within each row ---

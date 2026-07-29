@@ -155,16 +155,16 @@ def placement(config, pdk):
                 y_coord = clean_param(position.get("y_um", "0u"))
                 device_ref.movex(x_coord)
                 device_ref.movey(y_coord)
-                # Use pin1/pin2 to match parsed node names
+                # Map spice_parser "p"/"n" → device terminals "1"/"2"
                 port_map[dev_name] = {}
-                for term in ["pin1", "pin2"]:
-                    port_map[dev_name][term] = {}
+                for spice_term, dev_term in [("p", "1"), ("n", "2")]:
+                    port_map[dev_name][spice_term] = {}
                     for direc in ["N", "E", "S", "W"]:
-                        pname = f"multiplier_0_{term[-1]}_{direc}"
+                        pname = f"multiplier_0_{dev_term}_{direc}"
                         if pname in device_ref.ports:
-                            port_map[dev_name][term][direc] = {"param": device_ref.ports[pname], "layer": 2}
+                            port_map[dev_name][spice_term][direc] = {"param": device_ref.ports[pname], "layer": 2}
                         else:
-                            port_map[dev_name][term][direc] = {"param": gf.port.Port, "layer": 0}
+                            port_map[dev_name][spice_term][direc] = {"param": gf.port.Port, "layer": 0}
                 print(f"[LAYOUT] Resistor {dev_name} @ ({x_coord},{y_coord}) W={rw} L={rl}")
 
             elif "mimcap" in model or "cap_mim" in model:
@@ -178,9 +178,26 @@ def placement(config, pdk):
                 y_coord = clean_param(position.get("y_um", "0u"))
                 device_ref.movex(x_coord)
                 device_ref.movey(y_coord)
-                port_map[dev_name] = {}
-                for pname in device_ref.ports:
-                    port_map[dev_name][pname] = {"param": device_ref.ports[pname], "layer": 2}
+                # Map spice_parser "p"/"n" to MIMCAP's two terminals
+                port_map[dev_name] = {"p": {}, "n": {}}
+                cap_ports = sorted([p for p in device_ref.ports if not p.startswith("cap_")])
+                for spice_term, dev_pname in zip(["p", "n"], cap_ports[:2]):
+                    for direc in ["N", "E", "S", "W"]:
+                        # MIMCAP ports are typically single-direction; fill all with same port
+                        port_map[dev_name][spice_term][direc] = {
+                            "param": device_ref.ports[dev_pname],
+                            "layer": 2
+                        }
+                # Fallback: if no named ports found, try all ports
+                if not cap_ports:
+                    all_ps = list(device_ref.ports)
+                    for i, spice_term in enumerate(["p", "n"]):
+                        if i < len(all_ps):
+                            for direc in ["N", "E", "S", "W"]:
+                                port_map[dev_name][spice_term][direc] = {
+                                    "param": device_ref.ports[all_ps[i]],
+                                    "layer": 2
+                                }
                 print(f"[LAYOUT] MIMCAP {dev_name} @ ({x_coord},{y_coord}) size={size}")
 
             else:
@@ -366,20 +383,26 @@ def manual_placement(devices, pdk, top_cell_name="top"):
                     port_map[name]["body"][direc]["param"] = p
                     port_map[name]["body"][direc]["layer"] = _layer_num(p.layer)
         elif is_res:
-            for term in ["1", "2"]:
+            for term in ["p", "n"]:
                 port_map[name][term] = {}
                 for direc in ["N", "E", "S", "W"]:
                     port_map[name][term][direc] = {"param": gf.port.Port, "layer": 0}
-            for term in ["1", "2"]:
+            for spice_term, dev_term in [("p", "1"), ("n", "2")]:
                 for direc in ["N", "E", "S", "W"]:
-                    pname = f"multiplier_0_{term}_{direc}"
+                    pname = f"multiplier_0_{dev_term}_{direc}"
                     if pname in ref.ports:
                         p = ref.ports[pname]
-                        port_map[name][term][direc]["param"] = p
-                        port_map[name][term][direc]["layer"] = _layer_num(p.layer)
+                        port_map[name][spice_term][direc]["param"] = p
+                        port_map[name][spice_term][direc]["layer"] = _layer_num(p.layer)
         elif is_cap:
-            for pname in ref.ports:
-                port_map[name][pname] = {"param": ref.ports[pname], "layer": _layer_num(ref.ports[pname].layer)}
+            port_map[name] = {"p": {}, "n": {}}
+            cap_ports = [pn for pn in ref.ports if not pn.startswith("cap_")]
+            for spice_term, dev_pname in zip(["p", "n"], cap_ports[:2]):
+                for direc in ["N", "E", "S", "W"]:
+                    port_map[name][spice_term][direc] = {
+                        "param": ref.ports[dev_pname],
+                        "layer": _layer_num(ref.ports[dev_pname].layer)
+                    }
 
         print(f"[PLACEMENT] {name} ({model}) @ ({x:.1f}, {y:.1f})")
 
