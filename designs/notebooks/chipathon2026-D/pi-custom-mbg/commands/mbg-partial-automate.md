@@ -15,3 +15,22 @@
 | LVS | Match |
 | PEX | Done |
 | Post-layout | ≤10% deviation |
+
+## Core Tools Reference (from ~/.pi/core/)
+
+| Tool | Import | Usage |
+|------|--------|-------|
+| **Pipeline (full)** | `from core.pipeline import spice_to_gds_with_checks` | `r = spice_to_gds_with_checks(netlist)` |
+| **Pipeline (layout only)** | `from core.pipeline import spice_to_gds` | `c = spice_to_gds(netlist, run_checks=False)` |
+| **SPICE Parser** | `from core.spice_parser import parse_netlist_with_pdk` | `config = parse_netlist_with_pdk(netlist)` |
+| **DRC** | `from core.checks import run_drc` | `run_drc(gds_path, cell_name)` |
+| **LVS** | `from core.checks import run_lvs` | `run_lvs(gds, netlist, cell_name)` |
+| **PEX** | `from core.checks import run_pex` | `run_pex(gds_path, cell_name)` |
+| **Simulation** | `from core.simulation import run_spice` | `run_spice(spice_path)` |
+
+### Quick Start
+```python
+import sys, os; sys.path.insert(0, os.path.expanduser("~/.pi"))
+from core.pipeline import spice_to_gds_with_checks
+r = spice_to_gds_with_checks(netlist)
+```
