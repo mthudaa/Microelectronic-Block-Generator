@@ -8,7 +8,17 @@ description: Converts SPICE subcircuit netlist to DRC-clean GDSII layout using g
 Convert a SPICE subcircuit netlist into a DRC-clean GDSII layout using gLayout
 with auto-placement, power delivery, and negotiated-congestion routing.
 
-## Quick start
+## ⚠️ Primary API: `spice_to_gds_with_checks()`
+
+Use this for the **full flow** — it handles layout + DRC + LVS + PEX automatically:
+
+```python
+from core.pipeline import spice_to_gds_with_checks
+r = spice_to_gds_with_checks(netlist)
+# r["outdir"], r["gds_path"], r["drc"], r["lvs"], r["pex"], r["all_pass"]
+```
+
+## Quick start (layout only)
 
 ```python
 import sys, os

@@ -15,32 +15,28 @@ description: >
 ```bash
 export PDK_ROOT=/home/huda/.volare
 export PDK=gf180mcuD
-export PDKPATH=/home/huda/.volare/gf180mcuD
-export STD_CELL_LIBRARY=gf180mcu_fd_sc_mcu7t5v0
+export PDKPATH=$PDK_ROOT/$PDK
 ```
 
-Magic and netgen must be in PATH.
+Magic and netgen must be in PATH. PDK setup file is auto-resolved with symlink fallback.
 
 ## Quick Start
 
 ```python
 import sys, os
-sys.path.insert(0, "/foss/designs/chipathon2026-D")
-from core import run_drc, run_lvs, run_pex, extract_layout_netlist
+sys.path.insert(0, os.path.dirname(os.path.abspath(".")))
+from core import run_drc, run_lvs, run_pex
 
 # DRC
-drc = run_drc("out.gds", cell_name="opa_tuned3")
+drc = run_drc("out.gds", cell_name="my_cell")
 print(drc["summary"])   # "DRC: CLEAN" or "DRC: N ERRORS"
 
-# LVS (auto-fixes port order)
-lvs = run_lvs("out.gds", netlist_content=netlist, cell_name="opa_tuned3")
+# LVS (auto-fixes port order, netgen permute 1 3 for D/S swapping)
+lvs = run_lvs("out.gds", netlist_content=netlist, cell_name="my_cell")
 print(lvs["summary"]["message"])  # "LVS OK" or "LVS MISMATCH"
-if not lvs["match"]:
-    print("Port swaps:", lvs["summary"]["port_swaps"])
-    print("Missing:", lvs["summary"]["missing_devices"])
 
 # PEX
-pex = run_pex("out.gds", cell_name="opa_tuned3", mode=2)
+pex = run_pex("out.gds", cell_name="my_cell", mode=2)
 print(pex["summary"])   # "PEX: OK (C-coupled)"
 ```
 

@@ -1,6 +1,10 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "instructions": ["README.md", "designflow.txt"],
+  "instructions": [
+    "README.md",
+    "designflow.txt",
+    "pi-custom-mbg/SKILL.md"
+  ],
   "permission": {
     "edit": "allow",
     "bash": {
@@ -10,6 +14,8 @@
       "python *": "allow",
       "pip *": "ask",
       "rm *": "ask",
+      "curl *": "allow",
+      "git *": "allow",
       "*": "allow"
     },
     "external_directory": {
@@ -19,6 +25,17 @@
     }
   },
   "skills": {
-    "paths": [".opencode/skills"]
+    "paths": [
+      ".opencode/skills",
+      "pi-custom-mbg/custom-ic-netlist-to-layout",
+      "pi-custom-mbg/custom-ic-verify",
+      "pi-custom-mbg/custom-ic-pre-sim",
+      "pi-custom-mbg/custom-ic-post-sim",
+      "pi-custom-mbg/custom-ic-optimize",
+      "pi-custom-mbg/custom-ic-tapeout",
+      "pi-custom-mbg/custom-ic-spec-to-netlist",
+      "pi-custom-mbg/mbg-full-automate",
+      "pi-custom-mbg/custom-ic-research"
+    ]
   }
 }

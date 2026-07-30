@@ -105,6 +105,50 @@ export STD_CELL_LIBRARY=gf180mcu_fd_sc_mcu7t5v0
 Do not assume that a terminal is inside the container. Confirm the environment
 before running container-only commands.
 
+## ⚠️ PDK Design Constraints (GF180MCU 3.3V)
+
+These constraints are enforced at every pipeline stage:
+
+| Constraint | Value | Notes |
+|-----------|-------|-------|
+| **Supply** | **3.3V** single | Use `nfet_03v3` / `pfet_03v3` ONLY |
+| **MOSFET W** | < 10µm | Per finger width |
+| **MOSFET L** | < 10µm | Per transistor |
+| **Device prefix** | `XM1` (not `M1`) | Standard for gf180mcuD |
+| **Fingers vs mult** | Prefer `nf=N` over `m=N` | Better matching, compact |
+| **VDD pad** | `gf180mcu_fd_io__vdd` | Dedicated supply cell |
+| **VSS pad** | `gf180mcu_fd_io__vss` | Dedicated supply cell |
+| **Analog I/O** | `gf180mcu_fd_io__iopin` analog mode | T_EN=0, T_IE=1 |
+
+## ⚠️ Primary Pipeline API
+
+**Always use `spice_to_gds_with_checks(netlist)`** for SPICE→GDS conversion.
+NEVER call individual placement, power, or routing functions manually:
+
+```python
+from core.pipeline import spice_to_gds_with_checks
+r = spice_to_gds_with_checks(netlist)
+# r["outdir"], r["gds_path"], r["drc"], r["lvs"], r["pex"], r["all_pass"]
+```
+
+## ⚠️ Tapeout Gate
+
+| Gate | Requirement |
+|------|-------------|
+| DRC | Magic DRC zero violations (≤100 with note acceptable) |
+| LVS | Netgen LVS: netlist matches layout |
+| PEX | Parasitic extraction complete |
+| Post-layout | Matches pre-layout within 10% tolerance |
+
+A design passing DRC+LVS+PEX = **ready for tapeout**.
+
+## ⚠️ LVS Notes
+
+- Netgen `permute 1 3` handles MOSFET D/S swapping natively — no Python permute needed.
+- Auto net-merge is **disabled** in `run_lvs` (was corrupting schematic netlists).
+- PDK setup file is auto-resolved with symlink fallback.
+- Property errors on LVS match (W/L warnings) are acceptable.
+
 ## AI and LLM Rules
 
 * Load API credentials from `.env` or environment variables.

@@ -5,20 +5,22 @@
 ### `core.pipeline`
 | Function | Description |
 |----------|-------------|
-| `spice_to_gds(netlist, mode, add_labels, run_checks, gds_path)` | SPICE → GDS full flow |
-| `llm_to_gds(prompt, model, api_key, mode)` | Natural language → GDS |
-| `generate_netlist_from_prompt(prompt, model, api_key, api_url, llm_feedback)` | Spec → SPICE via LLM |
+| `spice_to_gds(netlist, mode, add_labels, run_checks, gds_path)` | SPICE → GDS full flow without DRC, LVS, and PEX |
+| `llm_to_gds(prompt, model, api_key, mode)` | Natural language → GDS (single prompt) |
+| `generate_netlist_from_prompt(prompt, model, api_key, api_url, llm_feedback)` | Spec → SPICE via LLM (Single prompt) |
+| `spice_to_gds_check(netlist, mode, add_labels, run_checks, gds_path)` | SPICE → GDS full flow with DRC, LVS, and PEX checks (recomended, ultimate flow)|
+
 
 ### `core.placement`
 | Function | Description |
 |----------|-------------|
-| `manual_placement(devices, pdk, top_cell_name)` | Place devices at explicit (x,y). Returns `(component, port_map, device_map)` |
+| `manual_placement(devices, pdk, top_cell_name)` | Place devices at explicit (x,y). Returns `(component, port_map, device_map)` to make AI easier interferne the device placement|
 | `placement(config, pdk)` | Auto-placement from parsed config |
 
 ### `core.routing`
 | Function | Description |
 |----------|-------------|
-| `manual_route(component, routes, memory)` | Draw explicit trace segments + vias |
+| `manual_route(component, routes, memory)` | Draw explicit trace segments + vias to give AI agent access to intervene to do device routing|
 | `auto_router(component, connection_goals)` | PathFinder NCR auto-routing |
 | `set_pdk(pdk)` | Set active PDK for routing |
 | `get_pdk()` | Get active PDK |
@@ -26,7 +28,7 @@
 ### `core.power`
 | Function | Description |
 |----------|-------------|
-| `manual_power(component, pdk, strips, rails, guardring)` | Add power strips, local rails, guard rings |
+| `manual_power(component, pdk, strips, rails, guardring)` | Add power strips, local rails, guard rings for AI agent access to intervene the power rail generation|
 | `add_power_strips(component, pdk, strip_width, margin)` | Auto power strips from bbox |
 
 ### `core.checks`

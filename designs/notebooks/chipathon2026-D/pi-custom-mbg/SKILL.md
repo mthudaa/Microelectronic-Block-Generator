@@ -50,6 +50,7 @@ The pipeline calls all of these automatically in the correct order.
 ## ⚠️ CAUTION: Prefer `nf` (Fingers) over `m` (Multipliers)
 
 **ALWAYS use finger number (`nf`) instead of multiplier (`m`) for MOSFET sizing.**
+**Use XM1 instead of M1, because it's the standard convention in SPICE and better represents the physical structure of the transistor of gf180mcuD PDK.**
 
 | Parameter | Behavior | Recommendation |
 |-----------|----------|----------------|
@@ -71,19 +72,17 @@ XM1 out in vdd vdd pfet_03v3 L=1u W=2u nf=1 m=4
 | Constraint | Value | Notes |
 |-----------|-------|-------|
 | **Supply** | 3.3V single | Use `nfet_03v3` / `pfet_03v3` ONLY |
-| **MOSFET W limit** | < 10µm | Per transistor finger width |
-| **MOSFET L limit** | < 10µm | Per transistor |
+| **MOSFET W limit** | < 5µm | Per transistor finger width |
+| **MOSFET L limit** | < 5µm | Per transistor |
 | **VDD pad** | `gf180mcu_fd_io__vdd` | Dedicated supply cell |
 | **VSS pad** | `gf180mcu_fd_io__vss` | Dedicated supply cell |
-| **Analog I/O** | `gf180mcu_fd_io__iopin` analog mode | T_EN=0, T_IE=1, ESD+pad cap only |
-| **Digital input** | `gf180mcu_fd_io__iopin` digital input mode | T_EN=0, T_IE=1 |
-| **Digital output** | `gf180mcu_fd_io__iopin` digital output mode | T_EN=1, T_IE=0 |
+| **Analog I/O** | `gf180mcu_fd_io__asign` analog mode | T_EN=0, T_IE=1, ESD+pad cap only, use this for Digital/Analog interfaces |
 
 ## ⚠️ Tapeout Gate — ALL must pass
 
 | Gate | Requirement |
 |------|-------------|
-| ✅ DRC | Magic DRC zero violations |
+| ✅ DRC | Magic DRC zero violations, if DRC error les than 100 you can pass it with giving a note to the user |
 | ✅ LVS | Netgen LVS: netlist matches layout |
 | ✅ PEX | Parasitic extraction → post-layout sim |
 | ✅ Post-layout | Matches pre-layout within 10% tolerance |
