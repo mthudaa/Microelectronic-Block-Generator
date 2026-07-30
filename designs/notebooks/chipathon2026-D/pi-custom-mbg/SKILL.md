@@ -47,6 +47,25 @@ top_level = auto_router(top_level, connections)     # NO
 ```
 The pipeline calls all of these automatically in the correct order.
 
+## ⚠️ CAUTION: Prefer `nf` (Fingers) over `m` (Multipliers)
+
+**ALWAYS use finger number (`nf`) instead of multiplier (`m`) for MOSFET sizing.**
+
+| Parameter | Behavior | Recommendation |
+|-----------|----------|----------------|
+| `nf=N` | Creates N gate fingers sharing diffusion | ✅ **PREFERRED** — better matching, compact |
+| `m=N` | Creates N separate transistor instances | ❌ **AVOID** — worse matching, larger area |
+
+```spice
+* ✅ CORRECT — use nf for wider transistors
+XM1 out in vdd vdd pfet_03v3 L=1u W=2u nf=4 m=1
+
+* ❌ WRONG — using multiplier instead of fingers
+XM1 out in vdd vdd pfet_03v3 L=1u W=2u nf=1 m=4
+```
+
+**Why**: Fingered transistors share diffusion regions, reducing parasitic capacitance and improving matching for differential pairs and current mirrors. Multipliers create isolated instances that must be routed separately, increasing area and mismatch.
+
 ## Quick Start
 
 Choose your mode:
