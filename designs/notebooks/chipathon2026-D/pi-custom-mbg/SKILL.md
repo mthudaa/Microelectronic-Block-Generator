@@ -66,6 +66,39 @@ XM1 out in vdd vdd pfet_03v3 L=1u W=2u nf=1 m=4
 
 **Why**: Fingered transistors share diffusion regions, reducing parasitic capacitance and improving matching for differential pairs and current mirrors. Multipliers create isolated instances that must be routed separately, increasing area and mismatch.
 
+## ⚠️ PDK Constraints (GF180MCU — enforced at every stage)
+
+| Constraint | Value | Notes |
+|-----------|-------|-------|
+| **Supply** | 3.3V single | Use `nfet_03v3` / `pfet_03v3` ONLY |
+| **MOSFET W limit** | < 10µm | Per transistor finger width |
+| **MOSFET L limit** | < 10µm | Per transistor |
+| **VDD pad** | `gf180mcu_fd_io__vdd` | Dedicated supply cell |
+| **VSS pad** | `gf180mcu_fd_io__vss` | Dedicated supply cell |
+| **Analog I/O** | `gf180mcu_fd_io__iopin` analog mode | T_EN=0, T_IE=1, ESD+pad cap only |
+| **Digital input** | `gf180mcu_fd_io__iopin` digital input mode | T_EN=0, T_IE=1 |
+| **Digital output** | `gf180mcu_fd_io__iopin` digital output mode | T_EN=1, T_IE=0 |
+
+## ⚠️ Tapeout Gate — ALL must pass
+
+| Gate | Requirement |
+|------|-------------|
+| ✅ DRC | Magic DRC zero violations |
+| ✅ LVS | Netgen LVS: netlist matches layout |
+| ✅ PEX | Parasitic extraction → post-layout sim |
+| ✅ Post-layout | Matches pre-layout within 10% tolerance |
+
+A design that passes DRC+LVS+PEX = **ready for tapeout**. Anything less is incomplete.
+
+## ⚠️ Anti-Hallucination Rules
+
+- If unsure about a parameter, output `UNSURE: [parameter]` + reason
+- Do NOT fabricate simulation results — only report computed values
+- Every spec claim must have calculated or theoretical justification
+- If a spec cannot be met, state clearly and explain trade-offs
+- Show ALL design equations used
+- Never claim DRC/LVS/PEX success without evidence from actual tool output
+
 ## Quick Start
 
 Choose your mode:

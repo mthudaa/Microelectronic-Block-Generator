@@ -1,55 +1,24 @@
-# /mbg-full-automate — Full Automatic Analog IC Design Flow
+# /mbg-full-automate — D08 Full Automatic Analog IC Flow
 
-**Mode**: AI-driven, minimal user intervention after initial spec.
+**PDK**: GF180MCU | 3.3V | nfet_03v3/pfet_03v3 | W<10µm L<10µm
+**LAYOUT**: `spice_to_gds_with_checks(netlist)` — NEVER manual step-by-step
+**IOPIN**: VDD→vdd | VSS→vss | Analog→iopin(T_EN=0,T_IE=1) | Digital in→iopin(0,1) | Digital out→iopin(1,0)
 
-## Workflow
+## Pipeline
+```
+1.SELECT → 2.PARSE → 3.GENERATE → 4.SIMULATE → 5.CHECK → 6.LAYOUT → 7.DRC/LVS/PEX → 8.POST-LAYOUT → 9.REPORT
+```
 
-### Step 1: Gather Requirements
-Ask the user:
-- What circuit to design? (e.g. "5T-OTA", "bandgap reference", "comparator")
-- Target specifications? (gain, bandwidth, power, area)
-- PDK constraints? (default: gf180mcuD, 1.8V)
+## TAPEOUT GATE
+| Gate | Requirement |
+|------|-------------|
+| DRC | Magic DRC = 0 |
+| LVS | Netgen match |
+| PEX | Extraction done |
+| Post-layout | ≤10% deviation from pre-layout |
 
-### Step 2: Research & Topology
-- Research optimal topology for given specs
-- Determine initial device sizing
-- Analyze trade-offs (power vs speed, area vs matching)
-- Present findings to user for confirmation
-
-### Step 3: Confirmation
-- Show proposed topology and sizing
-- **User must confirm** before proceeding
-- If rejected, return to Step 2 with feedback
-
-### Step 4: Pre-Layout Simulation & Finetuning
-- Generate SPICE netlist with initial sizing
-- Run `ngspice` simulation
-- Compare results against target specs
-- **Auto-finetune**: iteratively adjust W/L until specs met
-- Report final pre-simulation results
-
-### Step 5: Layout Generation (SPICE → GDS)
-- Convert SPICE to GDS using `spice_to_gds_with_checks()`
-- Auto-placement, power routing, signal routing (PathFinder NCR)
-- Run DRC — auto-fix if errors
-- Run LVS:
-  - **MATCH** → proceed to Step 6
-  - **MISMATCH** → simplify SPICE architecture, retry
-
-### Step 6: PEX & Post-Layout Verification
-- Run parasitic extraction (PEX)
-- Run post-layout simulation
-- Compare pre-sim vs post-sim:
-  - **Within spec** → proceed to Step 7
-  - **Too far off** → finetune sizing, retry from Step 4
-
-### Step 7: Final Report
-- Layout GDS file
-- DRC/LVS/PEX status
-- Pre-sim vs post-sim comparison
-- **Tapeout-ready** design
-
-## Safety
-- Never claim DRC/LVS/PEX success without evidence
-- Verify ngspice output before claiming results
-- No automatic git operations
+## Anti-Hallucination
+- UNSURE: [param] + reason
+- Never fabricate sim results
+- Every claim has proof
+- No DRC/LVS/PEX claim without evidence
