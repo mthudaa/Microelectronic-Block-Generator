@@ -2,13 +2,50 @@
 name: custom-ic-mbg
 description: >
   Complete custom analog IC design flow from specification to tapeout-ready GDSII.
-  Covers the full pipeline: spec-to-netlist, pre-layout simulation, layout generation
-  (placement/power/routing), DRC/LVS/PEX verification, post-layout simulation,
-  SPICE-in-the-loop optimization, and tapeout packaging. Uses GF180MCU PDK.
+  Two modes: /mbg-full-automate (AI-driven) and /mbg-partial-automate (user-guided).
+  Covers: spec-to-netlist, pre-layout simulation, layout (placement/power/routing),
+  DRC/LVS/PEX verification, post-layout simulation, SPICE-in-the-loop optimization,
+  and tapeout packaging. Uses GF180MCU PDK.
   Trigger on any IC design task.
 ---
 
 # Custom IC Design Flow — Microelectronic Block Generator (MBG)
+
+## Quick Start
+
+Choose your mode:
+
+| Command | Mode | User Involvement |
+|---------|------|-----------------|
+| `/mbg-full-automate` | AI-driven | Minimal — confirm at key checkpoints |
+| `/mbg-partial-automate` | User-guided | Full — confirm every step |
+
+## /mbg-full-automate — Full Automatic Flow
+
+```
+User Spec → Research → Confirm → Pre-Sim → Layout → LVS → PEX → Tapeout
+    │           │         │         │         │       │      │       │
+    └─ AI asks  └─ AI     └─ User   └─ AI     └─ AI   └─ AI  └─ AI   └─ Done
+       user      researches  approves  finetunes  places  checks matches final
+```
+
+**Steps**: See `commands/mbg-full-automate.md` for detailed workflow.
+
+## /mbg-partial-automate — Semi-Automatic Flow
+
+```
+User Spec → Research → Netlist → Pre-Sim → Layout → DRC/LVS → PEX → Tapeout
+    │          │         │         │         │         │       │       │
+    └─ AI asks └─ User   └─ User   └─ User   └─ User   └─ User └─ User └─ User
+                reviews   edits     reviews    directs   reviews compares approves
+```
+
+**Steps**: See `commands/mbg-partial-automate.md` for detailed workflow.
+
+## Development Tracking
+
+See `pi.dev.md` for active tasks, priorities, and completed items.
+
 
 ## Working Directory
 
