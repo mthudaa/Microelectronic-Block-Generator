@@ -3,13 +3,49 @@ name: custom-ic-mbg
 description: >
   Complete custom analog IC design flow from specification to tapeout-ready GDSII.
   Two modes: /mbg-full-automate (AI-driven) and /mbg-partial-automate (user-guided).
-  Covers: spec-to-netlist, pre-layout simulation, layout (placement/power/routing),
-  DRC/LVS/PEX verification, post-layout simulation, SPICE-in-the-loop optimization,
-  and tapeout packaging. Uses GF180MCU PDK.
+  PRIMARY API: Always use spice_to_gds_with_checks(netlist) for SPICE-to-GDS conversion.
+  DO NOT manually call placement → power → routing — the pipeline handles everything.
   Trigger on any IC design task.
 ---
 
 # Custom IC Design Flow — Microelectronic Block Generator (MBG)
+
+## ⚠️ CRITICAL: Always Use `spice_to_gds_with_checks(netlist)`
+
+**NEVER** manually call individual placement, power, or routing functions.
+The pipeline function `spice_to_gds_with_checks()` handles everything automatically:
+
+```python
+from core.pipeline import spice_to_gds_with_checks
+
+netlist = """
+.lib "..." typical
+.subckt my_design vdd vss in out
+...
+.ends
+"""
+
+result = spice_to_gds_with_checks(netlist)
+# Returns: outdir, gds_path, svg_path, drc, lvs, pex, all_pass
+```
+
+### When to use which function
+
+| Function | Use Case |
+|----------|----------|
+| `spice_to_gds_with_checks(netlist)` | **PRIMARY** — full SPICE→GDS+DRC+LVS+PEX |
+| `spice_to_gds(netlist, run_checks=False)` | Layout only, skip DRC/LVS/PEX |
+| `spice_to_gds(netlist, run_checks=True)` | Layout + checks inline |
+| `llm_to_gds_with_manifest(prompt)` | LLM prompt→GDS with experiment tracking |
+
+### ❌ NEVER do this (manual step-by-step)
+```python
+# WRONG — don't call these manually:
+top_level, port_map = placement(config, pdk)       # NO
+top_level, _ = manual_power(top_level, pdk, ...)   # NO
+top_level = auto_router(top_level, connections)     # NO
+```
+The pipeline calls all of these automatically in the correct order.
 
 ## Quick Start
 
