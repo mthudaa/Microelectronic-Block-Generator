@@ -83,16 +83,24 @@ prompt specifying only the target PDK and circuit type.
 | **Token consumption** | **~95K tokens** (input + output, single-pass generation) |
 | **API cost (est.)** | **~$0.05** (≈ Rp 800) |
 
-**Simulation plots generated:**
+**User prompt:**
 
-| Plot | File | Content |
-| :--- | :--- | :--- |
-| AC Gain | [`ota_5t_ac.png`](ota_5t/ota_5t_ac.png) | Gain (dB) vs Frequency |
-| DC Gain | [`ota_5t_dc_gain.png`](ota_5t/ota_5t_dc_gain.png) | DC transfer characteristic |
-| GBW | [`ota_5t_gbw.png`](ota_5t/ota_5t_gbw.png) | Gain-Bandwidth product |
-| Phase Margin | [`ota_5t_pm.png`](ota_5t/ota_5t_pm.png) | Phase (°) vs Frequency |
-| Slew Rate | [`ota_5t_sr.png`](ota_5t/ota_5t_sr.png) | Transient step response |
-| Report | [`ota_5t_report.png`](ota_5t/ota_5t_report.png) | Combined summary dashboard |
+> create 5T-OTA with external Vbias, don't use any passive component like
+> R/C. I want spec DC gain >25dB, other spec not matter.
+
+**Layout preview:**
+
+![OTA 5T Layout](ota_5t/ota_5t.svg)
+
+**Simulation plots:**
+
+| AC Gain | DC Gain | GBW |
+| :---: | :---: | :---: |
+| ![AC](ota_5t/ota_5t_ac.png) | ![DC](ota_5t/ota_5t_dc_gain.png) | ![GBW](ota_5t/ota_5t_gbw.png) |
+
+| Phase Margin | Slew Rate | Summary Report |
+| :---: | :---: | :---: |
+| ![PM](ota_5t/ota_5t_pm.png) | ![SR](ota_5t/ota_5t_sr.png) | ![Report](ota_5t/ota_5t_report.png) |
 
 **AI Agent notes:** This design served as the initial proof-of-concept for the
 SPICE→GDS pipeline. The agent correctly identified the 5T OTA topology,
@@ -137,14 +145,24 @@ until all performance targets were met.
 | **Token consumption** | **~120K tokens** (multiple SPICE-in-the-loop refinement iterations) |
 | **API cost (est.)** | **~$0.06** (≈ Rp 950) |
 
-**Simulation plots generated:**
+**User prompt (via `/mbg-full-automate`):**
 
-| Plot | File | Content |
-| :--- | :--- | :--- |
-| Pre-layout DC Transfer | [`pre_dc_transfer.png`](comparator_core/pre_dc_transfer.png) | VOUT vs VIN differential |
-| Pre-layout Transient | [`pre_tran_response.png`](comparator_core/pre_tran_response.png) | Clocked comparator response |
-| Post-layout DC Transfer | [`post_dc_transfer.png`](comparator_core/post_dc_transfer.png) | Post-PEX DC verification |
-| Post-layout Transient | [`post_tran_response.png`](comparator_core/post_tran_response.png) | Post-PEX transient verification |
+> Design a two-stage open-loop comparator with GF180MCU 3.3V PDK.
+> Target specs: Gain ≥ 40dB, Delay < 200ns, Power < 200µA, Offset < 20mV.
+
+**Layout preview:**
+
+![Comparator Layout](comparator_core/comparator_core.svg)
+
+**Simulation plots:**
+
+| Pre-layout DC Transfer | Pre-layout Transient |
+| :---: | :---: |
+| ![Pre DC](comparator_core/pre_dc_transfer.png) | ![Pre Tran](comparator_core/pre_tran_response.png) |
+
+| Post-layout DC Transfer | Post-layout Transient |
+| :---: | :---: |
+| ![Post DC](comparator_core/post_dc_transfer.png) | ![Post Tran](comparator_core/post_tran_response.png) |
 
 **AI Agent notes:** This design demonstrates the full SPICE-in-the-loop
 refinement capability. The initial netlist failed the transient simulation
@@ -192,17 +210,29 @@ temperature-independent bias circuits.
 | **Token consumption** | **~105K tokens** (detailed parameter sweeps + pre/post comparison) |
 | **API cost (est.)** | **~$0.06** (≈ Rp 950) |
 
-**Simulation plots generated:**
+**User prompt (via `/mbg-full-automate`):**
 
-| Plot | File | Content |
-| :--- | :--- | :--- |
-| Pre-layout DC Sweep | [`plot_pre_dc.png`](mbg_vref_1v2/plot_pre_dc.png) | VREF vs VDD sweep |
-| Pre-layout Temperature | [`plot_pre_temp.png`](mbg_vref_1v2/plot_pre_temp.png) | VREF vs Temperature (−40°C to 125°C) |
-| Pre-layout Transient | [`plot_pre_tran.png`](mbg_vref_1v2/plot_pre_tran.png) | Start-up transient |
-| Post-layout DC Sweep | [`plot_post_dc.png`](mbg_vref_1v2/plot_post_dc.png) | Post-PEX VREF vs VDD |
-| Post-layout Temperature | [`plot_post_temp.png`](mbg_vref_1v2/plot_post_temp.png) | Post-PEX temp sweep |
-| Post-layout Transient | [`plot_post_tran.png`](mbg_vref_1v2/plot_post_tran.png) | Post-PEX start-up |
-| Pre/Post Comparison | [`plot_compare.png`](mbg_vref_1v2/plot_compare.png) | Overlay comparison |
+> Simple MOSFET-only Voltage Reference with GF180MCU 3.3V PDK.
+> Target: VREF = 1.2V, beta-multiplier + diode load topology,
+> relaxed tempco (>200 ppm/°C), no strict current limit.
+
+**Layout preview:**
+
+![VREF Layout](mbg_vref_1v2/vref_1v2/vref_1v2.svg)
+
+**Simulation plots:**
+
+| Pre DC Sweep | Pre Temperature | Pre Transient |
+| :---: | :---: | :---: |
+| ![Pre DC](mbg_vref_1v2/plot_pre_dc.png) | ![Pre Temp](mbg_vref_1v2/plot_pre_temp.png) | ![Pre Tran](mbg_vref_1v2/plot_pre_tran.png) |
+
+| Post DC Sweep | Post Temperature | Post Transient |
+| :---: | :---: | :---: |
+| ![Post DC](mbg_vref_1v2/plot_post_dc.png) | ![Post Temp](mbg_vref_1v2/plot_post_temp.png) | ![Post Tran](mbg_vref_1v2/plot_post_tran.png) |
+
+| Pre/Post Comparison |
+| :---: |
+| ![Compare](mbg_vref_1v2/plot_compare.png) |
 
 **Pre vs Post-Layout Comparison:**
 
