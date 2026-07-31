@@ -160,3 +160,7 @@ function now:
 4. Feeds the fixed netlist to netgen for comparison
 
 This eliminates `vin↔vip` and `vdd↔vss` swap errors automatically.
+
+## ⚠️ PDK Body Constraint
+
+**MOSFET body: pfet_03v3→VDD ONLY, nfet_03v3→VSS ONLY.** No other connections allowed.

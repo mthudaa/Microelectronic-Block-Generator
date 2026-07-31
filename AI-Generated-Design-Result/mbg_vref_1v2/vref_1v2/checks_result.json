@@ -1,0 +1,10 @@
+{
+  "drc_summary": "DRC: CLEAN",
+  "drc_clean": true,
+  "drc_errors": 59,
+  "lvs_match": false,
+  "lvs_summary": "{'match': False, 'device_mismatch': '?', 'net_mismatch': '?', 'port_swaps': [], 'missing_devices': [], 'message': 'LVS MISMATCH'}",
+  "pex_path": "/home/huda/mbg_vref_1v2/vref_1v2/vref_1v2.pex.spice",
+  "pex_summary": "PEX: OK (C-coupled)",
+  "all_pass": false
+}

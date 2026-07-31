@@ -1,0 +1,32 @@
+* SPICE3 file created from vref_1v2.ext - technology: gf180mcuD
+
+.option scale=5n
+
+.subckt vref_1v2 vdd vss vref
+X0 a_n200_7311# a_n200_7311# vdd vdd pfet_03v3 ad=96n pd=1.84m as=96n ps=1.84m w=800 l=400
+X1 a_3229_3519# a_n200_n689# a_2709_3519# vss nfet_03v3 ad=44.8n pd=0.912m as=96n ps=1.84m w=800 l=400
+X2 a_3229_3519# a_n200_7311# vdd vdd pfet_03v3 ad=96n pd=1.84m as=96n ps=1.84m w=800 l=400
+X3 vref a_n200_7311# vdd vdd pfet_03v3 ad=96n pd=1.84m as=96n ps=1.84m w=800 l=400
+X4 a_n200_n689# a_n200_n689# vss vss nfet_03v3 ad=96n pd=1.84m as=96n ps=1.84m w=800 l=400
+X5 a_2709_3519# vdd vss vss nfet_03v3 ad=96n pd=1.84m as=96n ps=1.84m w=800 l=400
+X6 a_2709_3519# a_n200_n689# a_3229_3519# vss nfet_03v3 ad=96n pd=1.84m as=44.8n ps=0.912m w=800 l=400
+X7 vref vref vss vss nfet_03v3 ad=96n pd=1.84m as=96n ps=1.84m w=800 l=400
+C0 a_3229_3519# a_n200_n689# 0.47717f
+C1 a_3229_3519# vref 0.08862f
+C2 vref a_n200_n689# 0.09365f
+C3 vdd a_3229_3519# 2.2078f
+C4 vdd vref 1.91239f
+C5 m4_3570_5311# vref 0.02814f
+C6 a_n200_7311# a_3229_3519# 0.29689f
+C7 a_n200_7311# vref 0.4138f
+C8 a_2709_3519# a_3229_3519# 1.70563f
+C9 a_2709_3519# a_n200_n689# 0.54465f
+C10 a_2709_3519# vref 0.31821f
+C11 vdd a_n200_7311# 6.71867f
+C12 vdd a_2709_3519# 0.26439f
+C13 m4_3570_5311# vss 0.02506f 
+C14 a_2709_3519# vss 25.09814f
+C15 a_3229_3519# vss 6.79775f
+V_bridge a_n200_7311# a_n200_n689# DC 0
+.ends
+

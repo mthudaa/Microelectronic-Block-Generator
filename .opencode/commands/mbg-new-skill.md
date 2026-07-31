@@ -38,6 +38,11 @@ as the requested purpose or capability.
 9. Set the correct project owner and dependencies.
 10. Do not invent tools, APIs, modules, or verification results.
 
+## ⚠️ PDK Body Constraint
+
+**MOSFET body: pfet_03v3→VDD ONLY, nfet_03v3→VSS ONLY.** If your skill
+generates or processes SPICE netlists, it must enforce this rule.
+
 ## Required Frontmatter
 
 ```yaml

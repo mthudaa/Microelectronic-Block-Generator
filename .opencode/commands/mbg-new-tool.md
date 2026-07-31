@@ -36,6 +36,11 @@ the requested operation or purpose.
 11. Identify side effects and generated artifacts.
 12. Do not invent project APIs or modules that do not exist.
 
+## ⚠️ PDK Body Constraint
+
+**MOSFET body: pfet_03v3→VDD ONLY, nfet_03v3→VSS ONLY.** If your tool
+generates or processes SPICE netlists, it must enforce this rule.
+
 ## Path Safety
 
 When accepting a filesystem path:

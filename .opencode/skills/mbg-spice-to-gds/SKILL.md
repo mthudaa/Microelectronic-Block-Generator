@@ -61,6 +61,7 @@ r = spice_to_gds_with_checks(netlist)
 | MOSFET models | nfet_03v3 / pfet_03v3 ONLY |
 | W limit | < 5µm per finger |
 | L limit | < 5µm |
+| **Body** | **pfet_03v3→VDD ONLY, nfet_03v3→VSS ONLY** |
 | Device prefix | XM1 (not M1) |
 | Fingers vs multipliers | Prefer nf=N over m=N |
 

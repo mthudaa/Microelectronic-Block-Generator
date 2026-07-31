@@ -1,0 +1,18 @@
+* Post-layout AC with data export
+.include '/home/huda/.volare/gf180mcuD/libs.tech/ngspice/design.ngspice'
+.lib '/home/huda/.volare/gf180mcuD/libs.tech/ngspice/sm141064.ngspice' typical
+.include ota_5t.pex.spice
+
+X1 vdd vss vb out inm inp ota_5t
+Vdd vdd 0 DC 3.3
+Vss vss 0 DC 0
+Vb vb 0 DC 2.3
+Vinp inp 0 DC 1.65 AC 1
+Vinm inm 0 DC 1.65
+CL out 0 1p
+
+.control
+ac dec 50 1 1e9
+wrdata post_ac.dat vdb(out) frequency
+.endc
+.END

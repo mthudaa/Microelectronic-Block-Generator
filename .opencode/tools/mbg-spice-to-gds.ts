@@ -1,12 +1,25 @@
 import { tool } from "@opencode-ai/plugin"
 import path from "node:path"
+import { homedir } from "node:os"
 import { execSync } from "node:child_process"
 import { writeFile, mkdir } from "node:fs/promises"
 
-const CORE_DIR = path.resolve(
-  import.meta.dirname,
-  "core",
-)
+const CORE_DIR = path.resolve(import.meta.dirname)
+
+/**
+ * Resolve the working directory for pipeline execution.
+ *
+ * Priority:
+ *   1. ``MBG_WORKDIR`` environment variable
+ *   2. ``$HOME`` (user home directory)
+ *   3. ``context.workdir`` (VS Code workspace root)
+ */
+function resolveWorkdir(context: { workdir?: string }): string {
+  if (process.env.MBG_WORKDIR) {
+    return path.resolve(process.env.MBG_WORKDIR)
+  }
+  return context.workdir || homedir()
+}
 
 /**
  * Run the MBG SPICE-to-GDS pipeline with DRC/LVS/PEX checks.
@@ -38,6 +51,14 @@ const mbgSpiceToGds = tool({
     },
   },
   execute: async ({ netlist, workdir, mode }, context) => {
+    const cwd = resolveWorkdir(context)
+
+    // Build workdir argument for the Python pipeline
+    let workdirArg = "None"
+    if (workdir) {
+      workdirArg = JSON.stringify(path.resolve(cwd, workdir))
+    }
+
     const script = `
 import sys, os, json
 sys.path.insert(0, ${JSON.stringify(CORE_DIR)})
@@ -48,7 +69,8 @@ os.environ.setdefault("PDKPATH", os.path.join(os.environ["PDK_ROOT"], os.environ
 from core.pipeline import spice_to_gds_with_checks
 
 netlist = ${JSON.stringify(netlist)}
-r = spice_to_gds_with_checks(netlist)
+wd = ${workdirArg}
+r = spice_to_gds_with_checks(netlist, gds_path=wd)
 print(json.dumps({
     "outdir": r["outdir"],
     "gds_path": r["gds_path"],
@@ -61,10 +83,7 @@ print(json.dumps({
 }, indent=2))
 `
 
-    const tmpScript = path.join(
-      context.workdir || "/tmp",
-      "mbg_pipeline_run.py",
-    )
+    const tmpScript = path.join(cwd, "mbg_pipeline_run.py")
     await mkdir(path.dirname(tmpScript), { recursive: true })
     await writeFile(tmpScript, script, "utf-8")
 
@@ -72,7 +91,7 @@ print(json.dumps({
       const stdout = execSync(
         `python3 ${tmpScript}`,
         {
-          cwd: context.workdir || process.cwd(),
+          cwd,
           timeout: 600_000, // 10 min
           encoding: "utf-8",
           maxBuffer: 10 * 1024 * 1024,

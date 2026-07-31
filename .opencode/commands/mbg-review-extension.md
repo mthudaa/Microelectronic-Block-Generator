@@ -36,6 +36,11 @@ $1
 7. Do not modify the reviewed file.
 8. Do not stage, commit, or push changes.
 
+## ⚠️ PDK Body Constraint
+
+**MOSFET body: pfet_03v3→VDD ONLY, nfet_03v3→VSS ONLY.** Extensions that
+generate or process SPICE must enforce this rule.
+
 ## Output Format
 
 ```text

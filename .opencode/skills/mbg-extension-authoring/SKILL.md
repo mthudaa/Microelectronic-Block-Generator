@@ -80,6 +80,12 @@ Use lowercase alphanumeric kebab-case.
 For skills, the folder name must match the `name` value in the YAML
 frontmatter.
 
+## ⚠️ PDK Body Constraint (all generated SPICE)
+
+**MOSFET body: pfet_03v3→VDD ONLY, nfet_03v3→VSS ONLY.** Any skill, tool,
+command, or agent that generates or processes SPICE netlists must enforce
+this rule.
+
 ## Skill Requirements
 
 A skill must be stored at:

@@ -1,0 +1,60 @@
+
+Magic 8.3 revision 669 - Compiled on Sat Jul  4 04:51:36 AM CST 2026.
+Starting magic under Tcl interpreter
+Using the terminal as the console.
+Using NULL graphics device.
+Processing system .magicrc file
+Switching to WIRING tool.
+Switching to NETLIST tool.
+Switching to PICK tool.
+Switching to BOX tool.
+Sourcing design .magicrc for technology gf180mcuD ...
+10 Magic internal units = 1 Lambda
+Input style import: scaleFactor=10, multiplier=2
+The following types are not handled by extraction and will be treated as non-electrical types:
+    obsactive mvobsactive filldiff fillpoly m1hole obsm1 fillm1 obsv1 m2hole obsm2 fillm2 obsv2 m3hole obsm3 fillm3 m4hole obsm4 fillm4 m5hole obsm5 fillm5 glass fillblock lvstext obscomment 
+Scaled tech values by 10 / 1 to match internal grid scaling
+Loading gf180mcuD Device Generator Menu ...
+Loading "drc_cmd.tcl" from command line.
+Warning: Calma reading is not undoable!  I hope that's OK.
+Library written using GDS-II Release 6.0
+Library name: library
+Reading "comparator_core".
+Loading DRC CIF style.
+No option given in ":drc" command.
+ isn't a valid drc option.
+DRC commands have the form ":drc [list|listall] option", where option is one of:
+    catchup                run checker and wait for it to complete
+    check                  recheck area under box in all cells
+    count [total]          count error tiles in each cell under box
+    euclidean on|off	enable/disable Euclidean geometry checking
+    find [nth]     	locate next (or nth) error in the layout
+    help                   print this help information
+    ignore	[<text>|none]   do not report on rules with this text
+    off                    turn off background checker
+    on                     reenable background checker
+    status			report if the drc checker is on or off
+    style			set the DRC style
+    printrules [file]      print out design rules in file or on tty
+    rulestats              print out stats about design rule database
+    statistics             print out statistics gathered by checker
+    why                    print out reasons for errors under box
+DRC done.
+query isn't a valid drc option.
+DRC commands have the form ":drc [list|listall] option", where option is one of:
+    catchup                run checker and wait for it to complete
+    check                  recheck area under box in all cells
+    count [total]          count error tiles in each cell under box
+    euclidean on|off	enable/disable Euclidean geometry checking
+    find [nth]     	locate next (or nth) error in the layout
+    help                   print this help information
+    ignore	[<text>|none]   do not report on rules with this text
+    off                    turn off background checker
+    on                     reenable background checker
+    status			report if the drc checker is on or off
+    style			set the DRC style
+    printrules [file]      print out design rules in file or on tty
+    rulestats              print out stats about design rule database
+    statistics             print out statistics gathered by checker
+    why                    print out reasons for errors under box
+TOTAL_DRC_ERRORS: 

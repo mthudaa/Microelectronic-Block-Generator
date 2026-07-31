@@ -48,6 +48,12 @@ Review the experiment for:
 * DRC status.
 * LVS status.
 * PEX status.
+
+## ⚠️ PDK Body Constraint
+
+**MOSFET body: pfet_03v3→VDD ONLY, nfet_03v3→VSS ONLY.** When reviewing
+generated SPICE, verify all body terminals are connected to the correct
+supply rail.
 * Post-layout simulation status.
 * Final-status consistency.
 * Prompt artifact.

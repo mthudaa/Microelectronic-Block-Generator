@@ -96,6 +96,7 @@ Returns: `{netlist_path, raw_ports, log, success}`
 
 ## Safety Rules
 
+- **MOSFET body: pfet_03v3→VDD ONLY, nfet_03v3→VSS ONLY**
 - Never claim verification success without actual tool output
 - PDK setup file must exist (auto-resolved with symlink fallback)
 - LVS net merge is DISABLED (was corrupting schematic netlists)

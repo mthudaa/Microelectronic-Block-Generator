@@ -1,6 +1,7 @@
 # /mbg-full-automate — D08 Full Automatic Analog IC Flow
 
 **PDK**: GF180MCU | 3.3V | nfet_03v3/pfet_03v3 | W<10µm L<10µm
+**BODY**: pfet_03v3→VDD ONLY | nfet_03v3→VSS ONLY
 **LAYOUT**: `spice_to_gds_with_checks(netlist)` — NEVER manual step-by-step
 **IOPIN**: VDD→vdd | VSS→vss | Analog→iopin(T_EN=0,T_IE=1) | Digital in→iopin(0,1) | Digital out→iopin(1,0)
 
@@ -16,6 +17,10 @@
 | LVS | Netgen match |
 | PEX | Extraction done |
 | Post-layout | ≤10% deviation from pre-layout |
+
+> **⚠️ Sim plots required:** Save AC/DC/TRAN plots as `.png` in workdir.
+> Pre-layout: `<cell>_ac_pre.png`, `<cell>_tran_pre.png`
+> Post-layout: `<cell>_ac_post.png`, `<cell>_tran_post.png`
 
 ## Anti-Hallucination
 - UNSURE: [param] + reason

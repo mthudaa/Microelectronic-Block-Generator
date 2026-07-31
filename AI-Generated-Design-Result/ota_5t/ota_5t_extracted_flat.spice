@@ -1,0 +1,10 @@
+* NGSPICE file created from ota_5t.ext - technology: gf180mcuD
+
+.subckt ota_5t vdd vss inp inm out vb
+X0 a_n220_1519# vb vdd vdd pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=1u
+X1 a_100_1519# inp a_n220_1519# vdd pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=1u
+X2 out inm a_n220_1519# vdd pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=1u
+X3 out a_100_1519# vss vss nfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=1u
+X4 a_100_1519# a_100_1519# vss vss nfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=1u
+.ends
+

@@ -37,7 +37,7 @@ r = spice_to_gds_with_checks(netlist)
 | **MOSFET L** | < 10µm | Per transistor |
 | **VDD pad** | `gf180mcu_fd_io__vdd` | Dedicated supply cell |
 | **VSS pad** | `gf180mcu_fd_io__vss` | Dedicated supply cell |
-| **Analog I/O** | `gf180mcu_fd_io__iopin` (analog mode) | T_EN=0, T_IE=1 |
+| **Analog I/O** | `gf180mcu_fd_io__asign` (analog mode) | T_EN=0, T_IE=1 |
 
 ## ⚠️ CAUTION: Prefer `nf` (Fingers) over `m` (Multipliers)
 
@@ -56,7 +56,7 @@ XM1 out in vdd vdd pfet_03v3 L=1u W=2u nf=1 m=4
 
 - Models: `nfet_03v3` (NMOS), `pfet_03v3` (PMOS)
 - Supply: VDD = 3.3V, VSS = 0V
-- Body: NMOS→vss, PMOS→vdd
+- **Body: pfet_03v3→VDD ONLY, nfet_03v3→VSS ONLY** (no other connections allowed)
 - Model: `$PDK_ROOT/gf180mcuD/libs.tech/ngspice/sm141064.ngspice`
 - Corners: typical, ss, ff, sf, fs
 
@@ -83,9 +83,13 @@ A design passing DRC+LVS+PEX = **ready for tapeout**.
 
 1. **Determine requirements** — specs (gain, BW, delay, power, offset)
 2. **Write SPICE netlist** — `.subckt` with proper pin ordering
-3. **Generate layout** — `spice_to_gds_with_checks(netlist)`
-4. **Verify** — DRC, LVS, PEX
-5. **Compare** — pre vs post-layout
+3. **Simulate** — AC/DC/TRAN analysis — **save all plots as `.png`**
+4. **Generate layout** — `spice_to_gds_with_checks(netlist)`
+5. **Verify** — DRC, LVS, PEX — **save post-layout sim plots as `.png`**
+6. **Compare** — pre vs post-layout
+
+> **⚠️ Plot reminder:** Every simulation run (AC/DC/TRAN, pre- and post-layout)
+> must produce a `.png` plot saved to the working directory.
 
 ## Key modules
 

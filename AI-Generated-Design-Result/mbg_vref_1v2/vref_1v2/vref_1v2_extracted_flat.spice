@@ -1,0 +1,13 @@
+* NGSPICE file created from vref_1v2.ext - technology: gf180mcuD
+
+.subckt vref_1v2 vdd vss vref
+X0 a_n200_7311# a_n200_7311# vdd vdd pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=2u
+X1 a_3229_3519# a_n200_n689# a_2709_3519# vss nfet_03v3 ad=1.12p pd=4.56u as=2.4p ps=9.2u w=4u l=2u
+X2 a_3229_3519# a_n200_7311# vdd vdd pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=2u
+X3 vref a_n200_7311# vdd vdd pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=2u
+X4 a_n200_n689# a_n200_n689# vss vss nfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=2u
+X5 a_2709_3519# vdd vss vss nfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=2u
+X6 a_2709_3519# a_n200_n689# a_3229_3519# vss nfet_03v3 ad=2.4p pd=9.2u as=1.12p ps=4.56u w=4u l=2u
+X7 vref vref vss vss nfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=2u
+.ends
+

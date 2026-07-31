@@ -118,7 +118,7 @@ These constraints are enforced at every pipeline stage:
 | **Fingers vs mult** | Prefer `nf=N` over `m=N` | Better matching, compact |
 | **VDD pad** | `gf180mcu_fd_io__vdd` | Dedicated supply cell |
 | **VSS pad** | `gf180mcu_fd_io__vss` | Dedicated supply cell |
-| **Analog I/O** | `gf180mcu_fd_io__iopin` analog mode | T_EN=0, T_IE=1 |
+| **Analog I/O** | `gf180mcu_fd_io__asign` analog mode | T_EN=0, T_IE=1 |
 
 ## ⚠️ Primary Pipeline API
 

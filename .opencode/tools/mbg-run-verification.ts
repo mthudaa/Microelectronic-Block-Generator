@@ -1,12 +1,25 @@
 import { tool } from "@opencode-ai/plugin"
 import path from "node:path"
+import { homedir } from "node:os"
 import { execSync } from "node:child_process"
 import { writeFile, mkdir } from "node:fs/promises"
 
-const CORE_DIR = path.resolve(
-  import.meta.dirname,
-  "core",
-)
+const CORE_DIR = path.resolve(import.meta.dirname)
+
+/**
+ * Resolve the working directory for verification execution.
+ *
+ * Priority:
+ *   1. ``MBG_WORKDIR`` environment variable
+ *   2. ``$HOME`` (user home directory)
+ *   3. ``context.workdir`` (VS Code workspace root)
+ */
+function resolveWorkdir(context: { workdir?: string }): string {
+  if (process.env.MBG_WORKDIR) {
+    return path.resolve(process.env.MBG_WORKDIR)
+  }
+  return context.workdir || homedir()
+}
 
 /**
  * Run DRC, LVS, or PEX verification on a GDSII layout.
@@ -47,7 +60,7 @@ const mbgRunVerification = tool({
     { check_type, gds_path, netlist_content, cell_name, workdir },
     context,
   ) => {
-    const cwd = context.workdir || process.cwd()
+    const cwd = resolveWorkdir(context)
     const resolvedGds = path.resolve(cwd, gds_path || "")
 
     let netlistArg = "None"

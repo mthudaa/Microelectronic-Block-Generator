@@ -1,0 +1,10 @@
+.lib "/home/huda/.volare/gf180mcuD/libs.tech/ngspice/sm141064.ngspice" typical
+.subckt vref_1v2 vdd vss vref
+XM3 d1 d1 vdd vdd pfet_03v3 L=2u W=4u nf=2
+XM4 d2 d1 vdd vdd pfet_03v3 L=2u W=4u nf=2
+XM5 vref d1 vdd vdd pfet_03v3 L=2u W=4u nf=2
+XM1 d1 d1 vss vss nfet_03v3 L=2u W=4u nf=2
+XM2 d2 d1 src2 vss nfet_03v3 L=2u W=4u nf=1
+XM_r src2 vdd vss vss nfet_03v3 L=2u W=4u nf=1
+XM6 vref vref vss vss nfet_03v3 L=2u W=4u nf=1
+.ends

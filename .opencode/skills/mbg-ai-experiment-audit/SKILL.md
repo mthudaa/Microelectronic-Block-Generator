@@ -501,3 +501,9 @@ Expected:
 * Report a status-consistency error.
 * Require the final status to be changed to `FAIL` or `PARTIAL` according to
   project acceptance rules.
+
+## ⚠️ PDK Body Constraint
+
+**MOSFET body: pfet_03v3→VDD ONLY, nfet_03v3→VSS ONLY.** When auditing
+generated SPICE netlists, verify that all body terminals connect exclusively
+to the appropriate supply rail.

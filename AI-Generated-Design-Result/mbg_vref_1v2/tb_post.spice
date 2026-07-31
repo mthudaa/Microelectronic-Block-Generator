@@ -1,0 +1,34 @@
+* Post-layout testbench for vref_1v2 (bridged PEX)
+.include "/home/huda/.volare/gf180mcuD/libs.tech/ngspice/design.ngspice"
+.lib "/home/huda/.volare/gf180mcuD/libs.tech/ngspice/sm141064.ngspice" typical
+.include "vref_1v2/vref_1v2.pex_bridged.spice"
+
+Vvdd vdd 0 DC 3.3
+Vvss vss 0 DC 0
+Xref vdd vss vref vref_1v2
+Cload vref 0 0.1p
+
+.control
+  set temp=27
+  echo "=== POST-LAYOUT DC OP ==="
+  op
+  print v(vref) i(Vvdd)
+
+  echo "=== POST-LAYOUT DC SWEEP ==="
+  dc Vvdd 0 3.3 0.005
+  write vref_post_dc.raw
+
+  echo "=== POST-LAYOUT TEMP SWEEP ==="
+  alter Vvdd DC 3.3
+  dc temp -40 125 1
+  write vref_post_temp.raw
+
+  echo "=== POST-LAYOUT TRANSIENT ==="
+  alter Vvdd DC 0 PULSE(0 3.3 1u 1u 1u 10u 20u)
+  set temp=27
+  tran 100n 20u
+  write vref_post_tran.raw
+
+  echo "=== POST-LAYOUT COMPLETE ==="
+.endc
+.end

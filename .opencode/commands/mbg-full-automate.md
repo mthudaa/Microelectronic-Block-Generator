@@ -26,14 +26,16 @@ $ARGUMENTS
 7. Call `spice_to_gds_with_checks(netlist)` for layout + DRC + LVS + PEX.
 8. If LVS fails: analyze report, simplify topology if needed, retry.
 9. Run post-layout simulation and compare with pre-layout (≤10% deviation).
-10. Report final results with all evidence.
+10. **Save all sim plots as `.png`** (AC/DC/TRAN, pre- and post-layout) in workdir.
+11. Report final results with all evidence.
 
 ## ⚠️ PDK Constraints (GF180MCU 3.3V)
 
 - Use `nfet_03v3` / `pfet_03v3` ONLY
-- W < 10µm, L < 10µm
+- W < 5µm, L < 5µm
 - Prefer `nf=N` (fingers) over `m=N` (multipliers)
 - Device prefix: `XM1` (not `M1`)
+- **Body: pfet_03v3→VDD ONLY, nfet_03v3→VSS ONLY**
 
 ## ⚠️ Tapeout Gate
 

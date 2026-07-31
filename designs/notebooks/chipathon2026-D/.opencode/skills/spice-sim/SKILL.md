@@ -95,6 +95,11 @@ print(f"Delta: {cmp['delta']}")
 
 ## Model corners (gf180mcuD)
 
+- **Body: pfet_03v3→VDD ONLY, nfet_03v3→VSS ONLY**
+
+> **⚠️ REMEMBER: Save all simulation plots as `.png` in the working directory.**
+> AC → `<cell>_ac.png` | DC → `<cell>_dc.png` | TRAN → `<cell>_tran.png`
+
 | Corner key | `.LIB` section | Description |
 |-----------|---------------|-------------|
 | `typical` | `.LIB typical` | Nominal (TT) |

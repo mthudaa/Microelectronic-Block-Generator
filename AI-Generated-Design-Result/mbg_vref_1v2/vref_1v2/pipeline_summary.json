@@ -1,0 +1,9 @@
+{
+  "outdir": "/home/huda/mbg_vref_1v2/vref_1v2",
+  "gds_path": "/home/huda/mbg_vref_1v2/vref_1v2/vref_1v2.gds",
+  "svg_path": "/home/huda/mbg_vref_1v2/vref_1v2/vref_1v2.svg",
+  "drc_summary": "DRC ERROR: Missing env vars: PDKPATH. Set PDK_ROOT=/foss/pdks, PDK=gf180mcuD, PDKPATH=/foss/pdks/gf180mcuD",
+  "lvs_summary": "LVS ERROR: Missing env vars: PDKPATH. Set PDK_ROOT=/foss/pdks, PDK=gf180mcuD, PDKPATH=/foss/pdks/gf180mcuD",
+  "pex_summary": "PEX ERROR: Missing env vars: PDKPATH. Set PDK_ROOT=/foss/pdks, PDK=gf180mcuD, PDKPATH=/foss/pdks/gf180mcuD",
+  "all_pass": false
+}

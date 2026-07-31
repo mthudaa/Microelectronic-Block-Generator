@@ -39,6 +39,11 @@ as the requested workflow or purpose.
 13. Define clear stopping and failure conditions.
 14. Do not invent tools, modules, or project APIs that do not exist.
 
+## ⚠️ PDK Body Constraint
+
+**MOSFET body: pfet_03v3→VDD ONLY, nfet_03v3→VSS ONLY.** If your command
+generates or processes SPICE netlists, it must enforce this rule.
+
 ## Required Frontmatter
 
 ```yaml

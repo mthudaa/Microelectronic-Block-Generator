@@ -63,7 +63,8 @@ display_component(result, scale=2)
 
 - First line: `.lib "<model_path>" typical` (path auto-detected from PDK_ROOT/PDK env vars)
 - Models: `nfet_03v3` (NMOS), `pfet_03v3` (PMOS) for gf180mcuD
-- Supply: 1.8V, body connections: NMOS→vss, PMOS→vdd
+- Supply: 1.8V
+- **Body: pfet_03v3→VDD ONLY, nfet_03v3→VSS ONLY** (no other connections allowed)
 - Format: `M<name> <drain> <gate> <source> <body> <model> W=<w>u L=<l>u`
 - W between 1u–50u, L=1u for analog (0.5u for comparator)
 

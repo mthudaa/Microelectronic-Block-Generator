@@ -24,12 +24,13 @@ $ARGUMENTS
 5. **PRE-SIM**: Run ngspice simulation, show results, get approval.
 6. **LAYOUT**: Call `spice_to_gds_with_checks(netlist)`, show SVG preview.
 7. **DRC/LVS**: Run verification, show reports, get approval.
-8. **PEX**: Extract parasitics, compare pre/post-layout.
+8. **PEX**: Extract parasitics, compare pre/post-layout — **save plots as `.png`**.
 9. **TAPEOUT**: Confirm all gates pass, report ready status.
 
 ## ⚠️ PDK Constraints
 
 - GF180MCU 3.3V | nfet_03v3/pfet_03v3 | W<10µm L<10µm
+- **Body: pfet_03v3→VDD ONLY, nfet_03v3→VSS ONLY**
 - Prefer `nf=N` over `m=N` | Use `XM1` prefix
 - Primary API: `spice_to_gds_with_checks(netlist)`
 
