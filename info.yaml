@@ -1,0 +1,24 @@
+# ----- ------ ----- ----- ------ ----- ----- ------ -----
+# Chipathon 2026: Project configuration
+# LICENSE: Apache License Version 2.0
+# http://www.apache.org/licenses/
+# ----- ------ ----- ----- ------ ----- ----- ------ -----
+
+# data will be pulled from main branch of the repo.
+# please be sure that the main branch contains the data you want to submit.
+# This file will be updated with more information later
+
+# ======================================================
+# Project metadata (used for documentation / review)
+# ======================================================
+project:
+  title: "AI-generated analog blocks: 5T-OTA, Comparator, VREF"  # Project title (e.g. "Simple CPU", "PLL", "ADC")
+  team: "D08 Microelectronic Block Generator"      # Your Team name
+  discord: ""                    # Optional: Discord username (for support / communication)
+  description: "AI/LLM-generated analog layouts (gLayout track): 5-transistor OTA, comparator core, 1.2V voltage reference"  # Short one-line description
+  # Relative paths to the lvs_config.json files used for integration.
+  # Pin data will be added here going forward.
+  lvs_config:
+    - "lvs_config_comparator_core.json"
+    - "lvs_config_ota_5t.json"
+    - "lvs_config_vref_1v2.json"
