@@ -1,0 +1,50 @@
+.include '/home/huda/.volare/gf180mcuD/libs.tech/ngspice/design.ngspice'
+.lib '/home/huda/.volare/gf180mcuD/libs.tech/ngspice/sm141064.ngspice' typical
+.include /tmp/opencode/mbg_ota_5t/ota_5t_core.spice
+
+Vvdd vdd 0 3.3
+Vvss vss 0 0
+Ibias vdd vbias 50u
+XMref vbias vbias vss vss nfet_03v3 L=1u W=4u nf=4
+X1   vdd vss inp inm out vbias ota_5t
+
+Vcm  inmid 0 1.65
+Vin_p inp inmid DC 0 AC 0.5 PULSE(0 1m 50n 1n 1n 250n 500n)
+Vin_n inm inmid DC 0 AC -0.5
+CL   out vss 1p
+
+.control
+set appendwrite
+
+* ===== OP (DC operating point) =====
+op
+print v(out) v(vbias) v(net1) v(net2)
+let idd = i(vvdd)
+print idd
+write /tmp/opencode/mbg_ota_5t/pre_op.raw all
+
+* ===== AC =====
+ac dec 50 10 1000meg
+let av_db = vdb(out)
+let phase = (180/pi)*vp(out)
+meas ac AV0   FIND vdb(out) AT=10
+meas ac GBW   when vdb(out)=0 fall=1
+meas ac PM    FIND phase WHEN vdb(out)=0 fall=1
+meas ac GAIN3DB when vdb(out)=AV0-3 fall=1
+print AV0 GBW PM GAIN3DB
+wrdata /tmp/opencode/mbg_ota_5t/pre_ac.dat v(out) vdb(out) vp(out)
+
+* ===== DC: differential input sweep =====
+dc Vin_p -50m 50m 1m
+let gain_dc = (v(out)-1.636)/0.001
+meas dc VOUT_v0 FIND v(out) AT=0
+wrdata /tmp/opencode/mbg_ota_5t/pre_dc.dat v(out)
+
+* ===== TRAN: pulse differential input =====
+alter Vin_p AC=0
+tran 5n 1u 0
+wrdata /tmp/opencode/mbg_ota_5t/pre_tran.dat v(out) v(inp) v(inm)
+
+quit
+.endc
+.end

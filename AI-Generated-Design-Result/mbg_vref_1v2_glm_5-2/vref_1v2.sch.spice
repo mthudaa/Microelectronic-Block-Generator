@@ -1,0 +1,32 @@
+.lib "/home/huda/.volare/gf180mcuD/libs.tech/ngspice/sm141064.ngspice" typical
+* MOSFET-only Beta-Multiplier Voltage Reference (FINAL: T4 topology)
+* Target: Vref = 1.2V @ VDD=3.3V, GF180MCU 3.3V
+* Relaxed tempco (<200 ppm/C), power ~0.62mW (in 0.5-2mW band)
+* All devices single-finger (nf=1) for router/LVS-friendly diode self-loops.
+* Body: pfet_03v3 -> vdd, nfet_03v3 -> vss. Mirror 1:1:1, K=1.
+*
+* WHY nf=1 everywhere: the auto-router's PathFinder failed to physically
+* merge the gate<->drain self-loop of multi-finger (nf>=2) diode-connected
+* devices, splitting the shared reference net d1 and breaking LVS. Using
+* nf=1 for every device (including all diodes) produces a LVS-clean layout
+* ("Circuits match uniquely" with no property errors).
+*
+* Model libraries are included by the testbench - do NOT re-include here.
+
+.subckt vref_1v2 vdd vss vref
+* PMOS current mirror (1:1:1), all single-finger
+XM3 d1 d1 vdd vdd pfet_03v3 L=1.25u W=4u nf=1
+XM4 d2 d1 vdd vdd pfet_03v3 L=1.25u W=4u nf=1
+XM5 vref d1 vdd vdd pfet_03v3 L=1.25u W=4u nf=1
+
+* Beta-multiplier NMOS pair (K=1:1, single-finger)
+XM1 d1 d1 vss vss nfet_03v3 L=1.25u W=4u nf=1
+XM2 d2 d1 src2 vss nfet_03v3 L=1.25u W=4u nf=1
+
+* Triode NMOS resistor (gate=VDD, deep triode degenerating element)
+XM_r src2 vdd vss vss nfet_03v3 L=1.25u W=4u nf=1
+
+* Output diode-connected NMOS load -> VREF (L=1u sets Vref near 1.2V)
+XM6 vref vref vss vss nfet_03v3 L=1u W=4u nf=1
+
+.ends

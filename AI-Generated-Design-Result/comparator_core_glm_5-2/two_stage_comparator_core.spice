@@ -1,0 +1,10 @@
+.subckt two_stage_comparator vdd vss inp inm out ibias
+XM8   ibias  ibias vss vss nfet_03v3  L=1u W=3u nf=2 m=1
+XM3   int_p  int_p vdd vdd  pfet_03v3  L=1u W=4u nf=2 m=1
+XM4   int_n  int_p vdd vdd  pfet_03v3  L=1u W=4u nf=2 m=1
+XM1   int_p    inp int_src vss nfet_03v3  L=1u W=3u nf=2 m=1
+XM2   int_n    inm int_src vss nfet_03v3  L=1u W=3u nf=2 m=1
+XM5   int_src ibias vss vss  nfet_03v3  L=1u W=3u nf=2 m=1
+XM7   out    int_p vdd vdd  pfet_03v3  L=1u W=4u nf=2 m=1
+XM6   out    int_n vss vss  nfet_03v3  L=1u W=3u nf=2 m=1
+.ends

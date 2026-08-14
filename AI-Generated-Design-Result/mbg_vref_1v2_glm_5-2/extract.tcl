@@ -1,0 +1,15 @@
+crashbackups stop
+drc off
+gds read /home/huda/mbg_vref12/vref_1v2/vref_1v2.gds
+load vref_1v2
+expand
+select top cell
+extract path /home/huda/mbg_vref12/vref_1v2
+extract no capacitance
+extract no coupling
+extract no resistance
+extract no length
+extract all
+ext2spice lvs
+ext2spice -p /home/huda/mbg_vref12/vref_1v2 -o /home/huda/mbg_vref12/vref_1v2/vref_1v2_extracted.spice
+quit -noprompt

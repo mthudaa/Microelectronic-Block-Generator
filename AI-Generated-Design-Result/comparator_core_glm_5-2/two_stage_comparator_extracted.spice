@@ -1,0 +1,21 @@
+* NGSPICE file created from two_stage_comparator.ext - technology: gf180mcuD
+
+.subckt two_stage_comparator vdd vss ibias out inm inp
+X0 vdd a_n256_5311# a_3124_5519# vdd pfet_03v3 ad=2.4p pd=9.2u as=1.12p ps=4.56u w=4u l=1u
+X1 a_3124_5519# inm a_1214_2619# vss nfet_03v3 ad=0.84p pd=3.56u as=1.8p ps=7.2u w=3u l=1u
+X2 out a_3124_5519# vss vss nfet_03v3 ad=0.84p pd=3.56u as=1.8p ps=7.2u w=3u l=1u
+X3 vdd a_n256_5311# a_n256_5311# vdd pfet_03v3 ad=2.4p pd=9.2u as=1.12p ps=4.56u w=4u l=1u
+X4 a_n256_5311# a_n256_5311# vdd vdd pfet_03v3 ad=1.12p pd=4.56u as=2.4p ps=9.2u w=4u l=1u
+X5 a_3124_5519# a_n256_5311# vdd vdd pfet_03v3 ad=1.12p pd=4.56u as=2.4p ps=9.2u w=4u l=1u
+X6 a_n256_5311# inp a_1214_2619# vss nfet_03v3 ad=0.84p pd=3.56u as=1.8p ps=7.2u w=3u l=1u
+X7 out a_n256_5311# vdd vdd pfet_03v3 ad=1.12p pd=4.56u as=2.4p ps=9.2u w=4u l=1u
+X8 a_1214_2619# inm a_3124_5519# vss nfet_03v3 ad=1.8p pd=7.2u as=0.84p ps=3.56u w=3u l=1u
+X9 vss a_3124_5519# out vss nfet_03v3 ad=1.8p pd=7.2u as=0.84p ps=3.56u w=3u l=1u
+X10 a_1214_2619# inp a_n256_5311# vss nfet_03v3 ad=1.8p pd=7.2u as=0.84p ps=3.56u w=3u l=1u
+X11 vss ibias a_1214_2619# vss nfet_03v3 ad=1.8p pd=7.2u as=0.84p ps=3.56u w=3u l=1u
+X12 vdd a_n256_5311# out vdd pfet_03v3 ad=2.4p pd=9.2u as=1.12p ps=4.56u w=4u l=1u
+X13 ibias ibias vss vss nfet_03v3 ad=0.84p pd=3.56u as=1.8p ps=7.2u w=3u l=1u
+X14 vss ibias ibias vss nfet_03v3 ad=1.8p pd=7.2u as=0.84p ps=3.56u w=3u l=1u
+X15 a_1214_2619# ibias vss vss nfet_03v3 ad=0.84p pd=3.56u as=1.8p ps=7.2u w=3u l=1u
+.ends
+
