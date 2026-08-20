@@ -76,6 +76,9 @@ class Device:
     multipliers: int = 1
     finger_width: Optional[float] = None  # width actually handed to glayout
     params: Dict[str, Any] = field(default_factory=dict)
+    # True when this NMOS needs a deep n-well so its bulk can be biased
+    # independently of the substrate (see build_design_context).
+    needs_dnwell: bool = False
 
     @property
     def is_mos(self) -> bool:

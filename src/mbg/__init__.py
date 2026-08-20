@@ -18,7 +18,9 @@ than reaching for internals:
     mbg.router         DRC-aware grid router
     mbg.connectivity   internal OPEN / SHORT verification
     mbg.checks         Magic DRC, netgen LVS, PEX
-    mbg.simulation     ngspice
+    mbg.simulation     ngspice transport (run a deck, get files back)
+    mbg.analysis       op / dc / ac / tran / Monte Carlo / FFT
+    mbg.outputs        LEF / Liberty / Verilog views for integration
     mbg.llm            natural language -> SPICE
     mbg.pipeline       the flows that tie the above together
 
@@ -27,7 +29,22 @@ implementations. They are kept working for backward compatibility; new work
 should use `mbg.placement_engine` and `mbg.router`.
 """
 
-import numpy as _np
+# ── environment first, imports second ─────────────────────────────────
+# gLayout reads PDK_ROOT at *import* time and calls Path() on it, so importing
+# anything from this package with the variable unset used to fail as
+#     TypeError: expected str, bytes or os.PathLike object, not NoneType
+# raised inside glayout/pdk/sky130_mapped.py — a traceback that names neither
+# the PDK nor the missing variable. Populating the environment here, before
+# the first gLayout import below, is what keeps that from happening.
+from mbg import config as config           # noqa: E402  (must precede glayout)
+from mbg.config import (                   # noqa: E402
+    ToolError, ensure_pdk_env, pdk_config, repo_root,
+    resolve_magic, resolve_netgen, resolve_klayout, describe_environment,
+)
+
+ensure_pdk_env()
+
+import numpy as _np                        # noqa: E402
 
 if not hasattr(_np, "float_"):          # gdsfactory 7 expects the numpy 1 alias
     _np.float_ = _np.float64
@@ -69,6 +86,8 @@ from mbg.checks import (
     extract_layout_netlist, fix_port_order,
 )
 from mbg.simulation import run_spice, raw_to_csv, parse_dat, pdk_path
+from mbg.analysis import Testbench, SimResult, MonteCarloResult, fft
+from mbg.outputs import write_all, classify_ports, OutputSet, PortSpec
 
 # ── helpers ───────────────────────────────────────────────────────────
 from mbg.utils import clean_param, display_gds, display_component, GDS_PATH, SVG_PATH
@@ -100,6 +119,8 @@ __all__ = [
     "connectivity", "run_drc", "run_lvs", "run_pex", "check_tools",
     "validate_gds", "extract_layout_netlist", "fix_port_order",
     "run_spice", "raw_to_csv", "parse_dat", "pdk_path",
+    "Testbench", "SimResult", "MonteCarloResult", "fft",
+    "write_all", "classify_ports", "OutputSet", "PortSpec",
     # helpers
     "clean_param", "display_gds", "display_component", "GDS_PATH", "SVG_PATH",
     # superseded

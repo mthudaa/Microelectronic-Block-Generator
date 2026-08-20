@@ -9,6 +9,58 @@ platforms: [opencode, claude, codex]
 
 # MBG SPICE Simulation
 
+
+## Preferred API: mbg.analysis.Testbench
+
+`run_spice` is the transport. For anything beyond a raw deck use the analysis
+layer, which builds a correct deck and parses the results:
+
+```python
+from mbg.analysis import Testbench, fft
+
+tb = Testbench(netlist, cell="ota_5t",
+               supplies={"vdd": 3.3, "vss": 0.0},
+               sources={"inp": 1.65, "inm": 1.65, "vb": 0.8},
+               probes=["out"])
+
+tb.op()                       # operating point
+tb.dc("inp", 0, 3.3, 0.01)    # DC sweep
+tb.ac(1, 1e9, points=50)      # AC sweep  -> .bandwidth_3db("out")
+tb.tran("1n", "1u")           # transient -> .peak_to_peak(), .cross()
+tb.monte_carlo("op", runs=50) # mismatch spread -> .stats("out")
+freq, mag = fft(result, "out")
+```
+
+Three traps it handles for you:
+
+- **`design.ngspice` must be included before the model library.** The GF180
+  device subcircuits declare 24 formal parameters, and the statistical ones
+  (`par_vth`, `par_k`, `var_vth`, `p_sqrtarea`, ...) are *defined* in
+  `design.ngspice`. Without it ngspice reports their missing defaults as
+  `Syntax error: letter [$]`, `Mismatch: 24 formal but 15 actual params`,
+  `Expression err: $` and finally `Formula() error` — one burst per device.
+  All four messages are the same single root cause; `$` is ngspice's marker
+  for "no default supplied", not a corrupt netlist.
+- **Each analysis reads the file it wrote.** `dc`/`ac`/`tran` drop
+  `dc.dat`/`ac.dat`/`tran.dat` into one workdir, so picking "the first .dat"
+  hands back a previous analysis's data. A transient that comes back with the
+  output node missing is this bug, not a probe problem.
+- **AC data is complex.** `wrdata` writes `(freq, re, im)` triplets for AC and
+  `(x, y)` pairs for dc/tran. Magnitude is stored under the probe name, with
+  `<name>.re` / `<name>.im` alongside for phase.
+- **`dc`/`ac`/`tran` probe every port by default**, not just the stimulus —
+  recording only the swept source omits the response.
+- **An AC source needs an AC magnitude.** Attaching it must match the source
+  *line*, not a single-token value: a source written `DC 1.2` silently kept a
+  magnitude of zero and returned an all-zero sweep. `ac()` now raises rather
+  than returning that.
+- **ngspice's exit code is unreliable** — it commonly returns non-zero after a
+  `.control` block that succeeded. Results are judged by whether data appeared.
+- **Monte Carlo needs the `statistical` corner with `sw_stat_mismatch=1`.**
+  GF180 computes `delvto = mis_vth * sw_stat_mismatch`, and the `typical`
+  corner leaves that switch at zero, so re-seeding alone returns the same
+  number every run. `monte_carlo()` sets both.
+
 ## Purpose
 
 Run ngspice on a netlist and read the results back as usable numbers. This skill

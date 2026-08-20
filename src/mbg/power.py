@@ -214,3 +214,116 @@ def manual_power(component, pdk, strips=None, rails=None, guardring=None):
         print(f"[GUARD] Inner N+ tap: {inner_w:.1f}x{inner_h:.1f}um (gap={gap}um)")
 
     return component, ports
+
+
+# ══════════════════════════════════════════════════════════════════════
+#  DesignContext power rails
+#
+#  The legacy flow bolted power strips on after placement and fed their
+#  ports into the router's goal list. The DesignContext flow needs the
+#  rails to exist *before* routing, registered as real access points on the
+#  supply nets, so the router treats them as terminals like any other and
+#  LVS sees a connected supply.
+# ══════════════════════════════════════════════════════════════════════
+
+def add_power_rails(ctx, top, pdk, rail_layer="met5", access_layer="met3",
+                    rail_width=2.0, margin=3.0, drop_pitch=12.0, verbosity=1):
+    """Draw VDD and VSS rails and register them on the supply nets.
+
+    A rail is a wide strip on ``rail_layer`` spanning the design, with via
+    stacks dropping to ``access_layer`` at regular intervals. Each drop
+    becomes a PinAccessPoint on the corresponding supply net, so the router
+    connects device supply terminals to the nearest drop rather than daisy-
+    chaining them through each other.
+
+    Returns a dict describing what was created; records rail geometry on the
+    context as net-owned obstacles so foreign nets route around it.
+    """
+    from mbg.design_context import BoundingBox, Obstacle, PinAccessPoint, Zone
+    from mbg.pdk_rules import get_rules
+    from glayout import via_stack
+    from mbg.router import snap_to_grid
+
+    rules = ctx.rules or get_rules(pdk)
+    supplies = []
+    for net in sorted(ctx.power_nets):
+        supplies.append((net, "vdd"))
+    for net in sorted(ctx.ground_nets):
+        supplies.append((net, "vss"))
+    if not supplies:
+        if verbosity:
+            print("  [POWER] no supply nets in the netlist — no rails added")
+        return {"rails": [], "drops": 0}
+
+    bb = ctx.design_bbox()
+    x0 = rules.snap(bb.xmin - margin)
+    x1 = rules.snap(bb.xmax + margin)
+    span = x1 - x0
+    if span <= 0:
+        return {"rails": [], "drops": 0}
+
+    hw = rail_width / 2.0
+    rail_gds = rules.layer_tuple(rail_layer)
+    n_drops = max(2, int(span // drop_pitch) + 1)
+    created, total_drops = [], 0
+
+    for idx, (net, kind) in enumerate(supplies):
+        # VDD above the design, VSS below; extra supplies stack outwards.
+        step = margin + rail_width * 1.5
+        if kind == "vdd":
+            y = bb.ymax + margin + step * (idx // 2)
+        else:
+            y = bb.ymin - margin - step * (idx // 2)
+        # Land the rail on a routing track. Everything the router emits is
+        # grid-aligned, and the pitch is what keeps it legal; an off-grid rail
+        # drop is the one thing that can violate spacing against a route.
+        _, y = snap_to_grid(ctx, x0, y)
+
+        top.add_polygon([[x0, y - hw], [x1, y - hw], [x1, y + hw], [x0, y + hw]],
+                        layer=rail_gds)
+
+        rail_bb = BoundingBox(x0, y - hw, x1, y + hw)
+        ctx.add_obstacle(Obstacle(layer=rail_layer, bbox=rail_bb,
+                                  owner=f"RAIL_{net}", kind="power_rail", net=net))
+        ctx.add_zone(Zone(kind="power", bbox=rail_bb, layers=[rail_layer],
+                          owner=f"RAIL_{net}", net=net))
+
+        # via drops to the routing layer, each an access point for this net
+        stack = via_stack(pdk, access_layer, rail_layer, centered=True)
+        pad = rules.via_footprint(access_layer, rail_layer)
+        for k in range(n_drops):
+            raw = x0 + (span * k) / max(1, n_drops - 1) if n_drops > 1 else x0 + span / 2
+            dx, _ = snap_to_grid(ctx, min(max(raw, x0 + pad), x1 - pad), y)
+            ref = top.add_ref(stack)
+            ref.move((dx, y))
+
+            # The drop pad sits wherever the rail geometry puts it, which is
+            # not on the router's track grid. Register it as net-owned metal on
+            # every layer the stack passes through so foreign nets are held off
+            # by the normal spacing inflation; same-net routing still reaches it.
+            half = pad / 2.0
+            pad_bb = BoundingBox(dx - half, y - half, dx + half, y + half)
+            for lname in rules.layers_traversed(access_layer, rail_layer):
+                ctx.add_obstacle(Obstacle(layer=lname, bbox=pad_bb,
+                                          owner=f"RAIL_{net}", kind="power_via",
+                                          net=net))
+
+            ctx.add_access_point(PinAccessPoint(
+                instance=f"RAIL_{net}", terminal=f"tap{k}", net=net,
+                layer=access_layer, x=dx, y=y, orientation=270.0 if kind == "vdd" else 90.0,
+                width=pad))
+            total_drops += 1
+
+        # the supply net must be routable: give it terminals in the net record
+        n = ctx.nets.get(net)
+        if n is not None:
+            for k in range(n_drops):
+                n.terminals.append((f"RAIL_{net}", f"tap{k}"))
+
+        created.append({"net": net, "kind": kind, "y": y, "x0": x0, "x1": x1,
+                        "width": rail_width, "layer": rail_layer, "drops": n_drops})
+        if verbosity:
+            print(f"  [POWER] {kind.upper()} rail '{net}' on {rail_layer} "
+                  f"y={y:.2f} x=[{x0:.2f},{x1:.2f}] {n_drops} via drops")
+
+    return {"rails": created, "drops": total_drops}

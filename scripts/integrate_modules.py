@@ -21,6 +21,7 @@ sidecar ``integration_manifest.json``.
 from __future__ import annotations
 
 import argparse
+import os
 import json
 import os
 import sys
@@ -355,6 +356,20 @@ def build_wrapper(
 
 def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--librelane", action="store_true",
+                        help="collect generated modules into a LibreLane macro "
+                             "integration (Verilog, config.json, info.yaml, "
+                             "lvs_config.json) instead of building a GDS wrapper")
+    parser.add_argument("--top", default="mbg_top", help="top-level module name")
+    parser.add_argument("--search", action="append",
+                        help="directory to search for *.views.json (repeatable)")
+    parser.add_argument("--outdir", help="where to write the integration files")
+    parser.add_argument("--run", action="store_true",
+                        help="invoke LibreLane after generating the configuration")
+    parser.add_argument("--title", default="AI-generated analog blocks")
+    parser.add_argument("--team", default="D08 Microelectronic Block Generator")
+    parser.add_argument("--description", default="")
+    parser.add_argument("--discord", default="")
     parser.add_argument(
         "--output",
         type=Path,
@@ -384,7 +399,49 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     return parser.parse_args(argv)
 
 
+def _repo_src() -> str:
+    d = os.path.dirname(os.path.abspath(__file__))
+    for _ in range(8):
+        cand = os.path.join(d, "src")
+        if os.path.isdir(os.path.join(cand, "mbg")):
+            return cand
+        d = os.path.dirname(d)
+    raise RuntimeError("could not locate src/mbg")
+
+
+def _librelane_mode(args) -> int:
+    """Collect generated modules into a LibreLane macro integration."""
+    import sys as _sys
+    _sys.path.insert(0, _repo_src())
+    from mbg.integrate import integrate
+
+    root = str(repository_root())
+    roots = args.search or [os.path.join(root, "AI-Generated-Design-Result"),
+                            os.path.join(root, "outputs")]
+    outdir = args.outdir or os.path.join(root, "outputs", "integration")
+    res = integrate(args.top, roots, outdir,
+                    title=args.title, team=args.team,
+                    description=args.description, discord=args.discord,
+                    repo_root=root, run=args.run)
+    if not res.get("modules"):
+        print(f"[INTEGRATE] {res.get('reason')}")
+        return 1
+    print(f"\n[INTEGRATE] wrote {outdir}/")
+    for key in ("top_verilog", "config", "info_yaml", "macros"):
+        if res.get(key):
+            print(f"    {os.path.basename(res[key])}")
+    for c in res.get("lvs_configs", []):
+        print(f"    {os.path.basename(c)}")
+    ll = res.get("librelane", {})
+    print(f"[INTEGRATE] LibreLane: {ll.get('status')}"
+          + (f" — {ll.get('reason')}" if ll.get("reason") else ""))
+    return 0 if ll.get("status") in ("PASS", "NOT RUN") else 1
+
+
 def main(argv: list[str] | None = None) -> int:
+    args = _parse_args(argv)
+    if getattr(args, "librelane", False):
+        return _librelane_mode(args)
     args = _parse_args(argv)
     try:
         manifest = build_wrapper(

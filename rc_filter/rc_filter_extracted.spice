@@ -1,0 +1,7 @@
+* NGSPICE file created from rc_filter.ext - technology: gf180mcuD
+
+.subckt rc_filter vss vout vin
+X0 vin vout VSUBS ppolyf_u r_width=1u r_length=4u
+X1 vout vss cap_mim_2f0_m4m5_noshield c_width=5u c_length=5u
+.ends
+

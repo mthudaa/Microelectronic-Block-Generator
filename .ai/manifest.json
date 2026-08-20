@@ -145,6 +145,17 @@
         "codex": true
       }
     },
+    "generate_views": {
+      "summary": "Emit LEF, Liberty, Verilog and a views manifest alongside the GDS for every module.",
+      "class": "GENERATING",
+      "skill": "mbg-spice-to-gds",
+      "entry_point": "mbg.outputs.write_all",
+      "platforms": {
+        "opencode": true,
+        "claude": true,
+        "codex": true
+      }
+    },
     "inspect_generated_designs": {
       "summary": "Read previous results in AI-Generated-Design-Result as evidence and regression baselines.",
       "class": "READ-ONLY",
@@ -170,6 +181,18 @@
       "class": "MUTATING",
       "skill": "mbg-setup",
       "command": "./scripts/install_agents.sh",
+      "platforms": {
+        "opencode": true,
+        "claude": true,
+        "codex": true
+      }
+    },
+    "integrate_modules": {
+      "summary": "Collect generated modules into a LibreLane macro integration with info.yaml and lvs_config.json.",
+      "class": "GENERATING",
+      "skill": "mbg-spice-to-gds",
+      "command": "python3 scripts/integrate_modules.py --librelane",
+      "entry_point": "mbg.integrate.integrate",
       "platforms": {
         "opencode": true,
         "claude": true,
@@ -225,6 +248,17 @@
       "class": "MUTATING",
       "skill": "mbg-setup",
       "command": "./scripts/setup_env.sh",
+      "platforms": {
+        "opencode": true,
+        "claude": true,
+        "codex": true
+      }
+    },
+    "simulate_analyses": {
+      "summary": "Operating point, DC, AC, transient, Monte Carlo and FFT via mbg.analysis.Testbench.",
+      "class": "GENERATING",
+      "skill": "mbg-spice-sim",
+      "entry_point": "mbg.analysis.Testbench",
       "platforms": {
         "opencode": true,
         "claude": true,

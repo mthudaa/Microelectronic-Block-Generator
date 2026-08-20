@@ -242,11 +242,33 @@ if [ $RUN_MAGIC -eq 1 ]; then
 		echo 'quit -noprompt'
 	} >> "$EXT_SCRIPT"
 
-	# run it 
-	magic -dnull -noconsole \
+	# Run it. Output is captured to a log, never discarded: this used to be
+	# `> /dev/null 2> /dev/null &`, which threw away the one line that
+	# explained every failure ("Magic version 8.3.411 is required by this
+	# techfile...") and backgrounded the job so its exit status was lost too.
+	# MBG_MAGIC lets the caller pin the exact verified binary instead of
+	# whatever `magic` resolves to on this host.
+	MAGIC_BIN="${MBG_MAGIC:-magic}"
+	MAGIC_LOG="$(dirname "$EXT_SCRIPT")/magic_drc.log"
+	if ! "$MAGIC_BIN" -dnull -noconsole \
 		-rcfile "$PDKPATH/libs.tech/magic/$PDK.magicrc" \
-		"$EXT_SCRIPT" \
-		> /dev/null 2> /dev/null &
+		"$EXT_SCRIPT" > "$MAGIC_LOG" 2>&1
+	then
+		echo "[ERROR] Magic DRC exited non-zero. Relevant output:"
+		grep -iE "required by this techfile|couldn't be read|cifinput|no such file|error" \
+			"$MAGIC_LOG" | head -5 | sed 's/^/    /'
+		echo "[ERROR] Full log: $MAGIC_LOG"
+	fi
+	# Surface load failures even when Magic exits 0 — it does that while
+	# still having failed to read the layout.
+	if grep -qiE "required by this techfile|couldn't be read|nothing in \"?cifinput" \
+		"$MAGIC_LOG" 2>/dev/null
+	then
+		echo "[ERROR] Magic could not load the layout:"
+		grep -iE "required by this techfile|couldn't be read|cifinput" \
+			"$MAGIC_LOG" | head -5 | sed 's/^/    /'
+	fi
+	cat "$MAGIC_LOG"
 fi
 
 # launch KLayout DRC

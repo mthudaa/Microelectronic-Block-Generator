@@ -78,15 +78,17 @@ similar but use different placement/routing engines underneath:
 
 | Flow | Entry points | Placement | Routing | Used by the live design-script path? |
 |---|---|---|---|---|
-| **Legacy shape-router path** | `spice_to_gds`, `spice_to_gds_with_checks` | `mbg.placement.placement()` | `mbg.routing.auto_router()` (fixed I/L/Z/U shape catalogue) | **Yes** — this is what `run_layout.py` scripts and `test_all_designs.py` actually invoke today |
-| **DesignContext path** | `spice_to_gds_ctx`, `spice_to_gds_with_checks_ctx` | `mbg.placement_engine.place_with_routability()` | `mbg.router.GridRouter` (A* grid maze router with rip-up/reroute and internal connectivity verification) | Not called by the currently-used design scripts; it is the newer, structurally richer engine (matching groups, symmetry constraints, `PinAccessPoint`, `RoutingFailure`) |
+| **Legacy shape-router path** | `spice_to_gds`, `spice_to_gds_with_checks_legacy`, or `spice_to_gds_with_checks(..., legacy=True)` | `mbg.placement.placement()` | `mbg.routing.auto_router()` (fixed I/L/Z/U shape catalogue) | **No, not by default any more.** Reachable only via the explicit entry points at left. Kept working for reproducing archived runs. |
+| **DesignContext path** | `spice_to_gds_with_checks` (**the default**), `spice_to_gds_ctx`, `spice_to_gds_with_checks_ctx` | `mbg.placement_engine.place_with_routability()` | `mbg.router.GridRouter` (A* grid maze router with rip-up/reroute and internal connectivity verification) | **Yes** — `spice_to_gds_with_checks` now delegates here, so this is what `tests/test_all_designs.py` and the design scripts exercise. Adds matching groups, symmetry constraints, `PinAccessPoint`, `RoutingFailure`, power rails and view emission. |
 
 Both are live code — neither is dead — but they are **not interchangeable**
 and a change to one does not automatically apply to the other. When asked
 to fix "the placer" or "the router", first determine which of the two flows
-the reporting design script actually used, by checking whether it called
-`spice_to_gds_with_checks` (legacy) or `spice_to_gds_with_checks_ctx`
-(DesignContext).
+the reporting design script actually used. Note the name no longer tells
+you: `spice_to_gds_with_checks` means the **DesignContext** path unless the
+call passed `legacy=True`. Archived runs in `AI-Generated-Design-Result/`
+predate the switch and went through the legacy engine, so a bug described in
+those logs may live in `mbg/routing.py`, not `mbg/router.py`.
 
 ### 3. Separate active from legacy code
 

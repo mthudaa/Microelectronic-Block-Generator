@@ -7,6 +7,15 @@ import re
 from collections import defaultdict
 from gdsfactory import port
 
+def _first(params, *keys, default="-"):
+    """First key in `params` that carries a real value, not the "-" placeholder."""
+    for k in keys:
+        v = params.get(k, "-")
+        if v not in ("-", "", None):
+            return v
+    return default
+
+
 def parse_netlist_with_pdk(file_content, manual_pdk="Tidak Terdeteksi", mode="analog"):
     if file_content is None:
         raise ValueError("file_content is None — no SPICE netlist provided")
@@ -146,9 +155,17 @@ def parse_netlist_with_pdk(file_content, manual_pdk="Tidak Terdeteksi", mode="an
             if device_type_linear_dev == 'XM':
                 param_dict = { "w": params['w'], "l": params['l'], "m": params['m'], "nf": params['nf'] }
             elif device_type_linear_dev == 'XC':
-                param_dict = { "c_width": params['c_width'], "c_length": params['c_length'] }
+                # A subcircuit capacitor may be sized either the PDK way
+                # (c_width/c_length) or the way everyone actually writes it,
+                # and the way the LLM emits it (W=/L=). Accepting only the
+                # former silently dropped the size and fell back to a default.
+                param_dict = { "c_width": _first(params, 'c_width', 'w'),
+                               "c_length": _first(params, 'c_length', 'l'),
+                               "m": params['m'] }
             elif device_type_linear_dev == 'XR':
-                param_dict = { "r_width": params['r_width'], "r_length": params['r_length'] }
+                param_dict = { "r_width": _first(params, 'r_width', 'w'),
+                               "r_length": _first(params, 'r_length', 'l'),
+                               "m": params['m'] }
             elif device_type == 'R':
                 param_dict = { "r_width": params.get('w', params.get('r_width', '-')),
                                "r_length": params.get('l', params.get('r_length', '-')),
@@ -176,6 +193,22 @@ def parse_netlist_with_pdk(file_content, manual_pdk="Tidak Terdeteksi", mode="an
         "components": parsed_components
     }
 
+    _assign_initial_placement(final_output)
+
+    return final_output
+
+
+
+def _assign_initial_placement(final_output):
+    """Give every device a first-pass (x, y) from a multi-row floorplan.
+
+    Split out of ``parse_netlist_with_pdk`` unchanged: a netlist parser
+    had no business also being a placer, and the two concerns together ran
+    to 365 lines. This mutates ``final_output`` in place, exactly as the
+    inlined version did, and the DesignContext flow later replaces these
+    coordinates with analog-aware placement — they are a starting point,
+    not the final floorplan.
+    """
     # Ambil list device saja untuk kalkulasi matriks
     devices = [c for c in final_output["components"] if c["type"] == "device"]
 
@@ -363,8 +396,8 @@ def parse_netlist_with_pdk(file_content, manual_pdk="Tidak Terdeteksi", mode="an
         y_cursor -= row_heights[rank]
         devlist = rows[rank]
         place_row(devlist, y_cursor, row_widths[rank])
-            
-    return final_output
+        
+
 
 def matrix_port_init(config):
     port_matrix = {}
@@ -508,6 +541,21 @@ def build_design_context(config, pdk=None, name=None):
         elif net.is_ground:
             ctx.ground_nets.add(net.name)
             net.weight = 1.5
+
+    # ── deep n-well isolation ───────────────────────────────────────
+    # GF180MCU has no separate DNW transistor model, so isolation cannot be
+    # requested by model name. It is visible in the connectivity instead: an
+    # NMOS whose bulk sits on something other than the global ground can only
+    # be built with a deep n-well, and that is exactly the case where someone
+    # is using the body effect on purpose.
+    ground_like = {g.lower() for g in ctx.ground_nets} | {"0", "gnd", "vss"}
+    for dev in ctx.devices.values():
+        if dev.kind != "nmos":
+            continue
+        body = (dev.terminals.get("body") or "").lower()
+        if body and body not in ground_like:
+            dev.needs_dnwell = True
+            ctx.deep_nwell_flags[dev.name] = True
 
     # ── analog structure recognition ────────────────────────────────
     def _geom_key(d):

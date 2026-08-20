@@ -65,6 +65,47 @@ XM4 out out1 vdd vdd pfet_03v3 L=1u W=4u nf=1
 XM5 tail bias vss vss nfet_03v3 L=1u W=2u nf=1
 .ends
 """,
+    # Body-biased OTA: XM1's bulk sits on vbb rather than vss, so it can only
+    # be built with a deep n-well. Isolation propagates to XM2 to keep the
+    # differential pair matched.
+    "DNW Body-Biased OTA": """
+.lib "{PDK_LIB}" typical
+.subckt ota_bb vdd vss inp inm out vb vbb
+XM1  net1 inp net2 vbb nfet_03v3 L=1u W=4u nf=4
+XM2  out  inm net2 vss nfet_03v3 L=1u W=4u nf=4
+XM3  net1 net1 vdd vdd pfet_03v3 L=1u W=4u nf=4
+XM4  out  net1 vdd vdd pfet_03v3 L=1u W=4u nf=4
+XM5  net2 vb  vss vss nfet_03v3 L=1u W=4u nf=4
+.ends
+""",
+    # Beta-multiplier voltage reference: dominated by diode-connected devices
+    # (gate and drain on the same net). The archived run logged exactly that
+    # topology as failing to connect in the layout.
+    "VREF Beta-Multiplier": """
+.lib "{PDK_LIB}" typical
+.subckt vref_1v2 vdd vss vref
+XM3  d1   d1   vdd  vdd  pfet_03v3 L=1.25u W=4u nf=1
+XM4  d2   d1   vdd  vdd  pfet_03v3 L=1.25u W=4u nf=1
+XM5  vref d1   vdd  vdd  pfet_03v3 L=1.25u W=4u nf=1
+XM1  d1   d1   vss  vss  nfet_03v3 L=1.25u W=4u nf=1
+XM2  d2   d1   src2 vss  nfet_03v3 L=1.25u W=4u nf=1
+XM_r src2 vdd  vss  vss  nfet_03v3 L=1.25u W=4u nf=1
+XM6  vref vref vss  vss  nfet_03v3 L=1u    W=4u nf=1
+.ends
+""",
+    # Native passives: a real poly resistor and a metal4/metal5 MIM, neither
+    # of which gLayout can build in a form gf180 recognises. Both must
+    # extract as the actual PDK primitives, not as a pfet or as nothing.
+    "RC Filter (native passives)": """
+.lib "{PDK_LIB}" typical
+.subckt rc_filter vin vout vss
+XR1 vin  vout ppolyf_u W=1u L=4u
+XC1 vout vss  cap_mim_2f0_m4m5_noshield W=5u L=5u
+.ends
+""",
+
+
+
     "StrongArm-Comparator": """
 .lib "{PDK_LIB}" typical
 .subckt strongarm vdd vss clk inn inp outn outp

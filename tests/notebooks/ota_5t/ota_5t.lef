@@ -1,0 +1,82 @@
+VERSION 5.7 ;
+  NOWIREEXTENSIONATPIN ON ;
+  DIVIDERCHAR "/" ;
+  BUSBITCHARS "[]" ;
+MACRO ota_5t
+  CLASS BLOCK ;
+  FOREIGN ota_5t ;
+  ORIGIN 23.460 4.390 ;
+  SIZE 46.920 BY 54.200 ;
+  PIN vb
+    ANTENNAGATEAREA 4.000000 ;
+    PORT
+      LAYER Metal2 ;
+        RECT 1.860 1.465 2.140 1.745 ;
+    END
+  END vb
+  PIN out
+    ANTENNADIFFAREA 2.240000 ;
+    PORT
+      LAYER Metal4 ;
+        RECT 9.070 25.460 9.350 44.320 ;
+    END
+  END out
+  PIN inm
+    ANTENNAGATEAREA 4.000000 ;
+    PORT
+      LAYER Metal2 ;
+        RECT 15.050 21.485 15.330 21.765 ;
+    END
+  END inm
+  PIN inp
+    ANTENNAGATEAREA 4.000000 ;
+    PORT
+      LAYER Metal2 ;
+        RECT -11.330 21.485 -11.050 21.765 ;
+    END
+  END inp
+  PIN vss
+    ANTENNADIFFAREA 11.696000 ;
+    PORT
+      LAYER Metal3 ;
+        RECT 7.610 -3.670 22.990 -3.110 ;
+    END
+  END vss
+  PIN vdd
+    ANTENNADIFFAREA 23.392000 ;
+    PORT
+      LAYER Metal3 ;
+        RECT 7.610 48.530 22.990 49.090 ;
+    END
+  END vdd
+  OBS
+      LAYER Nwell ;
+        RECT -17.960 0.000 17.960 46.140 ;
+      LAYER Metal1 ;
+        RECT -17.730 0.210 17.730 45.930 ;
+      LAYER Metal2 ;
+        RECT -18.010 22.065 18.160 47.320 ;
+        RECT -18.010 21.185 -11.630 22.065 ;
+        RECT -10.750 21.185 14.750 22.065 ;
+        RECT 15.630 21.185 18.160 22.065 ;
+        RECT -18.010 2.045 18.160 21.185 ;
+        RECT -18.010 1.165 1.560 2.045 ;
+        RECT 2.440 1.165 18.160 2.045 ;
+        RECT -18.010 -1.030 18.160 1.165 ;
+      LAYER Metal3 ;
+        RECT -23.260 48.230 7.310 49.090 ;
+        RECT 23.290 48.230 23.410 49.090 ;
+        RECT -23.260 -2.810 23.410 48.230 ;
+        RECT -23.260 -3.670 7.310 -2.810 ;
+        RECT 23.290 -3.670 23.410 -2.810 ;
+      LAYER Metal4 ;
+        RECT -23.230 44.620 23.380 49.060 ;
+        RECT -23.230 25.160 8.770 44.620 ;
+        RECT 9.650 25.160 23.380 44.620 ;
+        RECT -23.230 -3.640 23.380 25.160 ;
+      LAYER Metal5 ;
+        RECT -23.460 -4.390 23.460 49.810 ;
+  END
+END ota_5t
+END LIBRARY
+

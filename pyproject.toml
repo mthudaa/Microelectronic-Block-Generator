@@ -15,7 +15,9 @@ name = "mbg"
 version = "0.2.0"
 description = "Microelectronic Block Generator — SPICE to GDSII analog layout engine (gLayout + gdsfactory, GF180MCU)"
 readme = "README.md"
-requires-python = ">=3.10"
+# Upper bound matches what setup_env.sh will install into and what the
+# dependency pins below can actually satisfy; 3.13 is untested here.
+requires-python = ">=3.10,<3.13"
 license = { text = "Apache-2.0" }
 authors = [{ name = "Microelectronic Block Generator Team" }]
 keywords = ["eda", "analog", "layout", "gdsii", "glayout", "gdsfactory", "gf180mcu"]

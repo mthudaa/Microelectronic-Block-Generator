@@ -26,6 +26,91 @@ StrongArm comparator): 4/4 pass DRC and LVS. The older shape-router path passed
 Returned keys: `outdir`, `gds_path`, `svg_path`, `cell_name`, `drc`, `lvs`,
 `pex`, `all_pass`, plus `context`, `verification` and `metrics`.
 
+
+## Outputs Produced
+
+Every run emits a full view set beside the GDS, recorded in `<cell>.views.json`:
+
+| View | File | Notes |
+| --- | --- | --- |
+| GDS | `<cell>.gds` | the implementation |
+| LEF | `<cell>.lef` | abstract for the floorplanner, written by Magic |
+| Liberty | `<cell>.lib` | hard-macro abstract; no timing arcs, none were characterised |
+| Verilog | `<cell>.v` | black-box declaration; signal pins are `inout` |
+| SVG | `<cell>.svg` | preview |
+| Schematic SPICE | `<cell>.spice` | the source netlist |
+| Extracted SPICE | `<cell>_extracted.spice` | from Magic |
+| PEX SPICE | `<cell>.pex.spice` | post-layout with parasitics |
+| DRC / LVS | `<cell>.magic.drc.rpt`, `<cell>.lvs.out` | tool output, verbatim |
+
+Signal pins are declared `inout` deliberately: a SPICE netlist records
+connectivity, not direction, so anything else would be invented.
+
+## Power Rails
+
+VDD and VSS rails are generated automatically on the top metal, with via drops
+registered as access points on the supply nets so the router connects to them.
+Drops land on the routing grid — off-grid drops are the one thing the track
+pitch cannot keep DRC-legal. Disable with `power_rails=False`.
+
+## Deep N-Well
+
+GF180MCU has no deep-n-well transistor model, so isolation is inferred from
+connectivity: an NMOS whose bulk is not on the global ground can only be built
+with a deep n-well. Isolation propagates across a matching group, because a
+differential pair with DNW on one side only is not matched. Override with
+`PlacementConfig(dnwell_devices={...})` or `with_dnwell=True`.
+
+## Passive Devices (resistors and MIM capacitors)
+
+Passives are built by `mbg.passives` from raw PDK layers, **not** by gLayout.
+That is not a preference — gLayout cannot produce either device in a form
+gf180mcuD recognises:
+
+| Device | gLayout builds | gf180 Magic expects | Result if used |
+|---|---|---|---|
+| Resistor | a diode-connected **pfet** (its own docstring says so) | `ppolyf_u` = POLY & SBLK & PPLUS & RESDEF | extracts as `pfet_03v3`, LVS can never match |
+| MIM cap | MIM on **met2/met3** | `mimcc mimcap metal5` over **metal4** | Magic extracts *no device at all* — the cap silently vanishes |
+
+Write passives the natural way; both spellings are accepted:
+
+```spice
+XR1 vin  vout ppolyf_u W=1u L=4u                    * or r_width=/r_length=
+XC1 vout vss  cap_mim_2f0_m4m5_noshield W=5u L=5u   * or c_width=/c_length=
+```
+
+Three constraints that surprise people:
+
+- **`W >= 0.80 um`** for a poly resistor (PRES.1).
+- **MIM top plate `>= 5.0 um`** (MIMTM.8a). There is no smaller MIM in gf180;
+  a request below this is rejected rather than silently resized.
+- **Only `ppolyf_u` has a native generator.** Another passive resistor model
+  (`npolyf_u`, `rm1`, ...) raises `UnsupportedDeviceError` instead of being
+  built from a different primitive, because substituting a device that
+  extracts under another name is exactly how a layout passes DRC and then
+  fails LVS for reasons nobody can find.
+
+Two non-obvious rules are already handled and should not be "fixed":
+
+- A resistor contact must land in the window **0.22-0.44 um** from the
+  salicide block. *Both* bounds report as `PRES.7`, so a too-far contact looks
+  like a spacing error and moving it further away never helps.
+- The MIM's terminals come out on **met3**, not on the plates. Magic derives
+  the bottom plate as `bloat-all *mim *m4` — the whole connected metal4 shape
+  — and then requires 1.2 um of clearance from any unrelated metal4, so a
+  router reaching the plates directly cannot satisfy MIMTM.1/MIMTM.3.
+
+## Chip Integration
+
+```bash
+python3 scripts/integrate_modules.py --librelane --top chip_top
+```
+
+Collects every module that published a views manifest into a LibreLane macro
+integration: top-level Verilog, `config.json`, `info.yaml` and per-module
+`lvs_config.json`. If LibreLane is not installed the configuration is still
+written and the run is reported `NOT RUN` — never as passing.
+
 ## Purpose
 
 Convert a SPICE subcircuit netlist into a DRC-clean GDSII layout with

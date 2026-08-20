@@ -1,14 +1,46 @@
-# Microelectronic Block Generator — AI/LLM Agentic Analog Chip Design
+<div align="center">
 
-### *From IDEA to SPICE, from SPICE to GDS in an instant.*
+# ⚡ MICROELECTRONIC BLOCK GENERATOR
 
-**SSCS Chipathon 2026 — gLayout Track (D): AI/LLM for Analog Circuits**
+### *From IDEA to SPICE, from SPICE to GDS — in an instant.*
 
-An AI-assisted analog-layout framework that converts SPICE subcircuit netlists to
-DRC-clean GDSII layout using [gLayout](https://github.com/ReaLLMASIC/gLayout),
-[gdsfactory](https://github.com/gdsfactory/gdsfactory), and the **DeepSeek API**.
-Supports AC/transient simulation,
-DRC/LVS/PEX verification, and pre/post-layout comparison.
+**An autonomous analog layout engine.**
+Describe a circuit in plain language; get back a routed, DRC-clean,
+LVS-matched GDSII you can tape out.
+
+<br/>
+
+[![License](https://img.shields.io/badge/License-Apache_2.0-0b7285?style=for-the-badge&logo=apache&logoColor=white)](LICENSE)
+[![PDK](https://img.shields.io/badge/PDK-GF180MCU_·_180nm-6741d9?style=for-the-badge)](https://github.com/google/gf180mcu-pdk)
+[![Python](https://img.shields.io/badge/Python-3.10+-2b8a3e?style=for-the-badge&logo=python&logoColor=white)](pyproject.toml)
+[![Chipathon](https://img.shields.io/badge/SSCS_Chipathon-2026_·_Track_D-c2255c?style=for-the-badge)](https://github.com/sscs-ose/sscs-chipathon-2026)
+
+![DRC](https://img.shields.io/badge/DRC-clean_6%2F6-2b8a3e?style=flat-square)
+![LVS](https://img.shields.io/badge/LVS-match_6%2F6-2b8a3e?style=flat-square)
+![Connectivity](https://img.shields.io/badge/connectivity-0_opens_·_0_shorts-2b8a3e?style=flat-square)
+![Agents](https://img.shields.io/badge/agents-OpenCode_·_Claude_·_Codex-1971c2?style=flat-square)
+
+</div>
+
+---
+
+> **SSCS Chipathon 2026 — gLayout Track (D): AI/LLM for Analog Circuits**
+
+An AI-assisted analog-layout framework that converts SPICE subcircuit netlists
+into DRC-clean GDSII using [gLayout](https://github.com/ReaLLMASIC/gLayout),
+[gdsfactory](https://github.com/gdsfactory/gdsfactory) and the **DeepSeek API**.
+It closes the loop: ngspice drives the netlist, the layout engine realises it,
+and Magic/netgen verify it — with every stage reporting honestly, so a failed
+route is reported as a failure rather than quietly emitted as geometry.
+
+| | |
+| :--- | :--- |
+| 🧠 **Agentic** | An LLM writes and tunes the netlist against real ngspice measurements |
+| 📐 **Analog-aware** | Matching groups, symmetry constraints, per-device deep n-well isolation |
+| 🧭 **DRC-aware routing** | A\* grid maze router with negotiated rip-up and via legality checks |
+| 🔍 **Self-verifying** | Union-find connectivity check catches opens/shorts *before* signoff |
+| 🧱 **Native passives** | Real `ppolyf_u` resistors and metal4/metal5 MIM caps, built from PDK layers |
+| 📦 **Tapeout-ready** | Emits GDS · LEF · LIB · Verilog · SPICE · PEX · SVG for LibreLane |
 
 ---
 
@@ -68,89 +100,457 @@ routed, DRC-clean GDS layout.
 | **Layout** | gLayout + gdsfactory |
 | **Physical Verification** | Magic (DRC), Netgen (LVS), Magic (PEX) |
 | **AI/LLM** | DeepSeek API |
-| **Container** | IIC-OSIC-TOOLS Docker |
+| **Install** | local scripts (`setup_env.sh`) — Docker optional |
 | **Languages** | Python 3, SPICE, Tcl, Bash |
 
 ---
 
 ## ⚡ Design Flow
 
+```mermaid
+flowchart LR
+    A["💬 Prompt"] --> B["🤖 LLM<br/>netlist"]
+    B --> C["📄 SPICE"]
+    C --> D["🔬 ngspice<br/>measure"]
+    D -->|specs not met| B
+    D -->|specs met| E["🧩 Parse<br/>devices + constraints"]
+    E --> F["📐 Analog-aware<br/>placement"]
+    F --> G["🧭 DRC-aware<br/>grid routing"]
+    G --> H["🔍 Connectivity<br/>opens / shorts"]
+    H -->|fail| F
+    H -->|clean| I["📦 GDSII<br/>+ LEF/LIB/Verilog/SVG"]
+    I --> J["✅ DRC"] --> K["✅ LVS"] --> L["⚡ PEX"]
+    L --> M["🚀 Tapeout"]
+
+    style A fill:#6741d9,stroke:#4c2fb8,color:#fff
+    style B fill:#6741d9,stroke:#4c2fb8,color:#fff
+    style M fill:#2b8a3e,stroke:#1d6329,color:#fff
+    style H fill:#c2255c,stroke:#9c1a48,color:#fff
 ```
-SPICE Netlist  →  Parse Devices  →  Multi-Row Placement  →  Power Routing
-     ↓                                                    ↓
-  Signal Routing  →  GDSII Export  →  DRC  →  LVS  →  PEX  →  Tapeout
-```
+
+The loop that matters is `D → B`: the agent keeps rewriting the netlist until
+ngspice says the specifications are met. The second loop, `H → F`, is the one
+most flows omit — if the router can't complete a net, placement is retried
+rather than shipping a layout with a hidden open.
 
 ### Primary Pipeline API
 
 ```python
 from mbg.pipeline import spice_to_gds_with_checks
+
 r = spice_to_gds_with_checks(netlist)
-# r["outdir"], r["gds_path"], r["drc"], r["lvs"], r["pex"], r["all_pass"]
+r["all_pass"]     # True only if DRC, LVS *and* internal connectivity all pass
+r["drc"], r["lvs"], r["pex"]
+r["gds_path"], r["outdir"]
+r["views"]        # GDS · LEF · LIB · Verilog · SCH SPICE · PEX SPICE · SVG
 ```
 
-See [`designs/notebooks/chipathon2026-D/`](designs/notebooks/chipathon2026-D/) for
-complete notebooks and the full design flow.
+Every run emits a full set of downstream views, so a block drops straight into
+a LibreLane macro flow:
+
+```python
+from mbg.analysis import Testbench          # op / dc / ac / tran / monte_carlo
+from mbg.integrate import integrate         # multi-macro chip assembly
+```
+
+`spice_to_gds_with_checks` runs the **DesignContext** engine (analog-aware
+placement, DRC-aware grid router, union-find connectivity verification). Pass
+`legacy=True` to reproduce the original shape-router behaviour.
+
+### Chip integration
+
+```bash
+python scripts/integrate_modules.py --librelane \
+       --top mbg_top --search outputs/regression --outdir integration/
+```
+
+Discovers every block that published a `*.views.json`, assembles them into one
+top cell and signs it off — emitting the integration **GDS · LEF · LIB · SCH
+SPICE · PEX SPICE · Verilog · DRC · LVS**, plus `info.yaml` and one
+`lvs_config_<cell>.json` per block in the [SSCS Chipathon
+2026](https://github.com/sscs-ose/sscs-chipathon-2026/tree/main/resources)
+submission format. Add `--run` to hand the generated config to LibreLane.
+
+Two things it will tell you rather than hide:
+
+- **Ground is global.** The macros share a p-substrate, so substrate-tied
+  grounds really are one net and the top netlist says so. A pin declared as
+  ground that *isn't* tied gets named in a warning — Magic splits it off as
+  `vss_uq2`, which means that block's ground is floating.
+- **Top-level LVS of disconnected macros is inconclusive**, and is reported as
+  such rather than as a pass. With no PDN and no inter-block nets the blocks
+  are symmetric islands and netgen cannot assign net classes uniquely. Each
+  macro's own LVS is authoritative; run LibreLane for a chip-level verdict.
+
+See [`tests/notebooks/`](tests/notebooks/) for the end-to-end notebooks
+(`spice_to_gds.ipynb`, `llm_to_gds.ipynb`) and [`tests/`](tests/) for the
+regression suites that exercise the full design flow.
 
 ---
 
 ## 🛠️ Getting Started
 
+**Local install, no Docker.** Everything lands in two places you control:
+`.venv/` inside the clone, and `$MBG_TOOLS_ROOT` (default `~/.local/mbg-tools`)
+for EDA builds. Nothing is written to `/usr`, `/usr/local`, or the system
+package database unless you explicitly ask for OS build dependencies.
+
 ### Prerequisites
 
-- **Docker Desktop** ([install guide](https://docs.docker.com/desktop/))
-- **GitHub Desktop** ([download](https://desktop.github.com/)) or Git CLI
+| | |
+| :--- | :--- |
+| **OS** | Linux — Debian/Ubuntu, Fedora/RHEL-like, Arch-like, openSUSE are detected |
+| **Python** | 3.10 – 3.12 (`MBG_PYTHON=/path/to/python3.11` to pin one) |
+| **Git** | any recent version |
+| **Disk** | ~2 GB (the GF180 PDK is most of it) |
 
-### 1. Clone the Repository
+Building Magic or netgen needs a C toolchain, Tcl/Tk, Cairo and X11 headers.
+You only need these if you don't already have compatible tools:
+
+```bash
+./scripts/setup_env.sh --deps        # prints the exact packages for your distro
+./scripts/setup_env.sh --deps --yes  # installs them (prompts for sudo)
+```
+
+Installing OS packages is the one step that needs root, so it is never done
+silently.
+
+### Quick Start
 
 ```bash
 git clone https://github.com/mthudaa/Microelectronic-Block-Generator.git
 cd Microelectronic-Block-Generator
+
+./scripts/setup_env.sh          # venv + dependencies + GF180 PDK + EDA tools
+source scripts/activate_mbg.sh  # venv + PDK vars + tool PATH, in one step
+
+./scripts/setup_env.sh --check  # preflight; non-zero if anything required fails
+python tests/test_all_designs.py
 ```
 
-### 2. Launch the Docker Container
+`setup_env.sh` reuses whatever already works. If you have a compatible Magic,
+netgen and PDK, it detects them and builds nothing.
 
-**Linux / macOS:**
+<details>
+<summary><b>Step by step, on a blank machine</b></summary>
+
+If nothing is installed yet, run the stages individually so a failure tells
+you exactly which one it was:
+
 ```bash
-./start_chipathon_vnc.sh
+# 0. OS build packages — the only step that needs root.
+#    Skip it if you already have working Magic and netgen.
+./scripts/setup_env.sh --deps          # review the list first
+./scripts/setup_env.sh --deps --yes    # then install
+
+# 1. Python: .venv, pinned dependencies, `pip install -e .`
+./scripts/setup_env.sh --python-only
+
+# 2. GF180MCU PDK via volare (~1.5 GB download)
+./scripts/setup_env.sh --pdk
+
+# 3. Magic and netgen — builds only what is missing or incompatible
+./scripts/setup_env.sh --eda
+
+# 4. Activate, then confirm
+source scripts/activate_mbg.sh
+./scripts/setup_env.sh --check
 ```
 
-**Windows:**
-```cmd
-.\start_chipathon_vnc.bat
+Each stage is idempotent: re-running one that already succeeded does nothing.
+
+</details>
+
+### Installation modes
+
+| Command | What it does |
+| :--- | :--- |
+| `./scripts/setup_env.sh` | everything below, in order |
+| `./scripts/setup_env.sh --python-only` | `.venv`, pinned dependencies, `pip install -e .` |
+| `./scripts/setup_env.sh --pdk` | GF180MCU via volare into `$PDK_ROOT` |
+| `./scripts/setup_env.sh --eda` | build Magic / netgen into `$MBG_TOOLS_ROOT` — only what's missing |
+| `./scripts/setup_env.sh --deps` | print (or `--yes`, install) OS build packages |
+| `./scripts/setup_env.sh --check` | full preflight, installs nothing |
+
+### Tool versions
+
+| Tool | Requirement | Tested |
+| :--- | :--- | :--- |
+| Python | 3.10 – 3.12 | 3.10.20, 3.11 |
+| Magic | **≥ the version the techfile names** (`requires magic-8.3.411`) | 8.3.669, 8.3.681 |
+| netgen | ≥ 1.5.200, must terminate in `-batch` | 1.5.322, 1.5.323 |
+| PDK | `gf180mcuD` via volare | — |
+| KLayout | **optional** — not used by the default flow | — |
+| ngspice | **optional** — simulation only | 45 |
+
+The Magic floor is read from *your* installed techfile rather than hard-coded,
+so the check tracks the PDK you actually have. An exact-version pin would
+reject working installations for no reason.
+
+### Environment variables
+
+`source scripts/activate_mbg.sh` sets all of these; you shouldn't need to
+export them by hand. Any value you set first is respected.
+
+| Variable | Default | Purpose |
+| :--- | :--- | :--- |
+| `PDK_ROOT` | `$HOME/.volare` | where PDKs live |
+| `PDK` | `gf180mcuD` | active PDK |
+| `PDKPATH` | `$PDK_ROOT/$PDK` | active PDK root |
+| `STD_CELL_LIBRARY` | `gf180mcu_fd_sc_mcu7t5v0` | standard cells |
+| `MBG_TOOLS_ROOT` | `$HOME/.local/mbg-tools` | where MBG builds EDA tools |
+| `MBG_MAGIC` / `MBG_NETGEN` | — | pin an exact executable |
+| `MBG_MAGIC_ROOT` / `MBG_NETGEN_ROOT` | — | pin a prefix (`<prefix>/bin/<tool>`) |
+| `MBG_TOOL_TIMEOUT` | per tool | seconds before an EDA call is killed |
+| `MBG_MAGIC_TIMEOUT` / `MBG_NETGEN_TIMEOUT` | 900 | per-tool override |
+
+`PDK_ROOT` has to exist **before** anything imports gLayout, which reads it at
+import time. `import mbg` sets it for you, so this is handled even if you
+forget — but a wrong value is still your value.
+
+### Which binaries am I actually running?
+
+Every run prints what it resolved, because "there is a `magic` on PATH" and
+"Magic can drive this PDK" are different claims:
+
+```text
+[TOOLS] magic: /home/user/.local/mbg-tools/magic-8.3.681/bin/magic (8.3.681, via MBG_TOOLS_ROOT)
+[TOOLS] netgen: /home/user/.local/mbg-tools/netgen-1.5.323/bin/netgen (1.5.323, via MBG_TOOLS_ROOT)
 ```
 
-The script pulls the IIC-OSIC-TOOLS image (first time only) and starts the
-container with GF180MCU PDK pre-loaded.
+Resolution order: `MBG_MAGIC` → `MBG_MAGIC_ROOT` → `$MBG_TOOLS_ROOT` → `PATH`.
+A tool is accepted only after a version check *and* a functional probe. If you
+name one explicitly and it doesn't work, that's an error — MBG will not
+quietly run a different one instead.
 
-### 3. Access the Design Environment
+### Verify the install
+
+`--check` is the single source of truth — it asks the same resolver the
+pipeline uses, so it cannot pass while a real run picks a different binary.
+
+```bash
+./scripts/setup_env.sh --check
+```
+
+```text
+MBG Local Environment Check
+==================================================
+
+Operating System
+  distro                 PASS  Fedora Linux 43 (Workstation Edition)
+
+Python
+  virtualenv             PASS  /path/to/repo/.venv
+  python                 PASS  3.11.15
+  mbg                    PASS  0.2.0
+  gdsfactory             PASS  7.7.0
+  gdstk                  PASS  0.9.62
+  glayout                PASS  0.1.2
+  numpy                  PASS  1.24.0
+
+PDK
+  PDK                   PASS  gf180mcuD
+  PDK_ROOT              PASS  /home/user/.volare
+  PDKPATH               PASS  /home/user/.volare/gf180mcuD
+  standard cells        PASS  gf180mcu_fd_sc_mcu7t5v0
+  Magic techfile        PASS  requires magic-8.3.411
+  Netgen setup          PASS
+
+EDA
+  Magic executable      PASS  /usr/local/bin/magic
+  Magic version         PASS  8.3.669
+  Netgen executable     PASS  /usr/local/bin/netgen
+  Netgen version        PASS  1.5.322
+  KLayout executable    OPTIONAL  not installed (not needed for the GF180 flow)
+  ngspice               PASS  /usr/local/bin/ngspice
+
+Regression readiness
+  GDS generation        READY
+  Magic DRC             READY
+  Magic extraction      READY
+  Netgen LVS            READY
+
+Environment OK — the GF180 regression can run.
+```
+
+Exit status is **0** only when every *required* component passes. Optional
+components (KLayout, ngspice) are reported but never fail the check.
+
+Then run the real thing:
+
+```bash
+python tests/test_all_designs.py     # SPICE -> GDS -> DRC -> extract -> LVS  (~10 min)
+python -m pytest tests/ -q           # 73 unit + environment tests           (~2 min)
+```
+
+```text
+  Inverter: DRC=DRC: CLEAN | LVS=MATCH
+  3-stage Ring Oscillator: DRC=DRC: CLEAN | LVS=MATCH
+  5T-OTA: DRC=DRC: CLEAN | LVS=MATCH
+  StrongArm-Comparator: DRC=DRC: CLEAN | LVS=MATCH
+  ...
+  7/7 designs pass DRC + LVS
+```
+
+### What gets installed, and how to undo it
+
+| Location | Contents | Remove with |
+| :--- | :--- | :--- |
+| `<repo>/.venv/` | Python environment | `rm -rf .venv` |
+| `$PDK_ROOT` (`~/.volare`) | GF180MCU PDK | `rm -rf ~/.volare/gf180mcuD` |
+| `$MBG_TOOLS_ROOT` (`~/.local/mbg-tools`) | Magic / netgen builds + sources | `rm -rf ~/.local/mbg-tools` |
+
+Nothing else is touched. `/usr`, `/usr/local` and the system package database
+are only ever written to by `--deps --yes`, which asks for sudo explicitly and
+installs nothing else.
+
+### Troubleshooting
+
+<details>
+<summary><b>PDK_ROOT missing / <code>TypeError: ... not NoneType</code></b></summary>
+
+gLayout calls `Path(os.getenv("PDK_ROOT"))` at import time, so an unset
+variable used to surface as a `TypeError` from inside gLayout. `import mbg`
+now populates the PDK environment first. If the PDK itself is missing:
+
+```bash
+./scripts/setup_env.sh --pdk
+```
+</details>
+
+<details>
+<summary><b>Magic incompatible</b></summary>
+
+```text
+Magic version 8.3.411 is required by this techfile, but this version of magic is 0.0.0
+Nothing in "cifinput" section of tech file.
+```
+
+A Magic that predates the techfile reads no GDS and extracts nothing — and
+still exits 0. It is rejected rather than used:
+
+```bash
+./scripts/setup_env.sh --eda     # builds a known-good Magic locally
+```
+</details>
+
+<details>
+<summary><b>netgen incompatible or hanging</b></summary>
+
+Some builds sit waiting on stdin under `-batch`; the mesh generator of the
+same name isn't the LVS tool at all. Both are caught by the batch probe.
+
+```bash
+./scripts/setup_env.sh --eda
+```
+</details>
+
+<details>
+<summary><b>Building Magic/netgen fails on a Tcl 9 system (Fedora 43+)</b></summary>
+
+```text
+couldn't load file ".../tclnetgen.so": cannot open shared object file
+make[2]: *** No rule to make target '../base/libbase.o', needed by 'tclnetgen.so'
+```
+
+Magic and netgen build their Tcl extensions against the system Tcl and
+support **8.6**. Distributions that have moved to **Tcl 9** (Fedora 43 and
+newer) produce a launcher script with no working library behind it.
+
+`--eda` detects this and **refuses to install the broken build** rather than
+leaving you with a tool that exists and never works. Options, in order of
+least effort:
+
+1. **Use what you have.** MBG detects and reuses any working Magic/netgen —
+   run `./scripts/setup_env.sh --check` first; you may not need to build
+   anything.
+2. Install Tcl 8.6 development files and rebuild.
+3. Use the optional Docker image, which ships working tools.
+
+</details>
+
+<details>
+<summary><b>KLayout not found</b></summary>
+
+Optional. The default flow is Magic for DRC and netgen for LVS. The `klayout`
+Python module and the `klayout` executable are different things — having the
+module does not give you the command. You need the executable only for
+`run_drc(engine="klayout")` or `engine="both"`.
+</details>
+
+<details>
+<summary><b>Extraction failure / LVS skipped</b></summary>
+
+```text
+[ERROR][MAGIC_EXTRACTION]
+  ...
+LVS was SKIPPED because no valid extracted SPICE netlist was generated.
+Full log: outputs/regression/inverter/logs/magic_extract.log
+```
+
+This is correct behaviour. LVS depends on extraction; with no extracted
+netlist there is nothing to compare. Fix the extraction — the log names the
+cause. MBG will never substitute the `.gds` for the missing netlist.
+</details>
+
+<details>
+<summary><b>Tool timeout</b></summary>
+
+```text
+netgen exceeded 900s during netgen_lvs and was terminated.
+```
+
+The process group is killed and the log kept. Raise the bound if the design
+is genuinely that large:
+
+```bash
+export MBG_NETGEN_TIMEOUT=1800
+```
+</details>
+
+<details>
+<summary><b>Where are the logs?</b></summary>
+
+Next to each result, never discarded:
+
+```text
+outputs/regression/<cell>/logs/
+    magic_drc.log
+    magic_extract.log
+    netgen_lvs.log
+```
+</details>
+
+### Docker (optional alternative)
+
+Local installation is the supported path. The IIC-OSIC-TOOLS container
+remains available if you'd rather not install EDA tools at all:
+
+<details>
+<summary>Container instructions</summary>
+
+```bash
+./start_chipathon_vnc.sh     # Linux/macOS
+.\start_chipathon_vnc.bat    # Windows
+```
 
 | Method | Address | Password |
 | :--- | :--- | :--- |
-| **VNC Client** (recommended) | `localhost:5901` | `abc123` |
-| **Web Browser** (noVNC) | `http://localhost` | `abc123` |
+| VNC client | `localhost:5901` | `abc123` |
+| Browser (noVNC) | `http://localhost` | `abc123` |
 
-### 4. Activate the Python Environment
-
-Inside the container terminal:
+Inside the container:
 
 ```bash
 unset PYTHONPATH PYTHONHOME LD_LIBRARY_PATH
 source /headless/conda-env/miniconda3/etc/profile.d/conda.sh
 conda activate GLdev
-
-export PDK_ROOT=/foss/pdks
-export PDK=gf180mcuD
-export PDKPATH=/foss/pdks/gf180mcuD
+export PDK_ROOT=/foss/pdks PDK=gf180mcuD PDKPATH=/foss/pdks/gf180mcuD
 export STD_CELL_LIBRARY=gf180mcu_fd_sc_mcu7t5v0
 ```
 
-### 5. Run the Design Flow
-
-```bash
-cd /foss/designs/notebooks/chipathon2026-D
-# Open and run spice_to_gds.ipynb or llm_to_gds.ipynb
-```
+The container ships its own Magic and netgen, so `--eda` is unnecessary there.
+</details>
 
 ---
 
@@ -169,12 +569,13 @@ All project-specific extensions use the `mbg-` prefix.
 
 ```bash
 git clone <this-repo> && cd Microelectronic-Block-Generator
-./scripts/setup_env.sh        # 1. Python environment (.venv + `import mbg`)
+./scripts/setup_env.sh        # 1. Python env + GF180 PDK + EDA tools
 ./scripts/install_agents.sh   # 2. OpenCode / Claude Code / Codex integrations
 ```
 
 That is the whole setup. Both scripts are idempotent, discover the repository
-root themselves, and perform no git operations.
+root themselves, and perform no git operations. If you only want the agent
+layer and already have a working environment, step 2 alone is enough.
 
 Inside an agent you can run the same thing as a slash command:
 
@@ -262,11 +663,11 @@ hand-maintained and safe to edit directly; if it does, edit the source under
 | **Generated** (never hand-edit) | `.opencode/skills/**`, `.opencode/commands/**`, `.claude/skills/**`, `.claude/commands/**`, `CLAUDE.md`, `plugins/mbg-analog/skills/**`, `plugins/mbg-analog/.codex-plugin/plugin.json`, `.agents/plugins/marketplace.json`, `.ai/project-index.json` | Overwritten by `scripts/sync_agent_tools.py`. Hand edits are silently lost on the next sync. |
 | **Platform-specific, maintained by hand** | `opencode.jsonc` (OpenCode permissions), `.claude/settings.json` (Claude Code permissions), `.opencode/tools/*.ts` (OpenCode custom code tools — only OpenCode supports repo-scoped code tools) | Not derived from `.ai/`; edit in place for the platform in question. |
 
-> ⚠️ `.opencode/tools/core/` is a **stale, partial mirror** of
-> `src/mbg` kept only as a last-resort
-> fallback for a broken checkout, and is being retired. The real
-> implementation the pipeline tools call is always
-> `src/mbg/`.
+> ℹ️ There is exactly **one** copy of the engine: `src/mbg/`. Earlier
+> revisions also carried a `.opencode/tools/core/` mirror that silently
+> drifted weeks behind; it has been removed, and the OpenCode tools now
+> **fail loudly** if `src/mbg/pipeline.py` is missing rather than falling
+> back to anything.
 
 ### Capability matrix
 
@@ -377,12 +778,11 @@ approve each stage yourself.
   are generated — a hand-edit there is either overwritten on the next
   `sync_agent_tools.py` run, or has no effect at all if another contributor
   syncs first. Edit `.ai/skills/<name>/SKILL.md` and resync.
-- *A pipeline tool silently uses stale placement/routing logic.*
-  `mbg-spice-to-gds.ts` resolves the canonical core at
-  `src/mbg` and only falls back to the local
-  `.opencode/tools/core/` mirror when that path is missing. If you're on a
-  partial checkout that mirror is weeks stale — make sure
-  `src/mbg/pipeline.py` actually exists.
+- *A pipeline tool can't find the engine.* `mbg-spice-to-gds.ts` resolves
+  the canonical package at `src/mbg` and throws if `src/mbg/pipeline.py` is
+  absent. This is deliberate: the tool used to fall back to a bundled mirror
+  and run weeks-old placement/routing code. Run the tool from inside a full
+  clone.
 
 ### Claude Code
 
@@ -552,6 +952,7 @@ DRC-clean GDSII layout for the gf180mcuD PDK: <netlist>
 
 ```text
 ├── src/mbg/                           # THE ENGINE — the only copy, `import mbg`
+│   ├── passives.py                    # native ppolyf_u resistor + met4/met5 MIM
 │   ├── pipeline.py                    # spice_to_gds_with_checks(), spice_to_gds_ctx()
 │   ├── spice_parser.py                # netlist parsing + constraint extraction
 │   ├── design_context.py              # DesignContext shared across every stage
@@ -575,11 +976,20 @@ DRC-clean GDSII layout for the gf180mcuD PDK: <netlist>
 │   │   ├── core_analog/               # circuit cells (OTA, comparator, ...)
 │   │   └── tb_analog/                 # testbench setups
 │   └── notebooks/chipathon2026-D/     # the Chipathon project directory
-│       ├── notebooks/                 # spice_to_gds.ipynb, llm_to_gds.ipynb
-│       ├── tests/                     # all test suites
-│       ├── scripts/                   # iic-drc.sh, iic-lvs.sh, iic-pex.sh
+│       ├── scripts/                   # iic-drc.sh, iic-lvs.sh, iic-pex.sh (found
+│       │                              #   automatically; override MBG_SCRIPTS_DIR)
 │       ├── examples/  docs/  ai_logs/ # runnable examples, reference docs, session logs
+│       ├── dataset/                   # finetuning / prompt datasets
 │       └── outputs/                   # generated artifacts (gitignored)
+│
+├── tests/                             # ALL test suites live at the repo root
+│   ├── test_all_designs.py            # 6-design DRC + LVS + connectivity regression
+│   ├── test_router_synthetic.py       # router unit tests (no PDK required)
+│   ├── test_analysis.py               # op/dc/ac/tran/Monte-Carlo
+│   ├── test_outputs.py                # GDS/LEF/LIB/Verilog/SPICE/SVG emission
+│   ├── test_integration.py            # multi-macro chip integration
+│   ├── test_agent_integrations.py     # canonical vs generated agent layer
+│   └── notebooks/                     # spice_to_gds.ipynb, llm_to_gds.ipynb
 │
 ├── AI-Generated-Design-Result/        # generated designs + preserved baselines
 ├── docs/                              # workflow documentation
@@ -588,8 +998,9 @@ DRC-clean GDSII layout for the gf180mcuD PDK: <netlist>
 
 The engine lives at `src/mbg/` and is imported as `mbg` from anywhere in the
 repository. There is exactly one copy — earlier revisions carried three, which
-silently diverged. The Chipathon design directory keeps its own notebooks,
-tests, EDA scripts and outputs so the template layout is preserved.
+silently diverged. Tests sit at the repository root so they run against the
+installed package rather than a relative path. The Chipathon design directory
+keeps its EDA scripts, examples and outputs so the template layout is preserved.
 
 ## 🧪 Test Key Circuits (Tapeout Plan)
 
@@ -597,7 +1008,7 @@ tests, EDA scripts and outputs so the template layout is preserved.
 | :--- | :--- | :--- |
 | **5T OTA** | ✅ Proven | Gain, GBW, Phase Margin |
 | **StrongARM Comparator** | ✅ Autonomous Tuning | `<10mV` Offset (all PVT) |
-| **Voltage Reference** | 🔄 In Progress | Temperature Coefficient |
+| **Voltage Reference** | ✅ Layout DRC/LVS clean | Temperature Coefficient *(not yet characterised)* |
 
 ### 📏 Chip Size & Pin List (per judge request — [Issue #20](https://github.com/sscs-ose/sscs-chipathon-2026/issues/20#issuecomment-5138077347))
 
@@ -649,9 +1060,9 @@ and seal ring.
 
 | Module | Owner | Files |
 | :--- | :--- | :--- |
-| Analog Design, Placement, Routing, Power, Simulation | **Huda** | `placement.py`, `routing.py`, `power.py`, `simulation.py`, `spice_parser.py` |
-| DRC, LVS, PEX, Verification, Environment | **Ahmad** | `checks.py`, `utils.py`, `scripts/` |
-| AI/LLM Integration, Prompts, Pipeline, Docs | **Jabir** | `pipeline.py`, `llm_to_gds.ipynb`, `.opencode/` |
+| Analog Design, Placement, Routing, Power, Simulation | **Huda** | `src/mbg/`: `placement_engine.py`, `router.py`, `connectivity.py`, `power.py`, `simulation.py`, `analysis.py`, `spice_parser.py` |
+| DRC, LVS, PEX, Verification, Environment | **Ahmad** | `src/mbg/`: `checks.py`, `pdk_rules.py`, `utils.py` · `scripts/`, `tests/` |
+| AI/LLM Integration, Prompts, Pipeline, Docs | **Jabir** | `src/mbg/`: `pipeline.py`, `llm.py`, `outputs.py`, `integrate.py` · `tests/notebooks/llm_to_gds.ipynb`, `.ai/` |
 
 ---
 
@@ -701,7 +1112,7 @@ These plots are required artifacts for experiment reports and tapeout reviews.
 
 ---
 
-## � Acknowledgments
+## 🙏 Acknowledgments
 
 This project is built on top of two outstanding open-source frameworks:
 
@@ -715,7 +1126,7 @@ making automated analog layout generation possible.
 
 ---
 
-## �📄 License
+## 📄 License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file
+This project is licensed under the Apache License, Version 2.0. See the [LICENSE](LICENSE) file
 for details.

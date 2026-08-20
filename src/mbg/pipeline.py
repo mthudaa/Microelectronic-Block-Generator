@@ -3,6 +3,7 @@
 @Role: AI/LLM & Backend Engineer
 @Responsibility: End-to-end pipeline (llm_to_gds), prompt engineering, LLM API integration (DeepSeek) for spec-to-netlist conversion, and dataset collection for future LLM fine-tuning.
 """
+import re
 import os
 import urllib.request
 import json as _json
@@ -362,6 +363,7 @@ def spice_to_gds_with_checks_legacy(netlist_input, gds_path=None,
 # ══════════════════════════════════════════════════════════════════════
 
 def spice_to_gds_ctx(netlist_input, mode="analog", add_labels=True,
+                     power_rails=True, rail_layer="met5",
                      placement_config=None, router_config=None,
                      verify=True, verbosity=1):
     """Full context-driven layout flow.
@@ -405,6 +407,20 @@ def spice_to_gds_ctx(netlist_input, mode="analog", add_labels=True,
 
     top, feedback = place_with_routability(ctx, pdk, pcfg, rcfg)
 
+    # Power rails must exist before routing so the router sees their via drops
+    # as ordinary terminals of the supply nets. The rail metal is claimed by
+    # its own net, so signal nets route around it instead of over it.
+    rails = {"rails": [], "drops": 0}
+    if power_rails:
+        from mbg.power import add_power_rails
+        rails = add_power_rails(ctx, top, pdk, rail_layer=rail_layer,
+                                access_layer=rcfg.access_layer,
+                                verbosity=verbosity)
+        # The rail metal is registered as net-owned obstacles, so foreign nets
+        # already route around it. Excluding the whole rail layer as well threw
+        # away a routing layer the router needs to cross wide obstacles such as
+        # a MIM capacitor's top plate.
+
     router = GridRouter(ctx, rcfg)
     result = router.run()
     realize(ctx, top, rcfg)
@@ -434,7 +450,8 @@ def spice_to_gds_ctx(netlist_input, mode="analog", add_labels=True,
     print(f"[METRICS] {metrics}")
     return {"component": top, "context": ctx,
             "verification": verification, "metrics": metrics,
-            "feedback": feedback, "router_result": result}
+            "feedback": feedback, "router_result": result,
+            "power_rails": rails}
 
 
 def _add_pin_labels(ctx, top, pdk):
@@ -499,7 +516,9 @@ def _add_pin_labels(ctx, top, pdk):
 
 def spice_to_gds_with_checks_ctx(netlist_input, gds_path=None, mode="analog",
                                  add_labels=True, verbosity=1,
-                                 placement_config=None, router_config=None):
+                                 placement_config=None, router_config=None,
+                                 power_rails=True, rail_layer="met5",
+                                 write_views=True):
     """Context-driven flow followed by the real Magic/netgen signoff.
 
     DRC and LVS results are reported exactly as the tools returned them.
@@ -513,7 +532,8 @@ def spice_to_gds_with_checks_ctx(netlist_input, gds_path=None, mode="analog",
 
     r = spice_to_gds_ctx(netlist_input, mode=mode, add_labels=add_labels,
                          placement_config=placement_config,
-                         router_config=router_config, verbosity=verbosity)
+                         router_config=router_config, verbosity=verbosity,
+                         power_rails=power_rails, rail_layer=rail_layer)
     r["component"].write_gds(gds_path)
     r["gds_path"] = gds_path
     r["outdir"] = outdir
@@ -534,7 +554,7 @@ def spice_to_gds_with_checks_ctx(netlist_input, gds_path=None, mode="analog",
 
     netlist_path = os.path.join(outdir, f"{cell_name}.spice")
     with open(netlist_path, "w") as f:
-        f.write(netlist_input)
+        f.write(_canonical_passive_params(netlist_input))
 
     try:
         r["drc"] = run_drc(gds_path, cell_name=cell_name, workdir=outdir)
@@ -551,6 +571,14 @@ def spice_to_gds_with_checks_ctx(netlist_input, gds_path=None, mode="analog",
     except Exception as e:
         r["pex"] = {"pex_path": None, "summary": f"PEX ERROR: {e}"}
 
+    if write_views:
+        from mbg.outputs import write_all
+        try:
+            r["views"] = write_all(r, outdir=outdir, verbosity=verbosity)
+        except Exception as e:
+            r["views"] = None
+            print(f"[OUTPUTS] view generation failed: {type(e).__name__}: {e}")
+
     internal_ok = bool(r["verification"] and r["verification"]["clean"])
     r["all_pass"] = bool(r["drc"].get("clean") and r["lvs"].get("match")
                          and internal_ok)
@@ -563,7 +591,9 @@ def spice_to_gds_with_checks_ctx(netlist_input, gds_path=None, mode="analog",
 
 def spice_to_gds_with_checks(netlist_input, gds_path=None, mode="analog",
                              add_labels=True, legacy=False, verbosity=0,
-                             placement_config=None, router_config=None):
+                             placement_config=None, router_config=None,
+                             power_rails=True, rail_layer="met5",
+                             write_views=True):
     """SPICE -> GDS with DRC, LVS and PEX. The primary entry point.
 
     Since v0.2 this drives the DesignContext flow (analog-aware placement plus
@@ -589,4 +619,38 @@ def spice_to_gds_with_checks(netlist_input, gds_path=None, mode="analog",
     return spice_to_gds_with_checks_ctx(
         netlist_input, gds_path=gds_path, mode=mode, add_labels=add_labels,
         verbosity=verbosity, placement_config=placement_config,
-        router_config=router_config)
+        router_config=router_config, power_rails=power_rails,
+        rail_layer=rail_layer, write_views=write_views)
+
+
+_PASSIVE_PARAM_NAMES = {
+    "XR": {"w": "r_width", "l": "r_length"},
+    "XC": {"w": "c_width", "l": "c_length"},
+}
+
+
+def _canonical_passive_params(netlist: str) -> str:
+    """Rewrite ``W=``/``L=`` on passive instances to the PDK's own names.
+
+    Magic extracts a poly resistor as ``r_width``/``r_length`` and a MIM as
+    ``c_width``/``c_length``. Netgen compares properties *by name*, so a
+    schematic written the natural way (``W=1u L=4u``) reports
+    "Property r_width in circuit1 has no matching property in circuit2" even
+    though the device and its dimensions are identical.
+
+    This renames a parameter to its canonical spelling and nothing else. It
+    does not touch connectivity, values, or device types — unlike net
+    merging (see ``checks._merge_schematic_nets``), it cannot make a broken
+    layout look correct, because a wrong dimension still mismatches.
+    """
+    out = []
+    for line in netlist.splitlines():
+        stripped = line.lstrip()
+        prefix = stripped[:2].upper()
+        names = _PASSIVE_PARAM_NAMES.get(prefix)
+        if names and not stripped.startswith("."):
+            for old_name, new_name in names.items():
+                line = re.sub(rf"\b{old_name}\s*=", f"{new_name}=", line,
+                              flags=re.IGNORECASE)
+        out.append(line)
+    return "\n".join(out) + ("\n" if netlist.endswith("\n") else "")

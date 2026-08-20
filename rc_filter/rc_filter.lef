@@ -1,0 +1,47 @@
+VERSION 5.7 ;
+  NOWIREEXTENSIONATPIN ON ;
+  DIVIDERCHAR "/" ;
+  BUSBITCHARS "[]" ;
+MACRO rc_filter
+  CLASS BLOCK ;
+  FOREIGN rc_filter ;
+  ORIGIN 9.900 4.390 ;
+  SIZE 19.900 BY 10.590 ;
+  PIN vss
+    PORT
+      LAYER Metal3 ;
+        RECT -9.280 -3.670 9.580 -3.110 ;
+    END
+  END vss
+  PIN vout
+    PORT
+      LAYER Metal3 ;
+        RECT -5.800 1.690 -1.450 1.970 ;
+    END
+  END vout
+  PIN vin
+    PORT
+      LAYER Metal1 ;
+        RECT -6.215 5.025 -5.985 5.255 ;
+    END
+  END vin
+  OBS
+      LAYER Metal1 ;
+        RECT -6.350 0.270 -5.690 4.725 ;
+      LAYER Metal2 ;
+        RECT -6.190 1.580 -5.690 2.080 ;
+      LAYER Metal3 ;
+        RECT -9.700 2.270 10.000 4.720 ;
+        RECT -9.700 1.390 -6.100 2.270 ;
+        RECT -1.150 1.390 10.000 2.270 ;
+        RECT -9.700 -2.810 10.000 1.390 ;
+        RECT -9.700 -3.670 -9.580 -2.810 ;
+        RECT 9.880 -3.670 10.000 -2.810 ;
+      LAYER Metal4 ;
+        RECT -9.670 -3.640 9.970 6.200 ;
+      LAYER Metal5 ;
+        RECT -9.900 -4.390 9.970 5.600 ;
+  END
+END rc_filter
+END LIBRARY
+

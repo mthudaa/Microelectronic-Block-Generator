@@ -10,7 +10,156 @@ AI agent usage pattern:
 Returns structured dicts — no log-parsing required.
 """
 
-import os, subprocess, shutil, re, tempfile, textwrap
+import os, subprocess, shutil, re, tempfile, textwrap, signal, time
+
+from mbg import config as _config
+from mbg.config import ToolError
+
+# ── stage results ─────────────────────────────────────────────────────
+# Verification is a dependency chain, not a set of independent checks:
+#
+#     GDS -> DRC
+#     GDS -> extraction -> extracted SPICE -> validate -> LVS -> PEX
+#
+# Every stage reports one of these states. SKIP is the important one: when
+# extraction fails, LVS must not run at all. The previous code fell back to
+# handing the raw .gds to netgen as though it were a netlist, which is not a
+# wrong answer so much as an unbounded wait for one.
+PASS, FAIL, SKIP, ERROR, TIMEOUT = "PASS", "FAIL", "SKIP", "ERROR", "TIMEOUT"
+
+_ERROR_HINTS = (
+    "is required by this techfile", "couldn't be read", "cifinput",
+    "nothing here to extract", "no such file", "can't read", "error",
+    "cannot open", "not found", "abort",
+)
+
+
+def _stage(stage, status, **kw):
+    d = {"stage": stage, "status": status, "tool": kw.pop("tool", ""),
+         "log": kw.pop("log", ""), "output": kw.pop("output", "")}
+    d.update(kw)
+    return d
+
+
+def _relevant_lines(text, limit=6):
+    """The lines a human actually needs out of several hundred of tool output."""
+    hits = [l.strip() for l in (text or "").splitlines()
+            if l.strip() and any(h in l.lower() for h in _ERROR_HINTS)]
+    seen, out = set(), []
+    for l in hits:
+        if l not in seen:
+            seen.add(l)
+            out.append(l)
+        if len(out) >= limit:
+            break
+    if not out:
+        tail = [l.strip() for l in (text or "").splitlines() if l.strip()]
+        out = tail[-limit:]
+    return out
+
+
+def run_tool(tool, argv, *, stage, workdir, timeout=None, stdin_text=None,
+             env=None):
+    """Run one external EDA command with a bounded timeout and full logging.
+
+    Returns a stage dict. stdout and stderr are always written to
+    ``<workdir>/logs/<stage>.log`` — never discarded, because the failure that
+    matters ("Magic version ... is required by this techfile") only ever
+    appears there. The console gets a summary; the log keeps everything.
+
+    On timeout the whole process group is killed, so a hung netgen cannot
+    outlive the call and stall the rest of the regression.
+    """
+    timeout = timeout or _config.tool_timeout(tool)
+    logs = _config.log_dir(workdir)
+    log_path = str(logs / f"{stage}.log")
+    started = time.time()
+
+    try:
+        proc = subprocess.Popen(
+            list(argv), stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            stdin=subprocess.PIPE if stdin_text is not None else None,
+            text=True, cwd=workdir, env=env or os.environ.copy(),
+            start_new_session=True)
+    except (OSError, ValueError) as e:
+        with open(log_path, "w") as f:
+            f.write(f"failed to launch {argv[0]}: {e}\n")
+        return _stage(stage, ERROR, tool=tool, log=log_path,
+                      message=f"could not launch {tool}: {e}")
+
+    timed_out = False
+    try:
+        out, err = proc.communicate(input=stdin_text, timeout=timeout)
+    except subprocess.TimeoutExpired:
+        timed_out = True
+        try:
+            os.killpg(os.getpgid(proc.pid), signal.SIGTERM)
+            proc.wait(timeout=10)
+        except Exception:
+            try:
+                os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
+            except Exception:
+                pass
+        out, err = proc.communicate()
+
+    elapsed = time.time() - started
+    with open(log_path, "w") as f:
+        f.write(f"$ {' '.join(argv)}\n")
+        f.write(f"cwd: {workdir}\n")
+        f.write(f"timeout: {timeout}s   elapsed: {elapsed:.1f}s\n")
+        f.write(f"exit: {'TIMEOUT' if timed_out else proc.returncode}\n")
+        f.write("\n--- stdout ---\n" + (out or ""))
+        f.write("\n--- stderr ---\n" + (err or ""))
+
+    blob = (out or "") + "\n" + (err or "")
+    if timed_out:
+        return _stage(stage, TIMEOUT, tool=tool, log=log_path, output=blob,
+                      timeout=timeout, elapsed=elapsed, command=" ".join(argv),
+                      message=(f"{tool} exceeded {timeout}s during {stage} and "
+                               f"was terminated. Raise MBG_{tool.upper()}_TIMEOUT "
+                               f"if the design is genuinely this large."),
+                      relevant=_relevant_lines(blob))
+    rc = proc.returncode
+    sig = -rc if rc is not None and rc < 0 else None
+    return _stage(stage, PASS if rc == 0 else FAIL, tool=tool, log=log_path,
+                  output=blob, returncode=rc, signal=sig, elapsed=elapsed,
+                  command=" ".join(argv), relevant=_relevant_lines(blob))
+
+
+def validate_spice_netlist(path, *, require_subckt=True):
+    """Confirm a file really is a SPICE netlist before netgen sees it.
+
+    Guards the specific accident this project hit: passing a ``.gds`` to
+    netgen as if it were an extracted netlist. netgen does not reject it — it
+    sits there, and the regression stops at the first circuit.
+    """
+    if not path:
+        return False, "no netlist path was produced"
+    if not os.path.isfile(path):
+        return False, f"file does not exist: {path}"
+    if os.path.getsize(path) == 0:
+        return False, f"file is empty: {path}"
+    if os.path.splitext(path)[1].lower() in (".gds", ".gds2", ".gdsii",
+                                             ".svg", ".png", ".oas"):
+        return False, (f"{os.path.basename(path)} is layout/binary data, not a "
+                       f"SPICE netlist — refusing to hand it to netgen")
+    try:
+        with open(path, "rb") as f:
+            head = f.read(8192)
+    except OSError as e:
+        return False, f"cannot read {path}: {e}"
+    if b"\x00" in head:
+        return False, f"{os.path.basename(path)} is binary, not a SPICE netlist"
+    try:
+        text = head.decode("utf-8", errors="replace").lower()
+    except Exception:
+        return False, f"{os.path.basename(path)} is not decodable text"
+    if require_subckt and ".subckt" not in text:
+        return False, (f"{os.path.basename(path)} contains no .subckt "
+                       f"definition — extraction produced nothing usable")
+    return True, ""
+
+
 
 def _find_eda_scripts():
     """Locate the iic-*.sh verification scripts.
@@ -168,36 +317,65 @@ def extract_layout_netlist(gds_path, cell_name=None, workdir=None, timeout=300):
         f.write(f"ext2spice -p {wd} -o {out_path}\n")
         f.write("quit -noprompt\n")
 
-    env = os.environ.copy()
-    pdk = env.get("PDK", "gf180mcuD")
-    rcfile = f"{env.get('PDK_ROOT', '')}/{pdk}/libs.tech/magic/{pdk}.magicrc"
+    cfg = _config.pdk_config()
     try:
-        r = subprocess.run(
-            ["magic", "-dnull", "-noconsole", "-rcfile", rcfile, ext_script],
-            capture_output=True, text=True, timeout=timeout, env=env,
-        )
-    except subprocess.TimeoutExpired:
-        return {"netlist_path": None, "raw_ports": [], "log": "Extraction timed out",
-                "success": False}
-    except FileNotFoundError:
-        return {"netlist_path": None, "raw_ports": [], "log": "magic not found in PATH",
-                "success": False}
+        magic = _config.magic_bin()
+    except ToolError as e:
+        return {"netlist_path": None, "raw_ports": [], "log": str(e),
+                "success": False, "status": ERROR, "stage": "extraction",
+                "message": str(e)}
 
-    log = r.stdout + "\n" + r.stderr
+    st = run_tool("magic",
+                  [magic, "-dnull", "-noconsole", "-rcfile",
+                   str(cfg.magicrc), ext_script],
+                  stage="magic_extract", workdir=wd,
+                  timeout=timeout or _config.tool_timeout("magic"))
+    log = st.get("output", "").strip()
+
+    # A file on disk is not a successful extraction. Magic writes a netlist
+    # even when it never managed to read the cell — the result is a .subckt
+    # with no devices, which LVS then "compares" against the real schematic.
+    ok, why = validate_spice_netlist(out_path)
+    if st["status"] in (TIMEOUT, ERROR):
+        ok, why = False, st.get("message", st["status"])
+    if ok and not _netlist_has_devices(out_path):
+        ok, why = False, (f"{os.path.basename(out_path)} has a .subckt but no "
+                          f"devices — Magic read no geometry")
+
     raw_ports = []
-    if os.path.isfile(out_path):
+    if ok:
         with open(out_path) as f:
             for line in f:
                 if line.startswith(".subckt"):
                     raw_ports = line.strip().split()[2:]
                     break
-    success = os.path.isfile(out_path)
+
     return {
-        "netlist_path": out_path if success else None,
+        "netlist_path": out_path if ok else None,
         "raw_ports": raw_ports,
-        "log": log.strip(),
-        "success": success,
+        "log": log,
+        "success": ok,
+        "status": PASS if ok else (st["status"] if st["status"] in (TIMEOUT, ERROR)
+                                   else FAIL),
+        "stage": "extraction",
+        "tool": magic,
+        "log_path": st.get("log"),
+        "message": "" if ok else why,
+        "relevant": st.get("relevant", []),
     }
+
+
+def _netlist_has_devices(path):
+    """True if an extracted netlist contains at least one device instance."""
+    try:
+        with open(path) as f:
+            for line in f:
+                t = line.strip()
+                if t and t[0] in "XxMmRrCcDdQq" and not t.lower().startswith(".s"):
+                    return True
+    except OSError:
+        return False
+    return False
 
 
 def fix_port_order(extracted_path, correct_order, out_path=None):
@@ -372,24 +550,53 @@ def run_drc(gds_path, cell_name=None, engine="magic", workdir=None,
     gds_path = os.path.abspath(gds_path)
     if not os.path.isfile(gds_path):
         raise FileNotFoundError(f"GDS not found: {gds_path}")
+    if os.path.getsize(gds_path) == 0:
+        raise ValueError(f"GDS is empty: {gds_path}")
     cell = cell_name or os.path.splitext(os.path.basename(gds_path))[0]
 
     engine_flag = {"magic": "-m", "klayout": "-k", "both": "-b"}.get(engine, "-m")
+    if engine in ("klayout", "both"):
+        kl = _config.resolve_klayout()
+        if not kl.ok:
+            return {"clean": False, "status": ERROR, "stage": "drc",
+                    "report_path": None, "error_count": -1,
+                    "rules_violated": [], "layout_load_errors": [],
+                    "log": kl.reason,
+                    "summary": f"DRC: KLAYOUT NOT AVAILABLE (engine={engine})"}
     cmd = ["bash", IIC_DRC, engine_flag]
     if clean: cmd += ["-c"]
     if workdir: cmd += ["-w", os.path.abspath(workdir)]
     cmd.append(gds_path)
 
+    env = os.environ.copy()
     try:
-        r = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
-    except subprocess.TimeoutExpired:
-        return {"clean": False, "report_path": None, "error_count": -1,
-                "log": "DRC timed out", "summary": "DRC: TIMEOUT"}
-    except FileNotFoundError:
-        return {"clean": False, "report_path": None, "error_count": -1,
-                "log": "bash not found", "summary": "DRC: BASH NOT FOUND"}
+        # Pin the exact verified binary; the script falls back to `magic` on
+        # PATH only if this is unset, and PATH is precisely what we do not
+        # want to trust here.
+        env["MBG_MAGIC"] = _config.magic_bin()
+    except ToolError as e:
+        return {"clean": False, "status": ERROR, "stage": "drc",
+                "report_path": None, "error_count": -1, "rules_violated": [],
+                "layout_load_errors": [], "log": str(e),
+                "summary": "DRC: NO USABLE MAGIC"}
 
-    log = r.stdout + "\n" + r.stderr
+    st = run_tool("magic", ["bash"] + cmd[1:] if cmd[0] == "bash" else cmd,
+                  stage="magic_drc",
+                  workdir=os.path.abspath(workdir) if workdir else os.getcwd(),
+                  timeout=timeout or _config.tool_timeout("magic"), env=env)
+    if st["status"] == TIMEOUT:
+        return {"clean": False, "status": TIMEOUT, "stage": "drc",
+                "report_path": None, "error_count": -1, "rules_violated": [],
+                "layout_load_errors": [], "log": st.get("message", ""),
+                "log_path": st.get("log"),
+                "summary": f"DRC: TIMEOUT after {st.get('timeout')}s"}
+    if st["status"] == ERROR:
+        return {"clean": False, "status": ERROR, "stage": "drc",
+                "report_path": None, "error_count": -1, "rules_violated": [],
+                "layout_load_errors": [], "log": st.get("message", ""),
+                "log_path": st.get("log"), "summary": "DRC: COULD NOT RUN"}
+
+    log = st.get("output", "")
     resdir = os.path.abspath(workdir) if workdir else os.getcwd()
 
     # iic-drc.sh names the report after the GDS FILE, which is not always the
@@ -422,7 +629,27 @@ def run_drc(gds_path, cell_name=None, engine="magic", workdir=None,
         except Exception:
             pass
 
-    if errors is None:
+    # "COUNT: 0" on its own does NOT mean the layout is clean. Magic prints a
+    # zero count just as happily when it never read the GDS at all — an
+    # unreadable cell yields zero error tiles because there is no geometry to
+    # check. A clean result therefore has to be corroborated: the run must
+    # not have failed, and the log must not carry any of the signatures of a
+    # layout that was never loaded.
+    load_failures = [
+        (r"is required by this techfile", "Magic is too old for this techfile"),
+        (r"[Nn]othing in \"?cifinput", "techfile has no cifinput section — "
+                                       "GDS cannot be read"),
+        (r"[Cc]ell\s+\S+\s+couldn't be read", "the top cell could not be read"),
+        (r"[Nn]othing here to extract", "Magic found no geometry"),
+        (r"[Nn]o such file or directory", "an input file was missing"),
+    ]
+    blocked = [why for pat, why in load_failures if re.search(pat, log)]
+
+    if blocked:
+        is_clean = False
+        errors = -1 if errors in (None, 0) else errors
+        summary = f"DRC: FAILED TO READ LAYOUT ({blocked[0]})"
+    elif errors is None:
         is_clean = "No DRC errors" in log or "CONGRATULATIONS" in log
         errors = 0 if is_clean else -1
         summary = "DRC: CLEAN" if is_clean else "DRC: NO REPORT PARSED"
@@ -432,10 +659,15 @@ def run_drc(gds_path, cell_name=None, engine="magic", workdir=None,
 
     return {
         "clean": is_clean,
+        "status": PASS if is_clean else FAIL,
+        "stage": "drc",
         "report_path": report,
         "error_count": errors,
         "rules_violated": rules_hit,
+        "layout_load_errors": blocked,
         "log": log.strip(),
+        "log_path": st.get("log"),
+        "tool": env.get("MBG_MAGIC", "magic"),
         "summary": summary,
     }
 
@@ -591,12 +823,18 @@ def _match_extracted_to_schematic(xtr_lines, xtr_ports, sch_lines, sch_ports):
 
 
 def _merge_schematic_nets(sch_content, merge_map):
-    """Rewrite schematic netlist merging nets listed in merge_map.
+    """DISABLED — retained only to document why automatic net merging is off.
 
-    merge_map: dict mapping internal_node → set of schematic nets to merge.
-    The function picks a canonical name for each merged set and rewrites
-    all device lines to use it.
+    This rewrote the *schematic* netlist to match whatever the layout
+    extracted, which makes LVS compare the layout against itself: any
+    router-induced short became "correct" instead of being reported.
+    The only call site is commented out in run_lvs() and must stay that
+    way. If LVS reports a merged net, fix the layout, not the netlist.
     """
+    raise RuntimeError(
+        "_merge_schematic_nets is disabled: it masks real shorts by editing the schematic to match the layout")
+    # --- original implementation retained below, unreachable ---
+
     lines = sch_content.split('\n')
     port_nets = set()
     for line in lines:
@@ -735,7 +973,47 @@ def run_lvs(gds_path, netlist_path=None, netlist_content=None,
             fix_port_order(flat_path, sch_ports)
         xtr_path = flat_path
     else:
-        xtr_path = gds_path
+        # LVS depends on extraction; without an extracted netlist there is
+        # nothing to compare and the stage is SKIPPED, not failed-open.
+        #
+        # This branch used to read `xtr_path = gds_path`, handing netgen the
+        # raw GDS as though it were a netlist. netgen does not reject binary
+        # input — it waits, and the regression stopped dead at the first
+        # circuit. Never substitute a different file for a missing one.
+        msg = xtr.get("message") or "Magic extraction produced no usable netlist"
+        detail = "\n".join(f"    {l}" for l in xtr.get("relevant", [])[:5])
+        report_txt = (
+            f"[ERROR][MAGIC_EXTRACTION]\n\n"
+            f"Magic failed while extracting:\n"
+            f"  design : {cell}\n"
+            f"  GDS    : {gds_path}\n"
+            f"  tool   : {xtr.get('tool', 'magic')}\n\n"
+            f"  {msg}\n"
+            + (f"\nRelevant output:\n{detail}\n" if detail else "")
+            + f"\nLVS was SKIPPED because no valid extracted SPICE netlist "
+              f"was generated.\n"
+            + (f"\nFull log:\n  {xtr.get('log_path')}\n"
+               if xtr.get("log_path") else ""))
+        print(report_txt)
+        return {
+            "match": False,
+            "status": SKIP,
+            "stage": "lvs",
+            "skipped_because": "extraction",
+            "extraction": {k: xtr.get(k) for k in
+                           ("status", "message", "log_path", "tool")},
+            "report_path": None,
+            "log": report_txt,
+            "summary": {
+                "match": False, "status": SKIP,
+                "topology_match": False, "property_errors": False,
+                "pin_matching_failed": False, "property_mismatches": [],
+                "device_mismatch": "?", "net_mismatch": "?", "port_swaps": [],
+                "missing_devices": [],
+                "message": "LVS SKIPPED — Magic extraction did not produce a "
+                           "valid netlist (see extraction log)",
+            },
+        }
 
     # ── Prepare netgen TCL setup ──
     _pdk_root = os.environ.get('PDK_ROOT', '/foss/pdks')
@@ -775,39 +1053,55 @@ def run_lvs(gds_path, netlist_path=None, netlist_content=None,
 
     # ── Helper: invoke netgen once ──
     def _invoke_netgen(xtr_file, report_file):
-        """Run netgen LVS.  Returns (subprocess_run, report_path_or_None)."""
+        """Run netgen LVS. Returns (stage_dict, report_path_or_None).
+
+        The netlist is re-validated here as well as at the call site. This is
+        the last point before a file is handed to a tool that will happily
+        block forever on the wrong kind of input, so it is worth checking
+        twice rather than trusting a caller.
+        """
+        ok, why = validate_spice_netlist(xtr_file)
+        if not ok:
+            return _stage("lvs", ERROR, tool="netgen",
+                          message=f"refusing to run netgen: {why}"), None
         try:
-            r = subprocess.run(
-                ["netgen", "-batch", "lvs",
-                 f"{xtr_file} {cell}", f"{sch_path} {cell}",
-                 custom_setup, report_file],
-                capture_output=True, text=True, timeout=timeout,
-                env={**os.environ, "PATH": f"/foss/tools/netgen/bin:{os.environ.get('PATH', '')}"}
-            )
-            return r, (report_file if os.path.isfile(report_file) else None)
-        except FileNotFoundError:
-            try:
-                r = subprocess.run(
-                    ["netgen", "-batch", "lvs",
-                     f"{xtr_file} {cell}", f"{sch_path} {cell}",
-                     custom_setup, report_file],
-                    capture_output=True, text=True, timeout=timeout)
-                return r, (report_file if os.path.isfile(report_file) else None)
-            except FileNotFoundError:
-                return None, None
-        except subprocess.TimeoutExpired:
-            return None, None
+            netgen = _config.netgen_bin()
+        except ToolError as e:
+            return _stage("lvs", ERROR, tool="netgen", message=str(e)), None
+
+        st = run_tool("netgen",
+                      [netgen, "-batch", "lvs",
+                       f"{xtr_file} {cell}", f"{sch_path} {cell}",
+                       custom_setup, report_file],
+                      stage="netgen_lvs", workdir=wd,
+                      timeout=timeout or _config.tool_timeout("netgen"))
+        return st, (report_file if os.path.isfile(report_file) else None)
 
     # ── First attempt: original extracted netlist ──
     report = os.path.join(wd, f"{cell}.lvs.out")
     r, report_path = _invoke_netgen(xtr_path, report)
 
-    if r is None:
-        return {"match": False, "report_path": None,
-                "log": "netgen not found or LVS timed out",
-                "summary": {"match": False, "message": "Netgen not found or LVS timed out"}}
+    if r is None or r.get("status") in (ERROR, TIMEOUT):
+        st = r or _stage("lvs", ERROR, tool="netgen", message="netgen unavailable")
+        msg = st.get("message") or (
+            f"netgen exceeded {st.get('timeout')}s and was terminated"
+            if st.get("status") == TIMEOUT else "netgen could not be run")
+        detail = "\n".join(f"    {l}" for l in st.get("relevant", [])[:5])
+        text = (f"[ERROR][NETGEN_LVS]\n\n  design : {cell}\n"
+                f"  tool   : {st.get('tool')}\n  {msg}\n"
+                + (f"\nRelevant output:\n{detail}\n" if detail else "")
+                + (f"\nFull log:\n  {st.get('log')}\n" if st.get("log") else ""))
+        print(text)
+        return {"match": False, "status": st.get("status", ERROR), "stage": "lvs",
+                "report_path": None, "log": text,
+                "summary": {"match": False, "status": st.get("status", ERROR),
+                            "topology_match": False, "property_errors": False,
+                            "pin_matching_failed": False,
+                            "property_mismatches": [], "device_mismatch": "?",
+                            "net_mismatch": "?", "port_swaps": [],
+                            "missing_devices": [], "message": msg}}
 
-    log = r.stdout + "\n" + r.stderr
+    log = r.get("output", "")
     summary = _parse_lvs_summary(report_path)
 
     # ── Fallback: permute D/S and retry ──
@@ -821,8 +1115,8 @@ def run_lvs(gds_path, netlist_path=None, netlist_content=None,
                 f.write(perm_content)
             report2 = os.path.join(wd, f"{cell}.lvs_permuted.out")
             r2, report_path2 = _invoke_netgen(perm_path, report2)
-            if r2 is not None:
-                log2 = r2.stdout + "\n" + r2.stderr
+            if r2 is not None and r2.get("status") not in (ERROR, TIMEOUT):
+                log2 = r2.get("output", "")
                 summary2 = _parse_lvs_summary(report_path2)
                 if summary2["match"]:
                     print("  [LVS] permuted D/S → MATCH ✓")
@@ -837,8 +1131,11 @@ def run_lvs(gds_path, netlist_path=None, netlist_content=None,
         except Exception as e:
             print(f"  [LVS] permute fallback error: {e}")
 
-    return {"match": summary["match"], "report_path": report_path,
-            "log": log.strip(), "summary": summary}
+    summary["status"] = PASS if summary["match"] else FAIL
+    return {"match": summary["match"], "status": summary["status"],
+            "stage": "lvs", "report_path": report_path,
+            "log": log.strip(), "summary": summary,
+            "tool": r.get("tool", "netgen"), "log_path": r.get("log")}
 
 
 # ── PEX ──────────────────────────────────────────────────────────────

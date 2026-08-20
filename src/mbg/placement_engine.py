@@ -28,6 +28,7 @@ from typing import Dict, List, Optional, Tuple
 import gdsfactory as gf
 from gdsfactory import Component
 from glayout import nmos, pmos, resistor, mimcap, mimcap_array
+from mbg.passives import poly_resistor, mim_cap, RES_MIN_WIDTH, CAP_MIN_SIZE
 
 from mbg.design_context import (
     BoundingBox, Device, Obstacle, PinAccessPoint, Placement, Zone,
@@ -57,7 +58,14 @@ class PlacementConfig:
         self.max_placement_attempts: int = kw.get("max_placement_attempts", 3)
 
         # device generation
+        # with_dnwell puts EVERY nmos in a deep n-well; dnwell_devices names
+        # individual instances. Per-device is the normal case — a blanket DNW
+        # roughly triples each device's area.
         self.with_dnwell: bool = kw.get("with_dnwell", False)
+        self.dnwell_devices: set = set(kw.get("dnwell_devices", ()) or ())
+        # Accept glayout's pfet-based resistor for a netlist that asked for a
+        # passive one. The layout will not LVS-match; off by default.
+        self.allow_active_resistor: bool = kw.get("allow_active_resistor", False)
         self.with_dummy: bool = kw.get("with_dummy", False)
         self.with_tie: bool = kw.get("with_tie", True)
 
@@ -84,8 +92,9 @@ def build_device(pdk, dev: Device, cfg: PlacementConfig):
     """
     w = dev.finger_width if dev.finger_width else (dev.width or 3.0)
     l = dev.length or 0.5
+    dnw = _wants_dnwell(dev, cfg)
     key = (dev.kind, round(w, 6), round(l, 6), dev.fingers, dev.multipliers,
-           cfg.with_dnwell, cfg.with_dummy, cfg.with_tie)
+           dnw, cfg.with_dummy, cfg.with_tie)
     if key in _DEV_CACHE:
         return _DEV_CACHE[key]
 
@@ -96,15 +105,47 @@ def build_device(pdk, dev: Device, cfg: PlacementConfig):
     elif dev.kind == "nmos":
         c = nmos(pdk, width=w, length=l, fingers=dev.fingers,
                  multipliers=dev.multipliers, with_substrate_tap=False,
-                 with_dnwell=cfg.with_dnwell, with_tie=cfg.with_tie,
+                 with_dnwell=dnw, with_tie=cfg.with_tie,
                  with_dummy=cfg.with_dummy)
     elif dev.kind == "res":
-        c = resistor(pdk, width=w, length=l, multipliers=dev.multipliers,
-                     with_substrate_tap=False, with_tie=False)
+        # A netlist asking for a real passive resistor (ppolyf_u, npolyf_u,
+        # ...) gets one built from PDK layers by mbg.passives, which Magic
+        # extracts as that primitive with the right r_width/r_length.
+        # glayout's resistor() is, in its own words, "a diode connected pfet
+        # which acts as a programmable resistor" — it extracts as pfet_03v3
+        # and can never LVS-match a passive model, so it is used only when the
+        # netlist actually asked for a pfet-based resistor.
+        model = (dev.model or "").lower()
+        if model in _PASSIVE_RESISTOR_MODELS:
+            if model not in _NATIVE_RESISTOR_MODELS:
+                raise UnsupportedDeviceError(
+                    f"{dev.name}: model '{dev.model}' is a passive resistor, but "
+                    f"only {sorted(_NATIVE_RESISTOR_MODELS)} have a native "
+                    f"generator. Building it from another primitive would put a "
+                    f"different device in the layout and fail LVS.")
+            if w < RES_MIN_WIDTH:
+                raise UnsupportedDeviceError(
+                    f"{dev.name}: W={w} um is below the PRES.1 minimum "
+                    f"{RES_MIN_WIDTH} um for a poly resistor.")
+            c = poly_resistor(width=w, length=l)
+        else:
+            # with_tie=True is required, not optional: without the well tie the
+            # generated resistor violates DF.7 (N-well overlap of P-Diffusion)
+            # on its own, before any routing touches it.
+            c = resistor(pdk, width=w, length=l, multipliers=dev.multipliers,
+                         with_substrate_tap=False, with_tie=True,
+                         with_dnwell=cfg.with_dnwell)
     elif dev.kind == "cap":
-        size = (max(w, l), max(w, l))
-        c = (mimcap_array(pdk, rows=1, columns=dev.multipliers, size=size)
-             if dev.multipliers > 1 else mimcap(pdk, size=size))
+        # gf180mcuD's Magic tech defines the MIM as "mimcc mimcap metal5" over
+        # metal4. glayout builds its MIM on met2/met3, so Magic recognises
+        # nothing and the capacitor silently disappears from the extracted
+        # netlist. mbg.passives builds the metal4/metal5 stack the PDK expects.
+        size = max(w, l)
+        if size < CAP_MIN_SIZE:
+            raise UnsupportedDeviceError(
+                f"{dev.name}: MIM top plate {size} um is below the MIMTM.8a "
+                f"minimum {CAP_MIN_SIZE} um. gf180 has no smaller MIM.")
+        c = mim_cap(size=size)
     else:
         raise ValueError(f"no generator for device kind {dev.kind!r} ({dev.name})")
 
@@ -119,8 +160,52 @@ _MOS_PORT_TEMPLATES = {
     "gate": "multiplier_0_gate_{d}",
     "source": "multiplier_0_source_{d}",
 }
-_RES_PORT_TEMPLATES = {"p": "multiplier_0_1_{d}", "n": "multiplier_0_2_{d}"}
+# Native passives (mbg.passives) expose "<terminal>_<N|E|S|W>" on met1 for the
+# resistor and met5/met4 for the two capacitor plates. The glayout fallbacks
+# name their terminals differently, so both sets are tried; the earlier
+# templates ("multiplier_0_1_{d}") matched nothing at all, which is why
+# passives used to harvest zero access points and could not be routed.
+_RES_PORT_TEMPLATES = {"p": "p_{d}", "n": "n_{d}"}
+_RES_PORT_FALLBACK = {"p": "pfet_drain_{d}", "n": "pfet_source_{d}"}
+
+_CAP_PORT_TEMPLATES = {"p": "p_{d}", "n": "n_{d}"}
+_CAP_PORT_FALLBACK = {"p": "top_met_{d}", "n": "bottom_met_{d}"}
+
 _DIRECTIONS = ("N", "E", "S", "W")
+
+# Real passive resistors in the GF180MCU model set. glayout has no generator
+# for these; see build_device() for why that matters.
+_PASSIVE_RESISTOR_MODELS = {
+    "ppolyf_u", "npolyf_u", "ppolyf_u_1k", "nplus_u", "pplus_u",
+    "rm1", "rm2", "rm3", "tm6k", "tm9k", "tm11k", "tm30k", "nwell",
+}
+
+# Of those, the ones mbg.passives can actually build and that Magic extracts
+# with the correct r_width/r_length. The rest have no generator; building them
+# from a different primitive would silently put the wrong device in the layout.
+_NATIVE_RESISTOR_MODELS = {"ppolyf_u"}
+
+
+class UnsupportedDeviceError(NotImplementedError):
+    """A netlist device the available primitives cannot build faithfully."""
+
+
+def _wants_dnwell(dev, cfg) -> bool:
+    """Whether this device gets a deep n-well.
+
+    Three ways to ask, in order of precedence: the device was named in
+    ``PlacementConfig.dnwell_devices``; the config turned it on for every
+    NMOS; or the netlist implies it, because the device's bulk is not on the
+    global ground and therefore cannot share the substrate.
+    """
+    if dev.kind != "nmos":
+        return False
+    if dev.name in (cfg.dnwell_devices or ()):
+        return True
+    if cfg.with_dnwell:
+        return True
+    return bool(getattr(dev, "needs_dnwell", False))
+
 
 
 def terminal_port_names(dev: Device) -> Dict[str, List[str]]:
@@ -131,9 +216,13 @@ def terminal_port_names(dev: Device) -> Dict[str, List[str]]:
         for term, tmpl in _MOS_PORT_TEMPLATES.items():
             out[term] = [tmpl.format(d=d) for d in _DIRECTIONS]
         out["body"] = [f"tie_{d}_top_met_{d}" for d in _DIRECTIONS]
-    elif dev.kind == "res":
-        for term, tmpl in _RES_PORT_TEMPLATES.items():
-            out[term] = [tmpl.format(d=d) for d in _DIRECTIONS]
+    elif dev.kind in ("res", "cap"):
+        native, fallback = ((_RES_PORT_TEMPLATES, _RES_PORT_FALLBACK)
+                            if dev.kind == "res"
+                            else (_CAP_PORT_TEMPLATES, _CAP_PORT_FALLBACK))
+        for term, tmpl in native.items():
+            out[term] = ([tmpl.format(d=d) for d in _DIRECTIONS]
+                         + [fallback[term].format(d=d) for d in _DIRECTIONS])
     return out
 
 
@@ -395,18 +484,44 @@ def place(ctx, pdk, cfg: Optional[PlacementConfig] = None) -> Component:
         ctx.rules = get_rules(pdk)
     ctx.pdk = pdk
 
+    # Matched devices must share isolation. A differential pair with a deep
+    # n-well on one side and not the other is not a matched pair at all — the
+    # bulk conditions differ — so isolation propagates across the group.
+    for g in ctx.matching_groups.values():
+        members = [ctx.devices[d] for d in g.devices if d in ctx.devices]
+        if any(_wants_dnwell(d, cfg) for d in members):
+            for d in members:
+                if d.kind == "nmos" and not _wants_dnwell(d, cfg):
+                    d.needs_dnwell = True
+                    ctx.deep_nwell_flags[d.name] = True
+                    cfg.log(1, f"  [PLACEMENT] {d.name}: deep n-well added to match "
+                               f"{g.name} ({g.kind})")
+
     # 1. build every device once so we know its true size
     comps: Dict[str, object] = {}
     sizes: Dict[str, Tuple[float, float]] = {}
+    pads: Dict[str, float] = {}
     for name, dev in ctx.devices.items():
         try:
             c = build_device(pdk, dev, cfg)
+        except UnsupportedDeviceError:
+            # Never silently drop a device the netlist asked for — a layout
+            # missing a device cannot match it, and the reason must reach the
+            # caller rather than a log line.
+            raise
         except Exception as e:
             cfg.log(1, f"  [PLACEMENT] cannot build {name} ({dev.model}): {e}")
             continue
         comps[name] = c
         bb = c.bbox
-        sizes[name] = (float(bb[1][0] - bb[0][0]), float(bb[1][1] - bb[0][1]))
+        w_dev = float(bb[1][0] - bb[0][0])
+        h_dev = float(bb[1][1] - bb[0][1])
+        # A deep n-well must stand clear of neighbouring wells (LPW.11 and
+        # friends). The device bbox already contains the DNW, so the clearance
+        # has to come from the floorplan: reserve it as padding around the slot.
+        pad = ctx.rules.dnwell_spacing() if _wants_dnwell(dev, cfg) else 0.0
+        pads[name] = pad
+        sizes[name] = (w_dev + 2 * pad, h_dev + 2 * pad)
         cfg.log(2, f"  [PLACEMENT] {name}: W_total={dev.width} nf={dev.fingers} "
                    f"-> finger_w={dev.finger_width} size={sizes[name][0]:.2f}"
                    f"x{sizes[name][1]:.2f}um")
@@ -436,8 +551,9 @@ def place(ctx, pdk, cfg: Optional[PlacementConfig] = None) -> Component:
         ref = top << comp
         ref.name = name
         local = comp.bbox
-        ref.movex(p.x - float(local[0][0]))
-        ref.movey(p.y - float(local[0][1]))
+        pad = pads.get(name, 0.0)          # sit centred inside the padded slot
+        ref.movex(p.x + pad - float(local[0][0]))
+        ref.movey(p.y + pad - float(local[0][1]))
         ctx.references[name] = ref
 
         bb = BoundingBox.from_gf(ref.bbox)

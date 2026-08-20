@@ -231,6 +231,24 @@ class PDKRules:
         return self.snap(x), self.snap(y)
 
     # ── misc ────────────────────────────────────────────────────────
+    def dnwell_spacing(self) -> float:
+        """Clearance a deep n-well needs from neighbouring wells.
+
+        Takes the largest of the PDK's relevant rules so one number is safe
+        for floorplanning: DNW-to-DNW separation, and the p-well and n-well
+        enclosure/separation requirements around it.
+        """
+        vals = []
+        for a, b in (("dnwell", None), ("dnwell", "pwell"), ("dnwell", "nwell")):
+            r = self._grule(a, b) if b else self._grule(a)
+            for k in ("min_separation", "min_enclosure"):
+                if k in r:
+                    vals.append(float(r[k]))
+        return max(vals) if vals else 5.5
+
+    def has_dnwell(self) -> bool:
+        return bool(self._grule("dnwell"))
+
     def max_metal_separation(self) -> float:
         try:
             return float(self.pdk.util_max_metal_seperation())

@@ -1,0 +1,14 @@
+* PEX produced on Thu Aug 20 09:27:07 PM CST 2026 using /home/huda/opensource-project/Microelectronic-Block-Generator/designs/notebooks/chipathon2026-D/scripts/iic-pex.sh with m=2 and s=1
+* NGSPICE file created from rc_filter.ext - technology: gf180mcuD
+
+.option scale=5n
+
+.subckt rc_filter vss vout vin
+X0 vin vout VSUBS ppolyf_u r_width=200 r_length=800
+X1 vout vss cap_mim_2f0_m4m5_noshield c_width=1000 c_length=1000
+C0 vout vss 0.88577f
+C1 vin vout 0.01028f
+C2 vss VSUBS 3.96558f
+C3 vout VSUBS 1.57065f
+C4 vin VSUBS 0.21579f
+.ends

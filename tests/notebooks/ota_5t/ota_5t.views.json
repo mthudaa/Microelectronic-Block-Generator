@@ -1,0 +1,42 @@
+{
+  "cell": "ota_5t",
+  "files": {
+    "drc_report": "ota_5t.magic.drc.rpt",
+    "extracted_spice": "ota_5t_extracted.spice",
+    "gds": "ota_5t.gds",
+    "lef": "ota_5t.lef",
+    "lib": "ota_5t.lib",
+    "lvs_report": "ota_5t.lvs.out",
+    "pex_spice": "ota_5t.pex.spice",
+    "sch_spice": "ota_5t.spice",
+    "svg": "ota_5t.svg",
+    "verilog": "ota_5t.v"
+  },
+  "notes": [],
+  "ports": [
+    {
+      "direction": "power",
+      "name": "vdd"
+    },
+    {
+      "direction": "ground",
+      "name": "vss"
+    },
+    {
+      "direction": "inout",
+      "name": "inp"
+    },
+    {
+      "direction": "inout",
+      "name": "inm"
+    },
+    {
+      "direction": "inout",
+      "name": "out"
+    },
+    {
+      "direction": "inout",
+      "name": "vb"
+    }
+  ]
+}

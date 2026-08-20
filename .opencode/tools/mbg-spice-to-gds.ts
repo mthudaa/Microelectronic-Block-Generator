@@ -5,11 +5,11 @@ import { homedir } from "node:os"
 import { execSync } from "node:child_process"
 import { writeFile, mkdir } from "node:fs/promises"
 
-// Resolve the CANONICAL core package, not the copy that used to sit beside
-// this file. `.opencode/tools/core/` is a stale mirror (it lags the maintained
-// package by weeks and is missing whole modules), so importing it silently ran
-// old placement/routing code. Fall back to the local directory only if the
-// canonical path is absent, so a partial checkout still works.
+// Resolve the CANONICAL core package at `src/mbg`. A `.opencode/tools/core/`
+// mirror used to sit beside this file; it lagged the maintained package by
+// weeks, so importing it silently ran old placement/routing code. The mirror
+// has been removed and there is deliberately NO fallback — a missing package
+// is a broken checkout and must fail loudly, not resolve to something stale.
 const REPO_ROOT = path.resolve(import.meta.dirname, "..", "..")
 const CORE_DIR = path.join(REPO_ROOT, "src")
 if (!existsSync(path.join(CORE_DIR, "mbg", "pipeline.py"))) {

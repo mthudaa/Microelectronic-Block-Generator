@@ -1,0 +1,30 @@
+{
+  "cell": "rc_filter",
+  "files": {
+    "drc_report": "rc_filter.magic.drc.rpt",
+    "extracted_spice": "rc_filter_extracted.spice",
+    "gds": "rc_filter.gds",
+    "lef": "rc_filter.lef",
+    "lib": "rc_filter.lib",
+    "lvs_report": "rc_filter.lvs.out",
+    "pex_spice": "rc_filter.pex.spice",
+    "sch_spice": "rc_filter.spice",
+    "svg": "rc_filter.svg",
+    "verilog": "rc_filter.v"
+  },
+  "notes": [],
+  "ports": [
+    {
+      "direction": "inout",
+      "name": "vin"
+    },
+    {
+      "direction": "inout",
+      "name": "vout"
+    },
+    {
+      "direction": "ground",
+      "name": "vss"
+    }
+  ]
+}

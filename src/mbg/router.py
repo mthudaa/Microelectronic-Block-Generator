@@ -112,6 +112,11 @@ class OccupancyDB:
         self.hard_owner: Dict[str, Dict[Tuple[int, int], str]] = {l: {} for l in self.layers}
         self.history: Dict[str, Dict[Tuple[int, int], float]] = {l: {} for l in self.layers}
         self.present: Dict[str, Dict[Tuple[int, int], int]] = {l: {} for l in self.layers}
+        # Cells a specific net may use despite a hard obstacle. Obstacle cells
+        # are marked with a conservative inflation meant for wires; an access
+        # landing is checked exactly (overlap-or-clear against real geometry),
+        # so the coarse rule must not veto what the exact rule approved.
+        self.exempt: Dict[str, Dict[Tuple[int, int], Set[str]]] = {l: {} for l in self.layers}
 
     # -- obstacles (never removed) --
     def block(self, layer: str, cell: Tuple[int, int], owner: str = ""):
@@ -151,8 +156,17 @@ class OccupancyDB:
     def owner(self, layer: str, cell: Tuple[int, int]) -> Optional[str]:
         return self.occ.get(layer, {}).get(cell)
 
+    def allow(self, layer: str, cell: Tuple[int, int], net: str):
+        """Record that `net` may use `cell` despite a hard obstacle there."""
+        if layer in self.exempt:
+            self.exempt[layer].setdefault(cell, set()).add(net)
+
+    def is_exempt(self, layer: str, cell: Tuple[int, int], net: str) -> bool:
+        return net in self.exempt.get(layer, {}).get(cell, ())
+
     def blocked_for(self, layer: str, cell: Tuple[int, int], net: str) -> bool:
-        if self.is_hard(layer, cell) and self.hard_owner_of(layer, cell) != net:
+        if (self.is_hard(layer, cell) and self.hard_owner_of(layer, cell) != net
+                and not self.is_exempt(layer, cell, net)):
             return True
         o = self.owner(layer, cell)
         return o is not None and o != net
@@ -174,6 +188,45 @@ class OccupancyDB:
 
 
 # ── the router ─────────────────────────────────────────────────────────
+
+def grid_params(ctx, cfg=None):
+    """The routing grid (origin, pitch) for a context.
+
+    Exposed so power rails can place their via drops on the same tracks the
+    router uses. Off-grid drops are the one thing the pitch cannot keep legal:
+    everything else the router emits is grid-aligned by construction.
+
+    The origin depends only on device bounding boxes, never on rail geometry,
+    so calling this before or after rails are added gives the same answer.
+    """
+    from mbg.pdk_rules import get_rules
+    cfg = cfg or RouterConfig()
+    rules = ctx.rules or get_rules(ctx.pdk)
+    layers = [l for l in cfg.routing_layers if rules.has_layer(l)]
+    sp = max(rules.min_spacing(l) for l in layers)
+    widest_wire = max(rules.min_width(l) for l in layers) * max(
+        cfg.width_multiplier, cfg.power_width_multiplier)
+    widest_pad = 0.0
+    for lo in rules.metals:
+        for hi in layers:
+            try:
+                widest_pad = max(widest_pad, rules.via_footprint(lo, hi))
+            except Exception:
+                continue
+    half = max(widest_wire, widest_pad) / 2.0
+    pitch = cfg.grid_pitch or rules.snap(2 * half + sp + rules.manufacturing_grid())
+    bb = ctx.design_bbox().inflate(cfg.margin)
+    return (rules.snap(bb.xmin), rules.snap(bb.ymin)), pitch
+
+
+def snap_to_grid(ctx, x, y, cfg=None):
+    """Nearest routing-grid intersection to (x, y)."""
+    (ox, oy), pitch = grid_params(ctx, cfg)
+    from mbg.pdk_rules import get_rules
+    rules = ctx.rules or get_rules(ctx.pdk)
+    return (rules.snap(ox + round((x - ox) / pitch) * pitch),
+            rules.snap(oy + round((y - oy) / pitch) * pitch))
+
 
 class GridRouter:
     """Multi-layer A* router driven entirely by the DesignContext (§32)."""
@@ -203,6 +256,7 @@ class GridRouter:
         self._load_obstacles()
         self.select_access_points()
         self._reserve_access_cells()
+        self._block_escape_corridors()
 
     # -- grid helpers --
     def _derive_pitch(self) -> float:
@@ -298,6 +352,10 @@ class GridRouter:
             need = self._via_pad(ap) / 2.0 + sp + wire_half
             reach = int(math.floor(need / self.pitch))
             cx, cy = self.to_cell(ch.vx, ch.vy)
+            # The landing passed the exact geometric check in
+            # _find_via_landing, so let this net stand on it even if the
+            # conservative obstacle inflation covered the cell.
+            self.occ.allow(lname, (cx, cy), ap.net)
             for dx in range(-reach, reach + 1):
                 for dy in range(-reach, reach + 1):
                     c = (cx + dx, cy + dy)
@@ -311,6 +369,67 @@ class GridRouter:
         if contested:
             self.cfg.log(2, f"  [ROUTER] {contested} via-landing cells contested "
                             f"between nets (resolved by routing priority)")
+
+    def _block_escape_corridors(self):
+        """Keep routed track out of a notch against a committed escape leg.
+
+        Escape legs are off-grid — they run from the port to the via landing
+        on the port's own metal — so nothing in the occupancy grid described
+        them. The maze router could therefore lay a track parallel to a leg
+        and only 0.13um away, which Magic reports as "Metal3 spacing < 0.28um"
+        even though both shapes belong to the same net: proximity without
+        overlap is a notch regardless of connectivity (§45).
+
+        The corridor is blocked with a neutral owner so the leg's *own* net
+        avoids it too. The via landing itself stays reachable because
+        _reserve_access_cells exempts that cell for the net.
+        """
+        n = 0
+        for (inst, term), ch in (self._chosen_access or {}).items():
+            if not ch.legal:
+                continue
+            ap = ch.ap
+            # The legs run on the PORT's own metal, which is not necessarily
+            # cfg.access_layer — a met3 capacitor pad escapes on met3.
+            # Blocking the wrong layer silently protects nothing.
+            lname = ap.layer
+            if lname not in self.li:
+                continue
+            sp = self.rules.min_spacing(lname)
+            wire_half = self.rules.routing_width(
+                lname, self.cfg.power_width_multiplier) / 2.0
+            landing = self.to_cell(ch.vx, ch.vy)
+            legs = self._escape_path(ap, ch.vx, ch.vy)
+            widths = self._leg_widths(ap, len(legs))
+            for (x1, y1, x2, y2), w in zip(legs, widths):
+                half = w / 2.0
+                box = BoundingBox(min(x1, x2) - half, min(y1, y2) - half,
+                                  max(x1, x2) + half, max(y1, y2) + half)
+                grown = box.inflate(sp + 2 * wire_half)
+                c0 = self.to_cell(grown.xmin, grown.ymin)
+                c1 = self.to_cell(grown.xmax, grown.ymax)
+                for ix in range(c0[0], c1[0] + 1):
+                    for iy in range(c0[1], c1[1] + 1):
+                        if not self.in_bounds(ix, iy) or (ix, iy) == landing:
+                            continue
+                        cx, cy = self.to_xy(ix, iy)
+                        foot = BoundingBox(cx - wire_half, cy - wire_half,
+                                           cx + wire_half, cy + wire_half)
+                        if foot.overlaps(box):
+                            # merges with the leg: fine for this net, a short
+                            # for anyone else.
+                            self.occ.block(lname, (ix, iy), ap.net)
+                        elif foot.inflate(sp).overlaps(box):
+                            # the notch band — too close to merge, too close
+                            # to clear. Nobody may route here, this net least
+                            # of all, because it is the one that would notch.
+                            self.occ.block(lname, (ix, iy), "")
+                        else:
+                            continue        # genuinely clear, leave it usable
+                        n += 1
+        if n:
+            self.cfg.log(2, f"  [ROUTER] {n} cells blocked alongside pin escapes")
+        return n
 
     # -- routing width policy --
     def width_for(self, net: str) -> float:
@@ -968,6 +1087,7 @@ class GridRouter:
         for it in range(self.cfg.ripup_iterations):
             self.occ.release_all()
             self._reserve_access_cells()
+            self._block_escape_corridors()
             plans: Dict[str, RoutePlan] = {}
             failures: List[RoutingFailure] = []
 
@@ -1079,6 +1199,9 @@ def realize(ctx, component, cfg: Optional[RouterConfig] = None):
                    [s.x1 + hw, y1 + hw], [s.x1 - hw, y1 + hw]]
         component.add_polygon(pts, layer=layer)
 
+    for pts, layer in _same_net_notch_fills(ctx, cfg):
+        component.add_polygon(pts, layer=layer)
+
     cache: Dict[Tuple[str, str], object] = {}
     for v in ctx.vias:
         key = (v.lower, v.upper)
@@ -1089,3 +1212,49 @@ def realize(ctx, component, cfg: Optional[RouterConfig] = None):
     cfg.log(1, f"  [ROUTER] realized {len(ctx.segments)} segments, "
                f"{len(ctx.vias)} vias into {component.name}")
     return component
+
+
+def _same_net_notch_fills(ctx, cfg):
+    """Close sub-spacing gaps between two conductors of the SAME net.
+
+    A pin escape leg and the track that returns to it can end up running
+    parallel a fraction of a micron apart. Electrically that is one net and
+    perfectly correct, but Magic reports "Metal3 spacing < 0.28um": proximity
+    without overlap is a notch no matter who owns the metal (§45).
+
+    Filling the gap is safe precisely because the two shapes are the same
+    net — the fill shorts nothing that is not already connected — and it is
+    strictly better than nudging the router, which would just move the notch
+    somewhere else. Different nets are never bridged; those are real shorts
+    and must be reported, not papered over.
+    """
+    rules = ctx.rules
+    out = []
+    by_key = {}
+    for seg in ctx.segments:
+        by_key.setdefault((seg.layer, seg.net), []).append(seg.bbox())
+    for (layer, net), boxes in by_key.items():
+        sp = rules.min_spacing(layer)
+        lt = rules.layer_tuple(layer)
+        for i in range(len(boxes)):
+            for j in range(i + 1, len(boxes)):
+                a, b = boxes[i], boxes[j]
+                if a.overlaps(b):
+                    continue
+                # gap along x, with a shared y extent (and vice versa)
+                gx = max(a.xmin, b.xmin) - min(a.xmax, b.xmax)
+                gy = max(a.ymin, b.ymin) - min(a.ymax, b.ymax)
+                oy = min(a.ymax, b.ymax) - max(a.ymin, b.ymin)
+                ox = min(a.xmax, b.xmax) - max(a.xmin, b.xmin)
+                if 0 < gx < sp and oy > 0:
+                    x0, x1 = min(a.xmax, b.xmax), max(a.xmin, b.xmin)
+                    y0, y1 = max(a.ymin, b.ymin), min(a.ymax, b.ymax)
+                elif 0 < gy < sp and ox > 0:
+                    x0, x1 = max(a.xmin, b.xmin), min(a.xmax, b.xmax)
+                    y0, y1 = min(a.ymax, b.ymax), max(a.ymin, b.ymin)
+                else:
+                    continue
+                out.append(([[x0, y0], [x1, y0], [x1, y1], [x0, y1]], lt))
+    if out:
+        cfg.log(2, f"  [ROUTER] {len(out)} same-net notch(es) filled")
+    return out
