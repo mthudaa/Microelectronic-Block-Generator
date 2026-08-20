@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "defaultMode": "default",
+    "allow": [
+      "Bash(./scripts/install_agents.sh:*)",
+      "Bash(bash scripts/install_agents.sh:*)",
+      "Bash(docker ps:*)",
+      "Bash(find:*)",
+      "Bash(git branch:*)",
+      "Bash(git check-ignore:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git status:*)",
+      "Bash(grep:*)",
+      "Bash(ls:*)",
+      "Bash(pwd)",
+      "Bash(python3 scripts/sync_agent_tools.py:*)",
+      "Bash(python3 scripts/validate_agent_integrations.py:*)",
+      "Bash(rg:*)"
+    ],
+    "deny": [
+      "Bash(git push:*)",
+      "Bash(rm -rf:*)",
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./**/.env)"
+    ],
+    "ask": [
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(docker exec:*)",
+      "Bash(docker logs:*)"
+    ]
+  }
+}

@@ -123,10 +123,18 @@ These constraints are enforced at every pipeline stage:
 ## ⚠️ Primary Pipeline API
 
 **Always use `spice_to_gds_with_checks(netlist)`** for SPICE→GDS conversion.
-NEVER call individual placement, power, or routing functions manually:
+NEVER call individual placement, power, or routing functions manually.
+
+Since v0.2 this entry point drives the DesignContext flow (analog-aware
+placement plus the DRC-aware grid router with internal connectivity
+verification). On the four reference blocks the previous shape-router path
+passed 0/4 — it could not label top-level pins correctly and failed LVS pin
+matching — while the current path passes 4/4 with DRC clean, LVS match and
+zero opens or shorts. Pass `legacy=True`, or call
+`spice_to_gds_with_checks_legacy(...)`, to run the old implementation:
 
 ```python
-from core.pipeline import spice_to_gds_with_checks
+from mbg.pipeline import spice_to_gds_with_checks
 r = spice_to_gds_with_checks(netlist)
 # r["outdir"], r["gds_path"], r["drc"], r["lvs"], r["pex"], r["all_pass"]
 ```
@@ -216,18 +224,63 @@ Structured experiment metadata should include:
 * Runtime
 * Final status
 
-## OpenCode Extension Rules
+## Agent Extension Rules
 
-Project-specific OpenCode extensions must use the `mbg-` prefix.
+This repository supports three AI coding agents: OpenCode, Claude Code and
+Codex. Their extension files are GENERATED from one canonical source. Do not
+hand-edit a generated file — the next sync will overwrite it.
 
-Locations:
+Source of truth:
 
 ```text
-.opencode/skills/<skill-name>/SKILL.md
-.opencode/tools/<tool-name>.ts
-.opencode/commands/<command-name>.md
-.opencode/agents/<agent-name>.md
+.ai/manifest.json            capabilities, workflows and platform mapping
+.ai/skills/<name>/SKILL.md   canonical skill definitions
+.ai/workflows/<name>.md      canonical command/workflow definitions
+.ai/knowledge/PROJECT.md     canonical project knowledge
+AGENTS.md                    shared agent rules (this file)
 ```
+
+Generated adapters (do not edit by hand):
+
+```text
+.opencode/skills/<name>/SKILL.md      .opencode/commands/<name>.md
+.claude/skills/<name>/SKILL.md        .claude/commands/<name>.md
+plugins/mbg-analog/skills/<name>/SKILL.md
+plugins/mbg-analog/.codex-plugin/plugin.json
+.agents/plugins/marketplace.json
+CLAUDE.md
+.ai/project-index.json
+```
+
+Platform-specific files that are maintained by hand:
+
+```text
+opencode.jsonc            OpenCode permissions
+.claude/settings.json     Claude Code permissions
+.opencode/tools/*.ts      OpenCode custom tools (only OpenCode supports code tools)
+```
+
+First-time setup on a new machine, for any of the three agents:
+
+```bash
+./scripts/install_agents.sh          # add --check to inspect without changing anything
+```
+
+OpenCode and Claude Code read this repository directly and need no
+registration. Codex has no repo-scoped skills, so its plugin is registered
+once per machine; because Codex caches the plugin at install time, re-run
+`./scripts/install_agents.sh --only codex` after a sync to refresh it.
+
+To add or change a capability:
+
+1. Edit the canonical definition under `.ai/`.
+2. Add the implementation if one is needed.
+3. Update `.ai/manifest.json`.
+4. Run `python3 scripts/sync_agent_tools.py`.
+5. Run `python3 scripts/validate_agent_integrations.py`.
+6. Commit the canonical change together with the regenerated adapters.
+
+Project-specific extensions must use the `mbg-` prefix.
 
 Every extension must:
 
@@ -247,6 +300,9 @@ Every extension must:
 Do not create a custom tool named after a built-in tool such as `bash`, `read`,
 `write`, or `edit` unless overriding the built-in behavior is explicitly
 required.
+
+Do not hardcode absolute paths such as a personal home directory into any
+skill, tool or script. Discover the repository root dynamically.
 
 ## Filesystem Safety
 

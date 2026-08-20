@@ -1,0 +1,7 @@
+# Installed dependencies — recreated by `npm install` (see scripts/install_agents.sh)
+node_modules
+bun.lock
+
+# package.json IS tracked: it declares the @opencode-ai/plugin version the
+# custom tools import. Ignoring it meant a fresh clone had no dependency
+# manifest at all and .opencode/tools/*.ts could not resolve their import.

@@ -2,7 +2,7 @@
 """
 Docker-based sandbox: run MBG tools in a pre-configured IIC-OSIC-TOOLS container.
 No local installation needed — just Docker.
-Usage: python3 setup/docker_sandbox.py [--cmd "python inv_full_flow.py"]
+Usage: python3 setup/docker_sandbox.py [--cmd "python examples/inv_full_flow.py"]
 """
 import sys, os, argparse, subprocess, json
 
@@ -40,7 +40,9 @@ def start_container():
     cmd = [
         "docker", "run", "-d", "--rm",
         "-v", f"{DESIGNS_DIR}:/foss/designs",
-        "-v", f"{os.path.expanduser('~/.volare')}:/home/huda/.volare",
+        # Mount the host PDK at a generic in-container path; hardcoding a
+        # specific developer's home directory made this unusable for anyone else.
+        "-v", f"{os.path.expanduser('~/.volare')}:/root/.volare",
         "--name", "mbg_sandbox",
         image, "sleep", "infinity"
     ]
@@ -93,7 +95,7 @@ def run_in_container(container, command, use_venv=True):
 
 def main():
     parser = argparse.ArgumentParser(description="MBG Docker sandbox")
-    parser.add_argument("--cmd", default="python3 inv_full_flow.py",
+    parser.add_argument("--cmd", default="python3 examples/inv_full_flow.py",
                         help="Command to run in container")
     parser.add_argument("--start", action="store_true", help="Force start new container")
     parser.add_argument("--stop", action="store_true", help="Stop sandbox container")

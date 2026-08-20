@@ -47,3 +47,18 @@ context/
 !.opencode/
 !.opencode/tools/
 !.opencode/tools/**
+
+# The negations above re-include EVERYTHING under .opencode/tools/, which
+# overrode the __pycache__ rule and caused compiled .pyc files to be committed.
+# Re-exclude build artifacts without losing the source negation.
+.opencode/tools/**/__pycache__/
+.opencode/tools/**/*.pyc
+
+# Claude Code: settings.json is shared and committed; the .local override is personal.
+.claude/settings.local.json
+# Regression run artifacts
+outputs/
+
+# tools
+AGENTS.md
+CLAUDE.md

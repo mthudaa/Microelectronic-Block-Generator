@@ -1,0 +1,18 @@
+{
+  "author": {
+    "name": "Microelectronic Block Generator Team"
+  },
+  "description": "Microelectronic Block Generator analog IC design skills (gLayout + gdsfactory, gf180mcuD PDK).",
+  "interface": {
+    "capabilities": [],
+    "category": "Developer Tools",
+    "defaultPrompt": "Help me design, verify, and review analog IC blocks in this repository using the MBG skills.",
+    "developerName": "Microelectronic Block Generator Team",
+    "displayName": "Microelectronic Block Generator",
+    "longDescription": "Microelectronic Block Generator packages SPICE-to-GDS layout generation, placement and routing debugging, DRC/LVS/PEX verification, and design-regression skills for the gLayout + gdsfactory analog IC flow on the gf180mcuD PDK.",
+    "shortDescription": "Analog IC design skills for Microelectronic Block Generator (10 skills)."
+  },
+  "name": "mbg-analog",
+  "skills": "./skills/",
+  "version": "0.1.0"
+}

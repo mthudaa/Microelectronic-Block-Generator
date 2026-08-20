@@ -1,0 +1,20 @@
+{
+  "interface": {
+    "displayName": "Microelectronic Block Generator (local)"
+  },
+  "name": "mbg-local",
+  "plugins": [
+    {
+      "category": "Developer Tools",
+      "name": "mbg-analog",
+      "policy": {
+        "authentication": "ON_INSTALL",
+        "installation": "AVAILABLE"
+      },
+      "source": {
+        "path": "./plugins/mbg-analog",
+        "source": "local"
+      }
+    }
+  ]
+}

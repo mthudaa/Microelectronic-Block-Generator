@@ -1,10 +1,24 @@
 import { tool } from "@opencode-ai/plugin"
 import path from "node:path"
+import { existsSync } from "node:fs"
 import { homedir } from "node:os"
 import { execSync } from "node:child_process"
 import { writeFile, mkdir } from "node:fs/promises"
 
-const CORE_DIR = path.resolve(import.meta.dirname)
+// Resolve the CANONICAL core package, not the copy that used to sit beside
+// this file. `.opencode/tools/core/` is a stale mirror (it lags the maintained
+// package by weeks and is missing whole modules), so importing it silently ran
+// old placement/routing code. Fall back to the local directory only if the
+// canonical path is absent, so a partial checkout still works.
+const REPO_ROOT = path.resolve(import.meta.dirname, "..", "..")
+const CORE_DIR = path.join(REPO_ROOT, "src")
+if (!existsSync(path.join(CORE_DIR, "mbg", "pipeline.py"))) {
+  // Fail loudly rather than silently falling back to a stale copy — that is
+  // exactly how this tool ended up running weeks-old code before.
+  throw new Error(
+    `mbg package not found at ${CORE_DIR}/mbg — run this tool from inside a clone of the repository`,
+  )
+}
 
 /**
  * Resolve the working directory for pipeline execution.
@@ -66,7 +80,7 @@ os.environ.setdefault("PDK_ROOT", os.path.expanduser("~/.volare"))
 os.environ.setdefault("PDK", "gf180mcuD")
 os.environ.setdefault("PDKPATH", os.path.join(os.environ["PDK_ROOT"], os.environ["PDK"]))
 
-from core.pipeline import spice_to_gds_with_checks
+from mbg.pipeline import spice_to_gds_with_checks
 
 netlist = ${JSON.stringify(netlist)}
 wd = ${workdirArg}

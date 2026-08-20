@@ -1,0 +1,52 @@
+# Packaging metadata for the Microelectronic Block Generator engine.
+#
+# The layout is src/ style: the importable package is `mbg`, living at
+# <repo>/src/mbg/. Tests stay with the Chipathon design directory. Nothing here is required to *run* the code from a clone — every
+# entry point resolves src/ from its own location — but declaring it makes the
+# package installable (`pip install -e .`) and tells editors and linters where
+# the source root is.
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mbg"
+version = "0.2.0"
+description = "Microelectronic Block Generator — SPICE to GDSII analog layout engine (gLayout + gdsfactory, GF180MCU)"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Microelectronic Block Generator Team" }]
+keywords = ["eda", "analog", "layout", "gdsii", "glayout", "gdsfactory", "gf180mcu"]
+
+# Upper bounds are load-bearing, not caution:
+#   gdsfactory 8 moved to a kfactory backend and drops Component.references,
+#     ref.get_polygons(by_spec=True) and gf.Port(center=...) which this code uses.
+#   numpy 2 removed np.float_, which gdsfactory 7 still expects (mbg/__init__
+#     shims it, but the rest of the stack is built against numpy 1).
+dependencies = [
+    "gdsfactory>=7.7,<8",
+    # 1.24 has no cp312 wheel and its source build fails on 3.12
+    # (setuptools uses pkgutil.ImpImporter, removed in 3.12).
+    "numpy>=1.24,<2; python_version < '3.12'",
+    "numpy>=1.26,<2; python_version >= '3.12'",
+    "gdstk>=0.9",
+    "glayout>=0.1",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7"]
+notebooks = ["nbformat>=5.9", "nbclient>=0.9", "ipykernel>=6", "matplotlib>=3.7"]
+all = ["mbg[dev,notebooks]"]
+
+[project.scripts]
+mbg-sync = "mbg.cli:sync_entry"
+mbg-validate = "mbg.cli:validate_entry"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

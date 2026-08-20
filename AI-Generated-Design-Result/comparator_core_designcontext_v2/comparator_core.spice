@@ -1,0 +1,10 @@
+.lib "/home/huda/.volare/gf180mcuD/libs.tech/ngspice/sm141064.ngspice" typical
+.subckt comparator_core vdd vss inp inm vb out
+XM1 n1 inm tail vss nfet_03v3 L=1u W=8u nf=2
+XM2 n2 inp tail vss nfet_03v3 L=1u W=8u nf=2
+XM3 n1 n1 vdd vdd pfet_03v3 L=1u W=8u nf=2
+XM4 n2 n1 vdd vdd pfet_03v3 L=1u W=8u nf=2
+XM5 tail vb vss vss nfet_03v3 L=1u W=8u nf=2
+XM6 out n2 vdd vdd pfet_03v3 L=0.5u W=4u nf=1
+XM7 out n2 vss vss nfet_03v3 L=0.5u W=2u nf=1
+.ends

@@ -1,17 +1,27 @@
-# OpenCode Extension Authoring Guide
+# Agent Extension Authoring Guide
+
+> This file lives at `docs/opencode/AUTHORING_GUIDE.md` for path stability —
+> `.ai/skills/mbg-extension-authoring/SKILL.md` and
+> `.ai/workflows/mbg-new-skill.md` both link to this exact path, and those
+> files are outside this guide's own ownership, so the path is not moving.
+> The **content**, however, now covers the canonical authoring model used by
+> all three supported agents (OpenCode, Claude Code, Codex), not OpenCode
+> alone. See `README.md`'s "AI Coding Agent Integrations" section for the
+> platform-by-platform setup, sync, and troubleshooting story; this guide is
+> about *authoring* a skill, workflow, or tool correctly in the first place.
 
 ## Purpose
 
 This guide defines the project standard for creating, reviewing, and
-maintaining OpenCode extensions in the Microelectronic Block Generator
-repository.
+maintaining agent extensions in the Microelectronic Block Generator
+repository: skills and workflows that ship identically to OpenCode, Claude
+Code and Codex, plus OpenCode-only custom code tools.
 
 The guide covers:
 
 * Skills
-* Custom tools
-* Slash commands
-* Agents
+* Workflows (slash commands)
+* OpenCode custom code tools
 * Project-level instructions
 * Permissions
 * Validation and testing
@@ -24,34 +34,42 @@ The intended audience includes:
 * Reviewers
 * Maintainers
 
-## Project Locations
+## The canonical model
 
-Project-specific OpenCode extensions are stored at the repository root:
-
-```text
-.opencode/
-├── skills/
-│   └── <skill-name>/
-│       └── SKILL.md
-├── tools/
-│   └── <tool-name>.ts
-├── commands/
-│   └── <command-name>.md
-└── agents/
-    └── <agent-name>.md
-```
-
-Project-wide rules are stored in:
+`.ai/` is the single source of truth. A sync script reads it and regenerates
+the per-platform adapters — hand-editing a generated file is pointless, it
+is silently overwritten the next time anyone runs the sync.
 
 ```text
-AGENTS.md
+SOURCE OF TRUTH (author here)
+.ai/manifest.json            capabilities, workflows, platform mapping
+.ai/skills/<name>/SKILL.md   canonical skill definitions
+.ai/workflows/<name>.md      canonical workflow/slash-command definitions
+.ai/knowledge/PROJECT.md     canonical project knowledge
+AGENTS.md                    shared rules (read natively by OpenCode & Codex)
+
+GENERATED — never hand-edit, always resync instead
+.opencode/skills/<name>/SKILL.md      .opencode/commands/<name>.md
+.claude/skills/<name>/SKILL.md        .claude/commands/<name>.md
+plugins/mbg-analog/skills/<name>/SKILL.md
+plugins/mbg-analog/.codex-plugin/plugin.json
+.agents/plugins/marketplace.json
+CLAUDE.md                             (imports @AGENTS.md)
+.ai/project-index.json
+
+PLATFORM-SPECIFIC, MAINTAINED BY HAND — not derived from .ai/
+.opencode/tools/<name>.ts    OpenCode custom code tools (the ONLY platform
+                             of the three that supports repo-scoped code
+                             tools — see "OpenCode custom tool authoring")
+opencode.jsonc               OpenCode permissions
+.claude/settings.json        Claude Code permissions
 ```
 
-OpenCode permissions and repository configuration are stored in:
-
-```text
-opencode.jsonc
-```
+Every generated Markdown/JSON file starts with a banner (an HTML comment for
+Markdown, a `"$generated"` block for JSON) naming its source and the
+regeneration command. If a file has that banner, don't touch it — edit the
+named source under `.ai/` and resync. If it doesn't, it's meant to be
+hand-edited in place.
 
 ## Naming Convention
 
@@ -61,9 +79,8 @@ Examples:
 
 ```text
 mbg-extension-authoring
-mbg-validate-extension
+mbg-repo-analysis
 mbg-new-skill
-mbg-layout-review
 ```
 
 Names must:
@@ -75,100 +92,114 @@ Names must:
 * Not begin or end with a hyphen.
 * Not contain consecutive hyphens.
 
-For skills, the directory name must match the YAML frontmatter `name`.
+For a skill, the directory name (`.ai/skills/<name>/`) must match the YAML
+frontmatter `name`. For a workflow, the file basename
+(`.ai/workflows/<name>.md`) must match the frontmatter `name`.
 
 ## Choosing an Extension Type
 
 ### Skill
 
-Use a skill when the agent needs reusable domain instructions or a documented
-workflow.
+Use a skill when the agent needs reusable domain instructions or a
+documented read-only/generating workflow.
 
 Examples:
 
 * Reviewing an AI-generated SPICE netlist.
 * Recording AI experiment metrics.
-* Validating an LLM-to-GDS experiment.
-* Creating another OpenCode extension.
+* Debugging placement or routing.
+* Creating another canonical skill or workflow.
 
 A skill describes how work should be performed. It should not implement a
-runtime operation by itself.
+runtime operation by itself — it references the real implementation (e.g. a
+`core.*` entry point) rather than duplicating it.
 
-### Custom Tool
+### Workflow (slash command)
 
-Use a custom tool when the agent needs to perform a concrete and validated
-operation.
-
-Examples:
-
-* Validate an OpenCode extension file.
-* Read structured experiment metadata.
-* Run an approved project validation script.
-* Generate a report from experiment records.
-
-A tool should return a structured result and report failures explicitly.
-
-### Slash Command
-
-Use a slash command when users need a repeatable entry point for a workflow.
+Use a workflow when users need a repeatable, multi-step entry point.
 
 Examples:
 
 ```text
 /mbg-new-skill
-/mbg-new-tool
 /mbg-new-command
 /mbg-review-extension
 ```
 
-A command should load the relevant skill and call an approved custom tool when
-one exists.
+A workflow should load the relevant skill(s) and follow a defined sequence
+of steps with explicit stop conditions.
 
-### Agent
+Workflows currently ship to OpenCode and Claude Code only. **Codex has no
+repo-scoped slash-command mechanism** (`.ai/manifest.json` →
+`platforms.codex.unsupported` lists `repo_scoped_commands` and
+`repo_scoped_agents`) — do not add `codex` to a workflow's `platforms` list;
+the sync script rejects it.
 
-Use an agent when a focused role requires:
+### OpenCode Custom Tool
 
-* A dedicated system prompt.
-* Restricted permissions.
-* A clearly defined responsibility.
-* Separation from general-purpose project work.
+Use a custom tool when an agent needs to perform a concrete, validated,
+code-level operation, and that operation must run identically every time
+rather than being re-derived by the model from prose instructions.
 
 Examples:
 
-* Read-only OpenCode extension reviewer.
-* AI experiment auditor.
-* Documentation reviewer.
+* Validate an extension file against the authoring rules.
+* Read and summarize structured experiment metadata.
+* Run an approved project validation script.
+
+This is the **one deliberate exception** to "author under `.ai/`": custom
+code tools are OpenCode-only (Claude Code and Codex have no repo-scoped code
+tool runtime), so they are authored directly under `.opencode/tools/*.ts`
+and are not generated from anything.
 
 ### Project Instructions
 
-Use `AGENTS.md` for rules that apply broadly across the repository.
-
-Do not place a one-off workflow in `AGENTS.md`. Use a skill or command instead.
+Use `AGENTS.md` for rules that apply broadly across the repository and all
+three agents. Do not place a one-off workflow in `AGENTS.md`; use a skill or
+workflow instead. Do not hand-edit `CLAUDE.md` — it is generated and imports
+`AGENTS.md` for you.
 
 ## Skill Authoring
 
 A skill must be stored at:
 
 ```text
-.opencode/skills/<skill-name>/SKILL.md
+.ai/skills/<skill-name>/SKILL.md
 ```
 
-### Skill Frontmatter
+### Frontmatter parser constraints
 
-Use:
+The sync script (`scripts/sync_agent_tools.py`) uses a hand-rolled flat
+frontmatter parser — no PyYAML or `tomllib` is available in every Python
+environment this repo runs under. This means:
+
+* No nested YAML maps.
+* No YAML block lists (`- item` on its own line).
+* No multi-line folded/literal scalars.
+* List fields must be written **inline**: `capabilities: [cap_a, cap_b]`,
+  `platforms: [opencode, claude, codex]`.
+
+A malformed frontmatter line (missing `:`, unmatched bracket) makes the sync
+script fail loudly (`SyncError`) rather than silently mis-parsing — treat
+that failure as the review gate, not an obstacle to work around.
+
+### Skill Frontmatter
 
 ```yaml
 ---
 name: mbg-example-skill
-description: Explain exactly when the agent should load this skill.
-license: Apache-2.0
-compatibility: opencode
-metadata:
-  owner: jabir
-  project: microelectronic-block-generator
-  status: experimental
+description: 2-4 sentences — what it does, when to load it, when not to.
+class: READ-ONLY | GENERATING | MUTATING | DESTRUCTIVE
+owner: huda | ahmad | jabir
+capabilities: [cap_id]
+platforms: [opencode, claude, codex]
 ---
 ```
+
+All six keys (`name`, `description`, `class`, `owner`, `capabilities`,
+`platforms`) are required; the sync script rejects a skill missing any of
+them, an unrecognized `class`, an unrecognized `owner`, or a `platforms`
+entry outside `opencode`/`claude`/`codex`.
 
 The description should state:
 
@@ -178,16 +209,17 @@ The description should state:
 
 ### Skill Template
 
+Match the section layout every current canonical skill already uses (see
+`.ai/skills/*/SKILL.md`):
+
 ```markdown
 ---
 name: mbg-example-skill
 description: Use this skill when an agent must perform a specific MBG workflow.
-license: Apache-2.0
-compatibility: opencode
-metadata:
-  owner: jabir
-  project: microelectronic-block-generator
-  status: experimental
+class: GENERATING
+owner: huda
+capabilities: [example_capability]
+platforms: [opencode, claude, codex]
 ---
 
 # MBG Example Skill
@@ -220,30 +252,119 @@ List conditions that must be true before execution.
 4. Verify outputs.
 5. Report results.
 
-## Safety Rules
-
-Document secret, filesystem, Git, and side-effect restrictions.
-
-## Output Contract
+## Outputs
 
 Define the expected result structure.
 
-## Failure Handling
+## Failure Modes
 
 Explain how errors are reported and what work must stop.
-
-## Test Cases
-
-Include at least one successful case and one failure case.
 ```
 
-## Custom Tool Authoring
+Add extra sections only when the skill genuinely needs them — several
+canonical skills add `## PDK Body Constraint` (SPICE-generating/processing
+skills must state and enforce `pfet_03v3 → VDD ONLY`, `nfet_03v3 → VSS
+ONLY`), `## Safety Rules`, or `## Naming Rules`. Keep the eight core
+sections above as the baseline for every skill.
+
+Keep the body **platform-neutral** — the same body ships to all three
+adapters verbatim (with only the frontmatter re-rendered per platform), so
+don't write "in OpenCode, click..." unless the skill is genuinely about
+authoring for one specific platform.
+
+After writing or editing a skill:
+
+1. Register/confirm its capability entry in `.ai/manifest.json` (the
+   manifest is the lead's file — coordinate rather than editing it
+   unreviewed if you don't own it).
+2. Run `python3 scripts/sync_agent_tools.py` to regenerate all three
+   adapters.
+3. Run `python3 scripts/sync_agent_tools.py --check` to confirm nothing is
+   left stale.
+
+## Workflow Authoring
+
+A workflow must be stored at:
+
+```text
+.ai/workflows/<workflow-name>.md
+```
+
+It becomes the slash command `/<workflow-name>` on OpenCode and Claude Code
+(there is no Codex equivalent — see above).
+
+### Workflow Frontmatter
+
+```yaml
+---
+name: mbg-example-workflow
+description: Describe the workflow performed by this command
+agent: build | plan
+platforms: [opencode, claude]
+---
+```
+
+Use:
+
+* `plan` for read-only analysis and review.
+* `build` when the workflow may create or edit files.
+* `platforms` may include `opencode` and/or `claude`, but never `codex` —
+  the sync script raises a `SyncError` if it does.
+
+`agent: build|plan` selects one of OpenCode's/Claude Code's own **built-in**
+agent modes for the command to run under. This repository does not
+currently define any custom subagent files (there is no `.opencode/agents/`
+or `.claude/agents/` directory here) — if a task genuinely needs a
+dedicated, permission-restricted subagent persona rather than the built-in
+`build`/`plan` modes, treat that as a new kind of extension to design and
+discuss, not something this template already covers.
+
+### Workflow Template
+
+```markdown
+---
+name: mbg-example-workflow
+description: Run a specific MBG workflow
+agent: build
+platforms: [opencode, claude]
+---
+
+Perform the requested workflow for:
+
+$ARGUMENTS
+
+## Required Workflow
+
+1. Load the relevant `mbg-` skill.
+2. Validate required inputs.
+3. Validate filesystem paths.
+4. Stop after the first actionable failure.
+5. Report generated artifacts and evidence.
+6. Do not stage, commit, or push automatically.
+```
+
+Use `$ARGUMENTS` for the full argument string, or `$1`/`$2`/... for
+positional arguments. A workflow must stop and report a missing required
+argument instead of guessing.
+
+Reference only skills and capabilities that actually exist — check
+`.ai/manifest.json`'s `capabilities` and `workflows` sections before writing
+a reference into the body.
+
+After writing or editing a workflow, run
+`python3 scripts/sync_agent_tools.py` (and `--check` to confirm) the same as
+for a skill.
+
+## OpenCode Custom Tool Authoring
 
 A custom tool must be stored at:
 
 ```text
 .opencode/tools/<tool-name>.ts
 ```
+
+This is authored directly in place — it has no `.ai/` source and the sync
+script never touches it.
 
 ### Tool Template
 
@@ -287,6 +408,14 @@ Every custom tool must:
 8. Report generated artifacts.
 9. Protect credentials.
 10. Use minimum required permissions.
+11. Resolve the **canonical** implementation
+    (`src/mbg/`), not
+    `.opencode/tools/core/` — that directory is a stale, partial mirror kept
+    only as a last-resort fallback for a broken checkout, and is being
+    retired. Existing tools already do this (see the `CANONICAL_CORE_PARENT`
+    / `CORE_DIR` resolution at the top of `.opencode/tools/mbg-spice-to-gds.ts`)
+    — follow the same pattern in any new tool rather than importing
+    `.opencode/tools/core/` directly.
 
 ### Path Validation
 
@@ -347,128 +476,32 @@ When a tool executes another process:
 * Require approval for destructive side effects.
 * Do not silently convert failures into successful results.
 
-## Slash Command Authoring
-
-A command must be stored at:
-
-```text
-.opencode/commands/<command-name>.md
-```
-
-The file name becomes the slash-command name.
-
-Example:
-
-```text
-.opencode/commands/mbg-review-extension.md
-```
-
-is invoked as:
-
-```text
-/mbg-review-extension
-```
-
-### Command Frontmatter
-
-```yaml
----
-description: Describe the workflow performed by this command
-agent: build
----
-```
-
-Use:
-
-* `plan` for read-only analysis and review.
-* `build` when the workflow may create or edit files.
-
-### Command Template
-
-```markdown
----
-description: Run a specific MBG workflow
-agent: build
----
-
-Perform the requested workflow for:
-
-$ARGUMENTS
-
-## Required Workflow
-
-1. Load the relevant `mbg-` skill.
-2. Validate required inputs.
-3. Validate filesystem paths.
-4. Use an approved custom tool.
-5. Stop after the first actionable failure.
-6. Report generated artifacts and evidence.
-7. Do not stage, commit, or push automatically.
-
-## Safety Requirements
-
-- Never read `.env`.
-- Never expose API keys.
-- Never use personal absolute paths.
-- Never claim verification success without evidence.
-```
-
-### Command Arguments
-
-Use the full argument string:
-
-```text
-$ARGUMENTS
-```
-
-Use positional arguments:
-
-```text
-$1
-$2
-$3
-```
-
-A command must stop and report a missing required argument instead of guessing.
-
-## Agent Authoring
-
-An agent must be stored at:
-
-```text
-.opencode/agents/<agent-name>.md
-```
-
-An agent should define:
-
-* Description
-* Mode
-* Model when required
-* Focused permissions
-* Responsibilities
-* Boundaries
-* Required output format
-
-An agent must use only the permissions required for its role.
-
-A read-only reviewer should not have unrestricted edit or shell permissions.
-
 ## Project Permissions
 
-The repository configuration in `opencode.jsonc` should:
+Permissions are platform-specific and hand-maintained — they are not
+generated from `.ai/`.
 
-* Allow normal repository reads.
-* Deny secret-file access.
-* Require approval for edits.
-* Require approval for shell commands by default.
-* Allow safe Git inspection commands.
-* Deny automatic `git push`.
-* Deny destructive cleanup such as `rm -rf`.
-* Allow approved `mbg-` skills.
-* Allow approved read-only validation tools.
+`opencode.jsonc` (OpenCode) should:
+
+* Allow normal repository reads; deny `*.env`/`*.env.*` reads.
+* Require approval (`"ask"`) for edits and for shell commands by default.
+* Allow-list safe, read-only Git/inspection commands explicitly
+  (`git status`, `git diff`, `git log`, `git branch`, `docker ps`, `ls`,
+  `find`, `grep`, `pwd`).
+* Deny `git push` and `rm -rf` outright.
+* Allow the approved `mbg-*` skills.
+
+`.claude/settings.json` (Claude Code) should:
+
+* Mirror the same intent using its own `permissions.allow` / `.deny` /
+  `.ask` pattern lists, e.g. `Bash(git status:*)`,
+  `Bash(python3 scripts/sync_agent_tools.py:*)`.
+* Deny `Bash(git push:*)`, `Bash(rm -rf:*)`, and any `.env` read.
 
 Permission rules should progress from general rules to more specific
-restrictions.
+restrictions, and a new command or script only becomes prompt-free once it
+is explicitly added to the relevant allow-list — do not widen a wildcard
+(`bash: "*": "allow"`, an empty `deny`, etc.) as a shortcut.
 
 ## Secret Protection
 
@@ -488,11 +521,18 @@ Use placeholders in examples:
 DEEPSEEK_API_KEY=sk-your-key-here
 ```
 
-Do not use real credentials in documentation or test fixtures.
+Do not use real credentials in documentation or test fixtures. Do not use a
+personal absolute filesystem path (e.g. a home directory) anywhere in a
+skill, workflow, tool, or example — discover the repository root
+dynamically instead (see `find_repo_root()` in
+`scripts/sync_agent_tools.py` for the pattern this repo already uses: ask
+`git rev-parse --show-toplevel`, then fall back to walking up from the
+script's own location).
 
 ## Ownership Boundaries
 
-OpenCode extensions must respect project ownership.
+Agent extensions must respect project ownership (see `AGENTS.md` for the
+authoritative module list).
 
 ### Jabir
 
@@ -501,8 +541,9 @@ Owns:
 * AI and LLM integration
 * Prompt engineering
 * Experiment metadata
-* AI metrics
-* OpenCode extensions
+* AI evaluation metrics
+* Canonical agent skills and workflows (`.ai/skills/`, `.ai/workflows/`)
+* OpenCode-only custom tools (`.opencode/tools/`)
 * AI-related documentation
 
 ### Huda
@@ -526,9 +567,9 @@ Owns:
 * Verification automation
 * Verification scripts
 
-An OpenCode extension may invoke an approved API owned by another member. It
-must not modify that implementation unless the task explicitly includes the
-owner's approval.
+An extension may invoke an approved API owned by another member. It must
+not modify that implementation unless the task explicitly includes the
+owner's approval — record the need as a dependency instead.
 
 ## Testing Requirements
 
@@ -556,7 +597,7 @@ Recommended additional tests:
 
 ## Review Checklist
 
-Before staging a skill, tool, command, or agent:
+Before staging a skill, workflow, or tool:
 
 * [ ] Uses the `mbg-` prefix.
 * [ ] Has one clear responsibility.
@@ -567,8 +608,8 @@ Before staging a skill, tool, command, or agent:
 * [ ] Documents outputs.
 * [ ] Documents side effects.
 * [ ] Uses minimum permissions.
-* [ ] Validates filesystem paths.
-* [ ] Rejects parent traversal.
+* [ ] Validates filesystem paths (tools).
+* [ ] Rejects parent traversal (tools).
 * [ ] Protects `.env` and credentials.
 * [ ] Reports failures explicitly.
 * [ ] Contains no personal absolute paths.
@@ -578,32 +619,37 @@ Before staging a skill, tool, command, or agent:
 * [ ] Does not automatically commit.
 * [ ] Does not automatically push.
 * [ ] Does not claim unsupported simulation or verification results.
+* [ ] Was authored under `.ai/` (skill/workflow) or `.opencode/tools/`
+      (code tool) — never directly under a generated adapter path.
+* [ ] `python3 scripts/sync_agent_tools.py --check` passes after the change.
 
 ## Validation Workflow
 
-Review an extension through OpenCode:
+Regenerate every platform adapter from the canonical `.ai/` sources:
 
-```text
-/mbg-review-extension .opencode/skills/mbg-extension-authoring/SKILL.md
+```bash
+python3 scripts/sync_agent_tools.py
 ```
 
-Create a skill:
+Confirm nothing is stale without writing anything (useful in CI or before a
+commit):
 
-```text
-/mbg-new-skill mbg-netlist-review Review AI-generated SPICE netlists
+```bash
+python3 scripts/sync_agent_tools.py --check
 ```
 
-Create a tool:
+Then run the full validator:
 
-```text
-/mbg-new-tool mbg-read-experiment Read and summarize experiment metadata
+```bash
+python3 scripts/validate_agent_integrations.py
 ```
 
-Create a command:
-
-```text
-/mbg-new-command mbg-review-netlist Review an AI-generated SPICE netlist
-```
+> `sync_agent_tools.py --check` only answers "are the adapters stale?".
+> `validate_agent_integrations.py` is the authoritative check: ten checks
+> covering root discovery, frontmatter parsing, adapter completeness, broken
+> references, sync determinism, capability parity, documented-command
+> existence, hardcoded home directories, and phantom APIs (every `core.*`
+> symbol a skill names must actually exist). Run it before committing.
 
 Before staging files, run:
 
@@ -613,20 +659,22 @@ git status --short
 ```
 
 Stage files explicitly. Do not use `git add .` when generated experiment
-artifacts are present.
+artifacts are present, and always commit a canonical `.ai/` change together
+with its regenerated adapter output in the same commit.
 
 ## Definition of Done
 
-An OpenCode extension is complete when:
+An agent extension is complete when:
 
 1. Its name and path follow project conventions.
 2. Its responsibility is clearly defined.
 3. Inputs and outputs are documented.
 4. Permissions are minimized.
-5. Filesystem access is validated.
+5. Filesystem access is validated (tools).
 6. Secret access is prohibited.
 7. Failures are reported explicitly.
 8. Success and failure tests pass.
 9. Ownership and dependencies are documented.
-10. Validation reports no blocking errors.
-11. Git changes contain only files related to the task.
+10. `python3 scripts/sync_agent_tools.py --check` reports up to date.
+11. Git changes contain only files related to the task, with the canonical
+    `.ai/` source and its regenerated adapters committed together.

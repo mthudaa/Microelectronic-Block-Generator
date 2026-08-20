@@ -1,0 +1,198 @@
+{
+  "$generated": {
+    "command": "python3 scripts/sync_agent_tools.py",
+    "do_not_edit": true,
+    "generated": true,
+    "source": ".ai/manifest.json#index_targets"
+  },
+  "project": "mbg",
+  "schema_version": 1,
+  "targets": {
+    "framework_utils": [
+      {
+        "lines": 109,
+        "path": "src/mbg/__init__.py"
+      },
+      {
+        "lines": 913,
+        "path": "src/mbg/checks.py"
+      },
+      {
+        "lines": 54,
+        "path": "src/mbg/cli.py"
+      },
+      {
+        "lines": 359,
+        "path": "src/mbg/connectivity.py"
+      },
+      {
+        "lines": 565,
+        "path": "src/mbg/design_context.py"
+      },
+      {
+        "lines": 801,
+        "path": "src/mbg/experiment_manifest.py"
+      },
+      {
+        "lines": 369,
+        "path": "src/mbg/llm.py"
+      },
+      {
+        "lines": 168,
+        "path": "src/mbg/pdk_devices.py"
+      },
+      {
+        "lines": 261,
+        "path": "src/mbg/pdk_rules.py"
+      },
+      {
+        "lines": 592,
+        "path": "src/mbg/pipeline.py"
+      },
+      {
+        "lines": 430,
+        "path": "src/mbg/placement.py"
+      },
+      {
+        "lines": 525,
+        "path": "src/mbg/placement_engine.py"
+      },
+      {
+        "lines": 216,
+        "path": "src/mbg/power.py"
+      },
+      {
+        "lines": 1091,
+        "path": "src/mbg/router.py"
+      },
+      {
+        "lines": 757,
+        "path": "src/mbg/routing.py"
+      },
+      {
+        "lines": 183,
+        "path": "src/mbg/simulation.py"
+      },
+      {
+        "lines": 608,
+        "path": "src/mbg/spice_parser.py"
+      },
+      {
+        "lines": 53,
+        "path": "src/mbg/utils.py"
+      }
+    ],
+    "generated_designs": [
+      {
+        "path": "AI-Generated-Design-Result/comparator_core"
+      },
+      {
+        "path": "AI-Generated-Design-Result/comparator_core_designcontext_v2"
+      },
+      {
+        "path": "AI-Generated-Design-Result/comparator_core_glm_5-2"
+      },
+      {
+        "path": "AI-Generated-Design-Result/mbg_vref_1v2"
+      },
+      {
+        "path": "AI-Generated-Design-Result/mbg_vref_1v2_glm_5-2"
+      },
+      {
+        "path": "AI-Generated-Design-Result/ota_5t"
+      },
+      {
+        "path": "AI-Generated-Design-Result/ota_5t_designcontext_v2"
+      },
+      {
+        "path": "AI-Generated-Design-Result/ota_5t_glm_5-2"
+      },
+      {
+        "path": "AI-Generated-Design-Result/two_stage_comparator_designcontext_v2"
+      },
+      {
+        "path": "AI-Generated-Design-Result/vref_1v2_designcontext_v2"
+      }
+    ],
+    "pdk_modules": [
+      {
+        "lines": 168,
+        "path": "src/mbg/pdk_devices.py"
+      },
+      {
+        "lines": 261,
+        "path": "src/mbg/pdk_rules.py"
+      }
+    ],
+    "placement_modules": [
+      {
+        "lines": 430,
+        "path": "src/mbg/placement.py"
+      },
+      {
+        "lines": 525,
+        "path": "src/mbg/placement_engine.py"
+      },
+      {
+        "lines": 216,
+        "path": "src/mbg/power.py"
+      }
+    ],
+    "routing_modules": [
+      {
+        "lines": 359,
+        "path": "src/mbg/connectivity.py"
+      },
+      {
+        "lines": 1091,
+        "path": "src/mbg/router.py"
+      },
+      {
+        "lines": 757,
+        "path": "src/mbg/routing.py"
+      }
+    ],
+    "spice_modules": [
+      {
+        "lines": 183,
+        "path": "src/mbg/simulation.py"
+      },
+      {
+        "lines": 608,
+        "path": "src/mbg/spice_parser.py"
+      }
+    ],
+    "tests": [
+      {
+        "lines": 270,
+        "path": "tests/test_agent_integrations.py"
+      },
+      {
+        "lines": 143,
+        "path": "tests/test_all_designs.py"
+      },
+      {
+        "lines": 231,
+        "path": "tests/test_experiment_manifest.py"
+      },
+      {
+        "lines": 105,
+        "path": "tests/test_notebooks.py"
+      },
+      {
+        "lines": 302,
+        "path": "tests/test_router_synthetic.py"
+      }
+    ],
+    "verification_modules": [
+      {
+        "lines": 913,
+        "path": "src/mbg/checks.py"
+      },
+      {
+        "lines": 359,
+        "path": "src/mbg/connectivity.py"
+      }
+    ]
+  }
+}

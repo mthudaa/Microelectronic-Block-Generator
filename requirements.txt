@@ -1,0 +1,18 @@
+# Direct runtime requirements for the mbg engine.
+# For a byte-identical environment use requirements-lock.txt instead.
+#
+#   pip install -r requirements.txt        # flexible, resolves fresh
+#   pip install -r requirements-lock.txt   # exact, reproduces a known-good env
+#
+# Upper bounds are load-bearing — see pyproject.toml for why.
+gdsfactory>=7.7,<8
+numpy>=1.24,<2; python_version < '3.12'
+numpy>=1.26,<2; python_version >= '3.12'
+gdstk>=0.9
+glayout>=0.1
+
+# Notebooks (tests/notebooks/*.ipynb and tests/test_notebooks.py)
+nbformat>=5.9
+nbclient>=0.9
+ipykernel>=6
+matplotlib>=3.7

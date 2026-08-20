@@ -1,8 +1,8 @@
 ---
-
-description: Create a safe MBG OpenCode custom tool using the project authoring standard
+description: Create a safe OpenCode custom code tool using the project authoring standard. OpenCode-only — Claude Code and Codex do not support repository-scoped code tools.
 agent: build
-------------
+---
+<!-- GENERATED FILE — do not edit by hand. Source: .ai/workflows/mbg-new-tool.md. Regenerate with: python3 scripts/sync_agent_tools.py -->
 
 Create a new OpenCode custom tool for the Microelectronic Block Generator
 project.
@@ -13,8 +13,8 @@ Requested input:
 $ARGUMENTS
 ```
 
-Interpret the first argument as the tool name. Treat the remaining arguments as
-the requested operation or purpose.
+Interpret the first argument as the tool name. Treat the remaining
+arguments as the requested operation or purpose.
 
 ## Requirements
 
@@ -23,10 +23,14 @@ the requested operation or purpose.
 3. Require lowercase alphanumeric kebab-case.
 4. Create the tool at:
 
-```text
-.opencode/tools/<tool-name>.ts
-```
+   ```text
+   .opencode/tools/<tool-name>.ts
+   ```
 
+   This file is authored directly in place — it has no `.ai/` source and
+   is not generated or touched by `scripts/sync_agent_tools.py`, because
+   OpenCode is the only one of the three supported platforms
+   (`opencode`/`claude`/`codex`) with code-tool support.
 5. Do not overwrite an existing tool without explicit approval.
 6. Use the `tool()` helper from `@opencode-ai/plugin`.
 7. Give the tool one clear responsibility.
@@ -36,10 +40,10 @@ the requested operation or purpose.
 11. Identify side effects and generated artifacts.
 12. Do not invent project APIs or modules that do not exist.
 
-## ⚠️ PDK Body Constraint
+## PDK Body Constraint
 
-**MOSFET body: pfet_03v3→VDD ONLY, nfet_03v3→VSS ONLY.** If your tool
-generates or processes SPICE netlists, it must enforce this rule.
+**MOSFET body: `pfet_03v3` -> VDD ONLY, `nfet_03v3` -> VSS ONLY.** If the
+tool generates or processes SPICE netlists, it must enforce this rule.
 
 ## Path Safety
 
@@ -91,14 +95,14 @@ function resolveInsideWorktree(
 
 ## Execution Safety
 
-* Do not construct raw shell commands from untrusted input.
-* Prefer argument arrays for subprocess execution.
-* Preserve stderr and nonzero exit codes.
-* Use a timeout for potentially long operations.
-* Require user approval for destructive side effects.
-* Do not silently suppress failures.
-* Do not automatically stage, commit, or push files.
-* Do not claim simulation or verification success without report evidence.
+- Do not construct raw shell commands from untrusted input.
+- Prefer argument arrays for subprocess execution.
+- Preserve stderr and nonzero exit codes.
+- Use a timeout for potentially long operations.
+- Require user approval for destructive side effects.
+- Do not silently suppress failures.
+- Do not automatically stage, commit, or push files.
+- Do not claim simulation or verification success without report evidence.
 
 ## Required Tool Structure
 
@@ -128,20 +132,21 @@ export default tool({
 })
 ```
 
-Replace the placeholder implementation with the requested validated operation.
+Replace the placeholder implementation with the requested validated
+operation.
 
 ## Validation
 
 After creating the tool:
 
-1. Run `mbg-validate-extension` on the new TypeScript file.
-2. Confirm that the file name starts with `mbg-`.
-3. Confirm that it imports `tool` from `@opencode-ai/plugin`.
-4. Confirm that it defines a description, argument schema, and execute function.
-5. Confirm that paths are restricted to `context.worktree`.
-6. Run one valid-input test.
-7. Run one invalid-input or traversal test.
-8. Do not claim completion if validation fails.
+1. Confirm the file name starts with `mbg-`.
+2. Confirm it imports `tool` from `@opencode-ai/plugin`.
+3. Confirm it defines a description, argument schema, and execute
+   function.
+4. Confirm that paths are restricted to `context.worktree`.
+5. Run one valid-input test.
+6. Run one invalid-input or traversal test.
+7. Do not claim completion if validation fails.
 
 ## Output Format
 

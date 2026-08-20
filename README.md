@@ -84,7 +84,7 @@ SPICE Netlist  →  Parse Devices  →  Multi-Row Placement  →  Power Routing
 ### Primary Pipeline API
 
 ```python
-from core.pipeline import spice_to_gds_with_checks
+from mbg.pipeline import spice_to_gds_with_checks
 r = spice_to_gds_with_checks(netlist)
 # r["outdir"], r["gds_path"], r["drc"], r["lvs"], r["pex"], r["all_pass"]
 ```
@@ -154,142 +154,442 @@ cd /foss/designs/notebooks/chipathon2026-D
 
 ---
 
-## 🤖 OpenCode Skills & Tools Tutorial
+## 🤖 AI Coding Agent Integrations
 
-The project ships with a suite of **OpenCode extensions** (`.opencode/`) that
-let you run the entire analog design flow — from SPICE netlist to tapeout-ready
-GDS — using natural-language commands and AI agents.
+The project ships a **canonical agent layer** under `.ai/` that is the single
+source of truth for every domain skill and workflow (SPICE→GDS, DRC/LVS/PEX,
+placement/routing debug, design regression, experiment audit, extension
+authoring). A sync script regenerates matching, platform-native adapters for
+three coding agents — **OpenCode**, **Claude Code**, and **Codex** — so the
+same `mbg-` skill behaves the same way no matter which agent you're driving.
 
 All project-specific extensions use the `mbg-` prefix.
 
-### Skills
+### ⚡ Quick install
 
-Skills teach the AI agent how to perform a specific domain task. They are
-loaded automatically when the task matches the skill's description.
-
-| Skill | Owner | Purpose |
-| :--- | :--- | :--- |
-| `mbg-spice-to-gds` | Huda | Convert SPICE netlist → DRC-clean GDSII layout via `spice_to_gds_with_checks()` |
-| `mbg-ic-verify` | Ahmad | Run DRC (Magic), LVS (Netgen), and PEX (Magic) on a GDS layout |
-| `mbg-ai-experiment-audit` | Jabir | Audit an AI experiment for reproducibility, bounded refinement, and evidence-backed claims |
-| `mbg-extension-authoring` | Jabir | Create/review new OpenCode skills, tools, commands, or agents following project standards |
-
-**How to invoke a skill:** Just ask the AI agent naturally — the skill loads
-when the request matches its purpose. For example:
-
-> *"Convert this SPICE netlist to GDS and run DRC/LVS/PEX."*
-> → loads `mbg-spice-to-gds` + `mbg-ic-verify`
-
-> *"Audit the experiment at outputs/exp-07/experiment.json."*
-> → loads `mbg-ai-experiment-audit`
-
-### Slash Commands
-
-Type `/` in the chat to access these workflow commands. Each command runs a
-multi-step pipeline with user checkpoints.
-
-| Command | Agent | Description |
-| :--- | :--- | :--- |
-| `/mbg-full-automate` | `build` | **9-stage fully automatic flow**: spec → SPICE → sim → layout → DRC/LVS/PEX → post-layout → report. No manual steps. |
-| `/mbg-partial-automate` | `build` | **8-stage user-guided flow**: same pipeline but the agent pauses at each stage for your review and approval. |
-| `/mbg-review-ai-experiment` | `plan` | Validate an `experiment.json` against the project audit standard. Checks prompt traceability, model ID, refinement bounds, and evidence. |
-| `/mbg-review-extension` | `plan` | Review an OpenCode extension (skill/tool/command/agent) for naming, safety, ownership, and correctness. |
-| `/mbg-new-skill` | `build` | Scaffold a new `mbg-*` skill with proper YAML frontmatter and structure. |
-| `/mbg-new-tool` | `build` | Scaffold a new `mbg-*` TypeScript tool with safety guards. |
-| `/mbg-new-command` | `build` | Scaffold a new `mbg-*` slash command with required workflow steps. |
-
-**How to use a command:** Type `/mbg-full-automate` in the chat, then describe
-your design. The agent guides you through the pipeline:
-
+```bash
+git clone <this-repo> && cd Microelectronic-Block-Generator
+./scripts/setup_env.sh        # 1. Python environment (.venv + `import mbg`)
+./scripts/install_agents.sh   # 2. OpenCode / Claude Code / Codex integrations
 ```
+
+That is the whole setup. Both scripts are idempotent, discover the repository
+root themselves, and perform no git operations.
+
+Inside an agent you can run the same thing as a slash command:
+
+```text
+/mbg-install      # both steps, then verification
+/mbg-setup-env    # Python environment only
+```
+
+Codex has no slash commands — ask for the skill by name instead:
+*"use the mbg-setup skill to install this repository"*.
+
+**As a Python package**
+
+```bash
+pip install -e ".[dev,notebooks]"   # editable, from a clone
+pip install -r requirements-lock.txt # exact known-good versions
+```
+
+This installs the `mbg` package plus two console commands, `mbg-sync` and
+`mbg-validate`.
+
+```python
+from mbg import spice_to_gds_with_checks
+r = spice_to_gds_with_checks(netlist)
+r["gds_path"], r["drc"], r["lvs"], r["pex"], r["all_pass"]
+```
+
+**Requirements.** Python 3.10–3.12 — gdsfactory 7 and numpy 1 have no wheels
+for 3.13+, and `setup_env.sh` picks a supported interpreter automatically. The
+EDA tools (ngspice, Magic, netgen) and the GF180MCU PDK come from the
+IIC-OSIC-TOOLS container; the setup script reports whether it can see them but
+does not install them.
+
+| | Per-machine step? | What the installer does |
+| :--- | :--- | :--- |
+| **Python** | yes | creates `.venv`, installs `mbg` editable |
+| **OpenCode** | no — reads `.opencode/` from the clone | `npm install` for the custom `.ts` tools |
+| **Claude Code** | no — reads `.claude/` from the clone | nothing to register |
+| **Codex** | **yes** — no repo-scoped skills exist | registers the local plugin marketplace |
+
+Useful variants:
+
+```bash
+./scripts/setup_env.sh --check        # report status, install nothing
+./scripts/setup_env.sh --locked       # exact pinned versions
+./scripts/setup_env.sh --freeze       # rewrite requirements-lock.txt
+./scripts/install_agents.sh --check   # report status, change nothing
+./scripts/install_agents.sh --only codex
+./scripts/install_agents.sh --uninstall
+```
+
+### Canonical architecture: source vs. generated
+
+```text
+                         SOURCE OF TRUTH (hand-edited)
+        .ai/manifest.json  +  .ai/skills/*/SKILL.md  +  .ai/workflows/*.md
+                                        │
+                                        │  python3 scripts/sync_agent_tools.py
+                                        ▼
+        ┌───────────────────────────────────────────────────────────────┐
+        │                                                               │
+        ▼                              ▼                                ▼
+  .opencode/skills/**            .claude/skills/**              plugins/mbg-analog/skills/**
+  .opencode/commands/**          .claude/commands/**             plugins/mbg-analog/.codex-plugin/plugin.json
+        (OpenCode)               CLAUDE.md (@AGENTS.md import)   .agents/plugins/marketplace.json
+                                        (Claude Code)                    (Codex)
+
+                                        +  .ai/project-index.json  (repo map used by all three)
+
+  AGENTS.md — shared rules — is NOT generated. OpenCode and Codex read it
+  natively; CLAUDE.md imports it with a single `@AGENTS.md` line so Claude
+  Code shares the exact same rules instead of a forked copy.
+```
+
+Every generated file opens with an HTML comment banner naming its source and
+the regeneration command — if a file doesn't have that banner, it's
+hand-maintained and safe to edit directly; if it does, edit the source under
+`.ai/` instead and resync.
+
+### Source of truth vs. generated vs. platform-specific
+
+| Layer | Files | Rule |
+| :--- | :--- | :--- |
+| **Source of truth** (hand-edited) | `.ai/manifest.json`, `.ai/skills/<name>/SKILL.md`, `.ai/workflows/<name>.md`, `.ai/knowledge/PROJECT.md`, `AGENTS.md` | Edit these directly. Everything else flows from them. |
+| **Generated** (never hand-edit) | `.opencode/skills/**`, `.opencode/commands/**`, `.claude/skills/**`, `.claude/commands/**`, `CLAUDE.md`, `plugins/mbg-analog/skills/**`, `plugins/mbg-analog/.codex-plugin/plugin.json`, `.agents/plugins/marketplace.json`, `.ai/project-index.json` | Overwritten by `scripts/sync_agent_tools.py`. Hand edits are silently lost on the next sync. |
+| **Platform-specific, maintained by hand** | `opencode.jsonc` (OpenCode permissions), `.claude/settings.json` (Claude Code permissions), `.opencode/tools/*.ts` (OpenCode custom code tools — only OpenCode supports repo-scoped code tools) | Not derived from `.ai/`; edit in place for the platform in question. |
+
+> ⚠️ `.opencode/tools/core/` is a **stale, partial mirror** of
+> `src/mbg` kept only as a last-resort
+> fallback for a broken checkout, and is being retired. The real
+> implementation the pipeline tools call is always
+> `src/mbg/`.
+
+### Capability matrix
+
+Sourced directly from `.ai/manifest.json` (15 capabilities as of this writing
+— re-run `python3 scripts/sync_agent_tools.py --check` to confirm the count
+hasn't moved since). All of them currently
+ship to all three platforms as skills — the gaps between platforms show up
+one level up, in *workflows* (see next table), not in raw capabilities.
+
+| Capability | OpenCode | Claude Code | Codex | Canonical skill |
+| :--- | :---: | :---: | :---: | :--- |
+| `inspect_repository` | ✅ | ✅ | ✅ | `mbg-repo-analysis` |
+| `analyze_spice` | ✅ | ✅ | ✅ | `mbg-repo-analysis` |
+| `spice_to_gds` | ✅ | ✅ | ✅ | `mbg-spice-to-gds` |
+| `run_simulation` | ✅ | ✅ | ✅ | `mbg-spice-sim` |
+| `debug_placement` | ✅ | ✅ | ✅ | `mbg-placement-debug` |
+| `debug_routing` | ✅ | ✅ | ✅ | `mbg-routing-debug` |
+| `verify_connectivity` | ✅ | ✅ | ✅ | `mbg-routing-debug` |
+| `run_drc` | ✅ | ✅ | ✅ | `mbg-ic-verify` |
+| `run_lvs` | ✅ | ✅ | ✅ | `mbg-ic-verify` |
+| `run_pex` | ✅ | ✅ | ✅ | `mbg-ic-verify` |
+| `inspect_generated_designs` | ✅ | ✅ | ✅ | `mbg-design-regression` |
+| `compare_layout_results` | ✅ | ✅ | ✅ | `mbg-design-regression` |
+| `audit_ai_experiment` | ✅ | ✅ | ✅ | `mbg-ai-experiment-audit` |
+| `author_extension` | ✅ | ✅ | ✅ | `mbg-extension-authoring` |
+| `sync_agent_metadata` | ✅ | ✅ | ✅ | `scripts/sync_agent_tools.py` (a command, not a skill) |
+
+Each skill file is at `.ai/skills/<skill-name>/SKILL.md`.
+
+### Workflows (slash commands)
+
+Workflows are where the platforms genuinely diverge — Codex has no
+repo-scoped slash-command mechanism at all.
+
+| Workflow | Agent mode | OpenCode | Claude Code | Codex | Canonical source |
+| :--- | :--- | :---: | :---: | :---: | :--- |
+| `/mbg-full-automate` | `build` | ✅ | ✅ | n/a¹ | `.ai/workflows/mbg-full-automate.md` |
+| `/mbg-partial-automate` | `build` | ✅ | ✅ | n/a¹ | `.ai/workflows/mbg-partial-automate.md` |
+| `/mbg-review-ai-experiment` | `plan` | ✅ | ✅ | n/a¹ | `.ai/workflows/mbg-review-ai-experiment.md` |
+| `/mbg-review-extension` | `plan` | ✅ | ✅ | n/a¹ | `.ai/workflows/mbg-review-extension.md` |
+| `/mbg-new-skill` | `build` | ✅ | ✅ | n/a¹ | `.ai/workflows/mbg-new-skill.md` |
+| `/mbg-new-command` | `build` | ✅ | ✅ | n/a¹ | `.ai/workflows/mbg-new-command.md` |
+| `/mbg-new-tool` | `build` | ✅ | n/a² | n/a¹ | `.ai/workflows/mbg-new-tool.md` |
+
+¹ Codex has no repo-scoped commands or subagents (`.ai/manifest.json` →
+`platforms.codex.unsupported`). There is no Codex equivalent of typing
+`/mbg-full-automate` — drive the same work by asking Codex directly in
+natural language; it still has the skill and reads `AGENTS.md` natively.
+² `mbg-new-tool` only targets OpenCode — Claude Code has no repo-scoped
+code-tool runtime, so there's nothing for it to generate there.
+
+### OpenCode
+
+**Prerequisites:** OpenCode CLI (tested against `1.18.18`); Node.js on `PATH`
+(OpenCode's custom tools in `.opencode/tools/*.ts` run under Node — confirmed
+via `.opencode/package.json`'s `@opencode-ai/plugin` dependency); the repo
+opened as the OpenCode workspace root so `opencode.jsonc` is picked up.
+
+**Where it lives:** `.opencode/skills/<name>/SKILL.md`,
+`.opencode/commands/<name>.md`, `.opencode/tools/*.ts` (hand-maintained,
+OpenCode-only), permissions in `opencode.jsonc`.
+
+**Setup:** nothing to install — the generated skills/commands are already
+committed. Just open the repo in OpenCode.
+
+**Sync command:**
+
+```bash
+python3 scripts/sync_agent_tools.py           # regenerate all adapters
+python3 scripts/sync_agent_tools.py --check   # exit 1 if anything is stale
+```
+
+**Validation:** run the dedicated validator, which is the authoritative check:
+
+```bash
+python3 scripts/validate_agent_integrations.py
+```
+
+It runs ten checks (F1-F9): repository-root discovery, canonical frontmatter
+parsing, adapter completeness, broken references, sync determinism, capability
+parity, documented-command existence, absence of hardcoded home directories,
+and a phantom-API check that every `core.*` symbol named in a skill actually
+exists in `src/mbg/`. It exits non-zero on any
+failure. `python3 scripts/sync_agent_tools.py --check` remains the fast
+staleness-only check.
+
+**Quick start:**
+
+```text
 /mbg-full-automate
 Design a StrongARM latch comparator with <10mV input offset, 1GHz clock,
 GF180MCU 3.3V PDK.
 ```
 
-### Custom Tools
+The agent researches topologies, generates SPICE, simulates, creates layout,
+and runs DRC/LVS/PEX automatically. Use `/mbg-partial-automate` instead to
+approve each stage yourself.
 
-These are TypeScript tools that agents can call during a workflow. They wrap the
-Python core modules with schema validation and safety checks.
+**Troubleshooting:**
 
-| Tool | Purpose |
-| :--- | :--- |
-| `mbg-spice-to-gds` | Execute `spice_to_gds_with_checks(netlist)` — the primary pipeline tool |
-| `mbg-run-verification` | Run DRC, LVS, or PEX on a GDS file (`check_type`: `drc`/`lvs`/`pex`) |
-| `mbg-validate-ai-experiment` | Validate `experiment.json` schema, paths, statuses, and metric completeness |
-| `mbg-validate-extension` | Validate an OpenCode extension file against project authoring rules |
+- *A shell command hangs waiting for approval.* `opencode.jsonc` defaults
+  `bash: "*"` to `"ask"` and only allow-lists a short list of read-only
+  commands (`pwd`, `ls`, `find`, `grep`, `git status|diff|log|branch`,
+  `docker ps`). Anything else — including a brand-new script — pauses for
+  approval by design; add a narrowly-scoped entry to `opencode.jsonc` rather
+  than widening the wildcard.
+- *You edited a skill and nothing changed.* Skills under `.opencode/skills/`
+  are generated — a hand-edit there is either overwritten on the next
+  `sync_agent_tools.py` run, or has no effect at all if another contributor
+  syncs first. Edit `.ai/skills/<name>/SKILL.md` and resync.
+- *A pipeline tool silently uses stale placement/routing logic.*
+  `mbg-spice-to-gds.ts` resolves the canonical core at
+  `src/mbg` and only falls back to the local
+  `.opencode/tools/core/` mirror when that path is missing. If you're on a
+  partial checkout that mirror is weeks stale — make sure
+  `src/mbg/pipeline.py` actually exists.
 
-**How tools are used:** Tools are called automatically by agents when executing
-a skill or command. You don't invoke them directly — the agent selects the
-right tool for the task.
+### Claude Code
 
-### Extension Locations
+**Prerequisites:** Claude Code CLI (tested against `2.1.235`), launched from
+the repo root (the `@AGENTS.md` import in `CLAUDE.md` is a relative path).
 
-```text
-.opencode/
-├── skills/
-│   ├── mbg-spice-to-gds/SKILL.md
-│   ├── mbg-ic-verify/SKILL.md
-│   ├── mbg-ai-experiment-audit/SKILL.md
-│   └── mbg-extension-authoring/SKILL.md
-├── commands/
-│   ├── mbg-full-automate.md
-│   ├── mbg-partial-automate.md
-│   ├── mbg-review-ai-experiment.md
-│   ├── mbg-review-extension.md
-│   ├── mbg-new-skill.md
-│   ├── mbg-new-tool.md
-│   └── mbg-new-command.md
-├── tools/
-│   ├── mbg-spice-to-gds.ts
-│   ├── mbg-run-verification.ts
-│   ├── mbg-validate-ai-experiment.ts
-│   └── mbg-validate-extension.ts
-└── tests/
-    └── fixtures/
+**Where it lives:** `.claude/skills/<name>/SKILL.md`,
+`.claude/commands/<name>.md`, instructions in `CLAUDE.md` (which imports
+`AGENTS.md` — Claude Code does not read `AGENTS.md` natively, hence the
+import), permissions in `.claude/settings.json`. This repo defines no
+`.claude/agents/` subagents.
+
+**Setup:** nothing to install — `CLAUDE.md`, `.claude/skills/`, and
+`.claude/commands/` are already committed and generated. Just open the repo.
+
+**Sync command:** the same sync script regenerates the Claude Code adapter
+too — there's no separate Claude-specific generator:
+
+```bash
+python3 scripts/sync_agent_tools.py
+python3 scripts/sync_agent_tools.py --check
 ```
 
-### Quick Start: Your First Automated Design
+**Validation:** same as OpenCode — `python3 scripts/validate_agent_integrations.py`
+for the full ten-check run, `python3 scripts/sync_agent_tools.py --check` for a
+fast staleness check. `.claude/settings.json` pre-approves both so neither
+prompts for permission.
 
-1. Open VS Code in this repository with the OpenCode extension enabled.
-2. Type `/mbg-full-automate` in the chat.
-3. Describe your circuit requirements (e.g., "5T OTA with 60dB gain, 10MHz GBW").
-4. The agent will research topologies, generate SPICE, simulate, create layout,
-   and run DRC/LVS/PEX — all automatically.
-5. Review the final report and GDS output.
+**Quick start:** same invocation shape as OpenCode —
 
-For more control, use `/mbg-partial-automate` to approve each stage before the
-agent proceeds.
+```text
+/mbg-full-automate
+Design a StrongARM latch comparator with <10mV input offset, 1GHz clock,
+GF180MCU 3.3V PDK.
+```
+
+**Troubleshooting:**
+
+- *`AGENTS.md` rules don't seem to apply.* The `@AGENTS.md` import in
+  `CLAUDE.md` is resolved relative to where Claude Code was launched — start
+  the session from the repository root, not a subdirectory.
+- *A command you expect to be pre-approved still prompts.* `.claude/settings.json`
+  allow-lists exact patterns (`Bash(python3 scripts/sync_agent_tools.py:*)`,
+  read-only git/docker inspection, etc.) — a different script or a bare
+  `python3` invocation outside that list still asks for approval every time.
+- *You expect a generated OpenCode-style code tool and there isn't one.*
+  Claude Code has no repo-scoped code-tool runtime (see the workflow table's
+  footnote ²) — `.opencode/tools/*.ts` logic has no Claude Code equivalent;
+  it has to be re-expressed as skill instructions plus ordinary Bash/Python.
+
+### Codex
+
+**Prerequisites:** Codex CLI (tested against `codex-cli 0.148.0`) with the
+`codex plugin` subcommand family available.
+
+**Where it lives:** `AGENTS.md` is read natively at the repo root — no
+import shim needed, unlike Claude Code. Repo skills ship as a **local
+plugin**: `plugins/mbg-analog/skills/<name>/SKILL.md`, plugin manifest
+`plugins/mbg-analog/.codex-plugin/plugin.json`, discovered through a local
+marketplace descriptor `.agents/plugins/marketplace.json` (marketplace name
+`mbg-local`) that points at `./plugins/mbg-analog`. Codex has **no**
+repo-scoped commands, **no** repo-scoped subagents, and **no** repo-scoped
+`config.toml` — normal Codex skills otherwise live user-level under
+`$CODEX_HOME/skills`, which is exactly why this repo needs its own local
+marketplace/plugin instead.
+
+**Setup / install** (syntax verified against `codex plugin marketplace add --help`
+and `codex plugin add --help` on `0.148.0`; this is a one-time, per-machine
+step, not something `git clone` gives you for free):
+
+```bash
+./scripts/install_agents.sh --only codex     # does both steps below for you
+```
+
+or manually:
+
+```bash
+cd <repo-root>
+codex plugin marketplace add .          # the DIRECTORY, not the .json file
+codex plugin add mbg-analog@mbg-local
+# equivalently: codex plugin add mbg-analog --marketplace mbg-local
+```
+
+The marketplace source must be the **directory** that contains
+`.agents/plugins/marketplace.json` — pass the repo root (`.`). Pointing at the
+JSON file itself fails with *"local marketplace source must be a directory,
+not a file"*.
+
+This registers the marketplace and installs the plugin into your user-level
+`~/.codex/config.toml` (under `[marketplaces.mbg-local]` and
+`[plugins."mbg-analog@mbg-local"]`) — every teammate runs it once, locally.
+
+**Refreshing after a sync:** Codex copies the plugin into
+`~/.codex/plugins/cache/` at install time, so regenerating the adapters does
+**not** reach Codex on its own. Re-run `./scripts/install_agents.sh --only codex`
+— it does a `remove` + `add`, which refreshes the copy without needing a
+version bump. OpenCode and Claude Code read the repository directly and need
+no refresh step.
+
+**Sync command:** the same script regenerates the Codex adapter (the plugin
+skills, `plugin.json`, and `marketplace.json`) from `.ai/`:
+
+```bash
+python3 scripts/sync_agent_tools.py
+python3 scripts/sync_agent_tools.py --check
+```
+
+**Validation:** `python3 scripts/validate_agent_integrations.py` as above, plus,
+once the plugin is installed,
+`codex plugin list --marketplace mbg-local` (a real, `--help`-confirmed
+read-only command) to confirm Codex itself now sees all the `mbg-` skills
+(9 as of this writing — count varies as skills are added; re-run
+`python3 scripts/sync_agent_tools.py --check` for the current total).
+
+**Quick start:** there is no slash command on Codex — after installing the
+plugin, just ask directly:
+
+```text
+Using the mbg-spice-to-gds skill, convert this SPICE netlist to a
+DRC-clean GDSII layout for the gf180mcuD PDK: <netlist>
+```
+
+**Troubleshooting:**
+
+- *`codex plugin marketplace add` fails with "local marketplace source must
+  be a directory, not a file".* You passed the manifest path. Pass the
+  directory that contains it — the repo root: `codex plugin marketplace add .`
+- *Codex still shows old skills after you edited `.ai/`.* The plugin is cached
+  at install time. Run `./scripts/install_agents.sh --only codex` to refresh it.
+- *You typed `/mbg-full-automate` and nothing happened.* Codex has no
+  repo-scoped commands or subagents at all (see the workflow table's
+  footnote ¹, and `platforms.codex.unsupported` in `.ai/manifest.json`) —
+  there is no slash-command equivalent to fall back to; describe the
+  workflow in natural language instead.
+- *A teammate says the skills "aren't there" after pulling your change.*
+  Marketplace/plugin registration lives in `~/.codex/config.toml`, which is
+  per-user and per-machine, not part of the repo — each person who wants the
+  `mbg-` skills on Codex has to run both `codex plugin marketplace add` and
+  `codex plugin add` themselves.
+
+### Contributor workflow: adding or changing a capability
+
+1. Edit the canonical definition — a new/changed `.ai/skills/<name>/SKILL.md`
+   or `.ai/workflows/<name>.md`. Frontmatter is validated by the sync script:
+   skills require `name`, `description`, `class`, `owner`, `capabilities`,
+   `platforms`; workflows require `name`, `description`, `agent`, `platforms`
+   (and workflows may not target `codex` — Codex doesn't support repo-scoped
+   commands).
+2. Add the implementation, if the capability needs one, under
+   `src/mbg/`.
+3. Register the capability (and/or workflow) in `.ai/manifest.json`.
+4. Regenerate every adapter:
+   ```bash
+   python3 scripts/sync_agent_tools.py
+   ```
+5. Confirm nothing drifted:
+   ```bash
+   python3 scripts/sync_agent_tools.py --check
+   ```
+6. Commit the canonical `.ai/` change together with every regenerated file
+   in the **same** commit — never split a source change from its generated
+   output across commits, and never hand-edit a generated file directly.
 
 ---
 
 ## 📁 Repository Structure
 
-```
-├── designs/
-│   ├── libs/                          # Design & testbench libraries
-│   │   ├── core_analog/               # Core circuit cells (OTA, comparator, etc.)
-│   │   └── tb_analog/                 # Testbench setups
-│   └── notebooks/chipathon2026-D/     # Main project notebooks & core modules
-│       ├── core/                      # Pipeline modules
-│       │   ├── pipeline.py            # Main SPICE→GDS pipeline
-│       │   ├── placement.py           # Multi-row device placement
-│       │   ├── routing.py             # Signal routing
-│       │   ├── power.py               # Power grid routing
-│       │   ├── simulation.py          # Pre/post-layout simulation
-│       │   ├── spice_parser.py        # SPICE netlist parser
-│       │   ├── checks.py              # DRC/LVS/PEX automation
-│       │   └── utils.py               # Utilities
-│       ├── scripts/                   # Verification scripts (DRC, LVS, PEX)
-│       ├── spice_to_gds.ipynb         # SPICE → GDS notebook
-│       ├── llm_to_gds.ipynb           # LLM → SPICE → GDS notebook
-│       └── test_all_designs.py        # Regression test suite
-├── scripts/                           # Container launch & tool scripts
-├── docs/                              # Workflow documentation
+```text
+├── src/mbg/                           # THE ENGINE — the only copy, `import mbg`
+│   ├── pipeline.py                    # spice_to_gds_with_checks(), spice_to_gds_ctx()
+│   ├── spice_parser.py                # netlist parsing + constraint extraction
+│   ├── design_context.py              # DesignContext shared across every stage
+│   ├── pdk_rules.py                   # all layer/width/spacing/via rules, from the PDK
+│   ├── placement.py placement_engine.py   # legacy rows / analog-aware placement
+│   ├── routing.py   router.py             # legacy shapes / DRC-aware grid router
+│   ├── connectivity.py                # internal OPEN/SHORT verification
+│   ├── checks.py                      # DRC / LVS / PEX automation
+│   ├── simulation.py                  # ngspice runner + raw parsing
+│   └── power.py utils.py pdk_devices.py experiment_manifest.py
+├── pyproject.toml                     # src-layout packaging (`pip install -e .`)
+│
+├── .ai/                               # canonical agent layer (SOURCE OF TRUTH)
+├── .claude/  .opencode/  plugins/  .agents/   # generated per-platform adapters
+├── AGENTS.md  CLAUDE.md               # shared agent rules (CLAUDE.md imports AGENTS.md)
+├── scripts/                           # sync_agent_tools.py, validate_agent_integrations.py,
+│                                      #   install_agents.sh, container launch scripts
+│
+├── designs/                           # Chipathon design tree (template convention)
+│   ├── libs/                          # design & testbench libraries
+│   │   ├── core_analog/               # circuit cells (OTA, comparator, ...)
+│   │   └── tb_analog/                 # testbench setups
+│   └── notebooks/chipathon2026-D/     # the Chipathon project directory
+│       ├── notebooks/                 # spice_to_gds.ipynb, llm_to_gds.ipynb
+│       ├── tests/                     # all test suites
+│       ├── scripts/                   # iic-drc.sh, iic-lvs.sh, iic-pex.sh
+│       ├── examples/  docs/  ai_logs/ # runnable examples, reference docs, session logs
+│       └── outputs/                   # generated artifacts (gitignored)
+│
+├── AI-Generated-Design-Result/        # generated designs + preserved baselines
+├── docs/                              # workflow documentation
 └── README.md
 ```
 
----
+The engine lives at `src/mbg/` and is imported as `mbg` from anywhere in the
+repository. There is exactly one copy — earlier revisions carried three, which
+silently diverged. The Chipathon design directory keeps its own notebooks,
+tests, EDA scripts and outputs so the template layout is preserved.
 
 ## 🧪 Test Key Circuits (Tapeout Plan)
 

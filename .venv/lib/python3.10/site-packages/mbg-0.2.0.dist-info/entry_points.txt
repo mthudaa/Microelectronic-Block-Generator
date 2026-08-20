@@ -1,0 +1,3 @@
+[console_scripts]
+mbg-sync = mbg.cli:sync_entry
+mbg-validate = mbg.cli:validate_entry

@@ -1,11 +1,6 @@
 ---
 name: mbg-ic-verify
-description: >
-  Runs DRC, LVS, and PEX verification for GDSII layouts using Magic/netgen.
-  Auto-fixes port order in extracted layout netlists. Netgen permute 1 3 handles
-  MOSFET D/S swapping natively. Use when user asks to "run DRC", "check LVS",
-  "extract parasitics", "verify layout", "run pex", or wants post-layout verification.
-  Supports GF180MCU PDK.
+description: Runs DRC, LVS, and PEX physical verification for GDSII layouts using Magic and netgen, with automatic port-order fixing for LVS. Use when the user asks to "run DRC", "check LVS", "extract parasitics", "verify layout", "run pex", or otherwise wants post-layout verification of an existing GDS under GF180MCU. Do not use it to generate layout (use mbg-spice-to-gds) or to run SPICE simulation.
 license: Apache-2.0
 compatibility: opencode
 metadata:
@@ -13,38 +8,76 @@ metadata:
   project: microelectronic-block-generator
   status: experimental
 ---
+<!-- GENERATED FILE — do not edit by hand. Source: .ai/skills/mbg-ic-verify/SKILL.md. Regenerate with: python3 scripts/sync_agent_tools.py -->
 
-# MBG IC Layout Verification (DRC/LVS/PEX)
+# MBG IC Layout Verification (DRC / LVS / PEX)
 
 ## Purpose
 
 Run physical verification checks on GDSII layouts: Design Rule Check (DRC),
-Layout vs Schematic (LVS), and Parasitic Extraction (PEX).
-
-## Prerequisites
-
-```bash
-export PDK_ROOT=/home/huda/.volare
-export PDK=gf180mcuD
-export PDKPATH=$PDK_ROOT/$PDK
-```
-
-Magic and netgen must be in PATH. PDK setup file is auto-resolved.
+Layout vs Schematic (LVS), and Parasitic Extraction (PEX), using the
+`mbg.checks` functions in
+`src/mbg/checks.py`.
 
 ## When to Use
 
-- Running DRC on a GDS file
-- Verifying LVS: layout matches schematic
-- Extracting parasitics (PEX) for post-layout simulation
-- User asks "verify my layout", "run DRC/LVS/PEX"
+- Running DRC on a GDS file.
+- Verifying LVS: does the layout match the schematic netlist.
+- Extracting parasitics (PEX) for post-layout simulation.
+- The user asks to "verify my layout" or "run DRC/LVS/PEX".
 
 ## When Not to Use
 
-- Generating layout (use mbg-spice-to-gds)
-- Running SPICE simulation (use mbg-spice-sim if available)
-- Manual netlist editing
+- Generating layout from SPICE — use `mbg-spice-to-gds`, which already runs
+  DRC/LVS/PEX as part of `spice_to_gds_with_checks`.
+- Running SPICE simulation (pre- or post-layout) — that is a separate
+  concern handled by `mbg.simulation`, not this skill.
+- Manually editing an extracted or schematic netlist outside of the
+  documented `fix_port_order` / permute helpers.
 
-## Quick Start
+## Required Inputs
+
+- Path to a GDS file to verify (DRC), or a GDS plus a source SPICE netlist
+  (string or path) to compare against (LVS), or a GDS to extract from (PEX).
+- A working directory to write reports into (optional; each function
+  defaults to a sensible location if omitted — read the function's own
+  docstring in `core/checks.py` rather than assuming).
+
+## Preconditions
+
+Magic and netgen must be on `PATH`. The PDK environment variables must be
+set before calling any `mbg.checks` function:
+
+```bash
+export PDK_ROOT=/foss/pdks
+export PDK=gf180mcuD
+export PDKPATH=/foss/pdks/gf180mcuD
+```
+
+This is the path used inside the IIC-OSIC-TOOLS container, and it is what
+`mbg.checks._check_env` requires (`PDK_ROOT`, `PDK`, `PDKPATH` must all be
+present in the environment or the call raises `EnvironmentError`).
+
+If you are not running inside the container — a bare host install — do not
+assume any single fixed path. Detect it instead:
+
+1. Check whether the caller already has `PDK_ROOT`/`PDK`/`PDKPATH` exported;
+   prefer that over guessing.
+2. If unset, `mbg.checks.run_lvs` itself falls back to `PDK_ROOT=/foss/pdks`
+   and then searches under `PDK_ROOT` for the PDK setup file before failing
+   — read that fallback logic in `core/checks.py` rather than hardcoding a
+   personal home directory path into a script or skill example.
+3. Never write a user-specific absolute path (e.g. a particular
+   contributor's home directory) into checked-in code, examples, or
+   generated scripts. If a concrete PDK install path is needed for a
+   one-off local run, ask the user or read it from the environment at
+   runtime.
+
+The Magic `.magicrc` file is resolved as
+`$PDK_ROOT/$PDK/libs.tech/magic/$PDK.magicrc` — confirm this file exists
+before assuming DRC/LVS extraction will succeed.
+
+## Workflow
 
 ```python
 import sys, os
@@ -55,7 +88,8 @@ from core import run_drc, run_lvs, run_pex
 drc = run_drc("out.gds", cell_name="my_cell")
 print(drc["summary"])   # "DRC: CLEAN" or "DRC: N ERRORS"
 
-# LVS (netgen permute 1 3 handles D/S swapping natively)
+# LVS — netgen's own "permute 1 3" rule handles MOSFET D/S swapping
+# natively; no manual Python permutation is required for that case.
 lvs = run_lvs("out.gds", netlist_content=netlist, cell_name="my_cell")
 print(lvs["summary"]["message"])  # "LVS OK" or "LVS MISMATCH"
 
@@ -64,40 +98,66 @@ pex = run_pex("out.gds", cell_name="my_cell", mode=2)
 print(pex["summary"])   # "PEX: OK (C-coupled)"
 ```
 
-## Functions
+### Functions
 
-### `run_drc(gds_path, cell_name, engine="magic", workdir, timeout=600)`
+`run_drc(gds_path, cell_name=None, engine="magic", workdir=None, clean=False, timeout=600)`
+Returns `{clean, report_path, error_count, log, summary}`.
 
-Returns: `{clean, report_path, error_count, log, summary}`
+`run_lvs(gds_path, netlist_path=None, netlist_content=None, cell_name=None, workdir=None, auto_fix_ports=True, auto_permute_sd=False, timeout=600)`
+Auto-fixes extracted port order to match the schematic when
+`auto_fix_ports=True` (the default). Netgen's `permute 1 3` rule already
+handles `nfet_03v3`/`pfet_03v3` D/S swapping natively — `auto_permute_sd`
+is a separate, optional Python-side permutation and is off by default.
+Returns `{match, report_path, log, summary}` where `summary` has
+`{match, device_mismatch, net_mismatch, port_swaps, missing_devices, message}`.
 
-### `run_lvs(gds_path, netlist_content/netlist_path, cell_name, workdir, auto_fix_ports=True, timeout=600)`
+`run_pex(gds_path, cell_name=None, mode=2, subcircuit=True, pex_name=None, workdir=None, permute_sd=False, timeout=600)`
+Returns `{pex_path, mode, log, summary}`.
 
-Auto-fixes extracted port order to match schematic. Netgen's `permute 1 3` rule
-is automatically added for nfet_03v3/pfet_03v3 D/S swapping.
+`extract_layout_netlist(gds_path, cell_name=None, workdir=None, timeout=300)`
+Extracts a SPICE netlist from GDS using Magic (no-RC / LVS mode).
+Returns `{netlist_path, raw_ports, log, success}`.
 
-Returns: `{match, report_path, log, summary}` where summary has:
-`{match, device_mismatch, net_mismatch, port_swaps, missing_devices, message}`
+`fix_port_order(extracted_path, correct_order, out_path=None)`
+Reorders an extracted netlist's ports to match a target order.
 
-### `run_pex(gds_path, cell_name, mode=2, subcircuit=True, workdir, timeout=600)`
+`check_tools()` / `validate_gds(gds_path, cell_name=None, min_size=100)`
+Environment and artifact sanity checks — call these first when a failure
+is ambiguous.
 
-Returns: `{pex_path, mode, log, summary}`
+## Outputs
 
-### `extract_layout_netlist(gds_path, cell_name, workdir, timeout=300)`
+- DRC: `summary` is `"DRC: CLEAN"` or `"DRC: N ERRORS"`.
+- LVS: `summary["message"]` is `"LVS OK"` or `"LVS MISMATCH"`.
+- PEX: `summary` is `"PEX: OK (C-coupled)"` or `"PEX: FAILED (...)"`.
 
-Extract SPICE netlist from GDS using Magic (no-RC / LVS mode).
+Report every field of the returned dict that is relevant, not just the
+top-line summary — `error_count`, `port_swaps`, and `missing_devices` are
+often what the user actually needs to act on.
 
-Returns: `{netlist_path, raw_ports, log, success}`
+## Failure Modes
 
-## Output Contract
+- `EnvironmentError` from `_check_env` — one or more of
+  `PDK_ROOT`/`PDK`/`PDKPATH` is unset. Report the missing variable(s); do
+  not invent a value.
+- Missing verification script (`iic-drc.sh`, `iic-lvs.sh`, `iic-pex.sh`
+  under `designs/notebooks/chipathon2026-D/scripts`) — report the exact
+  path that was expected.
+- `FileNotFoundError` for the GDS — confirm the path is repository-relative
+  or a valid absolute path before assuming a typo.
+- Auto net-merge for router-caused shorts (e.g. `net1<->net2`) is
+  **disabled** in `run_lvs` — the docstring still describes the intended
+  behavior, but the actual merge call is commented out in `core/checks.py`
+  because it was corrupting schematic netlists. Do not report LVS results
+  as if net-merge is active; a detected short must be investigated, not
+  silently normalized away.
+- Property errors on an otherwise-matching LVS run (W/L parameter
+  warnings) are acceptable and do not by themselves mean `match: False` —
+  check the `match` field itself, not just whether warnings are present.
 
-- DRC: `summary` is "DRC: CLEAN" or "DRC: N ERRORS"
-- LVS: `summary["message"]` is "LVS OK" or "LVS MISMATCH"
-- PEX: `summary` is "PEX: OK (C-coupled)" or "PEX: FAILED (...)"
+## PDK Body Constraint
 
-## Safety Rules
-
-- **MOSFET body: pfet_03v3→VDD ONLY, nfet_03v3→VSS ONLY**
-- Never claim verification success without actual tool output
-- PDK setup file must exist (auto-resolved with symlink fallback)
-- LVS net merge is DISABLED (was corrupting schematic netlists)
-- Property errors on LVS match are acceptable (W/L parameter warnings)
+**MOSFET body: `pfet_03v3` -> VDD ONLY, `nfet_03v3` -> VSS ONLY.** When
+interpreting LVS or PEX results, verify all body terminals in the source
+netlist connect exclusively to the correct supply rail before accepting a
+match as electrically sound.

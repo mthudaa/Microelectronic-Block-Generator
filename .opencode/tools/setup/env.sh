@@ -1,7 +1,7 @@
 #!/bin/bash
 # Custom IC Design Environment Setup
-# Source this file before using any skill: source pi-custom-mbg/common/env.sh
-# For first-time setup: bash pi-custom-mbg/setup/install_all.sh
+# Source this file before using any skill:  source .opencode/tools/setup/env.sh
+# For first-time setup:                     bash .opencode/tools/setup/install_all.sh
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 export MBG_DIR="$REPO_DIR"
@@ -13,18 +13,21 @@ export MBG_WORKDIR="${MBG_WORKDIR:-/tmp/mbg_workspace}"
 mkdir -p "$MBG_WORKDIR" 2>/dev/null
 echo "[MBG] Workdir: $MBG_WORKDIR"
 
-# ── Download latest core tools (if not present) ─────────
-if [ ! -d "$REPO_DIR/core" ]; then
-    echo "[MBG] Downloading core tools..."
-    if curl -sL --fail --connect-timeout 15 \
-        https://github.com/mthudaa/Microelectronic-Block-Generator/archive/refs/heads/main.tar.gz 2>/dev/null | \
-        tar -xzf - --strip-components=4 -C "$REPO_DIR" \
-        Microelectronic-Block-Generator-main/designs/notebooks/chipathon2026-D/core 2>/dev/null; then
-        echo "[MBG] Core tools installed to $REPO_DIR/core"
-    else
-        echo "[MBG] ⚠️  Download failed — using local core/ if available"
-        echo "       Manual install: cd $REPO_DIR && curl -sL <url> | tar -xzf - --strip-components=4 -C . <path>"
-    fi
+# ── Locate the canonical core package ──────────────────
+# The maintained Python engine lives in the repository itself. An earlier
+# version of this script downloaded core/ at runtime from a personal GitHub
+# fork, which is both a supply-chain risk and unnecessary inside a clone.
+_git_root="$(git -C "$REPO_DIR" rev-parse --show-toplevel 2>/dev/null)"
+if [ -z "$_git_root" ]; then
+    _git_root="$(cd "$REPO_DIR/../.." && pwd)"
+fi
+MBG_CORE_PARENT="$_git_root/src"
+if [ -f "$MBG_CORE_PARENT/mbg/pipeline.py" ]; then
+    export PYTHONPATH="$MBG_CORE_PARENT:$PYTHONPATH"
+    echo "[MBG] Core: $MBG_CORE_PARENT/mbg"
+else
+    echo "[MBG] ⚠️  Canonical package not found at $MBG_CORE_PARENT/mbg"
+    echo "       Run this from inside a clone of the repository."
 fi
 
 # Each skill has its own core/ copy — add to path
@@ -62,7 +65,7 @@ if [ -n "$_found_pdk" ]; then
     export STD_CELL_LIBRARY="${STD_CELL_LIBRARY:-gf180mcu_fd_sc_mcu7t5v0}"
     echo "[MBG] PDK:  $PDK ($PDKPATH)"
 else
-    export PDK_ROOT="${PDK_ROOT:-/home/huda/.volare}"
+    export PDK_ROOT="${PDK_ROOT:-$HOME/.volare}"
     export PDKPATH="${PDKPATH:-$PDK_ROOT/$PDK}"
     echo "[MBG] PDK:  $PDK NOT FOUND at $PDKPATH"
     echo "       Install with:"
