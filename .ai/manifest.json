@@ -373,6 +373,16 @@
         "claude": true,
         "codex": true
       }
+    },
+    "work_economically": {
+      "summary": "Work in this repository without exhausting the context window: resolve the repo from $MBG_ROOT, index before reading, never poll git state, and climb the verification ladder cheapest-first.",
+      "class": "READ-ONLY",
+      "skill": "mbg-context-economy",
+      "platforms": {
+        "opencode": true,
+        "claude": true,
+        "codex": true
+      }
     }
   },
   "workflows": {

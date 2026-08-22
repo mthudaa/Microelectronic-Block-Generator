@@ -69,6 +69,22 @@ and a `sync_agent_tools.py` run reaches the global install immediately. Codex
 caches its plugin at install time and needs `./install.sh --stage agents`
 re-run after a sync.
 
+## Context Economy
+
+How an agent gathers information in this repository decides whether it
+finishes the task. A measured Codex session spent 87% of a 1 MB conversation
+on tool output: one 1000-line script re-read 22 times (~89,000 tokens),
+`src/mbg/checks.py` re-read 9 times, git state polled 27+ times, and 33 KB
+spent searching `$HOME` for a repository already named by `$MBG_ROOT`.
+
+The rules are owned by the `mbg-context-economy` skill and are short enough
+to restate: resolve the repo from `$MBG_ROOT` rather than searching for it;
+index a module (`grep -n '^def '`, ~280 tokens) before reading it (~12,500
+tokens); read a span once; do not poll `git status`; run the cheapest check
+that can answer the question and read finished artifacts off disk instead of
+re-running the flow; cap command output. Reading less is the goal — checking
+less is not, and a check skipped for budget must be reported as not run.
+
 ## Core Utilities
 
 `src/mbg/` — the framework internals:

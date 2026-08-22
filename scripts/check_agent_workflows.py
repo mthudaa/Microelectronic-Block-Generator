@@ -41,6 +41,7 @@ PLATFORMS = {
         "knowledge": REPO / ".ai/knowledge/DESIGN_FLOW.md",
         "setup": REPO / ".ai/skills/mbg-setup/SKILL.md",
         "complexity": REPO / ".ai/skills/mbg-routing-debug/SKILL.md",
+        "economy": REPO / ".ai/skills/mbg-context-economy/SKILL.md",
     },
     "Claude Code": {
         "full_auto": REPO / ".claude/skills/mbg-full-auto/SKILL.md",
@@ -51,6 +52,7 @@ PLATFORMS = {
                       REPO / ".claude/commands/mbg-partial-automate.md"],
         "setup": REPO / ".claude/skills/mbg-setup/SKILL.md",
         "complexity": REPO / ".claude/skills/mbg-routing-debug/SKILL.md",
+        "economy": REPO / ".claude/skills/mbg-context-economy/SKILL.md",
     },
     "OpenCode": {
         "full_auto": REPO / ".opencode/skills/mbg-full-auto/SKILL.md",
@@ -61,6 +63,7 @@ PLATFORMS = {
                       REPO / ".opencode/commands/mbg-partial-automate.md"],
         "setup": REPO / ".opencode/skills/mbg-setup/SKILL.md",
         "complexity": REPO / ".opencode/skills/mbg-routing-debug/SKILL.md",
+        "economy": REPO / ".opencode/skills/mbg-context-economy/SKILL.md",
     },
     "Codex": {
         "full_auto": REPO / "plugins/mbg-analog/skills/mbg-full-auto/SKILL.md",
@@ -70,6 +73,7 @@ PLATFORMS = {
         "workflows": [],
         "setup": REPO / "plugins/mbg-analog/skills/mbg-setup/SKILL.md",
         "complexity": REPO / "plugins/mbg-analog/skills/mbg-routing-debug/SKILL.md",
+        "economy": REPO / "plugins/mbg-analog/skills/mbg-context-economy/SKILL.md",
     },
 }
 
@@ -190,6 +194,28 @@ COMPLEXITY_REQUIRED = {
     "measure, do not assume": r"measure|do not (reach|assume)|not.{0,30}device count",
 }
 
+#: The context-economy skill must carry the concrete discipline, not a vague
+#: "be efficient". This exists because a measured Codex session in this
+#: repository spent 87% of a 1 MB conversation on tool output — one 1000-line
+#: script re-read 22 times, git state polled 27+ times, and 33 KB spent
+#: searching $HOME for a repository whose path was already in $MBG_ROOT.
+#: Advice that does not name the habit does not change it, so each concept
+#: below is a specific behaviour an agent can check itself against.
+ECONOMY_REQUIRED = {
+    "measured evidence":      r"\b87%|1,?065 ?KB|22 times|27\+? times",
+    "resolve repo from env":  r"MBG_ROOT",
+    "never search HOME":      r"(never search|do not (search|crawl)|hunting for)",
+    "index before reading":   r"[Ii]ndex before|grep -n .\^def|structural question",
+    "do not re-read":         r"[Rr]e-?read only|already in (your )?context|does not refresh",
+    "do not poll state":      r"[Dd]o not poll|git status.{0,40}(twice|once)|State does not change",
+    "verification ladder":    r"cheapest[- ]first|ladder",
+    "internal check gates":   r"internal connectivity.{0,60}(gate|before)|gates the expensive",
+    "reuse artifacts":        r"artifacts are on disk|from disk instead of|already wrote",
+    "cap command output":     r"\| head -|\| tail -|[Cc]ap anything",
+    "delegate bulk reading":  r"sub-?agent",
+    "economy is not skipping checks": r"([Rr]eading less|verifying less|checking\s+less is not|never about not checking)",
+}
+
 # Generic names that must never be OFFERED as MBG commands. A line that
 # forbids a name necessarily contains it, so prohibitions are exempt —
 # otherwise the documentation telling agents not to use /full-auto would
@@ -263,7 +289,9 @@ def main() -> int:
                                      ("verify", VERIFY_REQUIRED, "verification skill"),
                                      ("setup", SETUP_REQUIRED, "setup skill"),
                                      ("complexity", COMPLEXITY_REQUIRED,
-                                      "complexity / routing-debug skill")):
+                                      "complexity / routing-debug skill"),
+                                     ("economy", ECONOMY_REQUIRED,
+                                      "context-economy skill")):
             doc = spec.get(key)
             if doc is None:
                 continue

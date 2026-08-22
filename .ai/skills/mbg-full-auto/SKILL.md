@@ -12,6 +12,18 @@ platforms: [opencode, claude, codex]
 Canonical definitions: `.ai/knowledge/FULL_AUTOMATE.md` and
 `.ai/knowledge/DESIGN_FLOW.md`. Read them before deviating.
 
+## Before you read anything: context economy
+
+This repository is big enough that *how* you gather information decides
+whether you finish. A measured session here spent **87% of a 1 MB
+conversation on tool output** — one file re-read 22 times, `git status`
+polled 27+ times, and 33 KB spent searching `$HOME` for a repo whose path
+was already in `$MBG_ROOT`. Read `mbg-context-economy` first. The short
+version: resolve the repo from `$MBG_ROOT`, index a file before opening it,
+never re-read what is already in context, do not poll git state, and climb
+the verification ladder cheapest-first. Reading less is the goal; **checking
+less is not**.
+
 ## Command
 
 ```text

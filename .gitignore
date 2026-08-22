@@ -82,3 +82,4 @@ src/*.egg-info/
 # Built under $MBG_TOOLS_ROOT (default ~/.local/mbg-tools); never in-tree.
 /tools/
 .mbg-env.sh
+AI-Generated-Design-Result/

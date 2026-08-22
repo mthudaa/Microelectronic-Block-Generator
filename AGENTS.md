@@ -77,6 +77,30 @@ Relevant files:
 Do not modify another member's implementation merely to complete an AI or
 documentation task. Record the requirement as a dependency or reviewer issue.
 
+## Context Economy
+
+How you gather information here decides whether you finish. A measured
+session in this repository spent **87% of a 1 MB conversation on tool
+output** — one 1000-line file re-read 22 times, `git status` polled 27+
+times, and 33 KB spent searching `$HOME` for a repo already named by
+`$MBG_ROOT`.
+
+* Resolve the repository from `$MBG_ROOT`. Never search `$HOME` for it.
+* Index a module before reading it — `grep -n '^def \|^class '` costs about
+  280 tokens against 12,500 for `src/mbg/checks.py`.
+* A file you have read is already in context. Re-read only after editing it,
+  or when a tool contradicts what you have.
+* `git status` twice per task — once before editing, once before committing.
+  Not between every command.
+* Run the cheapest check that answers the question, and read finished
+  artifacts off disk rather than re-running the flow to inspect one stage.
+* Cap command output (`| head`, `| tail`, `grep -c`); put bulk reading in a
+  sub-agent where the platform has one.
+
+Reading less is the goal. **Checking less is not** — if you skip a check to
+save budget, say that it did not run rather than implying it passed. Full
+rules: the `mbg-context-economy` skill.
+
 ## Development Environment
 
 The repository is stored in WSL. EDA tools and the GF180MCU PDK run inside the
