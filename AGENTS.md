@@ -127,17 +127,35 @@ NEVER call individual placement, power, or routing functions manually.
 
 Since v0.2 this entry point drives the DesignContext flow (analog-aware
 placement plus the DRC-aware grid router with internal connectivity
-verification). On the four reference blocks the previous shape-router path
-passed 0/4 — it could not label top-level pins correctly and failed LVS pin
-matching — while the current path passes 4/4 with DRC clean, LVS match and
-zero opens or shorts. Pass `legacy=True`, or call
+verification). The previous shape-router path could not label top-level pins
+correctly and failed LVS pin matching on every reference block; the current
+path passes all eight designs in `tests/netlists/` on all four legs — Magic
+DRC clean, KLayout sign-off PASS, LVS match, and zero opens, shorts or
+missing access points. Pass `legacy=True`, or call
 `spice_to_gds_with_checks_legacy(...)`, to run the old implementation:
 
 ```python
 from mbg.pipeline import spice_to_gds_with_checks
 r = spice_to_gds_with_checks(netlist)
-# r["outdir"], r["gds_path"], r["drc"], r["lvs"], r["pex"], r["all_pass"]
+# r["outdir"], r["gds_path"], r["drc"], r["drc_signoff"], r["lvs"],
+# r["pex"], r["verification"], r["metrics"], r["all_pass"]
 ```
+
+`all_pass` is all four legs, not a DRC summary: Magic clean AND
+`drc_signoff["verdict"] == "PASS"` AND LVS match AND
+`verification["clean"]`. A KLayout engine that did not run counts as a
+failure — silence from a checker is not a pass.
+
+## ⚠️ Complexity
+
+The tested ceiling is 12 MOS / 11 nets / max net degree 16, flat (single
+`.subckt`). Device count does not predict difficulty: the 11-MOS StrongArm
+comparator and the 12-MOS clocked comparator have the same maximum net
+degree, and only the latter exposed a boundary — device-size heterogeneity
+did, not size. Read `tests/test_complexity_ladder.py` for the metrics before
+attributing a failure to circuit size. Nested `.subckt` are parsed but NOT
+flattened; `.param` is not expanded. Do not claim support above what the
+regression demonstrates.
 
 ## ⚠️ Tapeout Gate
 
@@ -145,10 +163,14 @@ r = spice_to_gds_with_checks(netlist)
 |------|-------------|
 | DRC | Magic DRC zero violations (≤100 with note acceptable) |
 | LVS | Netgen LVS: netlist matches layout |
-| PEX | Parasitic extraction complete |
-| Post-layout | Matches pre-layout within 10% tolerance |
+| PEX extraction | Parasitic netlist produced |
+| PEX simulation | Extracted netlist simulated successfully |
+| PEX specifications | Post-layout results meet the target specifications |
 
-A design passing DRC+LVS+PEX = **ready for tapeout**.
+A design passing DRC + LVS + PEX **extraction** is verified, not finished.
+Ready for tapeout means the *extracted* design meets its specifications —
+see `.ai/knowledge/DESIGN_FLOW.md`. PEX is feedback into a second
+optimisation loop, not a final stamp.
 
 ## ⚠️ LVS Notes
 
@@ -263,13 +285,13 @@ opencode.jsonc            OpenCode permissions
 First-time setup on a new machine, for any of the three agents:
 
 ```bash
-./scripts/install_agents.sh          # add --check to inspect without changing anything
+./install.sh --stage agents          # add --check to inspect without changing anything
 ```
 
 OpenCode and Claude Code read this repository directly and need no
 registration. Codex has no repo-scoped skills, so its plugin is registered
 once per machine; because Codex caches the plugin at install time, re-run
-`./scripts/install_agents.sh --only codex` after a sync to refresh it.
+`./install.sh --stage agents` after a sync to refresh it.
 
 To add or change a capability:
 

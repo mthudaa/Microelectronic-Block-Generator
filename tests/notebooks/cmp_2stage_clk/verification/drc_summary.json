@@ -1,0 +1,38 @@
+{
+  "verdict": "PASS",
+  "reason": "all configured DRC engines report clean",
+  "primary": "klayout",
+  "gds_sha256": "79d13e584f7b883c",
+  "results": [
+    {
+      "engine": "magic",
+      "status": "CLEAN",
+      "violations": 0,
+      "rules": {},
+      "report_path": "/home/huda/opensource-project/Microelectronic-Block-Generator/tests/notebooks/cmp_2stage_clk/verification/cmp_2stage_clk.magic.drc.rpt",
+      "log_path": "/home/huda/opensource-project/Microelectronic-Block-Generator/tests/notebooks/cmp_2stage_clk/verification/logs/magic_drc.log",
+      "tool": "/usr/local/bin/magic",
+      "tool_version": "8.3.669",
+      "deck": "/home/huda/.volare/gf180mcuD/libs.tech/magic/gf180mcuD.tech",
+      "gds": "/home/huda/opensource-project/Microelectronic-Block-Generator/tests/notebooks/cmp_2stage_clk/cmp_2stage_clk.gds",
+      "gds_sha256": "79d13e584f7b883c",
+      "elapsed": 1.265,
+      "message": ""
+    },
+    {
+      "engine": "klayout",
+      "status": "CLEAN",
+      "violations": 0,
+      "rules": {},
+      "report_path": "/home/huda/opensource-project/Microelectronic-Block-Generator/tests/notebooks/cmp_2stage_clk/verification/cmp_2stage_clk.klayout.lyrdb",
+      "log_path": "/home/huda/opensource-project/Microelectronic-Block-Generator/tests/notebooks/cmp_2stage_clk/verification/logs/klayout_drc.log",
+      "tool": "/nix/store/dljmpck53kb6zxhvd73b688286b0kwkn-klayout-0.30.9/bin/klayout",
+      "tool_version": "0.30.9",
+      "deck": "/home/huda/.volare/gf180mcuD/libs.tech/klayout/tech/drc/gf180mcu.drc",
+      "gds": "/home/huda/opensource-project/Microelectronic-Block-Generator/tests/notebooks/cmp_2stage_clk/cmp_2stage_clk.gds",
+      "gds_sha256": "79d13e584f7b883c",
+      "elapsed": 12.297,
+      "message": ""
+    }
+  ]
+}

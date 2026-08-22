@@ -1,0 +1,13 @@
+* 5T-OTA.
+*
+* Classic five-transistor OTA: differential pair, current-mirror
+* load, tail current source.
+* complexity: 5 MOS, 6 nets, max net degree 9
+.lib "{PDK_LIB}" typical
+.subckt ota_5t vdd vss inn inp out
+XM1 tail inn out1 vss nfet_03v3 L=1u W=2u nf=1
+XM2 out inp tail vss nfet_03v3 L=1u W=2u nf=1
+XM3 out1 out1 vdd vdd pfet_03v3 L=1u W=4u nf=1
+XM4 out out1 vdd vdd pfet_03v3 L=1u W=4u nf=1
+XM5 tail bias vss vss nfet_03v3 L=1u W=2u nf=1
+.ends

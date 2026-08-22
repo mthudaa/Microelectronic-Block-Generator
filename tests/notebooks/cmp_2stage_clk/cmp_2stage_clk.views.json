@@ -1,0 +1,42 @@
+{
+  "cell": "cmp_2stage_clk",
+  "files": {
+    "drc_report": "cmp_2stage_clk.magic.drc.rpt",
+    "extracted_spice": "cmp_2stage_clk_extracted.spice",
+    "gds": "cmp_2stage_clk.gds",
+    "lef": "cmp_2stage_clk.lef",
+    "lib": "cmp_2stage_clk.lib",
+    "lvs_report": "cmp_2stage_clk.lvs.out",
+    "pex_spice": "cmp_2stage_clk.pex.spice",
+    "sch_spice": "cmp_2stage_clk.spice",
+    "svg": "cmp_2stage_clk.svg",
+    "verilog": "cmp_2stage_clk.v"
+  },
+  "notes": [],
+  "ports": [
+    {
+      "direction": "power",
+      "name": "vdd"
+    },
+    {
+      "direction": "ground",
+      "name": "vss"
+    },
+    {
+      "direction": "inout",
+      "name": "inp"
+    },
+    {
+      "direction": "inout",
+      "name": "inm"
+    },
+    {
+      "direction": "inout",
+      "name": "clk"
+    },
+    {
+      "direction": "inout",
+      "name": "out"
+    }
+  ]
+}

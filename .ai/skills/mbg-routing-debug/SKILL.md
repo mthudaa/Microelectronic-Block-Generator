@@ -14,16 +14,17 @@ platforms: [opencode, claude, codex]
 Diagnose routing failures and internal connectivity problems using the
 `DesignContext` grid router in
 `src/mbg/router.py` and the connectivity
-checker in `core/connectivity.py`. Read both files before relying on any
+checker in `src/mbg/connectivity.py`. Read both files before relying on any
 claim below — this is a map for orienting a debugging session, not a
 substitute for the current source.
 
-Note: `core/router.py` is the newer of two routing implementations (see
-`mbg-repo-analysis`). `core/routing.py`'s `auto_router` — a fixed I/L/Z/U
-shape-catalogue router — is what the currently-used design-script path
-(`spice_to_gds` / `spice_to_gds_with_checks`) actually calls; confirm which
-path produced the routing you are debugging before applying this skill's
-findings, since the two engines have different failure models entirely.
+Note: there are two routing implementations. `src/mbg/router.py` — the
+DesignContext grid router this skill describes — is what
+`spice_to_gds_with_checks()` drives by default. `src/mbg/routing.py`'s
+`auto_router`, a fixed I/L/Z/U shape-catalogue router, runs only when the
+caller passes `legacy=True` or calls `spice_to_gds_with_checks_legacy()`.
+The two have unrelated failure models, so confirm which one produced the
+layout you are debugging before applying anything below.
 
 ## When to Use
 
@@ -44,7 +45,7 @@ findings, since the two engines have different failure models entirely.
   `mbg.connectivity.verify` is a fast *internal* check that signoff then
   confirms, not a replacement for it.
 - Changing router weights or algorithm behavior — this skill explains, it
-  does not modify `core/router.py` (owned by Huda).
+  does not modify `src/mbg/router.py` (owned by Huda).
 
 ## Required Inputs
 
@@ -113,12 +114,12 @@ sweep.
 ### 5. Detecting shorts and opens with `mbg.connectivity.verify`
 
 ```python
-from core import connectivity
+from mbg import connectivity
 
 result = connectivity.verify(ctx, stage="routing", spacing=True, vias=True)
-# result: {opens, shorts, anonymous, drc, clean,
-#          open_details, short_details, drc_details}
-consistency = connectivity.compare_with_netlist(ctx)
+# result: {opens, shorts, anonymous, drc, missing_access, clean,
+#          open_details, short_details, drc_details,
+#          missing_access_details, netlist_consistency}
 ```
 
 - **Opens** (`check_opens`) — a net whose committed geometry does not form
@@ -129,13 +130,22 @@ consistency = connectivity.compare_with_netlist(ctx)
   regardless of declared net).
 - **Anonymous geometry** (`check_anonymous_geometry`) — any segment or via
   with no net owner; always a bug, never expected.
+- **Missing access points** (`compare_with_netlist`, folded into `verify()`)
+  — a SPICE terminal the layout never gave a `PinAccessPoint` to. It produces
+  no shape, so it joins no cluster, so `check_opens` cannot see it: opens can
+  read 0 while a device terminal is entirely unconnected. `verify()` counts
+  it and `clean` is False when it is non-zero. Report `missing_access`
+  alongside opens and shorts; a "0 opens" claim without it is incomplete.
 - `verify()` also records every finding onto `ctx` via `ctx.add_violation`
   so a later pass can see accumulated violations, not just this call's
   return value.
 
-This is a fast internal check, not a substitute for Magic/netgen signoff —
-route `ctx` through `mbg-ic-verify` for the authoritative DRC/LVS result
-once internal `verify()` is clean.
+This is a fast internal check, not a substitute for signoff — route `ctx`
+through `mbg-ic-verify` for the authoritative result, which is dual-engine:
+KLayout running the GF180 foundry deck is the DRC sign-off authority, Magic
+is the independent complementary check, and netgen does LVS. A clean
+internal `verify()` is a precondition for spending time on those tools, not
+a substitute for them; equally, never report DRC from Magic alone.
 
 ### 6. The overlap-or-clear rule — same-net proximity is NOT automatically DRC-clean
 
@@ -154,6 +164,71 @@ obstacle harvesting (see `mbg-placement-debug`'s note on
 metal is deliberately left unattributed rather than guessed). Always cross-
 check a same-net "clean" result against `check_shorts`' cluster analysis
 rather than assuming same-net proximity alone proves correctness.
+
+### 7. Complexity: what changes as circuits get larger
+
+The framework's first hard complexity boundary was found with a 12-MOS
+two-stage clocked comparator (`tests/netlists/cmp_2stage_clk.spice`). The
+lessons generalise, and the mechanisms below are the ones to check first
+when a bigger circuit misbehaves.
+
+**Device count and net degree do not predict difficulty.** The 11-MOS
+StrongArm comparator has the same maximum net degree — 12 device terminals
+on `vdd`, 16 counting the power-rail taps — as the 12-MOS clocked comparator
+that failed, and it passed throughout. What separated them was device
+GEOMETRY: every other reference block uses one or two distinct (W, L) pairs,
+while the clocked comparator uses seven across twelve devices. Heterogeneous
+sizing produces heterogeneous tap rings and row heights, and it was that
+placement in which some `body` terminals could find no legal via landing.
+Do not reach for "too many devices" as an explanation; measure.
+
+**Multi-terminal nets are the normal case, not the exception.** A supply net
+gains a terminal per device, so `vdd` on a 12-MOS block is a 16-terminal net
+before the power-rail taps are counted. `route_net()` grows a Steiner-like
+tree: it seeds from one terminal group and attaches each remaining group to
+the nearest point already on the tree, so the net ends as ONE connected
+conductor rather than a bundle of independent point-to-point routes that
+could overlap each other. `terminal_groups(net)` is what enumerates them;
+one logical terminal contributes one group, not one per N/E/S/W port.
+
+**A net is no longer all-or-nothing.** `route_net()` returns
+`(plan, failure)` and BOTH may be set. A terminal that cannot be reached —
+whether it has no legal via landing or the A* search is blocked — leaves the
+rest of the net routed, the net marked `complete=False`, and the failure
+recorded. Before this, one unreachable terminal discarded every terminal of
+the net, so the blast radius scaled with net degree, which is what scales
+with circuit size. When debugging, check `RoutePlan.partial`: real geometry
+with `complete=False` means a partial route, not a clean one.
+
+**Same-net proximity has a precise rule, not a blanket one.** See §6 for the
+general statement. The refinement that matters at scale: metal that
+OVERLAPS a same-net shape merges with it, and a near-miss against another
+same-net shape is legal only when the facing slot between them is covered by
+same-net metal the new shape merges with (`router._rects_cover`). A gLayout
+tap ring arrives as a wide band plus the contact pads it contains, so an
+escape drawn on the band is within min-spacing of pads the band itself
+encloses — no gap exists after the boolean merge, and rejecting it strands
+every `body` terminal on the device. A slot nothing fills is still a
+violation.
+
+**Widths and pitch are per-layer.** `width_for(net)` is chosen before a path
+exists and returns the ACCESS layer's width for the whole net;
+`_emit_segment` raises each segment to its own layer's minimum. GF180's top
+metal is the one that differs (MT.1 = 0.44um against 0.28um for met2-met4),
+so a net routed at the access width and sent over met5 is a guaranteed width
+violation. The grid pitch is likewise per-layer, and comes from
+`grid_params()` — which `GridRouter` and `power.py` both use, so the rails
+and the routes are on one grid.
+
+**Notch fills cover net-owned metal, not just routes.** Power-rail via drops
+and device tap metal are net-owned obstacles, never segments.
+`_same_net_notch_fills` pairs each segment against its own net's obstacle
+metal as well as against other segments, and refuses any fill that would
+overlap another net.
+
+Useful complexity metrics, and the ladder that reports them, live in
+`tests/test_complexity_ladder.py`. Run it for the structural table before
+theorising about why a design is hard.
 
 ## Outputs
 
@@ -179,7 +254,14 @@ rather than assuming same-net proximity alone proves correctness.
   final result from `GridRouter.run()`.
 - Confusing this skill's fast internal `connectivity.verify()` with actual
   DRC/LVS signoff — always route final claims through `mbg-ic-verify`.
-- Applying findings from the DesignContext router (`core/router.py`) to a
+- Applying findings from the DesignContext router (`src/mbg/router.py`) to a
   layout that was actually produced by the legacy shape router
-  (`core/routing.py`'s `auto_router`) — the two have unrelated failure
-  models; confirm which one ran first (`mbg-repo-analysis`).
+  (`src/mbg/routing.py`'s `auto_router`, reached only via `legacy=True`) —
+  the two have unrelated failure models; confirm which one ran
+  (`mbg-repo-analysis`).
+- Reporting internal connectivity as clean from `opens` and `shorts` alone.
+  A terminal with no access point is invisible to both; read
+  `missing_access` too.
+- Explaining a failure on a larger circuit by device count. Check the
+  structural metrics first — the known boundary was triggered by device-size
+  heterogeneity, not by size.

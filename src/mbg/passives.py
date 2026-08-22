@@ -53,7 +53,10 @@ _CONT_WINDOW = 0.44      # PRES.7 upper bound (res_no_cont)
 _POLY_ENC = 0.07         # CO.3, poly overlap of contact >= 0.065
 _M1_ENC = 0.10           # M1.3 minimum metal1 area
 _PPLUS_SUR = 0.30        # PPLUS surround of rpp (tech comment, line ~749)
-_SAB_OVER = 0.20         # SAB/RES_MK wider than the poly it defines
+# PRES.6: minimum salicide-block overlap of the Poly2 resistor in the width
+# direction is 0.28 um. This was 0.20; Magic's techfile does not implement
+# the rule, so only the KLayout foundry deck caught it.
+_SAB_OVER = 0.28
 
 
 def poly_resistor(width: float = 1.0, length: float = 4.0) -> gf.Component:
@@ -112,8 +115,13 @@ CAP_MIN_SIZE = 5.00      # width *mimcap 5000 (MIMTM.8a)
 _M4_SUR = 0.60           # surround *mimcap m4 600  (MIMTM.3)
 _MIM_KEEPOUT = 1.20      # mim_bottom_plate_space: unrelated m4 must clear 1.2
 _VIA_SUR = 0.39          # surround mimcc mimcap 390
-_VIA_SIZE = 0.28         # width mimcapc/m5 280
-_VIA_SPACE = 0.36
+# V4.1: via4 is a fixed 0.26 um cut. The 0.28 used before came from
+# `width mimcapc/m5 280` in the Magic techfile, which is the *metal* width,
+# not the cut size — a misreading worth 200 violations per capacitor.
+_VIA_SIZE = 0.26
+# MIMTM.9: via spacing for the sea-of-vias on a MIM top plate is 0.5 um,
+# not the 0.36 um general via spacing.
+_VIA_SPACE = 0.50
 _VIA3_SIZE = 0.26        # VIA3 squares-grid 10 260 260
 _CAPDEF_G = 0.20         # cifoutput grows CAPDEF 200 beyond the plate
 _M5_MIN_W = 0.44         # width *m5 440 (MT.1)

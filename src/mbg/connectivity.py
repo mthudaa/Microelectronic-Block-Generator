@@ -316,6 +316,15 @@ def verify(ctx, stage: str = "routing", spacing: bool = True,
     if vias:
         drc += check_via_legality(ctx, stage)
 
+    # A terminal the layout never gave an access point to is invisible to the
+    # checks above: it produces no shape, so it joins no cluster, so no open
+    # is ever reported for it. compare_with_netlist is what sees that class,
+    # and its verdict used to be computed, printed, and then ignored — leaving
+    # a completely unconnected device terminal able to pass a "clean" internal
+    # check and reach external LVS as the first thing that notices.
+    consistency = compare_with_netlist(ctx)
+    missing = list(consistency["missing_access"])
+
     for v in opens + shorts + anon:
         ctx.add_violation(v)
     for d in drc:
@@ -326,10 +335,13 @@ def verify(ctx, stage: str = "routing", spacing: bool = True,
         "shorts": len(shorts),
         "anonymous": len(anon),
         "drc": len(drc),
-        "clean": not (opens or shorts or anon or drc),
+        "missing_access": len(missing),
+        "clean": not (opens or shorts or anon or drc or missing),
         "open_details": [v.detail for v in opens],
         "short_details": [v.detail for v in shorts],
         "drc_details": [f"{d.rule}: {d.detail}" for d in drc[:20]],
+        "missing_access_details": missing[:20],
+        "netlist_consistency": consistency,
     }
     return result
 

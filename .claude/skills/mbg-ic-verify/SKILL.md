@@ -6,6 +6,26 @@ description: Runs DRC, LVS, and PEX physical verification for GDSII layouts usin
 
 # MBG IC Layout Verification (DRC / LVS / PEX)
 
+## DRC is dual-engine — Magic *and* KLayout
+
+```python
+from mbg.drc import run_dual_drc
+s = run_dual_drc(gds_path, cell_name, workdir)
+s.verdict     # PASS | FAIL | DRC_DISAGREEMENT | ERROR | CONFIGURATION_FAILURE
+print(s.report())
+```
+
+**KLayout is the sign-off authority** — it runs the GF180 foundry deck from
+`$PDKPATH/libs.tech/klayout/tech/drc/gf180mcu.drc`. **Magic is the
+independent complementary check.** Both must be clean and must agree.
+
+Never report DRC from Magic alone. Never treat a KLayout run that produced no
+database as clean — the deck exits 0 by design, so the `.lyrdb` is the only
+verdict. A `DRC_DISAGREEMENT` is a result to investigate, not a pass.
+
+Cell-level runs exclude die-level density/fill rules (`decks=all,-density`);
+an assembled die uses `decks=all`.
+
 ## Purpose
 
 Run physical verification checks on GDSII layouts: Design Rule Check (DRC),

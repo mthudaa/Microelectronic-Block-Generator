@@ -31,6 +31,44 @@ regression evidence.
 - Device instance prefix is `XM1` (not `M1`); prefer `nf=N` (fingers) over
   `m=N` (multipliers) for matching and compactness.
 
+## Installed Environment
+
+MBG installs with one script, `./install.sh`, in six stages: `python`, `pdk`,
+`eda`, `shell`, `agents`, `global`. No Docker and no root are required; the
+only step that asks for sudo is `--deps --yes`, for OS build packages.
+
+Everything it creates lives in three directories, all overridable, none
+hard-coded to a particular user:
+
+| Variable | Default | Holds |
+| :--- | :--- | :--- |
+| `MBG_VENV` | `<repo>/.venv` | the Python environment |
+| `MBG_TOOLS_ROOT` | `$HOME/.local/mbg-tools` | Magic, netgen, KLayout builds |
+| `MBG_HOME` | `$HOME/.mbg` | `activate.sh`, `bin/mbg`, `bin/mbg-python` |
+
+The `shell` stage writes `$MBG_HOME/activate.sh` and adds one idempotent block
+to the user's rc file, so a new shell already has `MBG_HOME`, `MBG_ROOT`,
+`MBG_VENV`, the four GF180 variables, and each EDA tool pinned by **absolute
+path** in `MBG_MAGIC`, `MBG_NETGEN`, `MBG_KLAYOUT` and `MBG_NGSPICE`. Every
+assignment defers to a value the user already exported.
+
+Pinning by absolute path is load-bearing: several distributions ship no
+`klayout` package, so the working binary often lives somewhere `PATH` never
+looks — and without KLayout there is no foundry-deck DRC and no sign-off.
+
+The virtualenv is deliberately **not** activated by the rc file. `$MBG_HOME/bin`
+goes on `PATH` instead, with launchers that name MBG's interpreter explicitly:
+`mbg check`, `mbg version`, `mbg python <script>`, `mbg shell`, `mbg-python`.
+
+Inside the clone, `source scripts/activate_mbg.sh` delegates to
+`$MBG_HOME/activate.sh` and then activates the venv.
+
+The `global` stage symlinks the `mbg-*` skills and commands into
+`~/.claude/` and `~/.config/opencode/`, so `/mbg-*` works from any directory
+and a `sync_agent_tools.py` run reaches the global install immediately. Codex
+caches its plugin at install time and needs `./install.sh --stage agents`
+re-run after a sync.
+
 ## Core Utilities
 
 `src/mbg/` — the framework internals:

@@ -224,14 +224,31 @@ project's single supported pipeline entry point.
 | `drc` | DRC result dict from `run_drc` |
 | `lvs` | LVS result dict from `run_lvs` |
 | `pex` | PEX result dict from `run_pex` |
-| `all_pass` | `True` only if DRC clean AND LVS match AND PEX produced output |
+| `drc_signoff` | Dual-engine verdict from `run_dual_drc` — Magic AND KLayout |
+| `verification` | Internal connectivity: `opens`, `shorts`, `missing_access`, `clean` |
+| `metrics` | `routing_summary()`: routed/total nets, wire length, vias, congestion |
+| `context` | The `DesignContext` the layout was built from |
+| `all_pass` | All four legs: Magic DRC clean AND `drc_signoff["verdict"] == "PASS"` AND LVS match AND internal connectivity clean |
 
-For a from-scratch inspection of the same flow through the newer
-`DesignContext`-based path (`spice_to_gds_ctx` /
-`spice_to_gds_with_checks_ctx` in `core/pipeline.py`), see
-`mbg-repo-analysis` — that path returns `component`, `context`,
-`verification`, and `metrics` instead of a checks dict, and is not what
-`spice_to_gds_with_checks` calls internally today.
+`all_pass` is the whole gate, not a DRC summary. Two things it deliberately
+includes:
+
+* **The KLayout sign-off verdict, not Magic alone.** KLayout runs the GF180
+  foundry deck and is the sign-off authority (see `mbg-ic-verify`); Magic is
+  the independent complementary check. `all_pass` once read `drc["clean"]`
+  only, so a design KLayout had FAILED — or never checked, because it was
+  not configured — could still report `all_pass=True`. `NOT_CONFIGURED`
+  counts as a failure on purpose: an engine that did not run has not agreed
+  to anything.
+* **Internal connectivity**, including `missing_access` — a SPICE terminal
+  the layout never gave an access point to. It produces no geometry, so
+  `opens` cannot see it; without this leg an unconnected device terminal
+  could reach external LVS as the first thing that noticed.
+
+Since v0.2 this entry point drives the `DesignContext` path
+(`spice_to_gds_with_checks_ctx` in `src/mbg/pipeline.py`). The original
+shape-router path is reached only with `legacy=True` or via
+`spice_to_gds_with_checks_legacy()`.
 
 ## Failure Modes
 
@@ -239,8 +256,11 @@ For a from-scratch inspection of the same flow through the newer
   starts; do not silently set a personal fallback path.
 - Netlist has no `.subckt` or zero parsed components — the pipeline raises
   `ValueError` before layout starts.
-- `drc["clean"]` is `False`, `lvs["match"]` is `False`, or `pex["pex_path"]`
-  is `None` — report each stage's own `summary` field verbatim; do not
-  claim `all_pass` when the dict says otherwise.
+- `drc["clean"]` is `False`, `drc_signoff["verdict"]` is not `PASS`,
+  `lvs["match"]` is `False`, `verification["clean"]` is `False`, or
+  `pex["pex_path"]` is `None` — report each stage's own `summary`/`reason`
+  field verbatim; do not claim `all_pass` when the dict says otherwise, and
+  do not report a Magic-clean result as "DRC clean" without the sign-off
+  verdict beside it.
 - Floating/unrouted internal nets — inspect with `mbg-routing-debug`
   (`mbg.connectivity.verify`) rather than guessing from the SVG preview.

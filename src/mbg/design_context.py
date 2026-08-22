@@ -44,6 +44,11 @@ class BoundingBox:
     def contains_point(self, x: float, y: float) -> bool:
         return self.xmin <= x <= self.xmax and self.ymin <= y <= self.ymax
 
+    def contains_box(self, other: "BoundingBox", tol: float = 1e-9) -> bool:
+        """Is ``other`` entirely inside this box (within ``tol``)?"""
+        return (self.xmin <= other.xmin + tol and self.ymin <= other.ymin + tol
+                and self.xmax >= other.xmax - tol and self.ymax >= other.ymax - tol)
+
     @property
     def width(self) -> float:
         return self.xmax - self.xmin
@@ -242,6 +247,10 @@ class RoutePlan:
     vias: List[Via] = field(default_factory=list)
     detour_factor: float = 1.0
     manhattan_min: float = 0.0
+    #: True when some terminals of the net could not be reached, so the
+    #: geometry below is real but does not connect the whole net. A partial
+    #: plan is never marked ``complete`` on the context.
+    partial: bool = False
 
     def wire_length(self) -> float:
         return sum(s.length() for s in self.segments)

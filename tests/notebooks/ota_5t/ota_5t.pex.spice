@@ -1,44 +1,44 @@
-* PEX produced on Fri Aug 21 03:47:34 AM CST 2026 using /home/huda/opensource-project/Microelectronic-Block-Generator/designs/notebooks/chipathon2026-D/scripts/iic-pex.sh with m=2 and s=1
+* PEX produced on Sat Aug 22 07:46:46 PM CST 2026 using /home/huda/opensource-project/Microelectronic-Block-Generator/designs/notebooks/chipathon2026-D/scripts/iic-pex.sh with m=2 and s=1
 * NGSPICE file created from ota_5t.ext - technology: gf180mcuD
 
 .option scale=5n
 
 .subckt ota_5t vb out inm inp vss vdd
-X0 vdd a_n3006_4433# out vdd pfet_03v3 ad=24n pd=0.64m as=11.2n ps=0.312m w=200 l=200
-X1 vdd a_n3006_4433# a_n3006_4433# vdd pfet_03v3 ad=11.2n pd=0.312m as=11.2n ps=0.312m w=200 l=200
-X2 vss vb w_n4092_3504# vss nfet_03v3 ad=24n pd=0.64m as=11.2n ps=0.312m w=200 l=200
-X3 vdd a_n3006_4433# out vdd pfet_03v3 ad=11.2n pd=0.312m as=11.2n ps=0.312m w=200 l=200
-X4 w_n4092_3504# inm out w_n4092_3504# nfet_03v3 ad=11.2n pd=0.312m as=11.2n ps=0.312m w=200 l=200
-X5 w_n4092_3504# inm out w_n4092_3504# nfet_03v3 ad=24n pd=0.64m as=11.2n ps=0.312m w=200 l=200
-X6 vss vb w_n4092_3504# vss nfet_03v3 ad=11.2n pd=0.312m as=11.2n ps=0.312m w=200 l=200
-X7 w_n4092_3504# inp a_n3006_4433# w_n4092_3504# nfet_03v3 ad=24n pd=0.64m as=11.2n ps=0.312m w=200 l=200
-X8 w_n4092_3504# vb vss vss nfet_03v3 ad=11.2n pd=0.312m as=11.2n ps=0.312m w=200 l=200
-X9 vdd a_n3006_4433# a_n3006_4433# vdd pfet_03v3 ad=24n pd=0.64m as=11.2n ps=0.312m w=200 l=200
-X10 w_n4092_3504# vb vss vss nfet_03v3 ad=11.2n pd=0.312m as=24n ps=0.64m w=200 l=200
-X11 w_n4092_3504# inp a_n3006_4433# w_n4092_3504# nfet_03v3 ad=11.2n pd=0.312m as=11.2n ps=0.312m w=200 l=200
-X12 out a_n3006_4433# vdd vdd pfet_03v3 ad=11.2n pd=0.312m as=11.2n ps=0.312m w=200 l=200
-X13 out inm w_n4092_3504# w_n4092_3504# nfet_03v3 ad=11.2n pd=0.312m as=11.2n ps=0.312m w=200 l=200
-X14 out a_n3006_4433# vdd vdd pfet_03v3 ad=11.2n pd=0.312m as=24n ps=0.64m w=200 l=200
-X15 out inm w_n4092_3504# w_n4092_3504# nfet_03v3 ad=11.2n pd=0.312m as=24n ps=0.64m w=200 l=200
-X16 a_n3006_4433# a_n3006_4433# vdd vdd pfet_03v3 ad=11.2n pd=0.312m as=24n ps=0.64m w=200 l=200
-X17 a_n3006_4433# a_n3006_4433# vdd vdd pfet_03v3 ad=11.2n pd=0.312m as=11.2n ps=0.312m w=200 l=200
-X18 a_n3006_4433# inp w_n4092_3504# w_n4092_3504# nfet_03v3 ad=11.2n pd=0.312m as=24n ps=0.64m w=200 l=200
-X19 a_n3006_4433# inp w_n4092_3504# w_n4092_3504# nfet_03v3 ad=11.2n pd=0.312m as=11.2n ps=0.312m w=200 l=200
-C0 vdd out 2.50898f
-C1 w_n4092_3504# inm 2.84357f
-C2 w_n4092_3504# a_n3006_4433# 2.43201f
-C3 w_n4092_3504# inp 2.84067f
-C4 inp a_n3006_4433# 0.26955f
-C5 vdd a_n3006_4433# 9.25256f
-C6 w_n4092_3504# out 2.2176f
-C7 out inm 0.26955f
-C8 out a_n3006_4433# 0.30562f
-C9 w_n4092_3504# vb 0.26955f
-C10 vb vss 3.02391f
-C11 inm vss 0.16598f
-C12 inp vss 0.16598f
-C13 out vss 1.55294f
-C14 vdd vss 22.5496f
-C15 a_n3006_4433# vss 2.03415f ; **FLOATING
-C16 w_n4092_3504# vss 11.7338f ; **FLOATING
+X0 a_n3610_5037# inp w_n4696_4108# w_n4696_4108# nfet_03v3 ad=11.2n pd=0.312m as=24n ps=0.64m w=200 l=200
+X1 out a_n3610_5037# vdd vdd pfet_03v3 ad=11.2n pd=0.312m as=24n ps=0.64m w=200 l=200
+X2 out inm w_n4696_4108# w_n4696_4108# nfet_03v3 ad=11.2n pd=0.312m as=11.2n ps=0.312m w=200 l=200
+X3 vss vb w_n4696_4108# vss nfet_03v3 ad=24n pd=0.64m as=11.2n ps=0.312m w=200 l=200
+X4 a_n3610_5037# a_n3610_5037# vdd vdd pfet_03v3 ad=11.2n pd=0.312m as=24n ps=0.64m w=200 l=200
+X5 a_n3610_5037# a_n3610_5037# vdd vdd pfet_03v3 ad=11.2n pd=0.312m as=11.2n ps=0.312m w=200 l=200
+X6 vss vb w_n4696_4108# vss nfet_03v3 ad=11.2n pd=0.312m as=11.2n ps=0.312m w=200 l=200
+X7 w_n4696_4108# inm out w_n4696_4108# nfet_03v3 ad=11.2n pd=0.312m as=11.2n ps=0.312m w=200 l=200
+X8 w_n4696_4108# vb vss vss nfet_03v3 ad=11.2n pd=0.312m as=11.2n ps=0.312m w=200 l=200
+X9 a_n3610_5037# inp w_n4696_4108# w_n4696_4108# nfet_03v3 ad=11.2n pd=0.312m as=11.2n ps=0.312m w=200 l=200
+X10 w_n4696_4108# vb vss vss nfet_03v3 ad=11.2n pd=0.312m as=24n ps=0.64m w=200 l=200
+X11 vdd a_n3610_5037# out vdd pfet_03v3 ad=24n pd=0.64m as=11.2n ps=0.312m w=200 l=200
+X12 vdd a_n3610_5037# a_n3610_5037# vdd pfet_03v3 ad=11.2n pd=0.312m as=11.2n ps=0.312m w=200 l=200
+X13 vdd a_n3610_5037# out vdd pfet_03v3 ad=11.2n pd=0.312m as=11.2n ps=0.312m w=200 l=200
+X14 w_n4696_4108# inm out w_n4696_4108# nfet_03v3 ad=24n pd=0.64m as=11.2n ps=0.312m w=200 l=200
+X15 w_n4696_4108# inp a_n3610_5037# w_n4696_4108# nfet_03v3 ad=24n pd=0.64m as=11.2n ps=0.312m w=200 l=200
+X16 vdd a_n3610_5037# a_n3610_5037# vdd pfet_03v3 ad=24n pd=0.64m as=11.2n ps=0.312m w=200 l=200
+X17 out inm w_n4696_4108# w_n4696_4108# nfet_03v3 ad=11.2n pd=0.312m as=24n ps=0.64m w=200 l=200
+X18 w_n4696_4108# inp a_n3610_5037# w_n4696_4108# nfet_03v3 ad=11.2n pd=0.312m as=11.2n ps=0.312m w=200 l=200
+X19 out a_n3610_5037# vdd vdd pfet_03v3 ad=11.2n pd=0.312m as=11.2n ps=0.312m w=200 l=200
+C0 w_n4696_4108# out 2.42229f
+C1 out inm 0.26955f
+C2 out a_n3610_5037# 0.29716f
+C3 w_n4696_4108# vb 0.26955f
+C4 vdd out 2.51041f
+C5 w_n4696_4108# inm 2.82289f
+C6 w_n4696_4108# a_n3610_5037# 2.44359f
+C7 w_n4696_4108# inp 2.82307f
+C8 inp a_n3610_5037# 0.26955f
+C9 vdd a_n3610_5037# 8.80877f
+C10 vb vss 3.02322f
+C11 inm vss 0.16693f
+C12 inp vss 0.16693f
+C13 out vss 1.91377f
+C14 vdd vss 24.1051f
+C15 a_n3610_5037# vss 2.47762f ; **FLOATING
+C16 w_n4696_4108# vss 12.246f ; **FLOATING
 .ends

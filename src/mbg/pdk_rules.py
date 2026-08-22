@@ -29,6 +29,75 @@ DEFAULT_DIRECTIONS = {
 }
 
 
+#: Rules the foundry deck enforces but glayout's ``get_grule`` under-reports.
+#:
+#: glayout returns min_width 0.28 / min_separation 0.30 for *every* GF180
+#: metal, including the top one.  The foundry decks do not agree: the thick
+#: top metal has its own, larger rules, and both sign-off engines enforce
+#: them --
+#:
+#:     libs.tech/klayout/tech/drc/rule_decks/metaltop.rb   MT.1 / MT.2a / MT.4
+#:     libs.tech/magic/gf180mcuD.tech                      "width *m5,rm5 440"
+#:                                                         "spacing allm5 460"
+#:
+#: which metaltop branch applies is set by the PDK variant's MetalTop
+#: thickness (options.rb: A=30K, B/D=11K, C/E/F=9K), and 9K and 11K carry the
+#: same numbers.  Routing on the top metal at 0.28um is therefore a
+#: guaranteed MT.1 violation -- latent for as long as the router only ever
+#: put wide power rails up there, and immediate as soon as a signal net used
+#: it.  Trusting the PDK object is the right default; where the shipped deck
+#: contradicts it, the deck wins, because the deck is what signs the design
+#: off.  ``tests/test_router_synthetic.py`` re-reads the deck sources and
+#: fails if these numbers drift away from them.
+TOP_METAL_RULES = {
+    "6K":  {"min_width": 0.36, "min_spacing": 0.38, "min_area": 0.5625},
+    "9K":  {"min_width": 0.44, "min_spacing": 0.46, "min_area": 0.5625},
+    "11K": {"min_width": 0.44, "min_spacing": 0.46, "min_area": 0.5625},
+    "30K": {"min_width": 0.44, "min_spacing": 0.46, "min_area": 0.5625},
+}
+
+#: PDK variant -> (MetalTop thickness, number of metal levels), from the
+#: deck's own options.rb table.  The top metal is ``met<metal_level>``.
+GF180_VARIANTS = {
+    "gf180mcua": ("30K", 3), "gf180mcub": ("11K", 4), "gf180mcuc": ("9K", 5),
+    "gf180mcud": ("11K", 5), "gf180mcue": ("9K", 6), "gf180mcuf": ("9K", 6),
+}
+
+
+def _pdk_variant(pdk) -> str:
+    """Which GF180 variant is in play: ``gf180mcuD``, ``gf180mcuC``, ...
+
+    The glayout PDK object only calls itself ``gf180`` — it does not carry
+    the variant, and the variant is what selects the MetalTop thickness and
+    therefore the top-metal rules.  ``$PDK`` is where the rest of the flow
+    (Magic techfile, netgen setup, KLayout deck variant switch) already
+    reads it from, so it is read from there here too rather than guessed.
+    """
+    name = (getattr(pdk, "name", "") or "").lower()
+    if name in GF180_VARIANTS:
+        return name
+    if name.startswith("gf180"):
+        import os
+        env = (os.environ.get("PDK") or "").lower()
+        if env in GF180_VARIANTS:
+            return env
+        return "gf180mcud"          # project default, see AGENTS.md
+    return name
+
+
+def top_metal_rules(pdk_name: str) -> Tuple[Optional[str], Optional[dict]]:
+    """``(top metal glayer name, its deck rules)`` for a GF180 variant.
+
+    Returns ``(None, None)`` for a PDK this table does not describe, so a
+    non-GF180 flow keeps whatever its own PDK object reports.
+    """
+    entry = GF180_VARIANTS.get((pdk_name or "").lower())
+    if entry is None:
+        return None, None
+    thickness, levels = entry
+    return f"met{levels}", TOP_METAL_RULES.get(thickness)
+
+
 @dataclass
 class LayerInfo:
     """Everything the router needs to know about one routing metal."""
@@ -39,6 +108,9 @@ class LayerInfo:
     min_spacing: float
     direction: str          # "H" | "V"
     index: int              # position in the metal stack, 0 = met1
+    #: Minimum polygon area, 0 when the deck states no area rule for the
+    #: layer.  Only the top metal carries one in GF180 (MT.4).
+    min_area: float = 0.0
 
     @property
     def layer_tuple(self) -> Tuple[int, int]:
@@ -77,6 +149,7 @@ class PDKRules:
         self._directions = dict(directions or DEFAULT_DIRECTIONS)
         self._layer_cache: Dict[str, LayerInfo] = {}
         self._via_cache: Dict[str, ViaInfo] = {}
+        self._top_metal, self._top_rules = top_metal_rules(_pdk_variant(pdk))
         self._build()
 
     # ── construction ────────────────────────────────────────────────
@@ -93,12 +166,22 @@ class PDKRules:
             except Exception:
                 continue
             r = self._grule(m)
+            width = float(r.get("min_width", 0.28))
+            spacing = float(r.get("min_separation", 0.3))
+            area = 0.0
+            # Where the shipped DRC deck is stricter than the PDK object, the
+            # deck wins — it is what signs the design off (see TOP_METAL_RULES).
+            if m == self._top_metal and self._top_rules:
+                width = max(width, float(self._top_rules["min_width"]))
+                spacing = max(spacing, float(self._top_rules["min_spacing"]))
+                area = float(self._top_rules.get("min_area", 0.0))
             self._layer_cache[m] = LayerInfo(
                 name=m,
                 gds_layer=int(gds[0]),
                 gds_datatype=int(gds[1]) if len(gds) > 1 else 0,
-                min_width=float(r.get("min_width", 0.28)),
-                min_spacing=float(r.get("min_separation", 0.3)),
+                min_width=width,
+                min_spacing=spacing,
+                min_area=area,
                 direction=self._directions.get(m, "H" if i % 2 == 0 else "V"),
                 index=i,
             )
@@ -141,6 +224,10 @@ class PDKRules:
 
     def min_width(self, layer: str) -> float:
         return self.layer(layer).min_width
+
+    def min_area(self, layer: str) -> float:
+        """Minimum polygon area for a layer; 0 when the deck states none."""
+        return self.layer(layer).min_area
 
     def min_spacing(self, layer: str, other_layer: Optional[str] = None) -> float:
         """Same-layer spacing.  Different metals never interact laterally,

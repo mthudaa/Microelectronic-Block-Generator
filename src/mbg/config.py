@@ -457,13 +457,32 @@ def resolve_klayout() -> ToolInfo:
     executable matters for the DRC engine, and only when it is selected.
     """
     info = ToolInfo(name="klayout", optional=True)
-    path = shutil.which("klayout")
+    # Same resolution order as the other tools: explicit config, then an
+    # MBG-managed build, then PATH. A distro that ships no klayout package
+    # (Fedora) or a binary living outside PATH (nix store) is common, so
+    # MBG_KLAYOUT must be honoured.
+    # Explicit configuration is authoritative, exactly as for Magic and
+    # netgen: if the user names a binary and it is unusable, that is an error
+    # to report — not permission to quietly run a different one.
+    path = source = None
+    explicit = {"$MBG_KLAYOUT", "$MBG_KLAYOUT_ROOT"}
+    for cand, src in _candidates("klayout", "MBG_KLAYOUT", "MBG_KLAYOUT_ROOT"):
+        if os.path.isfile(cand) and os.access(cand, os.X_OK):
+            path, source = cand, src
+            break
+        if src in explicit:
+            info.reason = (f"MBG_KLAYOUT/MBG_KLAYOUT_ROOT points at {cand}, "
+                           f"which is not an executable file.")
+            return info
     if path:
         rc, out, err = _run([path, "-v"], timeout=30)
         ver, vs = _parse_version(out + err, r"(\d+)\.(\d+)\.?(\d+)?")
         info.path, info.version, info.version_string = path, ver, vs or ""
         info.ok = True
-        info.source = "PATH"
+        # Report where it actually came from. Saying "PATH" for a binary found
+        # under MBG_TOOLS_ROOT misleads: it suggests the resolution depends on
+        # PATH order when it does not.
+        info.source = source or "PATH"
         return info
     try:
         import klayout  # noqa: F401

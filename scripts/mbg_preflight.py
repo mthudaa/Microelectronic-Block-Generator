@@ -63,9 +63,20 @@ def main() -> int:
     row("Netgen version", "PASS" if netgen.ok else "FAIL",
         netgen.version_string or "-")
 
+    # KLayout is REQUIRED for full DRC sign-off: it runs the GF180 foundry
+    # deck and is the sign-off authority. Reporting it OPTIONAL would let a
+    # Magic-only result look like a complete check.
+    from mbg.drc import KLayoutDRC, klayout_deck
     klayout = config.resolve_klayout()
-    row("KLayout executable", "PASS" if klayout.ok else "OPTIONAL",
-        klayout.path or "not installed (not needed for the GF180 flow)")
+    kl_ok, kl_why = KLayoutDRC().available()
+    row("KLayout executable", "PASS" if klayout.ok else "FAIL",
+        klayout.path or "not found — required for DRC sign-off "
+                        "(set MBG_KLAYOUT or install klayout)")
+    row("KLayout version", "PASS" if kl_ok else "FAIL",
+        klayout.version_string or "-")
+    deck = klayout_deck()
+    row("KLayout GF180 deck", "PASS" if deck else "FAIL",
+        deck or "gf180mcu.drc not found under $PDKPATH/libs.tech/klayout")
     ngspice = config.resolve_ngspice()
     row("ngspice", "PASS" if ngspice.ok else "OPTIONAL",
         ngspice.path or "not installed (needed only for simulation)")
@@ -74,7 +85,12 @@ def main() -> int:
     pdk_ok = not cfg.missing()
     row("GDS generation", "READY" if pdk_ok else "BLOCKED",
         "" if pdk_ok else "PDK incomplete")
-    row("Magic DRC", "READY" if (pdk_ok and magic.ok) else "BLOCKED", "")
+    row("Magic DRC", "READY" if (pdk_ok and magic.ok) else "BLOCKED",
+        "independent complementary check")
+    row("KLayout DRC", "READY" if (pdk_ok and kl_ok) else "BLOCKED",
+        "primary sign-off (GF180 foundry deck)" if kl_ok else kl_why[:70])
+    row("DRC sign-off", "READY" if (pdk_ok and magic.ok and kl_ok) else "BLOCKED",
+        "both engines required")
     row("Magic extraction", "READY" if (pdk_ok and magic.ok) else "BLOCKED", "")
     row("Netgen LVS", "READY" if (pdk_ok and magic.ok and netgen.ok) else "BLOCKED",
         "" if netgen.ok else "requires Magic extraction and netgen")

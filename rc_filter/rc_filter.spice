@@ -1,5 +1,0 @@
-.lib "/home/huda/.volare/gf180mcuD/libs.tech/ngspice/sm141064.ngspice" typical
-.subckt rc_filter vin vout vss
-XR1 vin  vout ppolyf_u  r_width=1u r_length=4u
-XC1 vout vss  cap_mim_2f0_m4m5_noshield c_width=5u c_length=5u
-.ends

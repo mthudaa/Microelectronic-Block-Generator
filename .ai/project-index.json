@@ -10,7 +10,7 @@
   "targets": {
     "framework_utils": [
       {
-        "lines": 130,
+        "lines": 157,
         "path": "src/mbg/__init__.py"
       },
       {
@@ -26,27 +26,43 @@
         "path": "src/mbg/cli.py"
       },
       {
-        "lines": 569,
+        "lines": 588,
         "path": "src/mbg/config.py"
       },
       {
-        "lines": 359,
+        "lines": 371,
         "path": "src/mbg/connectivity.py"
       },
       {
-        "lines": 568,
+        "lines": 577,
         "path": "src/mbg/design_context.py"
+      },
+      {
+        "lines": 551,
+        "path": "src/mbg/drc.py"
       },
       {
         "lines": 801,
         "path": "src/mbg/experiment_manifest.py"
       },
       {
+        "lines": 703,
+        "path": "src/mbg/flow.py"
+      },
+      {
+        "lines": 481,
+        "path": "src/mbg/flow_runtime.py"
+      },
+      {
+        "lines": 849,
+        "path": "src/mbg/full_auto.py"
+      },
+      {
         "lines": 576,
         "path": "src/mbg/integrate.py"
       },
       {
-        "lines": 369,
+        "lines": 370,
         "path": "src/mbg/llm.py"
       },
       {
@@ -54,7 +70,7 @@
         "path": "src/mbg/outputs.py"
       },
       {
-        "lines": 219,
+        "lines": 227,
         "path": "src/mbg/passives.py"
       },
       {
@@ -62,11 +78,11 @@
         "path": "src/mbg/pdk_devices.py"
       },
       {
-        "lines": 279,
+        "lines": 366,
         "path": "src/mbg/pdk_rules.py"
       },
       {
-        "lines": 656,
+        "lines": 711,
         "path": "src/mbg/pipeline.py"
       },
       {
@@ -74,7 +90,7 @@
         "path": "src/mbg/placement.py"
       },
       {
-        "lines": 641,
+        "lines": 647,
         "path": "src/mbg/placement_engine.py"
       },
       {
@@ -82,7 +98,11 @@
         "path": "src/mbg/power.py"
       },
       {
-        "lines": 1260,
+        "lines": 605,
+        "path": "src/mbg/reviewers.py"
+      },
+      {
+        "lines": 1437,
         "path": "src/mbg/router.py"
       },
       {
@@ -90,15 +110,23 @@
         "path": "src/mbg/routing.py"
       },
       {
+        "lines": 487,
+        "path": "src/mbg/search.py"
+      },
+      {
         "lines": 183,
         "path": "src/mbg/simulation.py"
       },
       {
-        "lines": 656,
+        "lines": 278,
+        "path": "src/mbg/specs.py"
+      },
+      {
+        "lines": 766,
         "path": "src/mbg/spice_parser.py"
       },
       {
-        "lines": 53,
+        "lines": 71,
         "path": "src/mbg/utils.py"
       }
     ],
@@ -140,7 +168,7 @@
         "path": "src/mbg/pdk_devices.py"
       },
       {
-        "lines": 279,
+        "lines": 366,
         "path": "src/mbg/pdk_rules.py"
       }
     ],
@@ -150,7 +178,7 @@
         "path": "src/mbg/placement.py"
       },
       {
-        "lines": 641,
+        "lines": 647,
         "path": "src/mbg/placement_engine.py"
       },
       {
@@ -160,11 +188,11 @@
     ],
     "routing_modules": [
       {
-        "lines": 359,
+        "lines": 371,
         "path": "src/mbg/connectivity.py"
       },
       {
-        "lines": 1260,
+        "lines": 1437,
         "path": "src/mbg/router.py"
       },
       {
@@ -178,7 +206,7 @@
         "path": "src/mbg/simulation.py"
       },
       {
-        "lines": 656,
+        "lines": 766,
         "path": "src/mbg/spice_parser.py"
       }
     ],
@@ -188,12 +216,20 @@
         "path": "tests/test_agent_integrations.py"
       },
       {
-        "lines": 184,
+        "lines": 232,
         "path": "tests/test_all_designs.py"
       },
       {
         "lines": 174,
         "path": "tests/test_analysis.py"
+      },
+      {
+        "lines": 211,
+        "path": "tests/test_complexity_ladder.py"
+      },
+      {
+        "lines": 233,
+        "path": "tests/test_drc_dual.py"
       },
       {
         "lines": 300,
@@ -202,6 +238,18 @@
       {
         "lines": 231,
         "path": "tests/test_experiment_manifest.py"
+      },
+      {
+        "lines": 382,
+        "path": "tests/test_flow.py"
+      },
+      {
+        "lines": 404,
+        "path": "tests/test_full_auto.py"
+      },
+      {
+        "lines": 238,
+        "path": "tests/test_installer.py"
       },
       {
         "lines": 167,
@@ -220,8 +268,24 @@
         "path": "tests/test_passives.py"
       },
       {
-        "lines": 302,
+        "lines": 135,
+        "path": "tests/test_pex_regression.py"
+      },
+      {
+        "lines": 186,
+        "path": "tests/test_reviewers.py"
+      },
+      {
+        "lines": 764,
         "path": "tests/test_router_synthetic.py"
+      },
+      {
+        "lines": 231,
+        "path": "tests/test_search.py"
+      },
+      {
+        "lines": 243,
+        "path": "tests/test_spice_parser.py"
       }
     ],
     "verification_modules": [
@@ -230,7 +294,7 @@
         "path": "src/mbg/checks.py"
       },
       {
-        "lines": 359,
+        "lines": 371,
         "path": "src/mbg/connectivity.py"
       }
     ]

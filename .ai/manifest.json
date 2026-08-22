@@ -177,10 +177,10 @@
       }
     },
     "install_agents": {
-      "summary": "Register the agent integrations for OpenCode, Claude Code and Codex.",
+      "summary": "Register the agent integrations for OpenCode, Claude Code and Codex \u2014 repo-scoped, or user-wide so /mbg-* works from any directory.",
       "class": "MUTATING",
       "skill": "mbg-setup",
-      "command": "./scripts/install_agents.sh",
+      "command": "./install.sh --stage agents",
       "platforms": {
         "opencode": true,
         "claude": true,
@@ -244,10 +244,10 @@
       }
     },
     "setup_environment": {
-      "summary": "Create or repair the Python environment and report the toolchain and PDK.",
+      "summary": "Install or repair the whole environment with ./install.sh \u2014 Python, GF180MCU PDK, Magic/netgen/KLayout, and the $MBG_HOME (~/.mbg) shell integration and mbg launchers \u2014 and report the toolchain and PDK.",
       "class": "MUTATING",
       "skill": "mbg-setup",
-      "command": "./scripts/setup_env.sh",
+      "command": "./install.sh",
       "platforms": {
         "opencode": true,
         "claude": true,
@@ -291,6 +291,83 @@
       "class": "READ-ONLY",
       "skill": "mbg-routing-debug",
       "entry_point": "mbg.connectivity.verify",
+      "platforms": {
+        "opencode": true,
+        "claude": true,
+        "codex": true
+      }
+    },
+    "run_design_flow": {
+      "summary": "Run the two-loop design flow: pre-layout optimisation, then PEX-aware post-layout optimisation against target specifications.",
+      "class": "WRITE",
+      "skill": "mbg-pex-aware-flow",
+      "entry_point": "mbg.flow.DesignFlow.run",
+      "platforms": {
+        "opencode": true,
+        "claude": true,
+        "codex": true
+      }
+    },
+    "evaluate_specifications": {
+      "summary": "Evaluate measured metrics against target specs and quantify pre-layout vs post-layout degradation.",
+      "class": "READ-ONLY",
+      "skill": "mbg-pex-aware-flow",
+      "entry_point": "mbg.specs.evaluate_specs",
+      "platforms": {
+        "opencode": true,
+        "claude": true,
+        "codex": true
+      }
+    },
+    "simulate_extracted_netlist": {
+      "summary": "Simulate the PEX-extracted netlist \u2014 a stage separate from PEX extraction.",
+      "class": "READ-ONLY",
+      "skill": "mbg-pex-aware-flow",
+      "entry_point": "mbg.flow_runtime.make_hooks",
+      "platforms": {
+        "opencode": true,
+        "claude": true,
+        "codex": true
+      }
+    },
+    "run_full_auto": {
+      "summary": "FULL AUTOMATE: one design request driven through specification, both optimisation loops, multi-agent review and the tapeout-ready sign-off gate.",
+      "class": "WRITE",
+      "skill": "mbg-full-auto",
+      "entry_point": "mbg.full_auto.run_full_auto",
+      "platforms": {
+        "opencode": true,
+        "claude": true,
+        "codex": true
+      }
+    },
+    "review_design_stage": {
+      "summary": "Run the independent Devil and Angel reviewers over one design stage and return structured findings.",
+      "class": "READ-ONLY",
+      "skill": "mbg-reviewers",
+      "entry_point": "mbg.reviewers.run_reviews",
+      "platforms": {
+        "opencode": true,
+        "claude": true,
+        "codex": true
+      }
+    },
+    "synthesize_reviews": {
+      "summary": "Combine reviewer output with measured evidence into a decision; evidence and hard gates take precedence.",
+      "class": "READ-ONLY",
+      "skill": "mbg-reviewers",
+      "entry_point": "mbg.reviewers.synthesize",
+      "platforms": {
+        "opencode": true,
+        "claude": true,
+        "codex": true
+      }
+    },
+    "signoff_gate": {
+      "summary": "Evaluate the explicit tapeout-ready gate; unevaluated conditions report NOT RUN and never count as passed.",
+      "class": "READ-ONLY",
+      "skill": "mbg-full-auto",
+      "entry_point": "mbg.full_auto.SignoffGate",
       "platforms": {
         "opencode": true,
         "claude": true,

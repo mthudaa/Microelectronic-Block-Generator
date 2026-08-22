@@ -103,8 +103,14 @@ def build_device(pdk, dev: Device, cfg: PlacementConfig):
                  multipliers=dev.multipliers, with_substrate_tap=False,
                  with_tie=cfg.with_tie, with_dummy=cfg.with_dummy)
     elif dev.kind == "nmos":
+        # A deep n-well needs a PCOMP guard ring around it, tied to the
+        # substrate (GF180 rule DN.3). The internal body tie that makes body
+        # biasing possible sits *inside* the DNW and does not satisfy it —
+        # the ring has to be outside. glayout's substrate tap is exactly that
+        # ring, so it is switched on for DNW devices and left off otherwise,
+        # where it would only cost area (roughly 2.3x on a single device).
         c = nmos(pdk, width=w, length=l, fingers=dev.fingers,
-                 multipliers=dev.multipliers, with_substrate_tap=False,
+                 multipliers=dev.multipliers, with_substrate_tap=dnw,
                  with_dnwell=dnw, with_tie=cfg.with_tie,
                  with_dummy=cfg.with_dummy)
     elif dev.kind == "res":

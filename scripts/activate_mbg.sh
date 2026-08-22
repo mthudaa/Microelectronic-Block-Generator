@@ -25,6 +25,22 @@ _mbg_dir="$(cd -- "$(dirname -- "${_mbg_src}")" && pwd)"
 MBG_ROOT="$(cd -- "${_mbg_dir}/.." && pwd)"
 export MBG_ROOT
 
+# --- prefer the installed activation ----------------------------------
+# install_shell.sh generates ~/.mbg/activate.sh from what it actually found
+# on this machine, including pinned MBG_MAGIC / MBG_NETGEN / MBG_KLAYOUT
+# paths. This file predates it and sets a strict subset, so if the generated
+# one exists it wins — two activation scripts that drift apart is how you end
+# up with DRC sign-off silently unavailable in one shell but not another.
+if [ -f "${MBG_HOME:-$HOME/.mbg}/activate.sh" ] && [ -z "${MBG_ACTIVATE_LEGACY:-}" ]; then
+    # shellcheck disable=SC1091
+    . "${MBG_HOME:-$HOME/.mbg}/activate.sh"
+    [ -f "${MBG_VENV:-$MBG_ROOT/.venv}/bin/activate" ] && [ -z "${VIRTUAL_ENV:-}" ] \
+        && . "${MBG_VENV:-$MBG_ROOT/.venv}/bin/activate"
+    printf 'mbg: %s (via ~/.mbg/activate.sh)\n' "${MBG_ROOT}"
+    unset _mbg_src _mbg_dir
+    return 0 2>/dev/null || true
+fi
+
 # --- Python virtual environment ---------------------------------------
 _mbg_venv="${MBG_VENV:-${MBG_ROOT}/.venv}"
 if [ -x "${_mbg_venv}/bin/activate" ] || [ -f "${_mbg_venv}/bin/activate" ]; then

@@ -32,6 +32,10 @@ from mbg.design_context import (
     RoutedNet, RoutingFailure, Segment, Via,
 )
 
+#: Below this, two edges are the same edge. The manufacturing grid is 5nm, so
+#: anything an order of magnitude under it is float noise, not geometry.
+_EPS = 1e-6
+
 
 # ── tuning (all overridable via RouterConfig, nothing hidden) ───────────
 
@@ -203,18 +207,30 @@ def grid_params(ctx, cfg=None):
     cfg = cfg or RouterConfig()
     rules = ctx.rules or get_rules(ctx.pdk)
     layers = [l for l in cfg.routing_layers if rules.has_layer(l)]
-    sp = max(rules.min_spacing(l) for l in layers)
-    widest_wire = max(rules.min_width(l) for l in layers) * max(
-        cfg.width_multiplier, cfg.power_width_multiplier)
-    widest_pad = 0.0
+
+    # What has to fit between two adjacent tracks is a per-LAYER question:
+    # a conductor on layer L plus L's own spacing rule. Taking the widest
+    # width found on ANY layer and the largest spacing found on ANY layer and
+    # combining them describes a wire that does not exist -- and it is not a
+    # harmless over-estimate, because the pitch sets the area of every design.
+    # GF180 made that concrete: correcting met5's minimum width to the
+    # foundry deck's 0.44um pushed a cross-product pitch from 0.87um to
+    # 1.34um on every design, met3-only ones included, purely because met5 is
+    # in the layer list. Per layer it is 1.02um, and for a stack whose layers
+    # all share one rule the two formulas agree exactly.
+    mult = max(cfg.width_multiplier, cfg.power_width_multiplier)
+    base = rules.routing_width(cfg.access_layer, mult)   # what width_for emits
+    need = 0.0
+    for l in layers:
+        # _emit_segment raises a segment to its own layer's minimum
+        need = max(need, max(base, rules.min_width(l)) + rules.min_spacing(l))
     for lo in rules.metals:
         for hi in layers:
             try:
-                widest_pad = max(widest_pad, rules.via_footprint(lo, hi))
+                need = max(need, rules.via_footprint(lo, hi) + rules.min_spacing(hi))
             except Exception:
                 continue
-    half = max(widest_wire, widest_pad) / 2.0
-    pitch = cfg.grid_pitch or rules.snap(2 * half + sp + rules.manufacturing_grid())
+    pitch = cfg.grid_pitch or rules.snap(need + rules.manufacturing_grid())
     bb = ctx.design_bbox().inflate(cfg.margin)
     return (rules.snap(bb.xmin), rules.snap(bb.ymin)), pitch
 
@@ -226,6 +242,64 @@ def snap_to_grid(ctx, x, y, cfg=None):
     rules = ctx.rules or get_rules(ctx.pdk)
     return (rules.snap(ox + round((x - ox) / pitch) * pitch),
             rules.snap(oy + round((y - oy) / pitch) * pitch))
+
+
+def _rects_cover(target: BoundingBox, boxes: Sequence[BoundingBox]) -> bool:
+    """Is ``target`` completely covered by the union of ``boxes``?
+
+    Exact, by coordinate compression: the union of axis-aligned rectangles can
+    only change along their own edges, so slicing the target at every edge
+    coordinate gives cells that are each either wholly inside some box or
+    wholly outside all of them.
+
+    A single-shape containment test is not enough. A device tap ring reaches
+    the router as several rectangles, and a corner of it is naturally two
+    abutting pieces that jointly cover a gap neither covers alone -- rejecting
+    that would strand exactly the terminals this whole exemption exists to
+    reach, one level further in.
+    """
+    if target.xmax - target.xmin <= 1e-9 or target.ymax - target.ymin <= 1e-9:
+        return True                      # degenerate: nothing to cover
+    xs = {target.xmin, target.xmax}
+    ys = {target.ymin, target.ymax}
+    for b in boxes:
+        if b.xmin > target.xmin:
+            xs.add(min(b.xmin, target.xmax))
+        if b.xmax < target.xmax:
+            xs.add(max(b.xmax, target.xmin))
+        if b.ymin > target.ymin:
+            ys.add(min(b.ymin, target.ymax))
+        if b.ymax < target.ymax:
+            ys.add(max(b.ymax, target.ymin))
+    xs, ys = sorted(xs), sorted(ys)
+    for i in range(len(xs) - 1):
+        cx = (xs[i] + xs[i + 1]) / 2.0
+        for j in range(len(ys) - 1):
+            cy = (ys[j] + ys[j + 1]) / 2.0
+            if not any(b.xmin <= cx <= b.xmax and b.ymin <= cy <= b.ymax
+                       for b in boxes):
+                return False
+    return True
+
+
+def _facing_gap(a: BoundingBox, b: BoundingBox) -> Optional[BoundingBox]:
+    """The empty slot directly between two non-overlapping boxes.
+
+    Returns the rectangle of space they face each other across, or ``None``
+    when they are diagonal neighbours — corner-to-corner there is no slot to
+    fill, so nothing may be exempted on that basis. Same gap geometry as
+    ``_same_net_notch_fills`` uses to close a gap; here it is used to decide
+    whether a gap is already closed.
+    """
+    ox = min(a.xmax, b.xmax) - max(a.xmin, b.xmin)
+    oy = min(a.ymax, b.ymax) - max(a.ymin, b.ymin)
+    if ox > 0 and oy <= 0:                      # separated along y
+        y0, y1 = (a.ymax, b.ymin) if b.ymin >= a.ymax else (b.ymax, a.ymin)
+        return BoundingBox(max(a.xmin, b.xmin), y0, min(a.xmax, b.xmax), y1)
+    if oy > 0 and ox <= 0:                      # separated along x
+        x0, x1 = (a.xmax, b.xmin) if b.xmin >= a.xmax else (b.xmax, a.xmin)
+        return BoundingBox(x0, max(a.ymin, b.ymin), x1, min(a.ymax, b.ymax))
+    return None
 
 
 class GridRouter:
@@ -244,9 +318,17 @@ class GridRouter:
             raise ValueError(f"none of {self.cfg.routing_layers} exist in this PDK")
         self.li = {l: i for i, l in enumerate(self.layers)}
 
-        self.pitch = self.cfg.grid_pitch or self._derive_pitch()
+        # ONE grid, from one function. grid_params() is also what
+        # snap_to_grid() exposes to power.py for its rail via drops, and two
+        # formulas that are meant to agree will not stay agreeing: while this
+        # class computed its own pitch, a correction to grid_params() left the
+        # rails snapping to a 1.02um grid while the router laid wire on a
+        # 1.34um one. Off-grid drops are precisely what the pitch exists to
+        # prevent, and the resulting sub-spacing gaps were reported by both
+        # DRC engines. Deriving both from the same call makes that class of
+        # divergence unrepresentable rather than merely fixed.
+        self.origin, self.pitch = grid_params(ctx, self.cfg)
         bb = ctx.design_bbox().inflate(self.cfg.margin)
-        self.origin = (self.rules.snap(bb.xmin), self.rules.snap(bb.ymin))
         self.nx = max(1, int(math.ceil(bb.width / self.pitch)) + 1)
         self.ny = max(1, int(math.ceil(bb.height / self.pitch)) + 1)
 
@@ -259,33 +341,6 @@ class GridRouter:
         self._block_escape_corridors()
 
     # -- grid helpers --
-    def _derive_pitch(self) -> float:
-        """Grid pitch that is legal for the WIDEST object the router emits.
-
-        Two objects on distinct grid cells are then always at least
-        min_spacing apart, whatever they are:
-
-            gap = pitch - half_widest - half_widest >= min_spacing
-
-        Sizing the pitch from the minimum wire width (the obvious choice)
-        silently breaks as soon as a wide power wire or a via landing pad —
-        both larger than a signal wire — sits on a neighbouring track.  One
-        extra grid unit of margin keeps the comparison off the equality
-        boundary where float rounding lives.
-        """
-        s = max(self.rules.min_spacing(l) for l in self.layers)
-        widest_wire = max(self.rules.min_width(l) for l in self.layers) * max(
-            self.cfg.width_multiplier, self.cfg.power_width_multiplier)
-        widest_pad = 0.0
-        for lo in self.rules.metals:
-            for hi in self.layers:
-                try:
-                    widest_pad = max(widest_pad, self.rules.via_footprint(lo, hi))
-                except Exception:
-                    continue
-        half = max(widest_wire, widest_pad) / 2.0
-        return self.rules.snap(2 * half + s + self.rules.manufacturing_grid())
-
     def to_cell(self, x: float, y: float) -> Tuple[int, int]:
         return (int(round((x - self.origin[0]) / self.pitch)),
                 int(round((y - self.origin[1]) / self.pitch)))
@@ -468,16 +523,45 @@ class GridRouter:
         Anything in between is a notch: same-net proximity is NOT
         automatically DRC-clean (§45), and it is what Magic reported as
         "Metal2 spacing < 0.28um" after the escapes were added.
+
+        The one exception is a slot that same-net metal already fills.  A
+        gLayout device is ringed by its tap/tie metal, and the ring is stored
+        as several polygons: one wide band plus the contact pads it contains.
+        A pin escape drawn ON that ring overlaps the band -- same net, legal
+        -- but then passes within min_spacing of two pads the band itself
+        encloses.  Per polygon that reads as a notch; after the boolean merge
+        every mask operation actually sees, the band fills the slot and there
+        is no gap at all.  So a same-net near-miss is accepted only when the
+        facing slot between the two is wholly contained in one same-net shape
+        this box merges with -- which is provable from the geometry, not
+        assumed from the net name.  Without that exception no terminal whose
+        port sits on a tap ring can ever find an escape, which is what
+        stranded every ``body`` terminal of the 12-MOS clocked comparator and,
+        through route_net, dropped both supply nets entirely.
         """
         sp = (max(self.rules.min_spacing(l) for l in layers)
               + self.cfg.drc_margin_grids * self.rules.manufacturing_grid())
         grown = box.inflate(sp)
-        for bb, obnet in self._device_shapes(layers):
+        shapes = self._device_shapes(layers)
+        merged = None          # same-net shapes this box merges with, lazily
+        for bb, obnet in shapes:
             if box.overlaps(bb):
                 if obnet != net:
                     return False          # short, or merging with unknown metal
             elif grown.overlaps(bb):
-                return False              # notch / spacing violation
+                if obnet != net or net is None:
+                    return False          # notch against foreign metal
+                gap = _facing_gap(box, bb)
+                if gap is None:
+                    return False          # diagonal: no slot, no exemption
+                if (gap.xmax - gap.xmin <= _EPS
+                        or gap.ymax - gap.ymin <= _EPS):
+                    continue              # they abut exactly: one polygon
+                if merged is None:
+                    merged = [s for s, on in shapes
+                              if on == net and box.overlaps(s)]
+                if not _rects_cover(gap, merged):
+                    return False          # a real same-net notch
         return True
 
     def _choice_boxes(self, ch):
@@ -888,12 +972,31 @@ class GridRouter:
 
     # -- one net --
     def route_net(self, net: str) -> Tuple[Optional[RoutePlan], Optional[RoutingFailure]]:
+        """Connect one net.  Returns ``(plan, failure)``; BOTH may be set.
+
+        A stranded terminal used to abandon the whole net, and that is the
+        single assumption this router made that does not survive circuit
+        complexity.  It is invisible on a two-pin net -- losing one terminal
+        of two leaves nothing to route anyway -- but a supply net grows a
+        terminal per device, so on the 12-MOS clocked comparator one
+        unreachable ``body`` port threw away all 17 vdd terminals and all 13
+        vss ones.  The blast radius scaled with net degree, which is exactly
+        what scales with circuit size.
+
+        Now the reachable terminals are routed and the stranded ones are
+        reported.  The net is NOT marked complete -- ``run()`` keeps it out of
+        ``routed_nets`` -- so this cannot turn an open into a false pass; it
+        makes the failure local to the terminals that actually failed, gives
+        the placement feedback loop a gradient to work with, and leaves real
+        geometry behind for the debug artifacts (§62) instead of an empty net.
+        """
         stranded = [f"{k[0]}.{k[1]}" for k, ch in (self._chosen_access or {}).items()
                     if ch.net == net and not ch.legal]
+        strand_fail = None
         if stranded:
             ap = next(ch.ap for k, ch in self._chosen_access.items()
                       if ch.net == net and not ch.legal)
-            return None, RoutingFailure(
+            strand_fail = RoutingFailure(
                 net=net, cause="NO_LEGAL_VIA",
                 region=BoundingBox(ap.x - 1, ap.y - 1, ap.x + 1, ap.y + 1),
                 blocking_instances=sorted({s.split(".")[0] for s in stranded}),
@@ -903,7 +1006,7 @@ class GridRouter:
 
         groups = self.terminal_groups(net)
         if len(groups) < 2:
-            return None, None                     # nothing to connect
+            return None, strand_fail              # nothing left to connect
 
         width = self.width_for(net)
         plan = RoutePlan(net=net)
@@ -918,6 +1021,7 @@ class GridRouter:
         remaining.sort(key=lambda grp: self._group_distance(grp, tree))
 
         manhattan_total = 0.0
+        search_fail = None
         for grp in remaining:
             targets = set(tree)
             path, reason = self._search(net, grp, targets, list(targets))
@@ -925,23 +1029,37 @@ class GridRouter:
                 # try the other direction before declaring failure
                 path, reason = self._search(net, list(tree), set(grp), list(grp))
             if path is None:
-                return None, RoutingFailure(
+                # Keep what is already connected. Returning None here threw
+                # away every terminal group attached earlier in this same
+                # call, which is the same all-or-nothing mistake the stranded-
+                # terminal path used to make -- and this is the half that
+                # scales with CONGESTION rather than device geometry, so it is
+                # the one that grows as designs do. The net stays incomplete
+                # and the failure is still reported; only the already-good
+                # geometry survives, which is what lets the rip-up sweeps and
+                # the placement feedback loop see progress instead of a cliff.
+                search_fail = RoutingFailure(
                     net=net, cause=reason,
                     region=self._group_bbox(grp),
                     blocking_instances=self._blockers(grp),
                     suggested_action=self._suggestion(reason),
                     detail=f"could not attach terminal group at "
                            f"{[self.to_xy(c[0], c[1]) for c in grp[:2]]}")
+                break
             self._commit_access(plan, net, grp, width)
             manhattan_total += self._group_distance(grp, tree)
             self._commit_path(plan, net, path, width)
             tree.update(path)
             tree.update(grp)
 
+        failure = strand_fail or search_fail
+        if search_fail is not None and not plan.segments:
+            return None, failure          # nothing was connected at all
         plan.manhattan_min = manhattan_total
         actual = plan.wire_length()
         plan.detour_factor = (actual / manhattan_total) if manhattan_total > 1e-9 else 1.0
-        return plan, None
+        plan.partial = failure is not None
+        return plan, failure
 
     def _group_distance(self, grp, tree) -> float:
         best = float("inf")
@@ -1049,10 +1167,22 @@ class GridRouter:
     def _emit_segment(self, plan: RoutePlan, net: str, a, b, width: float):
         if a[:2] == b[:2]:
             return
+        layer = self.layers[a[2]]
+        # ``width_for(net)`` is decided before any path exists, so it cannot
+        # know which layer a segment will land on -- it returns the access
+        # layer's width for the whole net.  Minimum width is a PER-LAYER rule,
+        # and GF180's top metal is the one that differs: 0.44um against 0.28um
+        # for met2-met4 (MT.1).  A net routed at the access layer's width and
+        # then sent over met5 is a guaranteed width violation.  The layer is
+        # known exactly here and nowhere earlier, so the floor is applied here.
+        # The grid pitch already reserves room for the widest wire on any
+        # routing layer (see grid_params), so widening cannot create a spacing
+        # violation against a neighbouring track.
+        w = max(width, self.rules.min_width(layer))
         x1, y1 = self.to_xy(a[0], a[1])
         x2, y2 = self.to_xy(b[0], b[1])
-        plan.segments.append(Segment(net=net, layer=self.layers[a[2]],
-                                     x1=x1, y1=y1, x2=x2, y2=y2, width=width))
+        plan.segments.append(Segment(net=net, layer=layer,
+                                     x1=x1, y1=y1, x2=x2, y2=y2, width=w))
 
     # -- priority (§48) --
     def net_priority(self, net: str) -> Tuple[float, str]:
@@ -1083,6 +1213,7 @@ class GridRouter:
 
         best_plans: Dict[str, RoutePlan] = {}
         best_failures: List[RoutingFailure] = []
+        best_score: Optional[Tuple[int, int]] = None
 
         for it in range(self.cfg.ripup_iterations):
             self.occ.release_all()
@@ -1095,13 +1226,20 @@ class GridRouter:
                 plan, fail = self.route_net(net)
                 if plan is not None:
                     plans[net] = plan
-                elif fail is not None:
-                    failures.append(fail)
+                if fail is not None:
+                    failures.append(fail)      # a plan may be PARTIAL and still fail
 
+            done = sum(1 for p in plans.values() if not p.partial)
             self.cfg.log(1, f"  [ROUTER] iter {it + 1}/{self.cfg.ripup_iterations}: "
-                            f"{len(plans)}/{len(order)} routed, {len(failures)} failed")
+                            f"{done}/{len(order)} routed, {len(failures)} failed"
+                         + (f", {len(plans) - done} partial" if len(plans) > done else ""))
 
-            if len(plans) > len(best_plans) or (len(plans) == len(best_plans) and not best_plans):
+            # Score on nets fully connected, then on how few terminals are
+            # stranded.  Counting plans alone would let a sweep that routed
+            # fewer nets but produced more partials look like an improvement.
+            score = (done, -len(failures))
+            if best_score is None or score > best_score:
+                best_score = score
                 best_plans, best_failures = plans, failures
 
             if not failures:
@@ -1131,7 +1269,9 @@ class GridRouter:
             self.ctx.add_failure(f)
         for net, plan in best_plans.items():
             self.ctx.add_route(plan)
-            self.ctx.routed_nets[net].complete = True
+            # A partial plan carries real geometry but does not connect every
+            # terminal, so it must never be reported as a routed net.
+            self.ctx.routed_nets[net].complete = not plan.partial
         for f in best_failures:
             self.ctx.add_failure(f)
 
@@ -1230,31 +1370,68 @@ def _same_net_notch_fills(ctx, cfg):
     """
     rules = ctx.rules
     out = []
-    by_key = {}
+    segs = {}
     for seg in ctx.segments:
-        by_key.setdefault((seg.layer, seg.net), []).append(seg.bbox())
-    for (layer, net), boxes in by_key.items():
+        segs.setdefault((seg.layer, seg.net), []).append(seg.bbox())
+
+    # A route is not the only metal a net owns. Power-rail via drops and the
+    # device tap metal are registered as net-owned obstacles, never as
+    # segments, so a route that stops one track short of a rail drop left a
+    # sub-spacing gap that this pass could not even see. That is what both DRC
+    # engines reported as "Metal3 spacing < 0.28um" on the inverter, the ring
+    # oscillator and the RC filter -- and it was latent rather than new: the
+    # gap only opens at some grid alignments, so the historical routing pitch
+    # happened to avoid it. Pairing every segment against its own net's other
+    # metal closes the whole class instead of the alignments we have seen.
+    owned = {}
+    for ob in ctx.obstacles:
+        if ob.net:
+            owned.setdefault((ob.layer, ob.net), []).append(ob.bbox)
+
+    # foreign metal, per layer: a fill must never bridge into another net
+    foreign = {}
+    for ob in ctx.obstacles:
+        foreign.setdefault(ob.layer, []).append((ob.bbox, ob.net))
+    for seg in ctx.segments:
+        foreign.setdefault(seg.layer, []).append((seg.bbox(), seg.net))
+
+    def _fill_box(a, b, sp):
+        """The slot between a and b if it is a real notch, else None."""
+        if a.overlaps(b):
+            return None
+        gx = max(a.xmin, b.xmin) - min(a.xmax, b.xmax)
+        gy = max(a.ymin, b.ymin) - min(a.ymax, b.ymax)
+        oy = min(a.ymax, b.ymax) - max(a.ymin, b.ymin)
+        ox = min(a.xmax, b.xmax) - max(a.xmin, b.xmin)
+        if 0 < gx < sp and oy > 0:
+            return (min(a.xmax, b.xmax), max(a.ymin, b.ymin),
+                    max(a.xmin, b.xmin), min(a.ymax, b.ymax))
+        if 0 < gy < sp and ox > 0:
+            return (max(a.xmin, b.xmin), min(a.ymax, b.ymax),
+                    min(a.xmax, b.xmax), max(a.ymin, b.ymin))
+        return None
+
+    def _clear_of_other_nets(layer, net, x0, y0, x1, y1):
+        box = BoundingBox(min(x0, x1), min(y0, y1), max(x0, x1), max(y0, y1))
+        for bb, obnet in foreign.get(layer, ()):
+            if obnet != net and box.overlaps(bb):
+                return False
+        return True
+
+    for (layer, net), boxes in segs.items():
         sp = rules.min_spacing(layer)
         lt = rules.layer_tuple(layer)
-        for i in range(len(boxes)):
-            for j in range(i + 1, len(boxes)):
-                a, b = boxes[i], boxes[j]
-                if a.overlaps(b):
-                    continue
-                # gap along x, with a shared y extent (and vice versa)
-                gx = max(a.xmin, b.xmin) - min(a.xmax, b.xmax)
-                gy = max(a.ymin, b.ymin) - min(a.ymax, b.ymax)
-                oy = min(a.ymax, b.ymax) - max(a.ymin, b.ymin)
-                ox = min(a.xmax, b.xmax) - max(a.xmin, b.xmin)
-                if 0 < gx < sp and oy > 0:
-                    x0, x1 = min(a.xmax, b.xmax), max(a.xmin, b.xmin)
-                    y0, y1 = max(a.ymin, b.ymin), min(a.ymax, b.ymax)
-                elif 0 < gy < sp and ox > 0:
-                    x0, x1 = max(a.xmin, b.xmin), min(a.xmax, b.xmax)
-                    y0, y1 = min(a.ymax, b.ymax), max(a.ymin, b.ymin)
-                else:
-                    continue
-                out.append(([[x0, y0], [x1, y0], [x1, y1], [x0, y1]], lt))
+        pairs = [(boxes[i], boxes[j])
+                 for i in range(len(boxes)) for j in range(i + 1, len(boxes))]
+        pairs += [(a, b) for a in boxes for b in owned.get((layer, net), ())]
+        for a, b in pairs:
+            got = _fill_box(a, b, sp)
+            if got is None:
+                continue
+            x0, y0, x1, y1 = got
+            if not _clear_of_other_nets(layer, net, x0, y0, x1, y1):
+                continue          # bridging here would short another net
+            out.append(([[x0, y0], [x1, y0], [x1, y1], [x0, y1]], lt))
     if out:
         cfg.log(2, f"  [ROUTER] {len(out)} same-net notch(es) filled")
     return out

@@ -468,7 +468,7 @@ def assemble_gds(top: str, modules: Sequence["Module"], outdir: str, *,
     import gdstk
 
     os.makedirs(outdir, exist_ok=True)
-    lib = gdstk.Library(name=top, unit=1e-6, precision=5e-9)
+    lib = gdstk.Library(name=top, unit=1e-6, precision=1e-9)  # GF180 DBU rule
     topcell = gdstk.Cell(top)
     lib.add(topcell)
 

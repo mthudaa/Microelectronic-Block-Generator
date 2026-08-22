@@ -1,0 +1,9 @@
+* Inverter.
+*
+* Smallest possible CMOS block: one PMOS, one NMOS.
+* complexity: 2 MOS, 4 nets, max net degree 7
+.lib "{PDK_LIB}" typical
+.subckt inverter vdd vss in out
+XM1p out in vdd vdd pfet_03v3 L=1u W=4u nf=1
+XM1n out in vss vss nfet_03v3 L=1u W=2u nf=1
+.ends

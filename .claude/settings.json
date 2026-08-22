@@ -2,8 +2,8 @@
   "permissions": {
     "defaultMode": "default",
     "allow": [
-      "Bash(./scripts/install_agents.sh:*)",
-      "Bash(bash scripts/install_agents.sh:*)",
+      "Bash(./install.sh --stage agents:*)",
+      "Bash(bash install.sh --stage agents:*)",
       "Bash(docker ps:*)",
       "Bash(find:*)",
       "Bash(git branch:*)",

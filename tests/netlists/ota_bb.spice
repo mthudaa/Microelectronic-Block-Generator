@@ -1,0 +1,14 @@
+* DNW Body-Biased OTA.
+*
+* Body-biased OTA. XM1's bulk sits on vbb rather than vss, so it can
+* only be built with a deep n-well; the isolation propagates to XM2 to
+* keep the differential pair matched.
+* complexity: 5 MOS, 8 nets, max net degree 8
+.lib "{PDK_LIB}" typical
+.subckt ota_bb vdd vss inp inm out vb vbb
+XM1  net1 inp net2 vbb nfet_03v3 L=1u W=4u nf=4
+XM2  out  inm net2 vss nfet_03v3 L=1u W=4u nf=4
+XM3  net1 net1 vdd vdd pfet_03v3 L=1u W=4u nf=4
+XM4  out  net1 vdd vdd pfet_03v3 L=1u W=4u nf=4
+XM5  net2 vb  vss vss nfet_03v3 L=1u W=4u nf=4
+.ends

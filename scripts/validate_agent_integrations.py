@@ -468,11 +468,15 @@ def check_broken_references(root: Path, manifest: dict, skills: dict, res: Resul
             continue
         # Accept any executable script under scripts/, not just Python — the
         # setup and install entry points are shell scripts.
-        m = re.search(r"(scripts/[A-Za-z0-9_./-]+\.(?:py|sh))", cmd)
+        # scripts/*.py|sh, or the repo-root install.sh. The four installers
+        # that used to live under scripts/ were merged into one install.sh at
+        # the root, so restricting this to scripts/ would reject the very
+        # command the manifest is supposed to advertise.
+        m = re.search(r"((?:scripts/)?[A-Za-z0-9_./-]+\.(?:py|sh))", cmd)
         if not m:
             problems.append(
                 f".ai/manifest.json: capability '{cap_id}' command '{cmd}' "
-                "does not name a scripts/*.py or scripts/*.sh file")
+                "does not name a scripts/*.py, scripts/*.sh or ./install.sh file")
             continue
         script_rel = m.group(1)
         if not (root / script_rel).is_file():

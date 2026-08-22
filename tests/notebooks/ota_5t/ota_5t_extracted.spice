@@ -1,25 +1,25 @@
 * NGSPICE file created from ota_5t.ext - technology: gf180mcuD
 
 .subckt ota_5t vb out inm inp vss vdd
-X0 vdd a_n3006_4433# out vdd pfet_03v3 ad=0.6p pd=3.2u as=0.28p ps=1.56u w=1u l=1u
-X1 vdd a_n3006_4433# a_n3006_4433# vdd pfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=1u
-X2 vss vb w_n4092_3504# vss nfet_03v3 ad=0.6p pd=3.2u as=0.28p ps=1.56u w=1u l=1u
-X3 vdd a_n3006_4433# out vdd pfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=1u
-X4 w_n4092_3504# inm out w_n4092_3504# nfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=1u
-X5 w_n4092_3504# inm out w_n4092_3504# nfet_03v3 ad=0.6p pd=3.2u as=0.28p ps=1.56u w=1u l=1u
-X6 vss vb w_n4092_3504# vss nfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=1u
-X7 w_n4092_3504# inp a_n3006_4433# w_n4092_3504# nfet_03v3 ad=0.6p pd=3.2u as=0.28p ps=1.56u w=1u l=1u
-X8 w_n4092_3504# vb vss vss nfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=1u
-X9 vdd a_n3006_4433# a_n3006_4433# vdd pfet_03v3 ad=0.6p pd=3.2u as=0.28p ps=1.56u w=1u l=1u
-X10 w_n4092_3504# vb vss vss nfet_03v3 ad=0.28p pd=1.56u as=0.6p ps=3.2u w=1u l=1u
-X11 w_n4092_3504# inp a_n3006_4433# w_n4092_3504# nfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=1u
-X12 out a_n3006_4433# vdd vdd pfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=1u
-X13 out inm w_n4092_3504# w_n4092_3504# nfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=1u
-X14 out a_n3006_4433# vdd vdd pfet_03v3 ad=0.28p pd=1.56u as=0.6p ps=3.2u w=1u l=1u
-X15 out inm w_n4092_3504# w_n4092_3504# nfet_03v3 ad=0.28p pd=1.56u as=0.6p ps=3.2u w=1u l=1u
-X16 a_n3006_4433# a_n3006_4433# vdd vdd pfet_03v3 ad=0.28p pd=1.56u as=0.6p ps=3.2u w=1u l=1u
-X17 a_n3006_4433# a_n3006_4433# vdd vdd pfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=1u
-X18 a_n3006_4433# inp w_n4092_3504# w_n4092_3504# nfet_03v3 ad=0.28p pd=1.56u as=0.6p ps=3.2u w=1u l=1u
-X19 a_n3006_4433# inp w_n4092_3504# w_n4092_3504# nfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=1u
+X0 a_n3610_5037# inp w_n4696_4108# w_n4696_4108# nfet_03v3 ad=0.28p pd=1.56u as=0.6p ps=3.2u w=1u l=1u
+X1 out a_n3610_5037# vdd vdd pfet_03v3 ad=0.28p pd=1.56u as=0.6p ps=3.2u w=1u l=1u
+X2 out inm w_n4696_4108# w_n4696_4108# nfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=1u
+X3 vss vb w_n4696_4108# vss nfet_03v3 ad=0.6p pd=3.2u as=0.28p ps=1.56u w=1u l=1u
+X4 a_n3610_5037# a_n3610_5037# vdd vdd pfet_03v3 ad=0.28p pd=1.56u as=0.6p ps=3.2u w=1u l=1u
+X5 a_n3610_5037# a_n3610_5037# vdd vdd pfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=1u
+X6 vss vb w_n4696_4108# vss nfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=1u
+X7 w_n4696_4108# inm out w_n4696_4108# nfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=1u
+X8 w_n4696_4108# vb vss vss nfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=1u
+X9 a_n3610_5037# inp w_n4696_4108# w_n4696_4108# nfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=1u
+X10 w_n4696_4108# vb vss vss nfet_03v3 ad=0.28p pd=1.56u as=0.6p ps=3.2u w=1u l=1u
+X11 vdd a_n3610_5037# out vdd pfet_03v3 ad=0.6p pd=3.2u as=0.28p ps=1.56u w=1u l=1u
+X12 vdd a_n3610_5037# a_n3610_5037# vdd pfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=1u
+X13 vdd a_n3610_5037# out vdd pfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=1u
+X14 w_n4696_4108# inm out w_n4696_4108# nfet_03v3 ad=0.6p pd=3.2u as=0.28p ps=1.56u w=1u l=1u
+X15 w_n4696_4108# inp a_n3610_5037# w_n4696_4108# nfet_03v3 ad=0.6p pd=3.2u as=0.28p ps=1.56u w=1u l=1u
+X16 vdd a_n3610_5037# a_n3610_5037# vdd pfet_03v3 ad=0.6p pd=3.2u as=0.28p ps=1.56u w=1u l=1u
+X17 out inm w_n4696_4108# w_n4696_4108# nfet_03v3 ad=0.28p pd=1.56u as=0.6p ps=3.2u w=1u l=1u
+X18 w_n4696_4108# inp a_n3610_5037# w_n4696_4108# nfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=1u
+X19 out a_n3610_5037# vdd vdd pfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=1u
 .ends
 

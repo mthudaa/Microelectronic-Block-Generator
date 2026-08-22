@@ -15,9 +15,10 @@ LVS-matched GDSII you can tape out.
 [![Python](https://img.shields.io/badge/Python-3.10+-2b8a3e?style=for-the-badge&logo=python&logoColor=white)](pyproject.toml)
 [![Chipathon](https://img.shields.io/badge/SSCS_Chipathon-2026_·_Track_D-c2255c?style=for-the-badge)](https://github.com/sscs-ose/sscs-chipathon-2026)
 
-![DRC](https://img.shields.io/badge/DRC-clean_6%2F6-2b8a3e?style=flat-square)
-![LVS](https://img.shields.io/badge/LVS-match_6%2F6-2b8a3e?style=flat-square)
-![Connectivity](https://img.shields.io/badge/connectivity-0_opens_·_0_shorts-2b8a3e?style=flat-square)
+![Magic DRC](https://img.shields.io/badge/Magic_DRC-clean_7%2F7-2b8a3e?style=flat-square)
+![LVS](https://img.shields.io/badge/LVS-match_7%2F7-2b8a3e?style=flat-square)
+![DRC signoff](https://img.shields.io/badge/dual--DRC_sign--off-7%2F7-2b8a3e?style=flat-square)
+![Tests](https://img.shields.io/badge/tests-209_passing-2b8a3e?style=flat-square)
 ![Agents](https://img.shields.io/badge/agents-OpenCode_·_Claude_·_Codex-1971c2?style=flat-square)
 
 </div>
@@ -40,6 +41,9 @@ route is reported as a failure rather than quietly emitted as geometry.
 | 🧭 **DRC-aware routing** | A\* grid maze router with negotiated rip-up and via legality checks |
 | 🔍 **Self-verifying** | Union-find connectivity check catches opens/shorts *before* signoff |
 | 🧱 **Native passives** | Real `ppolyf_u` resistors and metal4/metal5 MIM caps, built from PDK layers |
+| 🥇 **Dual-engine DRC** | KLayout runs the GF180 foundry deck as sign-off; Magic checks independently |
+| 🔁 **PEX-aware search** | Two optimisation loops; candidates measured, compared, promoted or rolled back |
+| 🧑‍⚖️ **Multi-agent review** | Independent Devil/Angel critics — they can block, never approve past a failed gate |
 | 📦 **Tapeout-ready** | Emits GDS · LEF · LIB · Verilog · SPICE · PEX · SVG for LibreLane |
 
 ---
@@ -98,40 +102,244 @@ routed, DRC-clean GDS layout.
 | **PDK** | GF180MCU (`gf180mcuD`) — 3.3V, 180nm |
 | **Schematic** | Xschem + Ngspice |
 | **Layout** | gLayout + gdsfactory |
-| **Physical Verification** | Magic (DRC), Netgen (LVS), Magic (PEX) |
+| **Physical Verification** | KLayout (DRC sign-off) + Magic (DRC, PEX), Netgen (LVS) |
 | **AI/LLM** | DeepSeek API |
-| **Install** | local scripts (`setup_env.sh`) — Docker optional |
+| **Install** | one `./install.sh` — no Docker, no root |
 | **Languages** | Python 3, SPICE, Tcl, Bash |
+
+---
+
+## 🆕 What Changed in v0.2
+
+Every claim below is backed by something you can re-run. The sections that
+follow carry the detail and the exact command.
+
+### Sign-off
+
+| Change | Why it matters |
+| :--- | :--- |
+| **KLayout is now the DRC sign-off authority**, running the GF180 foundry deck alongside Magic | Magic's rules are an approximation of the foundry's. Running only Magic passed layouts the foundry deck rejects. Both engines must agree — see *"Dual-engine DRC — KLayout sign-off, Magic complementary"* |
+| **`DRC_DISAGREEMENT` is a distinct verdict** | A Magic failure the foundry deck calls clean is not silently a pass, and not silently a fail — it is surfaced |
+| **Missing KLayout reports `CONFIGURATION_FAILURE`, never PASS** | A missing checker used to look exactly like a clean run |
+
+### Correctness fixes found by the new sign-off
+
+| Fix | Symptom it removed |
+| :--- | :--- |
+| **GDS database unit 1e-9** (was 5e-9) | Every emitted GDS violated the GF180 DBU rule. Caught by KLayout, not by Magic |
+| **DNW devices get a substrate tap ring outside the deep n-well** | `DN.3` violations on the body-biased OTA; the PPLUS tie sat inside the DNWELL |
+| **Native passive rules corrected** — `PRES.6` 0.28 µm, `V4.1` 0.26 µm, `MIMTM.9` 0.50 µm | Wrong enclosure and via geometry on resistors and MIM capacitors |
+
+### Flow
+
+- **`/mbg-full-auto`** — one command from a written specification to a
+  signed-off layout. It replaces `mbg-full-automate`, which was documented as a
+  command but was never actually invocable.
+- **Two-loop PEX-aware flow** — a pre-layout loop and a second loop that closes
+  on *extracted* parasitics, so the number you sign off on is the post-layout one.
+- **Multi-agent review** — Designer proposes; **Devil** attacks the result and
+  **Angel** defends it independently; a Synthesizer rules on the evidence.
+- **Branch-and-compare search** with rollback, a design memory, sensitivity
+  analysis and a Pareto archive, replacing single-path refinement.
+
+### Every module emits nine views
+
+`GDS · LEF · LIB · schematic SPICE · PEX SPICE · Verilog · SVG · DRC report · LVS report`
+
+`scripts/integrate_modules.py` consumes the LEF/LIB pair directly, so a block
+drops into a **LibreLane** chip-level flow without a hand-written wrapper.
+
+### Installation
+
+| Change | Detail |
+| :--- | :--- |
+| **Five install scripts merged into one `./install.sh`** | Six stages — `python pdk eda shell agents global` — one argument parser, one set of helpers |
+| **Global install** | `/mbg-*` slash commands work in any directory, for the whole user account, not only inside this checkout |
+| **Shell integration** | One idempotent block in `~/.bashrc`; EDA tools pinned by **absolute path**, so DRC sign-off survives a `PATH` that has no `klayout` on it |
+| **`mbg` / `mbg-python` launchers** | MBG's interpreter without activating a venv in every unrelated shell |
+| **Nothing needs root or Docker** | `--deps --yes` is the only path that asks for `sudo`, and only for OS packages |
+
+Licensed under **Apache 2.0**.
 
 ---
 
 ## ⚡ Design Flow
 
-```mermaid
-flowchart LR
-    A["💬 Prompt"] --> B["🤖 LLM<br/>netlist"]
-    B --> C["📄 SPICE"]
-    C --> D["🔬 ngspice<br/>measure"]
-    D -->|specs not met| B
-    D -->|specs met| E["🧩 Parse<br/>devices + constraints"]
-    E --> F["📐 Analog-aware<br/>placement"]
-    F --> G["🧭 DRC-aware<br/>grid routing"]
-    G --> H["🔍 Connectivity<br/>opens / shorts"]
-    H -->|fail| F
-    H -->|clean| I["📦 GDSII<br/>+ LEF/LIB/Verilog/SVG"]
-    I --> J["✅ DRC"] --> K["✅ LVS"] --> L["⚡ PEX"]
-    L --> M["🚀 Tapeout"]
+MBG has **two optimization loops**, not one.
 
-    style A fill:#6741d9,stroke:#4c2fb8,color:#fff
-    style B fill:#6741d9,stroke:#4c2fb8,color:#fff
-    style M fill:#2b8a3e,stroke:#1d6329,color:#fff
-    style H fill:#c2255c,stroke:#9c1a48,color:#fff
+```mermaid
+flowchart TD
+    SPEC["📋 Specifications"] --> RSPEC{{"🧑‍⚖️ Devil + Angel<br/>review"}}
+    RSPEC --> INIT["🧬 Initial Circuit"]
+    INIT --> PRESIM["🔬 Pre-Layout Simulation"]
+    PRESIM --> RPRE{{"🧑‍⚖️ Review"}}
+    RPRE --> PREEVAL{"Specs met?"}
+    PREEVAL -->|No| PRETUNE["🔧 Fine-Tune<br/>sizing · bias · topology"]
+    PRETUNE --> PRESIM
+    PREEVAL -->|Yes| LAYOUT["📐 Generate Layout"]
+
+    LAYOUT --> MDRC["✅ Magic DRC<br/>independent check"]
+    LAYOUT --> KDRC["🥇 KLayout DRC<br/>GF180 foundry deck"]
+    MDRC --> GATE{{"DRC sign-off<br/>reconciliation"}}
+    KDRC --> GATE
+    GATE --> LVS["✅ LVS"]
+    LVS --> PEXX["⚡ PEX Extraction"]
+    PEXX --> PEXSIM["🔬 PEX Simulation"]
+    PEXSIM --> RPEX{{"🧑‍⚖️ Devil + Angel<br/>review"}}
+    RPEX --> PEXEVAL{"Specs met?"}
+    PEXEVAL -->|No| PEXTUNE["🔧 PEX-Aware Fine-Tune<br/>circuit + layout constraints"]
+    PEXTUNE --> LAYOUT
+    PEXEVAL -->|Yes| SIGN{{"🧑‍⚖️ Sign-off review<br/>+ objective gate"}}
+    SIGN --> DONE["🚀 TAPEOUT_READY"]
+
+    style SPEC fill:#6741d9,stroke:#4c2fb8,color:#fff
+    style PRETUNE fill:#c2255c,stroke:#9c1a48,color:#fff
+    style PEXTUNE fill:#c2255c,stroke:#9c1a48,color:#fff
+    style PEXSIM fill:#1971c2,stroke:#14549a,color:#fff
+    style RSPEC fill:#f08c00,stroke:#c77700,color:#fff
+    style RPRE fill:#f08c00,stroke:#c77700,color:#fff
+    style RPEX fill:#f08c00,stroke:#c77700,color:#fff
+    style KDRC fill:#1971c2,stroke:#14549a,color:#fff
+    style GATE fill:#f08c00,stroke:#c77700,color:#fff
+    style SIGN fill:#f08c00,stroke:#c77700,color:#fff
+    style DONE fill:#2b8a3e,stroke:#1d6329,color:#fff
 ```
 
-The loop that matters is `D → B`: the agent keeps rewriting the netlist until
-ngspice says the specifications are met. The second loop, `H → F`, is the one
-most flows omit — if the router can't complete a net, placement is retried
-rather than shipping a layout with a hidden open.
+Every stage is reviewed by two **independent** critics before the flow moves
+on. They advise; the tools decide.
+
+> **Loop A** — pre-layout optimization — finds a nominal circuit solution.
+> **Loop B** — PEX-aware optimization — closes the loop on layout parasitics
+> and produces the final sign-off candidate.
+
+**PEX is feedback, not a final verification stamp.** A post-layout
+specification miss starts an optimization iteration; it does not end the run.
+Pre-layout PASS is not a finished design.
+
+Three separations are load-bearing:
+
+| | |
+| :--- | :--- |
+| **PEX extraction ≠ PEX simulation** | Extraction can succeed while the design misses every target. They report separately. |
+| **Tool failure ≠ spec failure** | ngspice crashing does not mean the gain is too low. The optimizer must not tune in response to a broken tool. |
+| **Verification gates extraction** | DRC or LVS failing ⇒ PEX and PEX simulation are `SKIP`, never run on a layout known to be wrong. |
+
+### Why this matters — measured, not asserted
+
+The regression inverter, biased at its own trip point, is a real small-signal
+amplifier. Extraction costs it most of its bandwidth:
+
+| Metric | Pre-layout | PEX | Δ |
+| :--- | ---: | ---: | ---: |
+| DC gain | 38.5 dB | 38.5 dB | ~0 |
+| −3 dB bandwidth | **158.5 MHz** | **63.1 MHz** | **−60%** |
+
+Gain is untouched and bandwidth collapses — the signature of capacitive
+loading. A flow that stops at "PEX extraction completed" reports this design
+as finished. `tests/test_pex_regression.py` reproduces these numbers.
+
+### A real PEX-aware run
+
+Actual output from the inverter above, with `bw_hz >= 100 MHz` — a target it
+meets before layout and misses after. Every number here is measured, not
+illustrative:
+
+```text
+[FLOW] Pre-layout iteration: 1/2
+[SPECS]
+  gain_db       38.52 dB       >= 30 dB  PASS
+  bw_hz     1.585e+08 Hz  >= 1e+08 Hz    PASS
+[FLOW] Pre-layout specifications satisfied.
+[FLOW] Starting layout generation.
+
+[VERIFY] DRC PASS      [VERIFY] LVS PASS      [PEX] Extraction PASS
+[FLOW] Stage: PEX_SIMULATION
+[SPECS]
+  gain_db       38.52 dB       >= 30 dB  PASS
+  bw_hz      6.31e+07 Hz  >= 1e+08 Hz    FAIL      <-- parasitics
+
+[PEX] Pre-layout vs post-layout:
+  bw_hz: 1.585e+08 Hz -> 6.31e+07 Hz  delta -9.54e+07 Hz (-60.2%)  worse  [FAIL]
+[OPTIMIZE] Entering PEX-aware fine-tuning iteration 2.
+                                   ... layout regenerated, DRC/LVS/PEX re-run
+
+[SPECS]
+  gain_db       35.81 dB       >= 30 dB  PASS
+  bw_hz     8.913e+07 Hz  >= 1e+08 Hz    FAIL
+```
+
+| Metric | Pre-layout | PEX iter 1 | PEX iter 2 | Target | |
+| :--- | ---: | ---: | ---: | ---: | :--- |
+| `gain_db` | 38.52 dB | 38.52 dB | 35.81 dB | ≥ 30 dB | PASS |
+| `bw_hz` | 158.5 MHz | 63.1 MHz | **89.1 MHz** | ≥ 100 MHz | FAIL |
+
+Widening the critical net recovered **41% of the lost bandwidth** (63.1 →
+89.1 MHz). It still missed the target, so with `max_pex_iterations=2` the run
+ended `NOT_CONVERGED / DESIGN_FAILURE` and reported iteration 2 as the best —
+which is the honest outcome, not a failure of the flow. Raising the limit, or
+supplying a better `tune_post`, is what closes the remaining gap.
+
+Reproduce with `tests/test_pex_regression.py`.
+
+### Running the flow
+
+```python
+from mbg import Spec, DesignPoint, FlowConfig, DesignFlow, make_hooks
+
+specs = [Spec("gain_db", ">=", 30.0, " dB"),
+         Spec("bw_hz",   ">=", 100e6, " Hz")]
+
+hooks = make_hooks(cell="inverter", in_node="in", out_node="out",
+                   supplies={"vdd": 3.3, "vss": 0.0},
+                   spec_names=[s.name for s in specs])
+
+res = DesignFlow(hooks, FlowConfig(specs=specs, outdir="outputs/inv")).run(
+    DesignPoint(cell="inverter", netlist=netlist))
+
+res.status              # PASS | FAIL | NOT_CONVERGED | ERROR
+res.failure             # SPEC_FAILURE | TOOL_FAILURE | VERIFICATION_FAILURE | ...
+res.degradation         # pre-layout vs PEX, worst metric first
+res.best_pex_iteration  # the best design is never silently lost
+print(res.summary())
+```
+
+Iteration history is written to `<outdir>/history.json`. Both loops are
+bounded (`max_pre_iterations`, `max_pex_iterations`, plus a `patience` stop
+when tuning stops helping), so a run always terminates.
+
+Diagnostics name the stage and the iteration:
+
+```text
+[FLOW] Stage: PEX_SIMULATION
+[FLOW] PEX iteration: 1/8
+
+[SPECS]
+  gain_db      38.52 dB       >= 30 dB  PASS
+  bw_hz     6.31e+07 Hz  >= 1e+08 Hz    FAIL
+
+[PEX] Pre-layout vs post-layout:
+  bw_hz: 1.585e+08 Hz -> 6.31e+07 Hz  delta -9.54e+07 Hz (-60.2%)  worse  [FAIL]
+
+[PEX] Post-layout specification target not met.
+[OPTIMIZE] Entering PEX-aware fine-tuning iteration 2.
+```
+
+### What is automated, and what is not
+
+Being precise about this, because "automatic analog optimization" claims a lot:
+
+| | Status |
+| :--- | :--- |
+| Two-loop flow, stage sequencing, verification gating, stop conditions, history, best-design tracking | **framework-supported** — `mbg.flow`, fully implemented and tested |
+| Spec evaluation and pre-layout vs PEX degradation analysis | **framework-supported** — `mbg.specs` |
+| PEX simulation of the extracted netlist | **framework-supported** — `mbg.flow_runtime` |
+| Choosing *what* to change when PEX misses spec | **agent-assisted** — the bundled `tune_pre`/`tune_post` are documented heuristics (scale widths, widen critical nets), not an analog optimizer. Supply your own via `FlowHooks`. |
+| Layout-constraint feedback (critical-net width, matched routing) reaching the placer/router | **partial** — constraints are carried on `DesignPoint.layout` and passed through; not every constraint is consumed by the router yet |
+| Automatic topology change | **not implemented** |
+
+`DesignPoint` keeps `circuit` and `layout` parameters separate because
+post-layout tuning is not only sizing — a parasitic problem caused by a long
+coupled route is not fixable by resizing a transistor.
 
 ### Primary Pipeline API
 
@@ -188,12 +396,338 @@ regression suites that exercise the full design flow.
 
 ---
 
+## 🧩 Complex Subcircuit Support
+
+The reference blocks MBG grew up on — an inverter, a ring oscillator, a 5T
+OTA — are small and, more importantly, *regular*: each is built from one or
+two distinct transistor sizes. A 12-MOS two-stage clocked comparator is
+neither, and it found a real complexity boundary. What that boundary actually
+was is worth stating plainly, because the obvious answers were wrong.
+
+### Device count did not predict the failure
+
+| Design | MOS | nets | max net degree | +rail taps | matched groups | distinct (W, L) |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `rc_filter` | 0 | 3 | 2 | 5 | 0 | – |
+| `inverter` | 2 | 4 | 2 | 6 | 0 | 2 |
+| `ota_5t` | 5 | 8 | 4 | 8 | 1 | 2 |
+| `ota_bb` | 5 | 9 | 4 | 8 | 2 | 1 |
+| `ring_osc_3` | 6 | 5 | 6 | 10 | 0 | 2 |
+| `vref_1v2` | 7 | 6 | 7 | 11 | 2 | 2 |
+| `strongarm` | 11 | 10 | **12** | **16** | 2 | **1** |
+| `cmp_2stage_clk` | 12 | 11 | **12** | **16** | 4 | **7** |
+
+The 11-MOS StrongArm comparator has the *same* maximum net degree as the
+12-MOS clocked comparator — 12 device terminals on `vdd`, 16 counting the
+power-rail taps — and it passed throughout. Device count differs by one. What
+separates them is the last column: every earlier design uses one or two
+transistor geometries, and the clocked comparator uses seven. Heterogeneous
+sizing produces heterogeneous tap rings and row heights, and it was that
+floorplan in which some `body` terminals could find no legal via landing.
+
+So **no scalar metric is a go/no-go predictor here**, and the regression is
+built as coverage rather than as a threshold: reproduce the table with
+`python tests/test_complexity_ladder.py`.
+
+### What was fixed, and what generalises
+
+| Root cause | Fix | Generalises to |
+| :--- | :--- | :--- |
+| A stranded terminal abandoned the **whole net** — so blast radius scaled with net degree, which scales with circuit size | `route_net()` returns a plan *and* a failure; reachable terminals stay routed, the net is not marked complete | Any high-degree net; both the via-landing and the congestion failure paths |
+| The DRC predicate judged a **notch per polygon**, so a pin escape drawn on a device's own tap ring was rejected against pads that ring encloses | A same-net near-miss is legal only when the facing slot is covered by same-net metal the new shape merges with (exact rectangle cover) | Every device whose terminal sits on multi-polygon tap metal |
+| One wire **width per net**, chosen before the layer was known | `_emit_segment` raises each segment to its own layer's minimum | GF180 top metal (MT.1 = 0.44 µm vs 0.28 µm); any non-uniform stack |
+| The grid pitch multiplied the **widest layer's width by the widest multiplier** and added the largest spacing — a wire that exists on no layer | Per-layer pitch, from one function the router and the power rails both use | Any PDK whose layers do not share one rule |
+| Notch filling looked only at **route segments**, so a route stopping short of its own net's rail via drop left a gap nothing could see | Segments are paired against their net's obstacle metal too, and no fill may overlap another net | Power rails, device tap metal, anything net-owned |
+| `all_pass` read **Magic only**; a KLayout failure, or KLayout never running, still reported success | All four legs: Magic **and** the dual-engine sign-off verdict **and** LVS **and** internal connectivity | Every caller of the primary API |
+| A port label fell back to an **arbitrary access point** when a net was unrouted — able to name a foreign node after a port and manufacture a false LVS match | Labelling is refused for a multi-terminal net with no routed geometry, and says so | Any design where routing does not complete |
+| `missing_access` — a SPICE terminal that never got an access point — was computed, printed, and **left out of the gate** | Folded into `verification["clean"]` | Terminals dropped before routing ever sees them |
+
+Also in the front end: `+` line continuations, `$` / `;` inline comments, and
+PDK inference from device models when no `.lib` line is present — plus a
+validation pass that refuses a transistor with no usable W/L, a truncated
+instance line, or an unrecognised model, **by name**, before layout starts.
+
+### Result
+
+```text
+12-MOS Two-Stage Clocked Comparator
+  internal connectivity   CLEAN  (0 opens, 0 shorts, 0 missing access)
+  Magic DRC               CLEAN
+  KLayout DRC             CLEAN   (GF180 foundry deck)
+  DRC sign-off            PASS
+  LVS                     MATCH   (11 nets == 11 nets, 12 == 12 devices)
+  PEX extraction          OK      (39 coupling capacitors)
+```
+
+No GDS was hand-edited, no rule deck weakened, no LVS rule relaxed, and the
+reference SPICE is unchanged. All eight regression designs pass all four legs.
+
+### Tested limits — and what is *not* claimed
+
+- **Verified**: up to **12 MOS / 11 nets / max net degree 16**, on GF180MCU
+  3.3 V, flat (single `.subckt`), 3 signal routing layers (met3–met5) over
+  device metal on met1/met2, with differential-pair, current-mirror and
+  matched-group constraints.
+- **Not claimed**: hierarchical designs (nested `.subckt` are not flattened —
+  the child's devices are not seen), `.param` expansion, case-insensitive net
+  names, and anything above the tested device count. Larger blocks may well
+  work; they have not been signed off here, and this table will say so when
+  they are.
+
+---
+
+## 🤖 Fully Automated Design — `/mbg-full-auto`
+
+One design request in; a tapeout-ready package or a diagnosed failure out.
+
+```text
+/mbg-full-auto "Design a 5T OTA in GF180 with VDD=3.3 V, gain >= 40 dB,
+bandwidth >= 100 MHz, phase margin >= 60 deg, power <= 1 mW, CL = 1 pF.
+Produce a tapeout-ready package and design report."
+```
+
+Identical command on **Claude Code, Codex and OpenCode** — one canonical
+definition in `.ai/`, generated into each platform.
+
+```python
+from mbg import Spec, make_hooks
+from mbg.full_auto import run_full_auto, FullAutoConfig
+
+res = run_full_auto(request, make_hooks(...),
+                    config=FullAutoConfig(outdir="outputs/ota_5t"))
+res.status          # SUCCESS | NOT_CONVERGED | BLOCKED | TOOL_FAILURE | ...
+res.tapeout_ready   # True only when every gate condition PASSed
+res.report_path
+```
+
+### Dual-engine DRC — KLayout sign-off, Magic complementary
+
+```text
+             ┌→ Magic DRC    (techfile rules — independent check)
+Layout / GDS ─┤
+             └→ KLayout DRC  (GF180 foundry deck — sign-off authority)
+                       │
+                 reconciliation
+                       │
+                 LVS → PEX
+```
+
+MBG uses KLayout as the primary DRC sign-off engine for the GF180 rule deck
+shipped with the PDK (`libs.tech/klayout/tech/drc/gf180mcu.drc`, ~600 checks),
+and runs Magic as an independent complementary DRC check. Neither is
+"better" in the abstract — they implement different rule sets, which is
+exactly why running both is worth the time.
+
+| Situation | Verdict |
+| :--- | :--- |
+| both CLEAN | `PASS` |
+| KLayout FAIL | `FAIL` |
+| Magic FAIL, KLayout CLEAN | `DRC_DISAGREEMENT` — investigate, **not** a pass |
+| either ERROR | `ERROR` |
+| KLayout or its deck missing | `CONFIGURATION_FAILURE` |
+| engines saw different GDS hashes | `ERROR` |
+
+Both engines run on the same GDS, verified by hash. Counts are never compared
+between engines — only statuses — and each engine's rule breakdown is kept.
+
+Two traps this design guards against:
+
+- **The GF180 deck always exits 0**, even with violations (its `exit()` is
+  commented out for LibreLane compatibility). The verdict comes from the
+  `.lyrdb` database; a run that produced no database is `ERROR`, never
+  "0 violations".
+- **Scope.** Die-level density rules (`M1.4`: *"metal coverage over the entire
+  die shall be >30%"*) cannot be met by a leaf cell — they are satisfied by
+  fill during chip assembly. Cell sign-off runs `decks=all,-density,-dummy`;
+  an assembled die runs `decks=all`. That is scope, not relaxation.
+
+#### What it found
+
+Adding KLayout immediately surfaced **real defects Magic never checked**:
+
+| Rule | Requirement | MBG had | Where |
+| :--- | :--- | :--- | :--- |
+| `DBU` | database unit must be 0.001 µm | **0.005 µm** | every GDS written |
+| `V4.1` ×200 | via4 cut = 0.26 µm | **0.28 µm** | MIM capacitor |
+| `MIMTM.9` ×84 | via spacing ≥ 0.5 µm on MIM top plate | **0.36 µm** | MIM capacitor |
+| `PRES.6` | salicide-block overlap ≥ 0.28 µm | **0.20 µm** | poly resistor |
+| `DN.3` | DNWELL needs a PCOMP guard ring | absent | DNW devices |
+
+All are fixed. The RC filter went from **288 violations to 0**, and enabling
+the substrate guard ring on deep-n-well devices cleared `DN.3`, so the
+regression is **8/8 on both engines**.
+
+Artifacts land in `<design>/verification/`: `klayout_drc.log`,
+`<cell>.klayout.lyrdb` (open with `klayout <gds> -m <lyrdb>` to see markers),
+`magic_drc.log`, and `drc_summary.json`.
+
+### Convergence-driven multi-agent design
+
+`/mbg-full-auto` runs an evidence-driven **search**, not a couple of guesses.
+
+**What was wrong.** The optimizer took one fixed step per iteration with a
+two-iteration budget. On the regression inverter it went 63.1 → 89.1 MHz
+against a 100 MHz target and reported `NOT_CONVERGED`. A measured sweep found
+the passing design one step further on. The direction was right; the step
+policy and the budget were wrong. Worse, the "widen the critical net" advice
+the reviewers produced was written onto the design and **never read by
+anything** — every layout recommendation was inert, so the ledger credited
+improvements to actions that did nothing.
+
+**Branch-and-compare.** Each iteration proposes several *distinct* candidates
+from one baseline, measures each independently, and promotes the winner:
+
+```text
+[SEARCH] evaluating 2 candidate(s) against baseline score 0.369
+[SEARCH]   H1.1: score 0.1087   (scale device widths x0.9)
+[SEARCH]   H1.2: score 0  PASSES ALL SPECS   (scale device widths x0.8)
+[SEARCH] promoting H1.2 (score 0.369 -> 0)
+```
+
+Because each candidate is built and simulated on its own, in its own
+directory, an improvement is attributable to exactly one change. The losers
+are archived, not folded in.
+
+| Mechanism | What it does |
+| :--- | :--- |
+| `sensitivity` | sizes the next step from a measured d(metric)/d(knob) |
+| `line_search` | continues a direction that worked, and brackets it |
+| `heuristic` | supplies the first move |
+| wide bracket | fires only when no local move remains |
+| memory | withholds a move that failed twice without ever helping |
+| rollback | resumes from the best design when an iteration regresses |
+| Pareto archive | keeps non-dominated alternatives for trade-off decisions |
+
+**Never extrapolate.** The same sweep shows shrinking *further* reaches
+224 MHz but drops gain to 26.2 dB — breaking the gain constraint — and that
+the space is non-monotonic. Scoring is total normalised violation across
+**all** required specs, so trading one violation for another scores worse.
+
+**Effort.** `FullAutoConfig.for_effort("normal" | "high" | "exhaustive")` —
+12/12/3, 20/20/4, 30/30/5 (pre iters / PEX iters / candidates). Default
+prioritises convergence over wall-clock.
+
+**Result on the 100 MHz challenge** — target unchanged, real Magic/netgen/ngspice:
+
+| | Old | New |
+| :--- | :--- | :--- |
+| PEX bandwidth | 89.1 MHz | **125.9 MHz** |
+| PEX gain | 35.81 dB | 31.81 dB |
+| Status | `NOT_CONVERGED` | **`SUCCESS` — TAPEOUT_READY** |
+
+### MBG command namespace
+
+**Every MBG slash command begins with `/mbg-`.**
+
+| Command | Purpose |
+| :--- | :--- |
+| `/mbg-full-auto` | **canonical** — full automation, request to sign-off |
+| `/mbg-partial-automate` | the same flow, confirming each stage |
+| `/mbg-review` | Devil + Angel review of the current state |
+| `/mbg-signoff` | run the tapeout-ready gate |
+| `/mbg-report` · `/mbg-status` | design report · run state |
+| `/mbg-check` · `/mbg-install` · `/mbg-setup-env` | environment |
+| `/mbg-new-skill` · `/mbg-new-command` | authoring |
+| `/mbg-review-ai-experiment` · `/mbg-review-extension` | audits |
+
+Generic names (`/full-auto`, `/full-design`, `/review`, `/signoff`) are not
+MBG commands and are rejected by `scripts/check_agent_workflows.py`.
+
+### Multi-agent review
+
+```text
+              Designer  ── proposes and modifies (only role that edits)
+                 │
+      ┌──────────┴──────────┐
+   Devil                  Angel
+   tries to falsify it    finds the cheapest change likely to work
+      └──────────┬──────────┘
+            Synthesizer  ── weighs both against measured evidence
+                 │
+   ACCEPT · REVISE · RETRY · ROLLBACK · ESCALATE · BLOCK
+```
+
+Reviewers return structured findings and recommendations; they never edit the
+design. Precedence is fixed and not negotiable:
+
+1. a reviewer that failed to run ⇒ `ESCALATE` — **silence is not approval**;
+2. a hard gate (DRC/LVS/PEX) failure outranks everything;
+3. an unresolved `CRITICAL` finding blocks acceptance;
+4. measured evidence outranks reviewer sentiment;
+5. reviewer verdicts last.
+
+**Critics can block. They cannot approve past a failed gate.** Two optimistic
+reviewers never turn an LVS mismatch into a sign-off.
+
+The bundled critics are deterministic and rule-based, so the flow still runs
+with no AI platform available. A platform registers a richer LLM critic with
+`mbg.reviewers.register_reviewer(...)` without changing any control logic.
+
+Every recommendation is traced `PROPOSED → APPLIED → IMPROVED | NEUTRAL |
+DEGRADED` with the measured score before and after, so advice that never helps
+is withheld after two attempts.
+
+### What "tapeout ready" means
+
+`SUCCESS` requires **every** configured condition to be `PASS`:
+
+```text
+pre-layout specs   PEX specs        DRC clean       LVS match
+PEX extraction     final GDS        final PEX netlist
+no CRITICAL findings                reviews complete    design report
+PVT corners             only if configured
+Monte Carlo / mismatch  only if configured
+```
+
+A condition that was not evaluated reads **`NOT RUN`** and **fails** the gate.
+It is never counted as a pass, and no claim is made about an analysis that did
+not run.
+
+### Outputs
+
+```text
+outputs/<design>/
+    history.json             per-iteration flow record
+    review_history.json      decisions, findings, recommendation trace
+    full_auto_result.json    machine-readable result
+    final_design_report.md   design report, or non-convergence report
+    final/                   GDS · PEX netlist · DRC/LVS reports · history
+```
+
+On non-convergence you get a **failure report**, not silence: best iteration,
+which specs remain unmet and by how much, unresolved findings, what was tried,
+what helped, what did not, and the recommended manual intervention.
+
+### Honest scope
+
+`/mbg-full-auto` means *autonomous execution of the supported design,
+verification and optimization loop*. It does **not** mean guaranteed analog
+design success from arbitrary specifications.
+
+| | Status |
+| :--- | :--- |
+| Orchestration, stage sequencing, bounds, gates, packaging, reporting | **implemented** |
+| Devil/Angel review, synthesis, severity, ledger, review history | **implemented** |
+| Spec parsing with `given`/`inferred`/`defaulted`/`missing` provenance | **implemented** |
+| Candidate search: branching, measured selection, credit assignment, rollback, memory, sensitivity | **implemented** — `mbg.search` |
+| Deciding *what* to change on a spec miss | **heuristic + measured search** — the candidate generator proposes device-width moves and sizes them from measured sensitivity. It does not yet propose topology changes or per-net layout edits; supply your own strategy or `tune_post`, or let an agent decide. |
+| Layout-constraint feedback reaching the router | **partial** — `DesignPoint.layout` is now forwarded into a real `RouterConfig` (global `width_multiplier`, `access_layer`, `routing_layers`). Per-net width and spacing are **not** available: the router's `width_for()` distinguishes only power from signal. |
+| Per-net parasitic ranking from the extracted netlist | **implemented** — `mbg.flow_runtime.net_capacitance` |
+| Artifact provenance (GDS ↔ PEX ↔ simulation hashes, per-iteration dirs) | **implemented** |
+| PVT corners, Monte Carlo in the gate | **configurable, not run by default** |
+| Automatic topology selection | **not implemented** |
+
+Outcomes are `TAPEOUT_READY` or a diagnosed failure state. Nothing else.
+
+---
+
 ## 🛠️ Getting Started
 
-**Local install, no Docker.** Everything lands in two places you control:
-`.venv/` inside the clone, and `$MBG_TOOLS_ROOT` (default `~/.local/mbg-tools`)
-for EDA builds. Nothing is written to `/usr`, `/usr/local`, or the system
-package database unless you explicitly ask for OS build dependencies.
+**Local install, no Docker, no root.** Everything lands in three places you
+control: `.venv/` inside the clone, `$MBG_TOOLS_ROOT` (default
+`~/.local/mbg-tools`) for EDA builds, and `$MBG_HOME` (default `~/.mbg`) for
+activation and launchers. Nothing is written to `/usr`, `/usr/local`, or the
+system package database unless you explicitly ask for OS build dependencies.
 
 ### Prerequisites
 
@@ -208,8 +742,8 @@ Building Magic or netgen needs a C toolchain, Tcl/Tk, Cairo and X11 headers.
 You only need these if you don't already have compatible tools:
 
 ```bash
-./scripts/setup_env.sh --deps        # prints the exact packages for your distro
-./scripts/setup_env.sh --deps --yes  # installs them (prompts for sudo)
+./install.sh --deps        # prints the exact packages for your distro
+./install.sh --deps --yes  # installs them (prompts for sudo)
 ```
 
 Installing OS packages is the one step that needs root, so it is never done
@@ -221,14 +755,14 @@ silently.
 git clone https://github.com/mthudaa/Microelectronic-Block-Generator.git
 cd Microelectronic-Block-Generator
 
-./scripts/setup_env.sh          # venv + dependencies + GF180 PDK + EDA tools
+./install.sh          # all six stages: python, pdk, eda, shell, agents, global
 source scripts/activate_mbg.sh  # venv + PDK vars + tool PATH, in one step
 
-./scripts/setup_env.sh --check  # preflight; non-zero if anything required fails
+./install.sh --check  # preflight; non-zero if anything required fails
 python tests/test_all_designs.py
 ```
 
-`setup_env.sh` reuses whatever already works. If you have a compatible Magic,
+`install.sh` reuses whatever already works. If you have a compatible Magic,
 netgen and PDK, it detects them and builds nothing.
 
 <details>
@@ -240,21 +774,21 @@ you exactly which one it was:
 ```bash
 # 0. OS build packages — the only step that needs root.
 #    Skip it if you already have working Magic and netgen.
-./scripts/setup_env.sh --deps          # review the list first
-./scripts/setup_env.sh --deps --yes    # then install
+./install.sh --deps          # review the list first
+./install.sh --deps --yes    # then install
 
 # 1. Python: .venv, pinned dependencies, `pip install -e .`
-./scripts/setup_env.sh --python-only
+./install.sh --stage python
 
 # 2. GF180MCU PDK via volare (~1.5 GB download)
-./scripts/setup_env.sh --pdk
+./install.sh --stage pdk
 
-# 3. Magic and netgen — builds only what is missing or incompatible
-./scripts/setup_env.sh --eda
+# 3. Magic, netgen and KLayout — builds only what is missing or incompatible
+./install.sh --stage eda
 
 # 4. Activate, then confirm
 source scripts/activate_mbg.sh
-./scripts/setup_env.sh --check
+./install.sh --check
 ```
 
 Each stage is idempotent: re-running one that already succeeded does nothing.
@@ -263,25 +797,42 @@ Each stage is idempotent: re-running one that already succeeded does nothing.
 
 ### Installation modes
 
+One script, six stages. Run it whole, or one stage at a time.
+
 | Command | What it does |
 | :--- | :--- |
-| `./scripts/setup_env.sh` | everything below, in order |
-| `./scripts/setup_env.sh --python-only` | `.venv`, pinned dependencies, `pip install -e .` |
-| `./scripts/setup_env.sh --pdk` | GF180MCU via volare into `$PDK_ROOT` |
-| `./scripts/setup_env.sh --eda` | build Magic / netgen into `$MBG_TOOLS_ROOT` — only what's missing |
-| `./scripts/setup_env.sh --deps` | print (or `--yes`, install) OS build packages |
-| `./scripts/setup_env.sh --check` | full preflight, installs nothing |
+| `./install.sh` | every stage below, in dependency order |
+| `./install.sh --list` | show the stages and stop |
+| `./install.sh --stage python` | `.venv`, pinned dependencies, `pip install -e .` |
+| `./install.sh --stage pdk` | GF180MCU via volare into `$PDK_ROOT` |
+| `./install.sh --stage eda` | Magic, netgen and **KLayout** into `$MBG_TOOLS_ROOT` — only what is missing or incompatible |
+| `./install.sh --stage shell` | `~/.mbg/activate.sh`, the `mbg` launchers, one `~/.bashrc` line |
+| `./install.sh --stage agents` | repo-scoped `/mbg-*` adapters + the Codex plugin *(optional)* |
+| `./install.sh --stage global` | `/mbg-*` for the whole user account *(optional)* |
+| `./install.sh --deps` | print (or with `--yes`, install) OS build packages |
+| `./install.sh --check` | full preflight, installs nothing; non-zero only on a real failure |
+| `./install.sh --uninstall` | remove shell + agent integration; keeps venv, PDK and built tools |
+
+`--check` and `--uninstall` accept `--stage` too, so you can inspect or undo a
+single layer. `agents` and `global` are optional: if one does not complete the
+install still succeeds, because MBG itself works without the agent layer.
 
 ### Tool versions
 
 | Tool | Requirement | Tested |
 | :--- | :--- | :--- |
-| Python | 3.10 – 3.12 | 3.10.20, 3.11 |
+| Python | 3.10 – 3.12 | 3.10.20, 3.11.15 |
 | Magic | **≥ the version the techfile names** (`requires magic-8.3.411`) | 8.3.669, 8.3.681 |
 | netgen | ≥ 1.5.200, must terminate in `-batch` | 1.5.322, 1.5.323 |
-| PDK | `gf180mcuD` via volare | — |
-| KLayout | **optional** — not used by the default flow | — |
-| ngspice | **optional** — simulation only | 45 |
+| **KLayout** | **required for DRC sign-off** — ≥ 0.30.9 (the GF180 deck warns that parallel runs below this hit KLayout issue #2339) | 0.30.9 |
+| PDK | `gf180mcuD` via volare, incl. `libs.tech/klayout/tech/drc/gf180mcu.drc` | — |
+| ngspice | optional — simulation only | 45 |
+
+KLayout is no longer optional: without it there is no foundry-deck DRC, and
+the sign-off gate reports `CONFIGURATION_FAILURE` rather than passing on
+Magic alone. Point MBG at a binary with `MBG_KLAYOUT=/path/to/klayout` if it
+is not on `PATH` — note the **`klayout` pip package is not sufficient**: it
+ships no executable and cannot run the deck's Ruby DSL.
 
 The Magic floor is read from *your* installed techfile rather than hard-coded,
 so the check tracks the PDK you actually have. An exact-version pin would
@@ -289,8 +840,9 @@ reject working installations for no reason.
 
 ### Environment variables
 
-`source scripts/activate_mbg.sh` sets all of these; you shouldn't need to
-export them by hand. Any value you set first is respected.
+`source scripts/activate_mbg.sh` sets all of these — and once the `shell`
+stage has run, every new shell has them already. You shouldn't need to export
+them by hand. Any value you set first is respected.
 
 | Variable | Default | Purpose |
 | :--- | :--- | :--- |
@@ -299,8 +851,12 @@ export them by hand. Any value you set first is respected.
 | `PDKPATH` | `$PDK_ROOT/$PDK` | active PDK root |
 | `STD_CELL_LIBRARY` | `gf180mcu_fd_sc_mcu7t5v0` | standard cells |
 | `MBG_TOOLS_ROOT` | `$HOME/.local/mbg-tools` | where MBG builds EDA tools |
+| `MBG_HOME` | `$HOME/.mbg` | activation script and the `mbg` launchers |
+| `MBG_ROOT` | the clone | repository root |
+| `MBG_VENV` | `<repo>/.venv` | MBG's Python environment |
 | `MBG_MAGIC` / `MBG_NETGEN` | — | pin an exact executable |
-| `MBG_MAGIC_ROOT` / `MBG_NETGEN_ROOT` | — | pin a prefix (`<prefix>/bin/<tool>`) |
+| `MBG_KLAYOUT` / `MBG_NGSPICE` | — | pin an exact executable |
+| `MBG_MAGIC_ROOT` / `MBG_NETGEN_ROOT` / `MBG_KLAYOUT_ROOT` | — | pin a prefix (`<prefix>/bin/<tool>`) |
 | `MBG_TOOL_TIMEOUT` | per tool | seconds before an EDA call is killed |
 | `MBG_MAGIC_TIMEOUT` / `MBG_NETGEN_TIMEOUT` | 900 | per-tool override |
 
@@ -316,12 +872,18 @@ Every run prints what it resolved, because "there is a `magic` on PATH" and
 ```text
 [TOOLS] magic: /home/user/.local/mbg-tools/magic-8.3.681/bin/magic (8.3.681, via MBG_TOOLS_ROOT)
 [TOOLS] netgen: /home/user/.local/mbg-tools/netgen-1.5.323/bin/netgen (1.5.323, via MBG_TOOLS_ROOT)
+[TOOLS] klayout: /home/user/.local/mbg-tools/klayout-0.30.9/bin/klayout (0.30.9, via $MBG_KLAYOUT)
 ```
 
-Resolution order: `MBG_MAGIC` → `MBG_MAGIC_ROOT` → `$MBG_TOOLS_ROOT` → `PATH`.
-A tool is accepted only after a version check *and* a functional probe. If you
-name one explicitly and it doesn't work, that's an error — MBG will not
-quietly run a different one instead.
+Resolution order, per tool: `MBG_<TOOL>` → `MBG_<TOOL>_ROOT` → `$MBG_TOOLS_ROOT`
+→ `PATH`. A tool is accepted only after a version check *and* a functional
+probe. If you name one explicitly and it doesn't work, that's an error — MBG
+will not quietly run a different one instead.
+
+KLayout is the case this matters most for. Several distributions ship no
+`klayout` package at all, so the working binary often lives somewhere `PATH`
+never looks; the `shell` stage pins it by absolute path for exactly that
+reason.
 
 ### Verify the install
 
@@ -329,7 +891,7 @@ quietly run a different one instead.
 pipeline uses, so it cannot pass while a real run picks a different binary.
 
 ```bash
-./scripts/setup_env.sh --check
+./install.sh --check
 ```
 
 ```text
@@ -354,21 +916,25 @@ PDK
   PDKPATH               PASS  /home/user/.volare/gf180mcuD
   standard cells        PASS  gf180mcu_fd_sc_mcu7t5v0
   Magic techfile        PASS  requires magic-8.3.411
-  Netgen setup          PASS
+  Netgen setup          PASS  
 
 EDA
   Magic executable      PASS  /usr/local/bin/magic
   Magic version         PASS  8.3.669
   Netgen executable     PASS  /usr/local/bin/netgen
   Netgen version        PASS  1.5.322
-  KLayout executable    OPTIONAL  not installed (not needed for the GF180 flow)
+  KLayout executable    PASS  /nix/store/<hash>-klayout-0.30.9/bin/klayout
+  KLayout version       PASS  0.30.9
+  KLayout GF180 deck    PASS  /home/user/.volare/gf180mcuD/libs.tech/klayout/tech/drc/gf180mcu.drc
   ngspice               PASS  /usr/local/bin/ngspice
 
 Regression readiness
-  GDS generation        READY
-  Magic DRC             READY
-  Magic extraction      READY
-  Netgen LVS            READY
+  GDS generation        READY  
+  Magic DRC             READY  independent complementary check
+  KLayout DRC           READY  primary sign-off (GF180 foundry deck)
+  DRC sign-off          READY  both engines required
+  Magic extraction      READY  
+  Netgen LVS            READY  
 
 Environment OK — the GF180 regression can run.
 ```
@@ -379,18 +945,37 @@ components (KLayout, ngspice) are reported but never fail the check.
 Then run the real thing:
 
 ```bash
-python tests/test_all_designs.py     # SPICE -> GDS -> DRC -> extract -> LVS  (~10 min)
-python -m pytest tests/ -q           # 73 unit + environment tests           (~2 min)
+python -m pytest tests/ -q                    # 209 tests                    (~5 min)
+python tests/test_all_designs.py              # 8 designs, all four legs     (~5 min)
+python tests/test_complexity_ladder.py        # complexity metrics           (instant)
+```
+
+The design regression drives real gLayout, Magic, KLayout and netgen, so it is
+opt-in under pytest rather than part of every run:
+
+```bash
+MBG_RUN_DESIGNS=1 python -m pytest tests/test_all_designs.py -q
+MBG_LADDER=full   python tests/test_complexity_ladder.py     # ladder + DRC/LVS
 ```
 
 ```text
-  Inverter: DRC=DRC: CLEAN | LVS=MATCH
-  3-stage Ring Oscillator: DRC=DRC: CLEAN | LVS=MATCH
-  5T-OTA: DRC=DRC: CLEAN | LVS=MATCH
-  StrongArm-Comparator: DRC=DRC: CLEAN | LVS=MATCH
-  ...
-  7/7 designs pass DRC + LVS
+  design                               Magic   KLayout   sign-off  LVS     internal
+  Inverter                             CLEAN   CLEAN     PASS      MATCH   CLEAN
+  3-stage Ring Oscillator              CLEAN   CLEAN     PASS      MATCH   CLEAN
+  5T-OTA                               CLEAN   CLEAN     PASS      MATCH   CLEAN
+  DNW Body-Biased OTA                  CLEAN   CLEAN     PASS      MATCH   CLEAN
+  VREF Beta-Multiplier                 CLEAN   CLEAN     PASS      MATCH   CLEAN
+  RC Filter (native passives)          CLEAN   CLEAN     PASS      MATCH   CLEAN
+  StrongArm-Comparator                 CLEAN   CLEAN     PASS      MATCH   CLEAN
+  2-Stage Clocked Comparator (12 MOS)  CLEAN   CLEAN     PASS      MATCH   CLEAN
+
+  8/8 designs pass all four legs (Magic + KLayout + LVS + internal)
 ```
+
+"All four legs" is the same gate `spice_to_gds_with_checks()` uses for
+`all_pass`, so the harness and the library cannot disagree about what passing
+means. Magic-clean alone is not a pass, and neither is a DRC result with the
+internal connectivity check left out.
 
 ### What gets installed, and how to undo it
 
@@ -414,7 +999,7 @@ variable used to surface as a `TypeError` from inside gLayout. `import mbg`
 now populates the PDK environment first. If the PDK itself is missing:
 
 ```bash
-./scripts/setup_env.sh --pdk
+./install.sh --stage pdk
 ```
 </details>
 
@@ -430,7 +1015,7 @@ A Magic that predates the techfile reads no GDS and extracts nothing — and
 still exits 0. It is rejected rather than used:
 
 ```bash
-./scripts/setup_env.sh --eda     # builds a known-good Magic locally
+./install.sh --stage eda     # builds a known-good Magic locally
 ```
 </details>
 
@@ -441,7 +1026,7 @@ Some builds sit waiting on stdin under `-batch`; the mesh generator of the
 same name isn't the LVS tool at all. Both are caught by the batch probe.
 
 ```bash
-./scripts/setup_env.sh --eda
+./install.sh --stage eda
 ```
 </details>
 
@@ -462,7 +1047,7 @@ leaving you with a tool that exists and never works. Options, in order of
 least effort:
 
 1. **Use what you have.** MBG detects and reuses any working Magic/netgen —
-   run `./scripts/setup_env.sh --check` first; you may not need to build
+   run `./install.sh --check` first; you may not need to build
    anything.
 2. Install Tcl 8.6 development files and rebuild.
 3. Use the optional Docker image, which ships working tools.
@@ -470,12 +1055,78 @@ least effort:
 </details>
 
 <details>
-<summary><b>KLayout not found</b></summary>
+<summary><b>KLayout not found — DRC sign-off unavailable</b></summary>
 
-Optional. The default flow is Magic for DRC and netgen for LVS. The `klayout`
-Python module and the `klayout` executable are different things — having the
-module does not give you the command. You need the executable only for
-`run_drc(engine="klayout")` or `engine="both"`.
+```text
+DRC sign-off (Magic + KLayout)   CONFIGURATION_FAILURE
+```
+
+KLayout is **required**: it runs the GF180 foundry rule deck and is the
+sign-off authority. Without it the gate reports `CONFIGURATION_FAILURE`
+rather than passing on Magic alone.
+
+The **`klayout` pip package is not enough** — it ships no executable and
+cannot run the deck's Ruby DSL. You need the standalone binary.
+
+`./install.sh --stage eda` installs it where upstream publishes a build,
+unpacking the official package **into `$MBG_TOOLS_ROOT` without sudo**:
+
+| Distribution | Package used |
+| :--- | :--- |
+| Ubuntu 16/18/20/22/24/26, Debian | `klayout_0.30.10-1_amd64.deb` |
+| Rocky / RHEL / AlmaLinux 9 | `RockyLinux_9` RPM |
+| CentOS 7/8 | `CentOS_7` / `CentOS_8` RPM |
+| openSUSE Leap 15 | `openSUSE_Leap_15` RPM |
+| **Fedora, Arch** | **no upstream build** — see below |
+
+**Fedora has no official KLayout package, and the EL9 build does not work
+there.** Extracting the Rocky 9 RPM on Fedora 43 leaves it unable to start:
+
+```text
+libpython3.9.so.1.0 => not found      libruby.so.3.0 => not found
+libhttp_parser.so.2 => not found      libQt5Multimedia.so.5 => not found
+```
+
+Ruby is the decisive one — the GF180 DRC deck *is* Ruby, so a KLayout without
+it cannot run the deck at all. On Fedora, either build from
+[source](https://www.klayout.org/downloads/source/) or point MBG at an
+existing binary:
+
+```bash
+export MBG_KLAYOUT=/path/to/klayout
+./install.sh --stage eda   # adopts it: stable path + nix GC root if applicable
+```
+
+Adoption gives you a stable `$MBG_TOOLS_ROOT/klayout-<version>/bin/klayout`
+so nothing depends on remembering a store hash, and — for a nix-store binary
+— registers a GC root so `nix-collect-garbage` cannot delete it out from
+under you.
+
+Version ≥ 0.30.9 — the GF180 deck warns that parallel runs below that hit
+KLayout issue #2339.
+</details>
+
+<details>
+<summary><b>KLayout reports violations Magic did not</b></summary>
+
+Expected, and the reason both run. They implement different rule sets: Magic
+checks its techfile rules, KLayout runs the ~600-check foundry deck. Counts
+are never compared — only statuses.
+
+Two common cases:
+
+- **Die-level density rules** (`M1.4`, `PL.8`, `DCF.1b`) — *"metal coverage
+  over the entire die shall be >30%"*. A leaf cell cannot satisfy these; they
+  are met by fill during chip assembly. Cell sign-off runs
+  `decks=all,-density,-dummy`; use `decks=all` for an assembled die.
+- **Real defects Magic does not check** — e.g. `DBU`, `V4.1`, `MIMTM.9`,
+  `PRES.6`, `DN.3`. These are genuine; fix them.
+
+Open the markers to see exactly where:
+
+```bash
+klayout <design>.gds -m <design>/verification/<cell>.klayout.lyrdb
+```
 </details>
 
 <details>
@@ -569,12 +1220,120 @@ All project-specific extensions use the `mbg-` prefix.
 
 ```bash
 git clone <this-repo> && cd Microelectronic-Block-Generator
-./scripts/setup_env.sh        # 1. Python env + GF180 PDK + EDA tools
-./scripts/install_agents.sh   # 2. OpenCode / Claude Code / Codex integrations
+./install.sh          # everything
 ```
 
-That is the whole setup. Both scripts are idempotent, discover the repository
-root themselves, and perform no git operations. If you only want the agent
+Then open a new shell and check it:
+
+```bash
+mbg check
+```
+
+`install.sh` is the only command you need. It runs six stages in order, each
+of which is a script under `scripts/` that also works standalone:
+
+| Stage | Does | Required |
+| :--- | :--- | :--- |
+| `python` | `.venv` + pinned dependencies + `pip install -e .` | yes |
+| `pdk` | GF180MCU via volare | yes |
+| `eda` | Magic, netgen, KLayout — reused if already compatible | yes |
+| `shell` | `~/.mbg/activate.sh` + one line in `~/.bashrc` | yes |
+| `agents` | repo-scoped adapters + the Codex plugin | optional |
+| `global` | `/mbg-*` skills for the whole user account | optional |
+
+```bash
+./install.sh --check          # verify every layer, install nothing
+./install.sh --stage eda      # run one stage
+./install.sh --list           # what each stage does
+./install.sh --uninstall      # remove shell + agent integration
+```
+
+An optional stage that does not complete is reported but does not fail the
+install — MBG itself still works without the agent integrations.
+
+`--uninstall` deliberately leaves the venv, the PDK and the built tools
+alone. Those take a long time to rebuild, so removing them stays a
+deliberate manual act.
+
+### Shell integration
+
+The `shell` stage writes one generated file, `~/.mbg/activate.sh`, and adds
+**one** line to `~/.bashrc` (and `~/.zshrc` if present):
+
+```bash
+# >>> Microelectronic Block Generator >>>
+[ -f "$HOME/.mbg/activate.sh" ] && . "$HOME/.mbg/activate.sh"
+# <<< Microelectronic Block Generator <<<
+```
+
+After that a fresh shell has, from any directory:
+
+| Variable | Purpose |
+| :--- | :--- |
+| `MBG_HOME`, `MBG_ROOT`, `MBG_VENV` | install root, checkout, interpreter |
+| `PDK_ROOT`, `PDK`, `PDKPATH`, `STD_CELL_LIBRARY` | GF180 |
+| `MBG_MAGIC`, `MBG_NETGEN`, `MBG_KLAYOUT`, `MBG_NGSPICE` | **resolved absolute paths** |
+| `MBG_TOOLS_ROOT`, `PATH` | MBG-built tools and launchers |
+
+Tools are pinned by absolute path rather than left to `PATH` order. That
+matters here: Fedora has no `klayout` package and the working binary lives in
+a nix store outside `PATH`, so a `PATH`-only setup silently loses DRC
+sign-off. Verified by running `mbg check` in a shell with `/usr/local/bin`
+stripped — all four tools still resolve.
+
+Every assignment defers to a value you already exported, so your own settings
+win.
+
+**The virtualenv is deliberately not activated.** Doing that in `.bashrc`
+changes what `python` and `pip` mean in every shell, including ones opened
+for unrelated projects. Instead `~/.mbg/bin` goes on `PATH` with launchers
+that use MBG's interpreter explicitly:
+
+```bash
+mbg check          # environment preflight
+mbg version
+mbg python x.py    # run with MBG's interpreter
+mbg-python -c ...
+```
+
+Pass `--with-venv` if you would rather have it active everywhere.
+
+```bash
+./install.sh --check --stage shell      # exactly one block? tools pinned?
+./install.sh --uninstall --stage shell  # removes the line and ~/.mbg/activate.sh
+```
+
+Re-running is safe: the block is replaced, never appended. Verified over five
+install/uninstall cycles — one block, and the original `.bashrc` lines
+byte-identical.
+
+Step 2 makes `/mbg-*` work when the agent is started **inside this checkout**;
+Codex is registered per machine because it has no repo-scoped skills.
+
+Step 3 installs for the **current user**, so `/mbg-full-auto` works from
+anywhere:
+
+| Platform | Installed to |
+| :--- | :--- |
+| Claude Code | `~/.claude/skills/mbg-*`, `~/.claude/commands/mbg-*.md` |
+| OpenCode | `~/.config/opencode/skills/mbg-*`, `~/.config/opencode/commands/mbg-*.md` |
+| Codex | plugin registered by the `agents` stage |
+
+It uses **symlinks**, so a `sync_agent_tools.py` run reaches the global
+install immediately — a copied skill silently goes stale and the slash
+command ends up invoking last week's instructions. Use `--copy` if your setup
+cannot follow symlinks, and re-run it after every sync.
+
+Only `mbg-*` entries are created or removed; other projects' skills in those
+directories are never touched.
+
+```bash
+./install.sh --check --stage global      # is the global install current?
+./install.sh --uninstall --stage global  # remove only the mbg-* entries
+```
+
+That is the whole setup. Every stage is idempotent, discovers the repository
+root itself, and performs no git operations. If you only want the agent
 layer and already have a working environment, step 2 alone is enough.
 
 Inside an agent you can run the same thing as a slash command:
@@ -604,7 +1363,7 @@ r["gds_path"], r["drc"], r["lvs"], r["pex"], r["all_pass"]
 ```
 
 **Requirements.** Python 3.10–3.12 — gdsfactory 7 and numpy 1 have no wheels
-for 3.13+, and `setup_env.sh` picks a supported interpreter automatically. The
+for 3.13+, and `install.sh` picks a supported interpreter automatically. The
 EDA tools (ngspice, Magic, netgen) and the GF180MCU PDK come from the
 IIC-OSIC-TOOLS container; the setup script reports whether it can see them but
 does not install them.
@@ -619,12 +1378,12 @@ does not install them.
 Useful variants:
 
 ```bash
-./scripts/setup_env.sh --check        # report status, install nothing
-./scripts/setup_env.sh --locked       # exact pinned versions
-./scripts/setup_env.sh --freeze       # rewrite requirements-lock.txt
-./scripts/install_agents.sh --check   # report status, change nothing
-./scripts/install_agents.sh --only codex
-./scripts/install_agents.sh --uninstall
+./install.sh --check        # report status, install nothing
+./install.sh --stage python       # exact pinned versions
+./install.sh --stage python       # rewrite requirements-lock.txt
+./install.sh --check --stage agents   # report status, change nothing
+./install.sh --stage agents
+./install.sh --uninstall --stage agents
 ```
 
 ### Canonical architecture: source vs. generated
@@ -854,7 +1613,7 @@ and `codex plugin add --help` on `0.148.0`; this is a one-time, per-machine
 step, not something `git clone` gives you for free):
 
 ```bash
-./scripts/install_agents.sh --only codex     # does both steps below for you
+./install.sh --stage agents     # does both steps below for you
 ```
 
 or manually:
@@ -877,7 +1636,7 @@ This registers the marketplace and installs the plugin into your user-level
 
 **Refreshing after a sync:** Codex copies the plugin into
 `~/.codex/plugins/cache/` at install time, so regenerating the adapters does
-**not** reach Codex on its own. Re-run `./scripts/install_agents.sh --only codex`
+**not** reach Codex on its own. Re-run `./install.sh --stage agents`
 — it does a `remove` + `add`, which refreshes the copy without needing a
 version bump. OpenCode and Claude Code read the repository directly and need
 no refresh step.
@@ -911,7 +1670,7 @@ DRC-clean GDSII layout for the gf180mcuD PDK: <netlist>
   be a directory, not a file".* You passed the manifest path. Pass the
   directory that contains it — the repo root: `codex plugin marketplace add .`
 - *Codex still shows old skills after you edited `.ai/`.* The plugin is cached
-  at install time. Run `./scripts/install_agents.sh --only codex` to refresh it.
+  at install time. Run `./install.sh --stage agents` to refresh it.
 - *You typed `/mbg-full-automate` and nothing happened.* Codex has no
   repo-scoped commands or subagents at all (see the workflow table's
   footnote ¹, and `platforms.codex.unsupported` in `.ai/manifest.json`) —
@@ -952,24 +1711,48 @@ DRC-clean GDSII layout for the gf180mcuD PDK: <netlist>
 
 ```text
 ├── src/mbg/                           # THE ENGINE — the only copy, `import mbg`
-│   ├── passives.py                    # native ppolyf_u resistor + met4/met5 MIM
-│   ├── pipeline.py                    # spice_to_gds_with_checks(), spice_to_gds_ctx()
+│   │                                  # -- layout generation --
 │   ├── spice_parser.py                # netlist parsing + constraint extraction
 │   ├── design_context.py              # DesignContext shared across every stage
-│   ├── pdk_rules.py                   # all layer/width/spacing/via rules, from the PDK
-│   ├── placement.py placement_engine.py   # legacy rows / analog-aware placement
-│   ├── routing.py   router.py             # legacy shapes / DRC-aware grid router
+│   ├── pdk_rules.py                   # layer/width/spacing/via rules, from the PDK
+│   ├── placement_engine.py            # analog-aware placement
+│   ├── router.py                      # DRC-aware grid router
 │   ├── connectivity.py                # internal OPEN/SHORT verification
-│   ├── checks.py                      # DRC / LVS / PEX automation
-│   ├── simulation.py                  # ngspice runner + raw parsing
-│   └── power.py utils.py pdk_devices.py experiment_manifest.py
+│   ├── passives.py                    # native ppolyf_u resistor + met4/met5 MIM
+│   ├── power.py pdk_devices.py        # rails, device primitives
+│   ├── placement.py routing.py        # superseded first generation, kept working
+│   │                                  # -- verification --
+│   ├── drc.py                         # dual-engine DRC: KLayout sign-off + Magic
+│   ├── checks.py                      # Magic DRC / netgen LVS / PEX automation
+│   │                                  # -- simulation --
+│   ├── simulation.py                  # ngspice transport
+│   ├── analysis.py                    # op / dc / ac / tran / Monte Carlo / FFT
+│   │                                  # -- design flow --
+│   ├── specs.py                       # targets, evaluation, degradation analysis
+│   ├── flow.py                        # the two optimisation loops
+│   ├── flow_runtime.py                # real ngspice/Magic/netgen hooks
+│   ├── search.py                      # candidates, branching, memory, rollback
+│   ├── reviewers.py                   # Devil / Angel critics + synthesis
+│   ├── full_auto.py                   # /mbg-full-auto orchestration + sign-off gate
+│   ├── pipeline.py                    # spice_to_gds_with_checks(), spice_to_gds_ctx()
+│   │                                  # -- integration and support --
+│   ├── outputs.py integrate.py        # LEF/LIB/Verilog views, chip assembly
+│   ├── config.py                      # PDK + tool resolution, timeouts
+│   ├── llm.py cli.py utils.py experiment_manifest.py
 ├── pyproject.toml                     # src-layout packaging (`pip install -e .`)
 │
 ├── .ai/                               # canonical agent layer (SOURCE OF TRUTH)
 ├── .claude/  .opencode/  plugins/  .agents/   # generated per-platform adapters
 ├── AGENTS.md  CLAUDE.md               # shared agent rules (CLAUDE.md imports AGENTS.md)
-├── scripts/                           # sync_agent_tools.py, validate_agent_integrations.py,
-│                                      #   install_agents.sh, container launch scripts
+├── install.sh                         # THE installer — all six stages, one file
+├── examples/                          # runnable demos (run_full_auto_ota5t.py)
+├── scripts/                           # maintenance tools (not installation)
+│   ├── activate_mbg.sh                # dev activation (delegates to ~/.mbg)
+│   ├── mbg_preflight.py               # the `--check` environment report
+│   ├── sync_agent_tools.py            # .ai/ -> per-platform adapters
+│   ├── validate_agent_integrations.py # adapter integrity
+│   ├── check_agent_workflows.py       # per-file agent drift detection
+│   └── integrate_modules.py           # multi-macro chip integration
 │
 ├── designs/                           # Chipathon design tree (template convention)
 │   ├── libs/                          # design & testbench libraries
@@ -983,8 +1766,20 @@ DRC-clean GDSII layout for the gf180mcuD PDK: <netlist>
 │       └── outputs/                   # generated artifacts (gitignored)
 │
 ├── tests/                             # ALL test suites live at the repo root
-│   ├── test_all_designs.py            # 6-design DRC + LVS + connectivity regression
-│   ├── test_router_synthetic.py       # router unit tests (no PDK required)
+│   ├── netlists/                      # the regression netlists, one .spice each
+│   ├── fixtures.py                    # loads them, resolving {PDK_LIB} at load time
+│   ├── test_all_designs.py            # 8-design four-leg sign-off regression
+│   ├── test_complexity_ladder.py      # complexity metrics + opt-in layout ladder
+│   ├── test_spice_parser.py           # continuations, comments, PDK, validation
+│   ├── test_drc_dual.py               # KLayout/Magic reconciliation policy
+│   ├── test_flow.py test_search.py    # two-loop flow; candidate search + rollback
+│   ├── test_reviewers.py              # Devil/Angel independence, evidence precedence
+│   ├── test_full_auto.py              # orchestration, sign-off gate, /mbg-* namespace
+│   ├── test_pex_regression.py         # measured pre-layout vs PEX degradation
+│   ├── test_passives.py               # native resistor / MIM extraction
+│   ├── test_environment.py            # install + tool-resolution failure modes
+│   ├── test_installer.py              # install.sh contract: help, stages, exit status
+│   ├── test_router_synthetic.py       # router unit tests, incl. the complexity fixes
 │   ├── test_analysis.py               # op/dc/ac/tran/Monte-Carlo
 │   ├── test_outputs.py                # GDS/LEF/LIB/Verilog/SPICE/SVG emission
 │   ├── test_integration.py            # multi-macro chip integration
@@ -1004,11 +1799,29 @@ keeps its EDA scripts, examples and outputs so the template layout is preserved.
 
 ## 🧪 Test Key Circuits (Tapeout Plan)
 
-| Circuit | Status | Key Metric |
-| :--- | :--- | :--- |
-| **5T OTA** | ✅ Proven | Gain, GBW, Phase Margin |
-| **StrongARM Comparator** | ✅ Autonomous Tuning | `<10mV` Offset (all PVT) |
-| **Voltage Reference** | ✅ Layout DRC/LVS clean | Temperature Coefficient *(not yet characterised)* |
+Regression status, from the artifacts in `outputs/regression/<cell>/verification/`:
+
+| Circuit | Magic DRC | KLayout DRC | LVS | Dual-DRC sign-off |
+| :--- | :--- | :--- | :--- | :--- |
+| Inverter | CLEAN | CLEAN | MATCH | ✅ PASS |
+| 3-stage Ring Oscillator | CLEAN | CLEAN | MATCH | ✅ PASS |
+| 5T OTA | CLEAN | CLEAN | MATCH | ✅ PASS |
+| StrongARM Comparator | CLEAN | CLEAN | MATCH | ✅ PASS |
+| Voltage Reference | CLEAN | CLEAN | MATCH | ✅ PASS |
+| RC Filter (native passives) | CLEAN | CLEAN | MATCH | ✅ PASS |
+| DNW Body-Biased OTA | CLEAN | CLEAN | MATCH | ✅ PASS |
+
+**8/8 on both engines.** `DN.3` — *"each DNWELL shall be directly surrounded
+by a PCOMP guard ring tied to the P-substrate potential"* — used to fail here.
+The body tie that makes body-biasing work sits **inside** the deep n-well and
+does not satisfy the rule; the ring has to be outside it. Deep-n-well devices
+now request gLayout's substrate tap, which is that ring. It costs roughly
+2.3× area on the affected device, so it is enabled only for DNW devices.
+Magic never implemented the rule, which is why it took the KLayout deck to
+find it.
+
+Performance characterisation (gain/GBW/phase margin over PVT, offset, TC) is
+separate from layout sign-off and is **not** covered by the table above.
 
 ### 📏 Chip Size & Pin List (per judge request — [Issue #20](https://github.com/sscs-ose/sscs-chipathon-2026/issues/20#issuecomment-5138077347))
 
@@ -1105,10 +1918,24 @@ These plots are required artifacts for experiment reports and tapeout reviews.
 
 | Gate | Requirement |
 | :--- | :--- |
-| **DRC** | Magic DRC zero violations |
+| **DRC sign-off** | **Magic *and* KLayout both clean and in agreement** |
 | **LVS** | Netgen LVS: netlist matches layout |
-| **PEX** | Parasitic extraction complete |
-| **Post-layout** | Matches pre-layout within 10% tolerance |
+| **PEX extraction** | Parasitic netlist produced |
+| **PEX simulation** | Extracted netlist simulated successfully |
+| **PEX specifications** | Post-layout results meet the **target specs** |
+
+Plus, for `/mbg-full-auto`: no unresolved `CRITICAL` reviewer finding, every
+review completed, matching GDS/PEX provenance, and the design report written.
+
+Extraction completing is not the gate — that is the toolchain working. The
+gate is the *extracted* design meeting its specifications. Comparing the
+post-layout result only against the pre-layout result answers a different
+question: a design can track pre-layout closely and still miss its target.
+
+`DRC sign-off`, `LVS`, `PEX extraction`, `PEX specs` and the GDS/PEX
+artifacts are **non-waivable** — configuration cannot switch them off. A
+condition that was never evaluated reads `NOT RUN` and fails the gate; it is
+never counted as passed.
 
 ---
 

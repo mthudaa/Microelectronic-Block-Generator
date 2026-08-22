@@ -1,0 +1,23 @@
+* StrongArm-Comparator.
+*
+* StrongArm latch comparator: clocked tail, differential pair,
+* cross-coupled regenerative latch, clocked precharge. The largest
+* reference block, and the closest structural neighbour of
+* cmp_2stage_clk -- it has the same 17-terminal vdd net and passed
+* throughout, which is why device count alone never predicted the
+* comparator's failure.
+* complexity: 11 MOS, 8 nets, max net degree 17
+.lib "{PDK_LIB}" typical
+.subckt strongarm vdd vss clk inn inp outn outp
+XM1 tail clk vss vss nfet_03v3 L=1u W=2u nf=1 
+XM2 d1 inn tail vss nfet_03v3 L=1u W=2u nf=1 
+XM3 d2 inp tail vss nfet_03v3 L=1u W=2u nf=1 
+XM4 outn outp d1 vss nfet_03v3 L=1u W=2u nf=1 
+XM5 outp outn d2 vss nfet_03v3 L=1u W=2u nf=1 
+XM6 outn outp vdd vdd pfet_03v3 L=1u W=2u nf=1 
+XM7 outp outn vdd vdd pfet_03v3 L=1u W=2u nf=1 
+XM8 outn clk vdd vdd pfet_03v3 L=1u W=2u nf=1 
+XM9 outp clk vdd vdd pfet_03v3 L=1u W=2u nf=1 
+XM10 d1 clk vdd vdd pfet_03v3 L=1u W=2u nf=1 
+XM11 d2 clk vdd vdd pfet_03v3 L=1u W=2u nf=1 
+.ends

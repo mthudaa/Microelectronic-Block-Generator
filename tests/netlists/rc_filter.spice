@@ -1,0 +1,12 @@
+* RC Filter (native passives).
+*
+* Native passives: a real poly resistor and a metal4/metal5 MIM,
+* neither of which gLayout can build in a form gf180 recognises.
+* Both must extract as the actual PDK primitives, not as a pfet or
+* as nothing.
+* complexity: 0 MOS, 2 passives, 3 nets
+.lib "{PDK_LIB}" typical
+.subckt rc_filter vin vout vss
+XR1 vin  vout ppolyf_u W=1u L=4u
+XC1 vout vss  cap_mim_2f0_m4m5_noshield W=5u L=5u
+.ends

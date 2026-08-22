@@ -1,0 +1,14 @@
+* 3-stage Ring Oscillator.
+*
+* Three inverters in a loop. Same structures as the inverter,
+* three times over, so it tests repetition rather than topology.
+* complexity: 6 MOS, 5 nets, max net degree 11
+.lib "{PDK_LIB}" typical
+.subckt ring_osc_3 vdd vss out
+XM1p n1 out vdd vdd pfet_03v3 L=1u W=4u nf=1
+XM1n n1 out vss vss nfet_03v3 L=1u W=2u nf=1
+XM2p n2 n1 vdd vdd pfet_03v3 L=1u W=4u nf=1
+XM2n n2 n1 vss vss nfet_03v3 L=1u W=2u nf=1
+XM3p out n2 vdd vdd pfet_03v3 L=1u W=4u nf=1
+XM3n out n2 vss vss nfet_03v3 L=1u W=2u nf=1
+.ends

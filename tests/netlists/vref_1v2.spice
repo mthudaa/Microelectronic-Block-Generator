@@ -1,0 +1,16 @@
+* VREF Beta-Multiplier.
+*
+* Beta-multiplier voltage reference, dominated by diode-connected
+* devices (gate and drain on the same net). An archived run logged
+* exactly that topology as failing to connect in the layout.
+* complexity: 7 MOS, 6 nets, max net degree 11
+.lib "{PDK_LIB}" typical
+.subckt vref_1v2 vdd vss vref
+XM3  d1   d1   vdd  vdd  pfet_03v3 L=1.25u W=4u nf=1
+XM4  d2   d1   vdd  vdd  pfet_03v3 L=1.25u W=4u nf=1
+XM5  vref d1   vdd  vdd  pfet_03v3 L=1.25u W=4u nf=1
+XM1  d1   d1   vss  vss  nfet_03v3 L=1.25u W=4u nf=1
+XM2  d2   d1   src2 vss  nfet_03v3 L=1.25u W=4u nf=1
+XM_r src2 vdd  vss  vss  nfet_03v3 L=1.25u W=4u nf=1
+XM6  vref vref vss  vss  nfet_03v3 L=1u    W=4u nf=1
+.ends

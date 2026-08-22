@@ -1,0 +1,25 @@
+* 12-MOS two-stage clocked comparator.
+*
+* Preserved from tests/notebooks/spice_to_gds.ipynb, where it was the first
+* design to expose MBG's complexity boundary: a clocked preamplifier feeding a
+* cross-coupled regenerative latch. What makes it harder than the reference
+* blocks is not the device count but the shape of the supply nets -- vdd
+* reaches 6 PMOS sources and 6 PMOS bulks, so with the power-rail taps it is a
+* 17-terminal net, and every one of those terminals has to find a via landing.
+*
+* complexity: 12 MOS, 11 nets, max net degree 17
+.lib "{PDK_LIB}" typical
+.subckt cmp_2stage_clk vdd vss inp inm clk out
+XM1 pre_n inp tail vss nfet_03v3 W=2.4u L=1u
+XM2 pre_p inm tail vss nfet_03v3 W=2.4u L=1u
+XM3 pre_n pre_n vdd vdd pfet_03v3 W=1.5u L=1u
+XM4 pre_p pre_n vdd vdd pfet_03v3 W=1.5u L=1u
+XM5 tail clk vss vss nfet_03v3 W=0.8u L=1u
+XM6 out clk vdd vdd pfet_03v3 W=1.5u L=0.8u
+XM7 outb clk vdd vdd pfet_03v3 W=1.5u L=0.8u
+XM8 out pre_p latch_tail vss nfet_03v3 W=1.8u L=0.8u
+XM9 outb pre_n latch_tail vss nfet_03v3 W=1.8u L=0.8u
+XM10 out outb vdd vdd pfet_03v3 W=2.4u L=0.8u
+XM11 outb out vdd vdd pfet_03v3 W=2.4u L=0.8u
+XM12 latch_tail clk vss vss nfet_03v3 W=1.6u L=0.8u
+.ends

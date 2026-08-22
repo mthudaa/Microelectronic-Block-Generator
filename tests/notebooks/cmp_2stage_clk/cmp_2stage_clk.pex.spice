@@ -1,0 +1,58 @@
+* PEX produced on Sun Aug 23 01:22:46 AM CST 2026 using /home/huda/opensource-project/Microelectronic-Block-Generator/designs/notebooks/chipathon2026-D/scripts/iic-pex.sh with m=2 and s=1
+* NGSPICE file created from cmp_2stage_clk.ext - technology: gf180mcuD
+
+.option scale=5n
+
+.subckt cmp_2stage_clk out clk inm inp vss vdd
+X0 a_n3550_5456# out vdd vdd pfet_03v3 ad=57.6n pd=1.2m as=57.6n ps=1.2m w=480 l=160
+X1 a_n3550_5456# clk vdd vdd pfet_03v3 ad=36n pd=0.84m as=36n ps=0.84m w=300 l=160
+X2 out clk vdd vdd pfet_03v3 ad=36n pd=0.84m as=36n ps=0.84m w=300 l=160
+X3 a_n2018_5456# inp a_n2138_2966# vss nfet_03v3 ad=57.6n pd=1.2m as=57.6n ps=1.2m w=480 l=200
+X4 a_n646_2966# inm a_n2138_2966# vss nfet_03v3 ad=57.6n pd=1.2m as=57.6n ps=1.2m w=480 l=200
+X5 a_n2018_5456# a_n2018_5456# vdd vdd pfet_03v3 ad=36n pd=0.84m as=36n ps=0.84m w=300 l=200
+X6 a_n646_2966# a_n2018_5456# vdd vdd pfet_03v3 ad=36n pd=0.84m as=36n ps=0.84m w=300 l=200
+X7 a_n3550_5456# a_n2018_5456# a_606_2968# vss nfet_03v3 ad=43.2n pd=0.96m as=43.2n ps=0.96m w=360 l=160
+X8 a_606_2968# clk vss vss nfet_03v3 ad=38.4n pd=0.88m as=38.4n ps=0.88m w=320 l=160
+X9 out a_n3550_5456# vdd vdd pfet_03v3 ad=57.6n pd=1.2m as=57.6n ps=1.2m w=480 l=160
+X10 a_n2138_2966# clk vss vss nfet_03v3 ad=19.2n pd=0.56m as=19.2n ps=0.56m w=160 l=200
+X11 out a_n646_2966# a_606_2968# vss nfet_03v3 ad=43.2n pd=0.96m as=43.2n ps=0.96m w=360 l=160
+C0 a_n2018_5456# a_n3550_5456# 0.20945f
+C1 a_n3550_5456# out 0.84366f
+C2 a_n3550_5456# a_n646_2966# 0.07771f
+C3 a_n2018_5456# clk 0.15063f
+C4 clk out 0.66589f
+C5 clk a_n646_2966# 0.49927f
+C6 a_n2018_5456# a_n2138_2966# 1.03208f
+C7 a_n2138_2966# a_n646_2966# 0.51314f
+C8 a_n3550_5456# vdd 5.67562f
+C9 clk inm 0.02202f
+C10 a_n3550_5456# a_606_2968# 0.63164f
+C11 clk vdd 2.21075f
+C12 a_n2138_2966# inp 0.13558f
+C13 a_n2018_5456# out 0.09564f
+C14 clk a_606_2968# 0.05206f
+C15 a_n2018_5456# a_n646_2966# 0.40116f
+C16 a_n2138_2966# inm 0.12513f
+C17 out a_n646_2966# 0.80468f
+C18 a_n3550_5456# clk 0.18835f
+C19 a_n2018_5456# inp 0.08447f
+C20 a_n2018_5456# inm 0.02117f
+C21 inm a_n646_2966# 0.09546f
+C22 clk a_n2138_2966# 0.50561f
+C23 a_n2018_5456# vdd 3.70276f
+C24 vdd out 5.59599f
+C25 vdd a_n646_2966# 1.83086f
+C26 a_n2018_5456# a_606_2968# 0.38096f
+C27 a_606_2968# out 0.49063f
+C28 a_606_2968# a_n646_2966# 0.17069f
+C29 inm vss 0.64202f
+C30 inp vss 0.65415f
+C31 clk vss 3.73877f
+C32 out vss 2.2975f
+C33 vdd vss 32.9954f
+C34 a_606_2968# vss 3.15889f ; **FLOATING
+C35 a_n2138_2966# vss 3.88239f ; **FLOATING
+C36 a_n646_2966# vss 2.49236f ; **FLOATING
+C37 a_n2018_5456# vss 3.48184f ; **FLOATING
+C38 a_n3550_5456# vss 2.76387f ; **FLOATING
+.ends

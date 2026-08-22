@@ -34,6 +34,7 @@ from mbg.experiment_manifest import (
 
 # LLM helpers now live in mbg.llm; re-exported so existing imports
 # such as `from mbg.pipeline import generate_netlist_from_prompt` keep working.
+from mbg.utils import write_gds_foundry
 from mbg.llm import (  # noqa: E402,F401
     _load_api_key, generate_netlist_from_prompt, llm_to_gds,
     llm_to_gds_with_manifest,
@@ -186,7 +187,7 @@ def _run_post_processing(top_level, gds_path, netlist_input, pdk_name):
 
     workdir = os.path.dirname(os.path.abspath(gds_path)) if gds_path else os.getcwd()
     gds_path = os.path.join(workdir, f"{cell_name}.gds")
-    top_level.write_gds(gds_path)
+    write_gds_foundry(top_level, gds_path)
     print(f"[CHECKS] GDS written to {gds_path}")
 
     if pdk_name == "gf180":
@@ -282,7 +283,7 @@ def spice_to_gds_with_checks_legacy(netlist_input, gds_path=None,
 
     # 1. Generate layout
     result = spice_to_gds(netlist_input, mode=mode, add_labels=add_labels)
-    result.write_gds(gds_path)
+    write_gds_foundry(result, gds_path)
 
     # SVG preview
     try:
@@ -428,12 +429,13 @@ def spice_to_gds_ctx(netlist_input, mode="analog", add_labels=True,
     verification = None
     if verify:
         verification = _conn.verify(ctx)
-        consistency = _conn.compare_with_netlist(ctx)
-        verification["netlist_consistency"] = consistency
         status = "CLEAN" if verification["clean"] else "ISSUES"
         print(f"[VERIFY] internal connectivity: {status} — "
               f"opens={verification['opens']} shorts={verification['shorts']} "
-              f"drc={verification['drc']}")
+              f"drc={verification['drc']} "
+              f"missing={verification['missing_access']}")
+        for d in verification["missing_access_details"][:5]:
+            print(f"[VERIFY] NO ACCESS POINT: {d}")
         for d in verification["short_details"][:5]:
             print(f"[VERIFY] SHORT: {d}")
         for d in verification["open_details"][:5]:
@@ -491,12 +493,41 @@ def _add_pin_labels(ctx, top, pdk):
             side = min(best.width, best.length())
             size = (side, side)
         else:
+            # No committed segment. That is legitimate only when the net had
+            # nothing to route -- a single terminal is already one conductor,
+            # so its access point IS the net. When the net has several
+            # terminals and the router did not connect them, the terminals are
+            # separate conductors and NONE of them is "the net": dropping the
+            # port's name on whichever access point happens to be first in
+            # insertion order asserts a connection that does not exist.
+            #
+            # That is not a cosmetic problem. Magic names the extracted node
+            # after the label, so an unrouted supply whose terminals happen to
+            # share device metal would extract under the port's own name and
+            # LVS could report MATCH on a net that was never routed. Refusing
+            # to label turns a possible false MATCH into a loud, diagnosable
+            # one. Verified on the 12-MOS clocked comparator: the fallback put
+            # the `vdd` label on XM3's source while the vdd net was entirely
+            # unrouted.
             aps = ctx.net_to_access.get(net, [])
-            if aps:
+            # Count LOGICAL terminals, not access points: one gLayout MOS
+            # terminal exposes N/E/S/W ports that are already tied together
+            # inside the device, so a single-terminal net such as a bare gate
+            # input has four access points and is still one conductor.
+            terminals = {(a.instance, a.terminal) for a in aps}
+            rn = ctx.routed_nets.get(net)
+            connected = (rn is not None and rn.complete) or len(terminals) <= 1
+            if aps and connected:
                 anchor = (aps[0].x, aps[0].y)
                 layer_name = aps[0].layer
                 side = ctx.rules.min_width(layer_name)
                 size = (side, side)
+            elif aps:
+                print(f"[PINS] REFUSING to label port {port_name!r}: net "
+                      f"{net!r} has {len(terminals)} terminals and no routed "
+                      f"geometry joining them — labelling one of them would "
+                      f"claim a connection the layout does not have")
+                continue
         if anchor is None:
             print(f"[PINS] net {net!r} has no geometry to label")
             continue
@@ -534,7 +565,7 @@ def spice_to_gds_with_checks_ctx(netlist_input, gds_path=None, mode="analog",
                          placement_config=placement_config,
                          router_config=router_config, verbosity=verbosity,
                          power_rails=power_rails, rail_layer=rail_layer)
-    r["component"].write_gds(gds_path)
+    write_gds_foundry(r["component"], gds_path)
     r["gds_path"] = gds_path
     r["outdir"] = outdir
     r["cell_name"] = cell_name
@@ -560,6 +591,19 @@ def spice_to_gds_with_checks_ctx(netlist_input, gds_path=None, mode="analog",
         r["drc"] = run_drc(gds_path, cell_name=cell_name, workdir=outdir)
     except Exception as e:
         r["drc"] = {"clean": False, "summary": f"DRC ERROR: {e}", "error_count": -1}
+
+    # Dual-engine DRC sign-off: KLayout runs the GF180 foundry deck and is the
+    # sign-off authority; Magic above is the independent complementary check.
+    # Failure to configure KLayout is reported, never silently skipped.
+    try:
+        from mbg.drc import run_dual_drc
+        _s = run_dual_drc(gds_path, cell_name=cell_name, workdir=outdir,
+                          verbosity=verbosity)
+        r["drc_signoff"] = _s.as_dict()
+        r["drc_report"] = _s.report()
+    except Exception as e:
+        r["drc_signoff"] = {"verdict": "ERROR", "reason":
+                            f"{type(e).__name__}: {e}", "results": []}
     try:
         r["lvs"] = run_lvs(gds_path, netlist_path, cell_name=cell_name,
                            workdir=outdir)
@@ -580,12 +624,23 @@ def spice_to_gds_with_checks_ctx(netlist_input, gds_path=None, mode="analog",
             print(f"[OUTPUTS] view generation failed: {type(e).__name__}: {e}")
 
     internal_ok = bool(r["verification"] and r["verification"]["clean"])
-    r["all_pass"] = bool(r["drc"].get("clean") and r["lvs"].get("match")
-                         and internal_ok)
+    # The dual-engine verdict, not Magic alone, decides DRC. KLayout runs the
+    # GF180 foundry deck and drc.py calls it the sign-off authority; leaving it
+    # out of all_pass meant a design KLayout had failed — or never checked at
+    # all — could still report all_pass=True through the documented primary
+    # API. NOT_CONFIGURED counts as a failure on purpose: an engine that did
+    # not run has not agreed to anything (see drc.py, "silence from a checker
+    # is not a pass"), and the printed reason says which engine and why.
+    signoff = (r.get("drc_signoff") or {})
+    drc_ok = bool(r["drc"].get("clean")) and signoff.get("verdict") == "PASS"
+    r["all_pass"] = bool(drc_ok and r["lvs"].get("match") and internal_ok)
     print(f"[SIGNOFF] DRC={r['drc'].get('summary')} "
+          f"signoff={signoff.get('verdict', 'NOT RUN')} "
           f"LVS={(r['lvs'].get('summary') or {}).get('message', r['lvs'].get('summary'))} "
           f"internal={'CLEAN' if internal_ok else 'ISSUES'} "
           f"all_pass={r['all_pass']}")
+    if not drc_ok and signoff.get("reason"):
+        print(f"[SIGNOFF] DRC not signed off: {signoff['reason']}")
     return r
 
 

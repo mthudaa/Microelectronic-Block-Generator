@@ -14,6 +14,7 @@ from pathlib import Path
 from time import perf_counter
 
 from mbg.spice_parser import parse_netlist_with_pdk
+from mbg.utils import write_gds_foundry
 from mbg.experiment_manifest import (
     ExperimentManifest,
     ExperimentStatus,
@@ -311,7 +312,7 @@ def llm_to_gds_with_manifest(
             run_checks=False,
         )
 
-        top_level.write_gds(str(gds_path))
+        write_gds_foundry(top_level, str(gds_path))
 
         if not gds_path.is_file():
             raise RuntimeError(

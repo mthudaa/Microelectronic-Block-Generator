@@ -16,31 +16,88 @@ def _first(params, *keys, default="-"):
     return default
 
 
+def _logical_lines(text):
+    """SPICE physical lines joined into logical ones, comments removed.
+
+    Three things every SPICE reader does and this parser did not:
+
+    * A leading ``+`` continues the previous line.  Long device lines wrap as
+      a matter of course in generated and hand-written netlists alike, and
+      without this the wrapped remainder was read as a *new device* named
+      ``+`` while the real device lost its model and its W/L — a silent
+      corruption of the circuit, with no exception raised.
+    * ``$`` and ``;`` start an end-of-line comment.  Parameters are found by
+      regex over the rest of the line, so a comment mentioning an old value
+      could be picked up in place of the real one.
+    * ``*`` comments and blank lines are dropped here rather than in the main
+      loop, so a continuation is never attached to a comment.
+    """
+    out = []
+    for raw in text.replace('\r\n', '\n').replace('\r', '\n').split('\n'):
+        line = raw.strip()
+        if not line or line.startswith('*'):
+            continue
+        for marker in ('$', ';'):
+            cut = line.find(marker)
+            if cut >= 0:
+                line = line[:cut].rstrip()
+        if not line:
+            continue
+        if line.startswith('+'):
+            body = line[1:].strip()
+            if out:
+                out[-1] = f"{out[-1]} {body}".strip()
+            elif body:
+                out.append(body)
+            continue
+        out.append(line)
+    return out
+
+
+def _pdk_from_models(components):
+    """Infer the PDK from the device models when no .lib/.inc said so.
+
+    Detection used to key only off a ``.LIB``/``.INC`` path containing
+    "GF180" or "SKY130", so a netlist without one — which every hand-written
+    subcircuit and most LLM output is — failed downstream with
+    ``Unknown PDK: Tidak Terdeteksi``, even though ``nfet_03v3`` names its
+    process unambiguously.  Nothing here overrides an explicit .lib.
+    """
+    for comp in components:
+        model = str(comp.get("model", "")).lower()
+        if not model or model == "-":
+            continue
+        if model.startswith("sky130_fd_pr__") or model.startswith("sky130_"):
+            return "sky130"
+        if model.startswith("gf180mcu"):
+            return "gf180"
+        # GF180 primitives: nfet_03v3 / pfet_06v0 / ppolyf_u / cap_mim_*
+        if re.match(r"^[np]fet_\d+v\d+", model) or model.startswith(
+                ("ppolyf", "npolyf", "cap_mim_", "rm1", "rm2", "rm3")):
+            return "gf180"
+    return None
+
+
 def parse_netlist_with_pdk(file_content, manual_pdk="Tidak Terdeteksi", mode="analog"):
     if file_content is None:
         raise ValueError("file_content is None — no SPICE netlist provided")
     parsed_components = []
-    lines = file_content.replace('\r\n', '\n').replace('\r', '\n').strip().split('\n')
-    
+    lines = _logical_lines(file_content)
+
     # Variabel untuk menyimpan nama PDK
     detected_pdk = manual_pdk
-    
-    for line in lines:
-        line_str = line.strip()
-        
-        # Abaikan baris kosong dan komentar
-        if not line_str or line_str.startswith('*'):
-            continue
-            
+    explicit_pdk = False
+
+    for line_str in lines:
         line_upper = line_str.upper()
         
         # --- DETEKSI PDK OTOMATIS ---
         if line_upper.startswith('.LIB') or line_upper.startswith('.INC'):
             if 'SKY130' in line_upper:
-                detected_pdk = 'sky130'
+                detected_pdk, explicit_pdk = 'sky130', True
             elif 'GF180' in line_upper:
-                detected_pdk = 'gf180'
-            continue 
+                detected_pdk, explicit_pdk = 'gf180', True
+            continue
             
         # Tangani perintah SPICE (.SUBCKT)
         if line_upper.startswith('.'):
@@ -184,6 +241,14 @@ def parse_netlist_with_pdk(file_content, manual_pdk="Tidak Terdeteksi", mode="an
             "nodes": nodes_dict,
             "model": model_name
         })
+
+    # An explicit .lib/.inc always wins; otherwise let the device models say
+    # which process this is, rather than failing on a netlist that names its
+    # primitives perfectly clearly.
+    if not explicit_pdk:
+        inferred = _pdk_from_models(parsed_components)
+        if inferred:
+            detected_pdk = inferred
 
     # --- BUNGKUS KE DALAM STRUKTUR FINAL ---
     final_output = {
@@ -467,6 +532,50 @@ def _num(val, default=None):
         return default
 
 
+def _validate_device(dev, comp):
+    """Reject a device the layout stage cannot build, and say which one.
+
+    A transistor with no W or no L used to pass straight through with
+    ``width=None`` and only surface much later — as a crash inside gLayout, or
+    worse as a default-sized device that nothing in the netlist asked for.
+    A netlist is not validated by parsing without raising; the project rule is
+    to check the SPICE *before* generating layout, and this is where enough is
+    known to do it.
+
+    Missing terminals are checked too: a MOSFET line short of its four nodes
+    is a truncated or mis-wrapped line, not a device.
+    """
+    if not dev.is_mos:
+        # An XM*/M* instance is a MOSFET by SPICE convention. Falling through
+        # to kind "other" means the model was unrecognised or absent — most
+        # often a truncated or mis-wrapped instance line — and "other" devices
+        # are not checked below, so it would pass silently.
+        name = (dev.name or "").upper()
+        if name.startswith("XM") or (name.startswith("M") and not name.startswith("MIM")):
+            raise ValueError(
+                f"{dev.name} looks like a MOSFET instance but its model "
+                f"{dev.model!r} is not a recognised transistor. Parsed nodes: "
+                f"{comp.get('nodes')}. A MOSFET line is "
+                f"'<name> <drain> <gate> <source> <body> <model> W=.. L=..'; "
+                f"check for a truncated or wrapped line.")
+        return
+    missing = [t for t in ("drain", "gate", "source", "body")
+               if not dev.terminals.get(t)]
+    if missing:
+        raise ValueError(
+            f"{dev.name} ({dev.model}) is missing terminal(s) "
+            f"{', '.join(missing)} — a MOSFET needs drain, gate, source and "
+            f"body. Parsed nodes: {comp.get('nodes')}")
+    for label, value in (("W", dev.width), ("L", dev.length)):
+        if value is None or value <= 0:
+            raise ValueError(
+                f"{dev.name} ({dev.model}) has no usable {label} "
+                f"(parsed {label.lower()}={comp.get('parameters', {}).get(label.lower())!r}). "
+                f"Every transistor needs a positive W and L before layout; "
+                f"check for a wrapped line, an inline comment swallowing the "
+                f"parameters, or an unexpanded .param.")
+
+
 def build_design_context(config, pdk=None, name=None):
     """Turn a parsed netlist ``config`` into a DesignContext (§11).
 
@@ -520,6 +629,7 @@ def build_design_context(config, pdk=None, name=None):
             dev.finger_width = w_total / float(max(1, nf) * max(1, m))
         else:
             dev.finger_width = w_total
+        _validate_device(dev, comp)
         ctx.add_device(dev)
 
     # ── nets ────────────────────────────────────────────────────────

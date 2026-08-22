@@ -22,6 +22,9 @@ than reaching for internals:
     mbg.analysis       op / dc / ac / tran / Monte Carlo / FFT
     mbg.outputs        LEF / Liberty / Verilog views for integration
     mbg.llm            natural language -> SPICE
+    mbg.specs          target specs, evaluation, degradation analysis
+    mbg.flow           the two-loop design flow (pre-layout + PEX-aware)
+    mbg.flow_runtime   real ngspice/Magic/netgen hooks for that flow
     mbg.pipeline       the flows that tie the above together
 
 `mbg.placement` and `mbg.routing` are the superseded first-generation
@@ -58,6 +61,22 @@ from mbg.pipeline import (
     spice_to_gds_ctx,
 )
 from mbg.llm import llm_to_gds, generate_netlist_from_prompt
+
+# ── the design flow: two optimisation loops ───────────────────────────
+# Pre-layout optimisation finds a nominal circuit; PEX-aware optimisation
+# closes the loop on layout parasitics. PEX is feedback, not a final stamp.
+from mbg.specs import (
+    Spec, SpecResult, SpecReport, Degradation,
+    evaluate_specs, compare_degradation, format_spec_table,
+)
+from mbg.flow import (
+    DesignFlow, DesignPoint, FlowConfig, FlowHooks, FlowResult,
+    LayoutResult, IterationRecord, Stage, Outcome, Failure, run_flow,
+)
+from mbg.flow_runtime import (
+    make_hooks, measure_ac_metrics, scale_device_widths,
+    default_tune_pre, default_tune_post,
+)
 
 # ── design description ────────────────────────────────────────────────
 from mbg.spice_parser import parse_netlist_with_pdk, build_design_context
@@ -99,6 +118,14 @@ from mbg.routing import auto_router, manual_route, set_pdk, get_pdk
 __version__ = "0.2.0"
 
 __all__ = [
+    # design flow (two loops: pre-layout, then PEX-aware)
+    "Spec", "SpecResult", "SpecReport", "Degradation",
+    "evaluate_specs", "compare_degradation", "format_spec_table",
+    "DesignFlow", "DesignPoint", "FlowConfig", "FlowHooks", "FlowResult",
+    "LayoutResult", "IterationRecord", "Stage", "Outcome", "Failure",
+    "run_flow", "make_hooks", "measure_ac_metrics", "scale_device_widths",
+    "default_tune_pre", "default_tune_post",
+
     # flows
     "spice_to_gds_with_checks", "spice_to_gds_with_checks_ctx",
     "spice_to_gds_with_checks_legacy", "spice_to_gds", "spice_to_gds_ctx",
