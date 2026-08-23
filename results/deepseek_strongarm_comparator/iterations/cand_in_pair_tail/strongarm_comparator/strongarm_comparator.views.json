@@ -1,0 +1,46 @@
+{
+  "cell": "strongarm_comparator",
+  "files": {
+    "drc_report": "strongarm_comparator.magic.drc.rpt",
+    "extracted_spice": "strongarm_comparator_extracted.spice",
+    "gds": "strongarm_comparator.gds",
+    "lef": "strongarm_comparator.lef",
+    "lib": "strongarm_comparator.lib",
+    "lvs_report": "strongarm_comparator.lvs.out",
+    "pex_spice": "strongarm_comparator.pex.spice",
+    "sch_spice": "strongarm_comparator.spice",
+    "svg": "strongarm_comparator.svg",
+    "verilog": "strongarm_comparator.v"
+  },
+  "notes": [],
+  "ports": [
+    {
+      "direction": "power",
+      "name": "VDD"
+    },
+    {
+      "direction": "ground",
+      "name": "VSS"
+    },
+    {
+      "direction": "inout",
+      "name": "INP"
+    },
+    {
+      "direction": "inout",
+      "name": "INN"
+    },
+    {
+      "direction": "inout",
+      "name": "CLK"
+    },
+    {
+      "direction": "inout",
+      "name": "OUTP"
+    },
+    {
+      "direction": "inout",
+      "name": "OUTN"
+    }
+  ]
+}

@@ -1,0 +1,97 @@
+VERSION 5.7 ;
+  NOWIREEXTENSIONATPIN ON ;
+  DIVIDERCHAR "/" ;
+  BUSBITCHARS "[]" ;
+MACRO strongarm_comparator
+  CLASS BLOCK ;
+  FOREIGN strongarm_comparator ;
+  ORIGIN 32.740 4.240 ;
+  SIZE 65.260 BY 53.300 ;
+  PIN OUTN
+    ANTENNAGATEAREA 4.800000 ;
+    ANTENNADIFFAREA 4.040000 ;
+    PORT
+      LAYER Metal4 ;
+        RECT 6.160 25.760 6.440 43.840 ;
+    END
+  END OUTN
+  PIN OUTP
+    ANTENNAGATEAREA 4.800000 ;
+    ANTENNADIFFAREA 4.040000 ;
+    PORT
+      LAYER Metal4 ;
+        RECT 15.340 25.760 15.620 38.740 ;
+    END
+  END OUTP
+  PIN CLK
+    ANTENNAGATEAREA 9.599999 ;
+    PORT
+      LAYER Metal4 ;
+        RECT -4.040 0.260 -3.760 40.780 ;
+    END
+  END CLK
+  PIN INN
+    ANTENNAGATEAREA 1.800000 ;
+    PORT
+      LAYER Metal2 ;
+        RECT -12.230 21.065 -11.950 21.345 ;
+    END
+  END INN
+  PIN INP
+    ANTENNAGATEAREA 1.800000 ;
+    PORT
+      LAYER Metal2 ;
+        RECT -20.010 21.065 -19.730 21.345 ;
+    END
+  END INP
+  PIN VSS
+    USE GROUND ;
+    PORT
+      LAYER Metal4 ;
+        RECT -15.400 -3.820 -14.840 22.420 ;
+    END
+  END VSS
+  PIN VDD
+    USE POWER ;
+    PORT
+      LAYER Metal3 ;
+        RECT -32.320 47.780 -19.340 48.340 ;
+    END
+  END VDD
+  OBS
+      LAYER Nwell ;
+        RECT -29.520 0.000 29.520 45.300 ;
+      LAYER Metal1 ;
+        RECT -29.290 0.210 29.290 45.090 ;
+      LAYER Metal2 ;
+        RECT -29.290 21.645 29.290 46.270 ;
+        RECT -29.290 20.765 -20.310 21.645 ;
+        RECT -19.430 20.765 -12.530 21.645 ;
+        RECT -11.650 20.765 29.290 21.645 ;
+        RECT -29.290 0.210 29.290 20.765 ;
+      LAYER Metal3 ;
+        RECT -32.740 48.200 -32.320 48.340 ;
+        RECT -32.740 47.920 -32.600 48.200 ;
+        RECT -32.740 47.780 -32.320 47.920 ;
+        RECT -32.740 47.480 -32.620 47.780 ;
+        RECT -19.040 47.480 32.080 48.340 ;
+        RECT -32.740 -4.240 32.080 47.480 ;
+      LAYER Metal4 ;
+        RECT -32.710 44.140 32.050 48.310 ;
+        RECT -32.710 41.080 5.860 44.140 ;
+        RECT -32.710 22.720 -4.340 41.080 ;
+        RECT -32.710 -4.120 -15.700 22.720 ;
+        RECT -14.540 -0.040 -4.340 22.720 ;
+        RECT -3.460 25.460 5.860 41.080 ;
+        RECT 6.740 39.040 32.050 44.140 ;
+        RECT 6.740 25.460 15.040 39.040 ;
+        RECT 15.920 25.460 32.050 39.040 ;
+        RECT -3.460 -0.040 32.050 25.460 ;
+        RECT -14.540 -4.120 32.050 -0.040 ;
+        RECT -32.710 -4.240 32.050 -4.120 ;
+      LAYER Metal5 ;
+        RECT -32.710 -3.940 32.520 49.060 ;
+  END
+END strongarm_comparator
+END LIBRARY
+

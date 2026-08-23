@@ -1,0 +1,135 @@
+{
+  "summary": {
+    "devil": {
+      "reviews": 2,
+      "findings": 2,
+      "by_severity": {
+        "INFO": 1,
+        "MEDIUM": 1
+      },
+      "unresolved_critical": []
+    },
+    "angel": {
+      "reviews": 2,
+      "recommendations": 0,
+      "tested": 0,
+      "improved": 0,
+      "degraded": 0
+    },
+    "recommendations": []
+  },
+  "decisions": [
+    {
+      "stage": "SPECIFICATION",
+      "verdict": "ACCEPT",
+      "reason": "measured results meet the required specifications",
+      "evidence_pass": true,
+      "blocking": [],
+      "accepted": [],
+      "reviews": [
+        {
+          "reviewer": "devil",
+          "stage": "SPECIFICATION",
+          "verdict": "ACCEPT",
+          "confidence": 0.55,
+          "status": "OK",
+          "error": "",
+          "elapsed": 0.0,
+          "findings": [
+            {
+              "severity": "INFO",
+              "category": "scope",
+              "finding": "No objection from the evidence provided. Note that corner and mismatch data were not part of this review.",
+              "evidence": {}
+            }
+          ],
+          "recommendations": []
+        },
+        {
+          "reviewer": "angel",
+          "stage": "SPECIFICATION",
+          "verdict": "ACCEPT",
+          "confidence": 0.8,
+          "status": "OK",
+          "error": "",
+          "elapsed": 0.0,
+          "findings": [
+            {
+              "severity": "INFO",
+              "category": "status",
+              "finding": "All required targets are met on the evidence supplied; no change recommended.",
+              "evidence": {}
+            }
+          ],
+          "recommendations": []
+        }
+      ],
+      "iteration": 0
+    },
+    {
+      "stage": "FINAL_SIGNOFF",
+      "verdict": "ACCEPT",
+      "reason": "measured results meet the required specifications",
+      "evidence_pass": true,
+      "blocking": [],
+      "accepted": [],
+      "reviews": [
+        {
+          "reviewer": "devil",
+          "stage": "FINAL_SIGNOFF",
+          "verdict": "REVISE",
+          "confidence": 0.6,
+          "status": "OK",
+          "error": "",
+          "elapsed": 0.0,
+          "findings": [
+            {
+              "severity": "MEDIUM",
+              "category": "swing_high_v",
+              "finding": "swing_high_v passes by only 4.1% \u2014 that is inside the noise of corner and mismatch variation, which has not been simulated here.",
+              "evidence": {
+                "target": 2.8,
+                "measured": 2.91494228,
+                "margin_pct": 4.105
+              }
+            }
+          ],
+          "recommendations": []
+        },
+        {
+          "reviewer": "angel",
+          "stage": "FINAL_SIGNOFF",
+          "verdict": "REVISE",
+          "confidence": 0.4,
+          "status": "OK",
+          "error": "",
+          "elapsed": 0.0,
+          "findings": [
+            {
+              "severity": "MEDIUM",
+              "category": "parasitics",
+              "finding": "swing_low_v met target before layout and lost it after extraction, so the circuit topology is adequate and the problem is physical. Layout changes should be tried before resizing.",
+              "evidence": {
+                "degraded": [
+                  "swing_low_v"
+                ]
+              }
+            },
+            {
+              "severity": "MEDIUM",
+              "category": "coverage",
+              "finding": "No catalogued action addresses swing_low_v; this needs a designer or a richer reviewer.",
+              "evidence": {
+                "unmet": [
+                  "swing_low_v"
+                ]
+              }
+            }
+          ],
+          "recommendations": []
+        }
+      ],
+      "iteration": 1
+    }
+  ]
+}

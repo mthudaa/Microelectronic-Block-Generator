@@ -1,0 +1,15 @@
+{
+  "full_auto_status": "SUCCESS",
+  "full_auto_tapeout_ready": true,
+  "complete_request_status": "NOT READY",
+  "physical_signoff": {
+    "drc_magic_and_klayout": "PASS",
+    "lvs": "PASS",
+    "pex_extraction": "PASS",
+    "pex_nominal_specs": "PASS"
+  },
+  "pre_layout_pvt": "PASS",
+  "post_layout_pvt": "NOT RUN",
+  "mismatch_monte_carlo": "NOT AVAILABLE",
+  "reason": "The configured full-auto gate passed nominal and physical checks, but the complete request requires post-PEX PVT and mismatch evidence that did not complete."
+}

@@ -1,0 +1,633 @@
+{
+  "status": "SUCCESS",
+  "tapeout_ready": true,
+  "message": "all sign-off conditions met",
+  "elapsed": 725.059,
+  "request": {
+    "raw": "Design a MOSFET-only Strong-Arm clocked comparator in GF180MCU gf180mcuD.\nUse VDD=3.3 V and VSS=0 V, with exactly the ports\nVDD VSS INP INN CLK OUTP OUTN. CLK is the evaluation clock and OUTP/OUTN\nare fully differential. Use nfet_03v3 and pfet_03v3 only, with no BJTs,\nexplicit resistors, explicit capacitors in the core, or behavioral elements.\nProvide reset/precharge and regenerative evaluation. At VCM=1.65 V, 10 MHz,\n20 fF output loads, and 27 C, require correct decisions at both +/-5 mV,\ndecision time <=5 ns, differential swing >=90 percent of VDD, approximately\nzero static current, and average current <=500 uA. Verify the 1.0 V to 2.3 V\ninput common-mode endpoints. Characterize delay at 5, 10, 25, 50, and 100 mV\nfor both polarities. Run PVT at VDD 3.0/3.3/3.6 V and -40/27/125 C over\nmeaningful GF180 corners. Run mismatch Monte Carlo when supported and report\nmean, 1 sigma, 3 sigma, and run count. Continue bounded optimization through\nlayout, dual DRC, LVS, PEX, post-layout simulation, and final reporting.",
+    "cell": "strongarm_comparator",
+    "topology": "comparator",
+    "pdk": "gf180mcuD",
+    "vdd": 3.3,
+    "load_f": null,
+    "specs": [
+      {
+        "name": "decision_time_5mV_ns",
+        "op": "<=",
+        "target": 5.0,
+        "unit": " ns"
+      },
+      {
+        "name": "decision_correct_5mV",
+        "op": ">=",
+        "target": 1.0,
+        "unit": ""
+      },
+      {
+        "name": "output_swing_ratio_5mV",
+        "op": ">=",
+        "target": 0.9,
+        "unit": ""
+      },
+      {
+        "name": "avg_current_uA",
+        "op": "<=",
+        "target": 500.0,
+        "unit": " uA"
+      },
+      {
+        "name": "cmr_endpoint_correct",
+        "op": ">=",
+        "target": 1.0,
+        "unit": ""
+      }
+    ],
+    "provenance": {
+      "given": [
+        "vdd",
+        "decision_time_5mV_ns",
+        "decision_correct_5mV",
+        "output_swing_ratio_5mV",
+        "avg_current_uA",
+        "cmr_endpoint_correct"
+      ],
+      "defaulted": [],
+      "inferred": [
+        "topology=comparator"
+      ],
+      "missing": [
+        "load capacitance"
+      ]
+    }
+  },
+  "flow": {
+    "cell": "strongarm_comparator",
+    "status": "PASS",
+    "stage": "COMPLETE",
+    "failure": "NONE",
+    "message": "final design meets PEX-aware specifications",
+    "elapsed": 725.049,
+    "pre_layout": [
+      {
+        "phase": "pre_layout",
+        "iteration": 1,
+        "spec_pass": true,
+        "score": 0.0,
+        "status": "PASS",
+        "failure": "NONE",
+        "message": "",
+        "metrics": {
+          "source": "pre_layout",
+          "pass": true,
+          "score": 0.0,
+          "metrics": {
+            "decision_time_5mV_ns": {
+              "value": 1.8985184999999998,
+              "target": 5.0,
+              "op": "<=",
+              "unit": " ns",
+              "status": "PASS",
+              "margin": 3.1014815000000002,
+              "margin_pct": 62.03
+            },
+            "decision_correct_5mV": {
+              "value": 1.0,
+              "target": 1.0,
+              "op": ">=",
+              "unit": "",
+              "status": "PASS",
+              "margin": 0.0,
+              "margin_pct": 0.0
+            },
+            "output_swing_ratio_5mV": {
+              "value": 0.999999987070717,
+              "target": 0.9,
+              "op": ">=",
+              "unit": "",
+              "status": "PASS",
+              "margin": 0.099999987070717,
+              "margin_pct": 11.111
+            },
+            "avg_current_uA": {
+              "value": 3.85526,
+              "target": 500.0,
+              "op": "<=",
+              "unit": " uA",
+              "status": "PASS",
+              "margin": 496.14474,
+              "margin_pct": 99.229
+            },
+            "cmr_endpoint_correct": {
+              "value": 1.0,
+              "target": 1.0,
+              "op": ">=",
+              "unit": "",
+              "status": "PASS",
+              "margin": 0.0,
+              "margin_pct": 0.0
+            }
+          }
+        },
+        "degradation": [],
+        "elapsed": 10.365
+      }
+    ],
+    "pex": [
+      {
+        "phase": "pex",
+        "iteration": 1,
+        "spec_pass": false,
+        "score": 2.0,
+        "status": "FAIL",
+        "drc": "PASS",
+        "lvs": "PASS",
+        "pex_extraction": "PASS",
+        "pex_simulation": "PASS",
+        "failure": "SPEC_FAILURE",
+        "message": "",
+        "metrics": {
+          "source": "pex",
+          "pass": false,
+          "score": 2.0,
+          "metrics": {
+            "decision_time_5mV_ns": {
+              "value": 3.3875593000000004,
+              "target": 5.0,
+              "op": "<=",
+              "unit": " ns",
+              "status": "PASS",
+              "margin": 1.6124406999999996,
+              "margin_pct": 32.249
+            },
+            "decision_correct_5mV": {
+              "value": 0.0,
+              "target": 1.0,
+              "op": ">=",
+              "unit": "",
+              "status": "FAIL",
+              "margin": -1.0,
+              "margin_pct": -100.0
+            },
+            "output_swing_ratio_5mV": {
+              "value": 0.9999999568189247,
+              "target": 0.9,
+              "op": ">=",
+              "unit": "",
+              "status": "PASS",
+              "margin": 0.0999999568189247,
+              "margin_pct": 11.111
+            },
+            "avg_current_uA": {
+              "value": 6.680562,
+              "target": 500.0,
+              "op": "<=",
+              "unit": " uA",
+              "status": "PASS",
+              "margin": 493.319438,
+              "margin_pct": 98.664
+            },
+            "cmr_endpoint_correct": {
+              "value": 0.0,
+              "target": 1.0,
+              "op": ">=",
+              "unit": "",
+              "status": "FAIL",
+              "margin": -1.0,
+              "margin_pct": -100.0
+            }
+          }
+        },
+        "degradation": [
+          {
+            "name": "decision_correct_5mV",
+            "pre": 1.0,
+            "post": 0.0,
+            "unit": "",
+            "delta": -1.0,
+            "delta_pct": -100.0,
+            "status": "FAIL",
+            "worsened": true
+          },
+          {
+            "name": "cmr_endpoint_correct",
+            "pre": 1.0,
+            "post": 0.0,
+            "unit": "",
+            "delta": -1.0,
+            "delta_pct": -100.0,
+            "status": "FAIL",
+            "worsened": true
+          },
+          {
+            "name": "decision_time_5mV_ns",
+            "pre": 1.8985184999999998,
+            "post": 3.3875593000000004,
+            "unit": " ns",
+            "delta": 1.4890408000000006,
+            "delta_pct": 78.432,
+            "status": "PASS",
+            "worsened": true
+          },
+          {
+            "name": "avg_current_uA",
+            "pre": 3.85526,
+            "post": 6.680562,
+            "unit": " uA",
+            "delta": 2.825302,
+            "delta_pct": 73.284,
+            "status": "PASS",
+            "worsened": true
+          },
+          {
+            "name": "output_swing_ratio_5mV",
+            "pre": 0.999999987070717,
+            "post": 0.9999999568189247,
+            "unit": "",
+            "delta": -3.025179229343422e-08,
+            "delta_pct": -0.0,
+            "status": "PASS",
+            "worsened": true
+          }
+        ],
+        "elapsed": 116.675
+      },
+      {
+        "phase": "pex",
+        "iteration": 2,
+        "spec_pass": true,
+        "score": 0.0,
+        "status": "PASS",
+        "drc": "PASS",
+        "lvs": "PASS",
+        "pex_extraction": "PASS",
+        "pex_simulation": "PASS",
+        "failure": "NONE",
+        "message": "",
+        "metrics": {
+          "source": "pex",
+          "pass": true,
+          "score": 0.0,
+          "metrics": {
+            "decision_time_5mV_ns": {
+              "value": 2.4935319000000002,
+              "target": 5.0,
+              "op": "<=",
+              "unit": " ns",
+              "status": "PASS",
+              "margin": 2.5064680999999998,
+              "margin_pct": 50.129
+            },
+            "decision_correct_5mV": {
+              "value": 1.0,
+              "target": 1.0,
+              "op": ">=",
+              "unit": "",
+              "status": "PASS",
+              "margin": 0.0,
+              "margin_pct": 0.0
+            },
+            "output_swing_ratio_5mV": {
+              "value": 0.9999999635850965,
+              "target": 0.9,
+              "op": ">=",
+              "unit": "",
+              "status": "PASS",
+              "margin": 0.09999996358509644,
+              "margin_pct": 11.111
+            },
+            "avg_current_uA": {
+              "value": 5.990007,
+              "target": 500.0,
+              "op": "<=",
+              "unit": " uA",
+              "status": "PASS",
+              "margin": 494.009993,
+              "margin_pct": 98.802
+            },
+            "cmr_endpoint_correct": {
+              "value": 1.0,
+              "target": 1.0,
+              "op": ">=",
+              "unit": "",
+              "status": "PASS",
+              "margin": 0.0,
+              "margin_pct": 0.0
+            }
+          }
+        },
+        "degradation": [
+          {
+            "name": "avg_current_uA",
+            "pre": 3.85526,
+            "post": 5.990007,
+            "unit": " uA",
+            "delta": 2.1347470000000004,
+            "delta_pct": 55.372,
+            "status": "PASS",
+            "worsened": true
+          },
+          {
+            "name": "decision_time_5mV_ns",
+            "pre": 1.8985184999999998,
+            "post": 2.4935319000000002,
+            "unit": " ns",
+            "delta": 0.5950134000000005,
+            "delta_pct": 31.341,
+            "status": "PASS",
+            "worsened": true
+          },
+          {
+            "name": "output_swing_ratio_5mV",
+            "pre": 0.999999987070717,
+            "post": 0.9999999635850965,
+            "unit": "",
+            "delta": -2.3485620559426934e-08,
+            "delta_pct": -0.0,
+            "status": "PASS",
+            "worsened": true
+          },
+          {
+            "name": "decision_correct_5mV",
+            "pre": 1.0,
+            "post": 1.0,
+            "unit": "",
+            "delta": 0.0,
+            "delta_pct": 0.0,
+            "status": "PASS",
+            "worsened": false
+          },
+          {
+            "name": "cmr_endpoint_correct",
+            "pre": 1.0,
+            "post": 1.0,
+            "unit": "",
+            "delta": 0.0,
+            "delta_pct": 0.0,
+            "status": "PASS",
+            "worsened": false
+          }
+        ],
+        "elapsed": 49.557
+      }
+    ],
+    "best_pre": {
+      "source": "pre_layout",
+      "pass": true,
+      "score": 0.0,
+      "metrics": {
+        "decision_time_5mV_ns": {
+          "value": 1.8985184999999998,
+          "target": 5.0,
+          "op": "<=",
+          "unit": " ns",
+          "status": "PASS",
+          "margin": 3.1014815000000002,
+          "margin_pct": 62.03
+        },
+        "decision_correct_5mV": {
+          "value": 1.0,
+          "target": 1.0,
+          "op": ">=",
+          "unit": "",
+          "status": "PASS",
+          "margin": 0.0,
+          "margin_pct": 0.0
+        },
+        "output_swing_ratio_5mV": {
+          "value": 0.999999987070717,
+          "target": 0.9,
+          "op": ">=",
+          "unit": "",
+          "status": "PASS",
+          "margin": 0.099999987070717,
+          "margin_pct": 11.111
+        },
+        "avg_current_uA": {
+          "value": 3.85526,
+          "target": 500.0,
+          "op": "<=",
+          "unit": " uA",
+          "status": "PASS",
+          "margin": 496.14474,
+          "margin_pct": 99.229
+        },
+        "cmr_endpoint_correct": {
+          "value": 1.0,
+          "target": 1.0,
+          "op": ">=",
+          "unit": "",
+          "status": "PASS",
+          "margin": 0.0,
+          "margin_pct": 0.0
+        }
+      }
+    },
+    "best_pex": {
+      "source": "pex",
+      "pass": true,
+      "score": 0.0,
+      "metrics": {
+        "decision_time_5mV_ns": {
+          "value": 2.4935319000000002,
+          "target": 5.0,
+          "op": "<=",
+          "unit": " ns",
+          "status": "PASS",
+          "margin": 2.5064680999999998,
+          "margin_pct": 50.129
+        },
+        "decision_correct_5mV": {
+          "value": 1.0,
+          "target": 1.0,
+          "op": ">=",
+          "unit": "",
+          "status": "PASS",
+          "margin": 0.0,
+          "margin_pct": 0.0
+        },
+        "output_swing_ratio_5mV": {
+          "value": 0.9999999635850965,
+          "target": 0.9,
+          "op": ">=",
+          "unit": "",
+          "status": "PASS",
+          "margin": 0.09999996358509644,
+          "margin_pct": 11.111
+        },
+        "avg_current_uA": {
+          "value": 5.990007,
+          "target": 500.0,
+          "op": "<=",
+          "unit": " uA",
+          "status": "PASS",
+          "margin": 494.009993,
+          "margin_pct": 98.802
+        },
+        "cmr_endpoint_correct": {
+          "value": 1.0,
+          "target": 1.0,
+          "op": ">=",
+          "unit": "",
+          "status": "PASS",
+          "margin": 0.0,
+          "margin_pct": 0.0
+        }
+      }
+    },
+    "best_pex_iteration": 2,
+    "degradation": [
+      {
+        "name": "avg_current_uA",
+        "pre": 3.85526,
+        "post": 5.990007,
+        "unit": " uA",
+        "delta": 2.1347470000000004,
+        "delta_pct": 55.372,
+        "status": "PASS",
+        "worsened": true
+      },
+      {
+        "name": "decision_time_5mV_ns",
+        "pre": 1.8985184999999998,
+        "post": 2.4935319000000002,
+        "unit": " ns",
+        "delta": 0.5950134000000005,
+        "delta_pct": 31.341,
+        "status": "PASS",
+        "worsened": true
+      },
+      {
+        "name": "output_swing_ratio_5mV",
+        "pre": 0.999999987070717,
+        "post": 0.9999999635850965,
+        "unit": "",
+        "delta": -2.3485620559426934e-08,
+        "delta_pct": -0.0,
+        "status": "PASS",
+        "worsened": true
+      },
+      {
+        "name": "decision_correct_5mV",
+        "pre": 1.0,
+        "post": 1.0,
+        "unit": "",
+        "delta": 0.0,
+        "delta_pct": 0.0,
+        "status": "PASS",
+        "worsened": false
+      },
+      {
+        "name": "cmr_endpoint_correct",
+        "pre": 1.0,
+        "post": 1.0,
+        "unit": "",
+        "delta": 0.0,
+        "delta_pct": 0.0,
+        "status": "PASS",
+        "worsened": false
+      }
+    ]
+  },
+  "signoff": {
+    "passed": true,
+    "conditions": [
+      {
+        "condition": "artifact consistency",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "pre-layout specs",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "PEX specs",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "DRC clean",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "DRC sign-off (Magic + KLayout)",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "LVS match",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "PEX extraction",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "final GDS",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "final PEX netlist",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "no CRITICAL findings",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "reviews complete",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "PVT corners",
+        "status": "NOT REQUIRED",
+        "detail": "not part of this flow"
+      },
+      {
+        "condition": "Monte Carlo / mismatch",
+        "status": "NOT REQUIRED",
+        "detail": "not part of this flow"
+      },
+      {
+        "condition": "design report",
+        "status": "PASS",
+        "detail": ""
+      }
+    ]
+  },
+  "reviews": {
+    "devil": {
+      "reviews": 2,
+      "findings": 5,
+      "by_severity": {
+        "INFO": 1,
+        "MEDIUM": 2,
+        "HIGH": 2
+      },
+      "unresolved_critical": []
+    },
+    "angel": {
+      "reviews": 2,
+      "recommendations": 0,
+      "tested": 0,
+      "improved": 0,
+      "degraded": 0
+    },
+    "recommendations": []
+  },
+  "package": {
+    "gds": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/gpt-5.6-luna_strongarm_comparator/final/strongarm_comparator.gds",
+    "pex_spice": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/gpt-5.6-luna_strongarm_comparator/final/strongarm_comparator.pex.spice",
+    "drc_report": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/gpt-5.6-luna_strongarm_comparator/final/strongarm_comparator.magic.drc.rpt",
+    "lvs_report": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/gpt-5.6-luna_strongarm_comparator/final/strongarm_comparator.lvs.out",
+    "iteration_history": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/gpt-5.6-luna_strongarm_comparator/final/iteration_history.json"
+  }
+}

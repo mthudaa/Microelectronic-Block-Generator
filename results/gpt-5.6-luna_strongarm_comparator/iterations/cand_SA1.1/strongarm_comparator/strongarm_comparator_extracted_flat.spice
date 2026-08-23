@@ -1,0 +1,43 @@
+* NGSPICE file created from strongarm_comparator.ext - technology: gf180mcuD
+
+.subckt strongarm_comparator VDD VSS INP INN CLK OUTP OUTN
+X0 VDD CLK OUTN VDD pfet_03v3 ad=0.3248p pd=1.72u as=0.3248p ps=1.72u w=1.16u l=0.6u
+X1 a_n4462_5328# CLK VDD VDD pfet_03v3 ad=0.3248p pd=1.72u as=0.696p ps=3.52u w=1.16u l=0.6u
+X2 OUTP OUTN VDD VDD pfet_03v3 ad=0.3248p pd=1.72u as=0.696p ps=3.52u w=1.16u l=0.6u
+X3 a_n2906_5328# CLK VDD VDD pfet_03v3 ad=0.3248p pd=1.72u as=0.696p ps=3.52u w=1.16u l=0.6u
+X4 OUTN CLK VDD VDD pfet_03v3 ad=0.3248p pd=1.72u as=0.696p ps=3.52u w=1.16u l=0.6u
+X5 a_n2906_5328# INN a_n3610_2878# VSS nfet_03v3 ad=0.696p pd=3.52u as=0.3248p ps=1.72u w=1.16u l=0.6u
+X6 a_n4462_5328# INP a_n3610_2878# VSS nfet_03v3 ad=0.696p pd=3.52u as=0.3248p ps=1.72u w=1.16u l=0.6u
+X7 OUTN OUTP a_n4462_5328# VSS nfet_03v3 ad=0.322p pd=1.71u as=0.69p ps=3.5u w=1.15u l=0.6u
+X8 OUTP OUTN a_n2906_5328# VSS nfet_03v3 ad=0.69p pd=3.5u as=0.322p ps=1.71u w=1.15u l=0.6u
+X9 a_n3610_2878# INP a_n4462_5328# VSS nfet_03v3 ad=0.3248p pd=1.72u as=0.3248p ps=1.72u w=1.16u l=0.6u
+X10 a_n3610_2878# INN a_n2906_5328# VSS nfet_03v3 ad=0.3248p pd=1.72u as=0.3248p ps=1.72u w=1.16u l=0.6u
+X11 a_n4462_5328# INP a_n3610_2878# VSS nfet_03v3 ad=0.3248p pd=1.72u as=0.696p ps=3.52u w=1.16u l=0.6u
+X12 a_n2906_5328# INN a_n3610_2878# VSS nfet_03v3 ad=0.3248p pd=1.72u as=0.696p ps=3.52u w=1.16u l=0.6u
+X13 OUTN OUTP VDD VDD pfet_03v3 ad=0.696p pd=3.52u as=0.3248p ps=1.72u w=1.16u l=0.6u
+X14 OUTP OUTN a_n2906_5328# VSS nfet_03v3 ad=0.322p pd=1.71u as=0.322p ps=1.71u w=1.15u l=0.6u
+X15 OUTP CLK VDD VDD pfet_03v3 ad=0.3248p pd=1.72u as=0.696p ps=3.52u w=1.16u l=0.6u
+X16 OUTN OUTP VDD VDD pfet_03v3 ad=0.3248p pd=1.72u as=0.696p ps=3.52u w=1.16u l=0.6u
+X17 OUTP OUTN a_n2906_5328# VSS nfet_03v3 ad=0.322p pd=1.71u as=0.69p ps=3.5u w=1.15u l=0.6u
+X18 VDD OUTP OUTN VDD pfet_03v3 ad=0.3248p pd=1.72u as=0.3248p ps=1.72u w=1.16u l=0.6u
+X19 a_n2906_5328# OUTN OUTP VSS nfet_03v3 ad=0.322p pd=1.71u as=0.322p ps=1.71u w=1.15u l=0.6u
+X20 VSS CLK a_n3610_2878# VSS nfet_03v3 ad=0.69p pd=3.5u as=0.322p ps=1.71u w=1.15u l=0.6u
+X21 VDD OUTN OUTP VDD pfet_03v3 ad=0.3248p pd=1.72u as=0.3248p ps=1.72u w=1.16u l=0.6u
+X22 a_n4462_5328# CLK VDD VDD pfet_03v3 ad=0.696p pd=3.52u as=0.3248p ps=1.72u w=1.16u l=0.6u
+X23 VDD CLK OUTP VDD pfet_03v3 ad=0.3248p pd=1.72u as=0.3248p ps=1.72u w=1.16u l=0.6u
+X24 a_n4462_5328# OUTP OUTN VSS nfet_03v3 ad=0.322p pd=1.71u as=0.322p ps=1.71u w=1.15u l=0.6u
+X25 VSS CLK a_n3610_2878# VSS nfet_03v3 ad=0.322p pd=1.71u as=0.322p ps=1.71u w=1.15u l=0.6u
+X26 a_n4462_5328# OUTP OUTN VSS nfet_03v3 ad=0.322p pd=1.71u as=0.322p ps=1.71u w=1.15u l=0.6u
+X27 OUTP OUTN VDD VDD pfet_03v3 ad=0.696p pd=3.52u as=0.3248p ps=1.72u w=1.16u l=0.6u
+X28 VDD CLK a_n4462_5328# VDD pfet_03v3 ad=0.3248p pd=1.72u as=0.3248p ps=1.72u w=1.16u l=0.6u
+X29 OUTN OUTP a_n4462_5328# VSS nfet_03v3 ad=0.322p pd=1.71u as=0.322p ps=1.71u w=1.15u l=0.6u
+X30 a_n2906_5328# OUTN OUTP VSS nfet_03v3 ad=0.322p pd=1.71u as=0.322p ps=1.71u w=1.15u l=0.6u
+X31 a_n2906_5328# CLK VDD VDD pfet_03v3 ad=0.696p pd=3.52u as=0.3248p ps=1.72u w=1.16u l=0.6u
+X32 a_n3610_2878# CLK VSS VSS nfet_03v3 ad=0.322p pd=1.71u as=0.69p ps=3.5u w=1.15u l=0.6u
+X33 OUTN CLK VDD VDD pfet_03v3 ad=0.696p pd=3.52u as=0.3248p ps=1.72u w=1.16u l=0.6u
+X34 a_n3610_2878# CLK VSS VSS nfet_03v3 ad=0.322p pd=1.71u as=0.322p ps=1.71u w=1.15u l=0.6u
+X35 VDD CLK a_n2906_5328# VDD pfet_03v3 ad=0.3248p pd=1.72u as=0.3248p ps=1.72u w=1.16u l=0.6u
+X36 OUTP CLK VDD VDD pfet_03v3 ad=0.696p pd=3.52u as=0.3248p ps=1.72u w=1.16u l=0.6u
+X37 OUTN OUTP a_n4462_5328# VSS nfet_03v3 ad=0.69p pd=3.5u as=0.322p ps=1.71u w=1.15u l=0.6u
+.ends
+

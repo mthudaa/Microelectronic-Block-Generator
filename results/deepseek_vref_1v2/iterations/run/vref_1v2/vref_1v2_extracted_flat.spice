@@ -1,0 +1,14 @@
+* NGSPICE file created from vref_1v2.ext - technology: gf180mcuD
+
+.subckt vref_1v2 VDD VSS VREF IBIAS
+X0 VDD a_n1398_2838# VREF VDD pfet_03v3 ad=2.4p pd=9.2u as=1.12p ps=4.56u w=4u l=2u
+X1 VREF a_n1398_2838# VDD VDD pfet_03v3 ad=1.12p pd=4.56u as=2.4p ps=9.2u w=4u l=2u
+X2 VREF VREF VSS VSS nfet_03v3 ad=0.72p pd=3.6u as=0.72p ps=3.6u w=1.2u l=0.5u
+X3 VSS IBIAS IBIAS VSS nfet_03v3 ad=1.2p pd=5.2u as=0.56p ps=2.56u w=2u l=2u
+X4 VDD a_n1398_2838# a_n1398_2838# VDD pfet_03v3 ad=1.2p pd=5.2u as=0.56p ps=2.56u w=2u l=2u
+X5 a_n1398_2838# a_n1398_2838# VDD VDD pfet_03v3 ad=0.56p pd=2.56u as=1.2p ps=5.2u w=2u l=2u
+X6 a_n1398_2838# IBIAS VSS VSS nfet_03v3 ad=0.56p pd=2.56u as=1.2p ps=5.2u w=2u l=2u
+X7 IBIAS IBIAS VSS VSS nfet_03v3 ad=0.56p pd=2.56u as=1.2p ps=5.2u w=2u l=2u
+X8 VSS IBIAS a_n1398_2838# VSS nfet_03v3 ad=1.2p pd=5.2u as=0.56p ps=2.56u w=2u l=2u
+.ends
+

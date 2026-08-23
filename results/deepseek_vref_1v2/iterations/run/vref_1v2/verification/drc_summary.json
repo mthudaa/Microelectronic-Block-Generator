@@ -1,0 +1,38 @@
+{
+  "verdict": "PASS",
+  "reason": "all configured DRC engines report clean",
+  "primary": "klayout",
+  "gds_sha256": "5ba064261d0317f6",
+  "results": [
+    {
+      "engine": "magic",
+      "status": "CLEAN",
+      "violations": 0,
+      "rules": {},
+      "report_path": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/deepseek_vref_1v2/iterations/run/vref_1v2/verification/vref_1v2.magic.drc.rpt",
+      "log_path": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/deepseek_vref_1v2/iterations/run/vref_1v2/verification/logs/magic_drc.log",
+      "tool": "/usr/local/bin/magic",
+      "tool_version": "8.3.669",
+      "deck": "/home/huda/.volare/gf180mcuD/libs.tech/magic/gf180mcuD.tech",
+      "gds": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/deepseek_vref_1v2/iterations/run/vref_1v2/vref_1v2.gds",
+      "gds_sha256": "5ba064261d0317f6",
+      "elapsed": 2.079,
+      "message": ""
+    },
+    {
+      "engine": "klayout",
+      "status": "CLEAN",
+      "violations": 0,
+      "rules": {},
+      "report_path": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/deepseek_vref_1v2/iterations/run/vref_1v2/verification/vref_1v2.klayout.lyrdb",
+      "log_path": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/deepseek_vref_1v2/iterations/run/vref_1v2/verification/logs/klayout_drc.log",
+      "tool": "/home/huda/.local/mbg-tools/klayout-0.30.9/bin/klayout",
+      "tool_version": "0.30.9",
+      "deck": "/home/huda/.volare/gf180mcuD/libs.tech/klayout/tech/drc/gf180mcu.drc",
+      "gds": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/deepseek_vref_1v2/iterations/run/vref_1v2/vref_1v2.gds",
+      "gds_sha256": "5ba064261d0317f6",
+      "elapsed": 47.675,
+      "message": ""
+    }
+  ]
+}

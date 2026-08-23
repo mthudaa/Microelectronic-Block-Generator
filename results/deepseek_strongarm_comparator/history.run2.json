@@ -1,0 +1,589 @@
+{
+  "cell": "strongarm_comparator",
+  "status": "ERROR",
+  "stage": "PEX_EXTRACTION",
+  "failure": "TOOL_FAILURE",
+  "message": "AttributeError: 'CandidateResult' object has no attribute 'circuit'",
+  "elapsed": 1703.738,
+  "pre_layout": [
+    {
+      "phase": "pre_layout",
+      "iteration": 1,
+      "spec_pass": true,
+      "score": 0.0,
+      "status": "PASS",
+      "failure": "NONE",
+      "message": "",
+      "metrics": {
+        "source": "pre_layout",
+        "pass": true,
+        "score": 0.0,
+        "metrics": {
+          "t_dec_ns": {
+            "value": 0.6110850249404205,
+            "target": 5.0,
+            "op": "<=",
+            "unit": " ns",
+            "status": "PASS",
+            "margin": 4.3889149750595795,
+            "margin_pct": 87.778
+          },
+          "out_swing_v": {
+            "value": 3.30000344275556,
+            "target": 2.9699999999999998,
+            "op": ">=",
+            "unit": " V",
+            "status": "PASS",
+            "margin": 0.33000344275556026,
+            "margin_pct": 11.111
+          },
+          "i_avg_ua": {
+            "value": 5.269835802989866,
+            "target": 500.0,
+            "op": "<=",
+            "unit": " uA",
+            "status": "PASS",
+            "margin": 494.73016419701014,
+            "margin_pct": 98.946
+          },
+          "i_static_ua": {
+            "value": 0.02649400860700202,
+            "target": 10.0,
+            "op": "<=",
+            "unit": " uA",
+            "status": "PASS",
+            "margin": 9.973505991392997,
+            "margin_pct": 99.735
+          },
+          "n_correct": {
+            "value": 10.0,
+            "target": 10.0,
+            "op": "==",
+            "unit": "",
+            "status": "PASS",
+            "margin": null,
+            "margin_pct": null
+          },
+          "precharge_ok": {
+            "value": 10.0,
+            "target": 10.0,
+            "op": "==",
+            "unit": "",
+            "status": "PASS",
+            "margin": null,
+            "margin_pct": null
+          },
+          "regenerate_ok": {
+            "value": 10.0,
+            "target": 10.0,
+            "op": "==",
+            "unit": "",
+            "status": "PASS",
+            "margin": null,
+            "margin_pct": null
+          },
+          "icmr_lo": {
+            "value": 0.9,
+            "target": 1.0,
+            "op": "<=",
+            "unit": " V",
+            "status": "PASS",
+            "margin": 0.09999999999999998,
+            "margin_pct": 10.0
+          },
+          "icmr_hi": {
+            "value": 2.7,
+            "target": 2.3,
+            "op": ">=",
+            "unit": " V",
+            "status": "PASS",
+            "margin": 0.40000000000000036,
+            "margin_pct": 17.391
+          }
+        }
+      },
+      "degradation": [],
+      "elapsed": 811.303
+    }
+  ],
+  "pex": [
+    {
+      "phase": "pex",
+      "iteration": 1,
+      "spec_pass": false,
+      "score": 0.186957,
+      "status": "FAIL",
+      "drc": "PASS",
+      "lvs": "PASS",
+      "pex_extraction": "PASS",
+      "pex_simulation": "PASS",
+      "failure": "SPEC_FAILURE",
+      "message": "",
+      "metrics": {
+        "source": "pex",
+        "pass": false,
+        "score": 0.186957,
+        "metrics": {
+          "t_dec_ns": {
+            "value": 0.9958447089251063,
+            "target": 5.0,
+            "op": "<=",
+            "unit": " ns",
+            "status": "PASS",
+            "margin": 4.004155291074894,
+            "margin_pct": 80.083
+          },
+          "out_swing_v": {
+            "value": 3.30000368464259,
+            "target": 2.9699999999999998,
+            "op": ">=",
+            "unit": " V",
+            "status": "PASS",
+            "margin": 0.3300036846425902,
+            "margin_pct": 11.111
+          },
+          "i_avg_ua": {
+            "value": 6.684836294786576,
+            "target": 500.0,
+            "op": "<=",
+            "unit": " uA",
+            "status": "PASS",
+            "margin": 493.3151637052134,
+            "margin_pct": 98.663
+          },
+          "i_static_ua": {
+            "value": 0.0007042716288889353,
+            "target": 10.0,
+            "op": "<=",
+            "unit": " uA",
+            "status": "PASS",
+            "margin": 9.999295728371111,
+            "margin_pct": 99.993
+          },
+          "n_correct": {
+            "value": 9.0,
+            "target": 10.0,
+            "op": "==",
+            "unit": "",
+            "status": "FAIL",
+            "margin": null,
+            "margin_pct": null
+          },
+          "precharge_ok": {
+            "value": 10.0,
+            "target": 10.0,
+            "op": "==",
+            "unit": "",
+            "status": "PASS",
+            "margin": null,
+            "margin_pct": null
+          },
+          "regenerate_ok": {
+            "value": 10.0,
+            "target": 10.0,
+            "op": "==",
+            "unit": "",
+            "status": "PASS",
+            "margin": null,
+            "margin_pct": null
+          },
+          "icmr_lo": {
+            "value": 0.9,
+            "target": 1.0,
+            "op": "<=",
+            "unit": " V",
+            "status": "PASS",
+            "margin": 0.09999999999999998,
+            "margin_pct": 10.0
+          },
+          "icmr_hi": {
+            "value": 2.1,
+            "target": 2.3,
+            "op": ">=",
+            "unit": " V",
+            "status": "FAIL",
+            "margin": -0.19999999999999973,
+            "margin_pct": -8.696
+          }
+        }
+      },
+      "degradation": [
+        {
+          "name": "icmr_hi",
+          "pre": 2.7,
+          "post": 2.1,
+          "unit": " V",
+          "delta": -0.6000000000000001,
+          "delta_pct": -22.222,
+          "status": "FAIL",
+          "worsened": true
+        },
+        {
+          "name": "n_correct",
+          "pre": 10.0,
+          "post": 9.0,
+          "unit": "",
+          "delta": -1.0,
+          "delta_pct": -10.0,
+          "status": "FAIL",
+          "worsened": true
+        },
+        {
+          "name": "t_dec_ns",
+          "pre": 0.6110850249404205,
+          "post": 0.9958447089251063,
+          "unit": " ns",
+          "delta": 0.38475968398468585,
+          "delta_pct": 62.963,
+          "status": "PASS",
+          "worsened": true
+        },
+        {
+          "name": "i_avg_ua",
+          "pre": 5.269835802989866,
+          "post": 6.684836294786576,
+          "unit": " uA",
+          "delta": 1.41500049179671,
+          "delta_pct": 26.851,
+          "status": "PASS",
+          "worsened": true
+        },
+        {
+          "name": "i_static_ua",
+          "pre": 0.02649400860700202,
+          "post": 0.0007042716288889353,
+          "unit": " uA",
+          "delta": -0.025789736978113084,
+          "delta_pct": -97.342,
+          "status": "PASS",
+          "worsened": false
+        },
+        {
+          "name": "out_swing_v",
+          "pre": 3.30000344275556,
+          "post": 3.30000368464259,
+          "unit": " V",
+          "delta": 2.418870299614184e-07,
+          "delta_pct": 0.0,
+          "status": "PASS",
+          "worsened": false
+        },
+        {
+          "name": "precharge_ok",
+          "pre": 10.0,
+          "post": 10.0,
+          "unit": "",
+          "delta": 0.0,
+          "delta_pct": 0.0,
+          "status": "PASS",
+          "worsened": false
+        },
+        {
+          "name": "regenerate_ok",
+          "pre": 10.0,
+          "post": 10.0,
+          "unit": "",
+          "delta": 0.0,
+          "delta_pct": 0.0,
+          "status": "PASS",
+          "worsened": false
+        },
+        {
+          "name": "icmr_lo",
+          "pre": 0.9,
+          "post": 0.9,
+          "unit": " V",
+          "delta": 0.0,
+          "delta_pct": 0.0,
+          "status": "PASS",
+          "worsened": false
+        }
+      ],
+      "elapsed": 233.082
+    },
+    {
+      "phase": "pex",
+      "iteration": 2,
+      "spec_pass": false,
+      "status": "FAIL",
+      "drc": "SKIP",
+      "lvs": "SKIP",
+      "pex_extraction": "SKIP",
+      "pex_simulation": "SKIP",
+      "failure": "TOOL_FAILURE",
+      "message": "AttributeError: 'CandidateResult' object has no attribute 'circuit'",
+      "metrics": {},
+      "degradation": [],
+      "elapsed": 0.0
+    }
+  ],
+  "best_pre": {
+    "source": "pre_layout",
+    "pass": true,
+    "score": 0.0,
+    "metrics": {
+      "t_dec_ns": {
+        "value": 0.6110850249404205,
+        "target": 5.0,
+        "op": "<=",
+        "unit": " ns",
+        "status": "PASS",
+        "margin": 4.3889149750595795,
+        "margin_pct": 87.778
+      },
+      "out_swing_v": {
+        "value": 3.30000344275556,
+        "target": 2.9699999999999998,
+        "op": ">=",
+        "unit": " V",
+        "status": "PASS",
+        "margin": 0.33000344275556026,
+        "margin_pct": 11.111
+      },
+      "i_avg_ua": {
+        "value": 5.269835802989866,
+        "target": 500.0,
+        "op": "<=",
+        "unit": " uA",
+        "status": "PASS",
+        "margin": 494.73016419701014,
+        "margin_pct": 98.946
+      },
+      "i_static_ua": {
+        "value": 0.02649400860700202,
+        "target": 10.0,
+        "op": "<=",
+        "unit": " uA",
+        "status": "PASS",
+        "margin": 9.973505991392997,
+        "margin_pct": 99.735
+      },
+      "n_correct": {
+        "value": 10.0,
+        "target": 10.0,
+        "op": "==",
+        "unit": "",
+        "status": "PASS",
+        "margin": null,
+        "margin_pct": null
+      },
+      "precharge_ok": {
+        "value": 10.0,
+        "target": 10.0,
+        "op": "==",
+        "unit": "",
+        "status": "PASS",
+        "margin": null,
+        "margin_pct": null
+      },
+      "regenerate_ok": {
+        "value": 10.0,
+        "target": 10.0,
+        "op": "==",
+        "unit": "",
+        "status": "PASS",
+        "margin": null,
+        "margin_pct": null
+      },
+      "icmr_lo": {
+        "value": 0.9,
+        "target": 1.0,
+        "op": "<=",
+        "unit": " V",
+        "status": "PASS",
+        "margin": 0.09999999999999998,
+        "margin_pct": 10.0
+      },
+      "icmr_hi": {
+        "value": 2.7,
+        "target": 2.3,
+        "op": ">=",
+        "unit": " V",
+        "status": "PASS",
+        "margin": 0.40000000000000036,
+        "margin_pct": 17.391
+      }
+    }
+  },
+  "best_pex": {
+    "source": "pex",
+    "pass": false,
+    "score": 0.186957,
+    "metrics": {
+      "t_dec_ns": {
+        "value": 0.9958447089251063,
+        "target": 5.0,
+        "op": "<=",
+        "unit": " ns",
+        "status": "PASS",
+        "margin": 4.004155291074894,
+        "margin_pct": 80.083
+      },
+      "out_swing_v": {
+        "value": 3.30000368464259,
+        "target": 2.9699999999999998,
+        "op": ">=",
+        "unit": " V",
+        "status": "PASS",
+        "margin": 0.3300036846425902,
+        "margin_pct": 11.111
+      },
+      "i_avg_ua": {
+        "value": 6.684836294786576,
+        "target": 500.0,
+        "op": "<=",
+        "unit": " uA",
+        "status": "PASS",
+        "margin": 493.3151637052134,
+        "margin_pct": 98.663
+      },
+      "i_static_ua": {
+        "value": 0.0007042716288889353,
+        "target": 10.0,
+        "op": "<=",
+        "unit": " uA",
+        "status": "PASS",
+        "margin": 9.999295728371111,
+        "margin_pct": 99.993
+      },
+      "n_correct": {
+        "value": 9.0,
+        "target": 10.0,
+        "op": "==",
+        "unit": "",
+        "status": "FAIL",
+        "margin": null,
+        "margin_pct": null
+      },
+      "precharge_ok": {
+        "value": 10.0,
+        "target": 10.0,
+        "op": "==",
+        "unit": "",
+        "status": "PASS",
+        "margin": null,
+        "margin_pct": null
+      },
+      "regenerate_ok": {
+        "value": 10.0,
+        "target": 10.0,
+        "op": "==",
+        "unit": "",
+        "status": "PASS",
+        "margin": null,
+        "margin_pct": null
+      },
+      "icmr_lo": {
+        "value": 0.9,
+        "target": 1.0,
+        "op": "<=",
+        "unit": " V",
+        "status": "PASS",
+        "margin": 0.09999999999999998,
+        "margin_pct": 10.0
+      },
+      "icmr_hi": {
+        "value": 2.1,
+        "target": 2.3,
+        "op": ">=",
+        "unit": " V",
+        "status": "FAIL",
+        "margin": -0.19999999999999973,
+        "margin_pct": -8.696
+      }
+    }
+  },
+  "best_pex_iteration": 1,
+  "degradation": [
+    {
+      "name": "icmr_hi",
+      "pre": 2.7,
+      "post": 2.1,
+      "unit": " V",
+      "delta": -0.6000000000000001,
+      "delta_pct": -22.222,
+      "status": "FAIL",
+      "worsened": true
+    },
+    {
+      "name": "n_correct",
+      "pre": 10.0,
+      "post": 9.0,
+      "unit": "",
+      "delta": -1.0,
+      "delta_pct": -10.0,
+      "status": "FAIL",
+      "worsened": true
+    },
+    {
+      "name": "t_dec_ns",
+      "pre": 0.6110850249404205,
+      "post": 0.9958447089251063,
+      "unit": " ns",
+      "delta": 0.38475968398468585,
+      "delta_pct": 62.963,
+      "status": "PASS",
+      "worsened": true
+    },
+    {
+      "name": "i_avg_ua",
+      "pre": 5.269835802989866,
+      "post": 6.684836294786576,
+      "unit": " uA",
+      "delta": 1.41500049179671,
+      "delta_pct": 26.851,
+      "status": "PASS",
+      "worsened": true
+    },
+    {
+      "name": "i_static_ua",
+      "pre": 0.02649400860700202,
+      "post": 0.0007042716288889353,
+      "unit": " uA",
+      "delta": -0.025789736978113084,
+      "delta_pct": -97.342,
+      "status": "PASS",
+      "worsened": false
+    },
+    {
+      "name": "out_swing_v",
+      "pre": 3.30000344275556,
+      "post": 3.30000368464259,
+      "unit": " V",
+      "delta": 2.418870299614184e-07,
+      "delta_pct": 0.0,
+      "status": "PASS",
+      "worsened": false
+    },
+    {
+      "name": "precharge_ok",
+      "pre": 10.0,
+      "post": 10.0,
+      "unit": "",
+      "delta": 0.0,
+      "delta_pct": 0.0,
+      "status": "PASS",
+      "worsened": false
+    },
+    {
+      "name": "regenerate_ok",
+      "pre": 10.0,
+      "post": 10.0,
+      "unit": "",
+      "delta": 0.0,
+      "delta_pct": 0.0,
+      "status": "PASS",
+      "worsened": false
+    },
+    {
+      "name": "icmr_lo",
+      "pre": 0.9,
+      "post": 0.9,
+      "unit": " V",
+      "delta": 0.0,
+      "delta_pct": 0.0,
+      "status": "PASS",
+      "worsened": false
+    }
+  ]
+}

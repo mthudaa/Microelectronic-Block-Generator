@@ -1,0 +1,30 @@
+.include '/home/huda/.volare/gf180mcuD/libs.tech/ngspice/design.ngspice'
+.lib '/home/huda/.volare/gf180mcuD/libs.tech/ngspice/sm141064.ngspice' statistical
+.temp 27
+.param sw_stat_mismatch=1
+.option seed=18
+* ox-alpha OTA -- 5T NMOS-input OTA, PMOS mirror load, IBIAS-driven tail
+* topology: differential pair XM1/XM2, mirror load XM3/XM4,
+* tail XMTAIL mirrored from external IBIAS via diode XMBIAS
+.subckt ota VDD VSS INP INN OUT IBIAS
+XMBIAS IBIAS IBIAS VSS VSS nfet_03v3 W=2.0u L=2.0u nf=1
+XMTAIL tail IBIAS VSS VSS nfet_03v3 W=12.0u L=4.0u nf=2
+XM1 n1 INN tail VSS nfet_03v3 W=6.0u L=2.0u nf=1
+XM2 OUT INP tail VSS nfet_03v3 W=6.0u L=2.0u nf=1
+XM3 n1 n1 VDD VDD pfet_03v3 W=30.0u L=4.0u nf=4
+XM4 OUT n1 VDD VDD pfet_03v3 W=30.0u L=4.0u nf=4
+.ends
+XDUT VDD VSS INP INN OUT IBIAS ota
+VVDD VDD 0 3.3
+VVSS VSS 0 0
+VINP INP 0 DC 1.65
+VINN INN 0 DC 1.65
+CLOAD OUT 0 5p
+IIB 0 ibias_inj DC 20u
+VMON ibias_inj IBIAS 0
+.control
+op
+print v(OUT)
+quit
+.endc
+.end

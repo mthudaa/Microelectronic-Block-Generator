@@ -1,0 +1,12 @@
+Design a 1.2-V MOS-only voltage reference in GF180MCU gf180mcuD.
+Use exactly the ports VDD VSS VREF IBIAS, with VDD=3.3 V and VSS=0 V;
+IBIAS is an external bias-current input. Use only nfet_03v3 and pfet_03v3,
+with no BJTs, parasitic bipolar devices, bandgap architecture, explicit
+resistors, or reference-setting capacitors. At VDD=3.3 V, IBIAS=20 uA,
+CL=1 pF and 27 C, require VREF=1.20 V within 1.15--1.25 V, temperature
+coefficient <=300 ppm/C over -40--125 C, line regulation <=100 mV/V over
+3.0--3.6 V, VREF span <=60 mV over that supply range, and supply current
+excluding IBIAS <=300 uA. Characterize IBIAS at 10/20/30 uA, supply from
+approximately 2.7--3.6 V, and PVT at VDD 3.0/3.3/3.6 V, -40/27/125 C,
+and GF180 typical/ff/ss/fs/sf corners. Use the simplest MOS-only topology
+and report non-convergence or missing verification evidence honestly.

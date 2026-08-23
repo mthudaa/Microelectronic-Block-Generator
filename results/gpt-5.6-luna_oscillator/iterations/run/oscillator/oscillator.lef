@@ -1,0 +1,58 @@
+VERSION 5.7 ;
+  NOWIREEXTENSIONATPIN ON ;
+  DIVIDERCHAR "/" ;
+  BUSBITCHARS "[]" ;
+MACRO oscillator
+  CLASS BLOCK ;
+  FOREIGN oscillator ;
+  ORIGIN 25.120 3.940 ;
+  SIZE 50.020 BY 30.560 ;
+  PIN OSC_OUT
+    ANTENNAGATEAREA 15.000000 ;
+    ANTENNADIFFAREA 3.600000 ;
+    PORT
+      LAYER Metal3 ;
+        RECT -12.460 7.120 14.800 7.400 ;
+    END
+  END OSC_OUT
+  PIN VSS
+    USE GROUND ;
+    PORT
+      LAYER Metal3 ;
+        RECT -0.220 -3.220 12.760 -2.660 ;
+    END
+  END VSS
+  PIN VDD
+    USE POWER ;
+    PORT
+      LAYER Metal3 ;
+        RECT -24.100 25.340 -12.740 25.900 ;
+    END
+  END VDD
+  OBS
+      LAYER Nwell ;
+        RECT -21.900 0.000 21.900 22.180 ;
+      LAYER Metal1 ;
+        RECT -21.670 0.210 21.670 21.970 ;
+      LAYER Metal2 ;
+        RECT -22.030 0.210 22.330 22.810 ;
+      LAYER Metal3 ;
+        RECT -25.120 25.040 -24.400 25.900 ;
+        RECT -12.440 25.040 24.400 25.900 ;
+        RECT -25.120 7.700 24.400 25.040 ;
+        RECT -25.120 6.820 -12.760 7.700 ;
+        RECT 15.100 6.820 24.400 7.700 ;
+        RECT -25.120 -2.360 24.400 6.820 ;
+        RECT -25.120 -2.660 -0.520 -2.360 ;
+        RECT -25.120 -2.800 -0.220 -2.660 ;
+        RECT -25.120 -3.080 -0.520 -2.800 ;
+        RECT -25.120 -3.220 -0.220 -3.080 ;
+        RECT 13.060 -3.220 24.400 -2.360 ;
+      LAYER Metal4 ;
+        RECT -25.090 -3.190 24.370 25.870 ;
+      LAYER Metal5 ;
+        RECT -25.090 -3.940 24.900 26.620 ;
+  END
+END oscillator
+END LIBRARY
+

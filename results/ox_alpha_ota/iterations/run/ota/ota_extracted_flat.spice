@@ -1,0 +1,18 @@
+* NGSPICE file created from ota.ext - technology: gf180mcuD
+
+.subckt ota VDD VSS INP INN OUT IBIAS
+X0 a_n4022_7056# a_n4022_7056# VDD VDD pfet_03v3 ad=2.1p pd=8.06u as=2.1p ps=8.06u w=7.5u l=4u
+X1 VDD a_n4022_7056# OUT VDD pfet_03v3 ad=4.5p pd=16.2u as=2.1p ps=8.06u w=7.5u l=4u
+X2 VDD a_n4022_7056# a_n4022_7056# VDD pfet_03v3 ad=2.1p pd=8.06u as=2.1p ps=8.06u w=7.5u l=4u
+X3 a_n4022_7056# INN a_n1006_3846# VSS nfet_03v3 ad=3.6p pd=13.2u as=3.6p ps=13.2u w=6u l=2u
+X4 OUT a_n4022_7056# VDD VDD pfet_03v3 ad=2.1p pd=8.06u as=4.5p ps=16.2u w=7.5u l=4u
+X5 VDD a_n4022_7056# OUT VDD pfet_03v3 ad=2.1p pd=8.06u as=2.1p ps=8.06u w=7.5u l=4u
+X6 IBIAS IBIAS VSS VSS nfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=2u
+X7 a_n1006_3846# IBIAS VSS VSS nfet_03v3 ad=1.68p pd=6.56u as=3.6p ps=13.2u w=6u l=4u
+X8 VDD a_n4022_7056# a_n4022_7056# VDD pfet_03v3 ad=4.5p pd=16.2u as=2.1p ps=8.06u w=7.5u l=4u
+X9 a_n4022_7056# a_n4022_7056# VDD VDD pfet_03v3 ad=2.1p pd=8.06u as=4.5p ps=16.2u w=7.5u l=4u
+X10 OUT a_n4022_7056# VDD VDD pfet_03v3 ad=2.1p pd=8.06u as=2.1p ps=8.06u w=7.5u l=4u
+X11 OUT INP a_n1006_3846# VSS nfet_03v3 ad=3.6p pd=13.2u as=3.6p ps=13.2u w=6u l=2u
+X12 VSS IBIAS a_n1006_3846# VSS nfet_03v3 ad=3.6p pd=13.2u as=1.68p ps=6.56u w=6u l=4u
+.ends
+

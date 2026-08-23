@@ -1,0 +1,38 @@
+{
+  "verdict": "PASS",
+  "reason": "all configured DRC engines report clean",
+  "primary": "klayout",
+  "gds_sha256": "ee664474c0ddcb7a",
+  "results": [
+    {
+      "engine": "magic",
+      "status": "CLEAN",
+      "violations": 0,
+      "rules": {},
+      "report_path": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/deepseek_oscillator/iterations/run/oscillator/verification/oscillator.magic.drc.rpt",
+      "log_path": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/deepseek_oscillator/iterations/run/oscillator/verification/logs/magic_drc.log",
+      "tool": "/usr/local/bin/magic",
+      "tool_version": "8.3.669",
+      "deck": "/home/huda/.volare/gf180mcuD/libs.tech/magic/gf180mcuD.tech",
+      "gds": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/deepseek_oscillator/iterations/run/oscillator/oscillator.gds",
+      "gds_sha256": "ee664474c0ddcb7a",
+      "elapsed": 1.429,
+      "message": ""
+    },
+    {
+      "engine": "klayout",
+      "status": "CLEAN",
+      "violations": 0,
+      "rules": {},
+      "report_path": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/deepseek_oscillator/iterations/run/oscillator/verification/oscillator.klayout.lyrdb",
+      "log_path": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/deepseek_oscillator/iterations/run/oscillator/verification/logs/klayout_drc.log",
+      "tool": "/home/huda/.local/mbg-tools/klayout-0.30.9/bin/klayout",
+      "tool_version": "0.30.9",
+      "deck": "/home/huda/.volare/gf180mcuD/libs.tech/klayout/tech/drc/gf180mcu.drc",
+      "gds": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/deepseek_oscillator/iterations/run/oscillator/oscillator.gds",
+      "gds_sha256": "ee664474c0ddcb7a",
+      "elapsed": 18.148,
+      "message": ""
+    }
+  ]
+}

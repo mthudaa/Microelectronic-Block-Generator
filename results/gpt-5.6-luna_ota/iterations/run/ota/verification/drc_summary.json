@@ -1,0 +1,38 @@
+{
+  "verdict": "PASS",
+  "reason": "all configured DRC engines report clean",
+  "primary": "klayout",
+  "gds_sha256": "dbdc6204e3549d6a",
+  "results": [
+    {
+      "engine": "magic",
+      "status": "CLEAN",
+      "violations": 0,
+      "rules": {},
+      "report_path": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/gpt-5.6-luna_ota/iterations/run/ota/verification/ota.magic.drc.rpt",
+      "log_path": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/gpt-5.6-luna_ota/iterations/run/ota/verification/logs/magic_drc.log",
+      "tool": "/usr/local/bin/magic",
+      "tool_version": "8.3.669",
+      "deck": "/home/huda/.volare/gf180mcuD/libs.tech/magic/gf180mcuD.tech",
+      "gds": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/gpt-5.6-luna_ota/iterations/run/ota/ota.gds",
+      "gds_sha256": "dbdc6204e3549d6a",
+      "elapsed": 1.441,
+      "message": ""
+    },
+    {
+      "engine": "klayout",
+      "status": "CLEAN",
+      "violations": 0,
+      "rules": {},
+      "report_path": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/gpt-5.6-luna_ota/iterations/run/ota/verification/ota.klayout.lyrdb",
+      "log_path": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/gpt-5.6-luna_ota/iterations/run/ota/verification/logs/klayout_drc.log",
+      "tool": "/home/huda/.local/mbg-tools/klayout-0.30.9/bin/klayout",
+      "tool_version": "0.30.9",
+      "deck": "/home/huda/.volare/gf180mcuD/libs.tech/klayout/tech/drc/gf180mcu.drc",
+      "gds": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/gpt-5.6-luna_ota/iterations/run/ota/ota.gds",
+      "gds_sha256": "dbdc6204e3549d6a",
+      "elapsed": 17.269,
+      "message": ""
+    }
+  ]
+}

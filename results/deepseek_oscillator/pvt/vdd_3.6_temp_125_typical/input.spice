@@ -1,0 +1,36 @@
+.include '/home/huda/.volare/gf180mcuD/libs.tech/ngspice/design.ngspice'
+.lib '/home/huda/.volare/gf180mcuD/libs.tech/ngspice/sm141064.ngspice' typical
+.temp 125.0
+
+* PEX produced on Sun Aug 23 07:13:34 AM CST 2026 using /home/huda/opensource-project/Microelectronic-Block-Generator/designs/notebooks/chipathon2026-D/scripts/iic-pex.sh with m=2 and s=1
+* NGSPICE file created from oscillator.ext - technology: gf180mcuD
+
+.option scale=5n
+
+.subckt oscillator OSC_OUT VSS VDD
+X0 a_400_428# a_n1772_428# VSS VSS nfet_03v3 ad=48n pd=1.04m as=48n ps=1.04m w=400 l=800
+X1 a_n1772_428# OSC_OUT VDD VDD pfet_03v3 ad=96n pd=1.84m as=96n ps=1.84m w=800 l=800
+X2 OSC_OUT a_400_428# VSS VSS nfet_03v3 ad=48n pd=1.04m as=48n ps=1.04m w=400 l=800
+X3 a_n1772_428# OSC_OUT VSS VSS nfet_03v3 ad=48n pd=1.04m as=48n ps=1.04m w=400 l=800
+X4 a_400_428# a_n1772_428# VDD VDD pfet_03v3 ad=96n pd=1.84m as=96n ps=1.84m w=800 l=800
+X5 OSC_OUT a_400_428# VDD VDD pfet_03v3 ad=96n pd=1.84m as=96n ps=1.84m w=800 l=800
+C0 VDD a_n1772_428# 4.97121f
+C1 a_400_428# OSC_OUT 0.96497f
+C2 VDD a_400_428# 5.09295f
+C3 VDD OSC_OUT 4.87799f
+C4 a_400_428# a_n1772_428# 0.53106f
+C5 a_n1772_428# OSC_OUT 0.95992f
+C6 OSC_OUT VSS 7.29331f
+C7 VDD VSS 33.8878f
+C8 a_400_428# VSS 6.30751f ; **FLOATING
+C9 a_n1772_428# VSS 6.2836f ; **FLOATING
+.ends
+
+Xosc OSC_OUT VSS VDD oscillator
+Vvdd VDD 0 PULSE(0 3.6 0 1u 1u 100u 100u)
+Vvss VSS 0 0
+.control
+tran 5n 12u 0 5n
+wrdata osc.dat v(OSC_OUT) v(vdd) i(Vvdd)
+.endc
+.end

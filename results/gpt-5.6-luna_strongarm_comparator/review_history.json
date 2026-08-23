@@ -1,0 +1,152 @@
+{
+  "summary": {
+    "devil": {
+      "reviews": 2,
+      "findings": 5,
+      "by_severity": {
+        "INFO": 1,
+        "MEDIUM": 2,
+        "HIGH": 2
+      },
+      "unresolved_critical": []
+    },
+    "angel": {
+      "reviews": 2,
+      "recommendations": 0,
+      "tested": 0,
+      "improved": 0,
+      "degraded": 0
+    },
+    "recommendations": []
+  },
+  "decisions": [
+    {
+      "stage": "SPECIFICATION",
+      "verdict": "ACCEPT",
+      "reason": "measured results meet the required specifications",
+      "evidence_pass": true,
+      "blocking": [],
+      "accepted": [],
+      "reviews": [
+        {
+          "reviewer": "devil",
+          "stage": "SPECIFICATION",
+          "verdict": "ACCEPT",
+          "confidence": 0.55,
+          "status": "OK",
+          "error": "",
+          "elapsed": 0.0,
+          "findings": [
+            {
+              "severity": "INFO",
+              "category": "scope",
+              "finding": "No objection from the evidence provided. Note that corner and mismatch data were not part of this review.",
+              "evidence": {}
+            }
+          ],
+          "recommendations": []
+        },
+        {
+          "reviewer": "angel",
+          "stage": "SPECIFICATION",
+          "verdict": "ACCEPT",
+          "confidence": 0.8,
+          "status": "OK",
+          "error": "",
+          "elapsed": 0.0,
+          "findings": [
+            {
+              "severity": "INFO",
+              "category": "status",
+              "finding": "All required targets are met on the evidence supplied; no change recommended.",
+              "evidence": {}
+            }
+          ],
+          "recommendations": []
+        }
+      ],
+      "iteration": 0
+    },
+    {
+      "stage": "FINAL_SIGNOFF",
+      "verdict": "ACCEPT",
+      "reason": "measured results meet the required specifications; 2 HIGH concern(s) noted",
+      "evidence_pass": true,
+      "blocking": [],
+      "accepted": [],
+      "reviews": [
+        {
+          "reviewer": "devil",
+          "stage": "FINAL_SIGNOFF",
+          "verdict": "REVISE",
+          "confidence": 0.9,
+          "status": "OK",
+          "error": "",
+          "elapsed": 0.0,
+          "findings": [
+            {
+              "severity": "MEDIUM",
+              "category": "decision_correct_5mV",
+              "finding": "decision_correct_5mV passes by only 0.0% \u2014 that is inside the noise of corner and mismatch variation, which has not been simulated here.",
+              "evidence": {
+                "target": 1.0,
+                "measured": 1.0,
+                "margin_pct": 0.0
+              }
+            },
+            {
+              "severity": "MEDIUM",
+              "category": "cmr_endpoint_correct",
+              "finding": "cmr_endpoint_correct passes by only 0.0% \u2014 that is inside the noise of corner and mismatch variation, which has not been simulated here.",
+              "evidence": {
+                "target": 1.0,
+                "measured": 1.0,
+                "margin_pct": 0.0
+              }
+            },
+            {
+              "severity": "HIGH",
+              "category": "avg_current_uA",
+              "finding": "avg_current_uA degraded +55.4% from pre-layout to extraction. A shift that large means the schematic result was not predictive of silicon.",
+              "evidence": {
+                "pre": 3.85526,
+                "post": 5.990007,
+                "delta_pct": 55.372
+              }
+            },
+            {
+              "severity": "HIGH",
+              "category": "decision_time_5mV_ns",
+              "finding": "decision_time_5mV_ns degraded +31.3% from pre-layout to extraction. A shift that large means the schematic result was not predictive of silicon.",
+              "evidence": {
+                "pre": 1.8985184999999998,
+                "post": 2.4935319000000002,
+                "delta_pct": 31.341
+              }
+            }
+          ],
+          "recommendations": []
+        },
+        {
+          "reviewer": "angel",
+          "stage": "FINAL_SIGNOFF",
+          "verdict": "ACCEPT",
+          "confidence": 0.8,
+          "status": "OK",
+          "error": "",
+          "elapsed": 0.0,
+          "findings": [
+            {
+              "severity": "INFO",
+              "category": "status",
+              "finding": "All required targets are met on the evidence supplied; no change recommended.",
+              "evidence": {}
+            }
+          ],
+          "recommendations": []
+        }
+      ],
+      "iteration": 2
+    }
+  ]
+}

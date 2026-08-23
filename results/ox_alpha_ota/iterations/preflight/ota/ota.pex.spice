@@ -1,0 +1,37 @@
+* PEX produced on Sun Aug 23 04:34:28 AM CST 2026 using /home/huda/opensource-project/Microelectronic-Block-Generator/designs/notebooks/chipathon2026-D/scripts/iic-pex.sh with m=2 and s=1
+* NGSPICE file created from ota.ext - technology: gf180mcuD
+
+.option scale=5n
+
+.subckt ota IBIAS OUT INN INP VSS VDD
+X0 VDD a_n4022_7856# a_n4022_7856# VDD pfet_03v3 ad=0.18u pd=3.24m as=84n ps=1.612m w=1500 l=800
+X1 a_n4022_7856# a_n4022_7856# VDD VDD pfet_03v3 ad=84n pd=1.612m as=0.18u ps=3.24m w=1500 l=800
+X2 OUT a_n4022_7856# VDD VDD pfet_03v3 ad=84n pd=1.612m as=84n ps=1.612m w=1500 l=800
+X3 a_n686_4246# INP OUT VSS nfet_03v3 ad=0.192u pd=3.44m as=0.192u ps=3.44m w=1600 l=400
+X4 IBIAS IBIAS VSS VSS nfet_03v3 ad=48n pd=1.04m as=48n ps=1.04m w=400 l=400
+X5 a_n686_4246# INN a_n4022_7856# VSS nfet_03v3 ad=0.192u pd=3.44m as=0.192u ps=3.44m w=1600 l=400
+X6 a_n686_4246# IBIAS VSS VSS nfet_03v3 ad=89.6n pd=1.712m as=0.192u ps=3.44m w=1600 l=800
+X7 a_n4022_7856# a_n4022_7856# VDD VDD pfet_03v3 ad=84n pd=1.612m as=84n ps=1.612m w=1500 l=800
+X8 VDD a_n4022_7856# OUT VDD pfet_03v3 ad=0.18u pd=3.24m as=84n ps=1.612m w=1500 l=800
+X9 VDD a_n4022_7856# a_n4022_7856# VDD pfet_03v3 ad=84n pd=1.612m as=84n ps=1.612m w=1500 l=800
+X10 VDD a_n4022_7856# OUT VDD pfet_03v3 ad=84n pd=1.612m as=84n ps=1.612m w=1500 l=800
+X11 OUT a_n4022_7856# VDD VDD pfet_03v3 ad=84n pd=1.612m as=0.18u ps=3.24m w=1500 l=800
+X12 VSS IBIAS a_n686_4246# VSS nfet_03v3 ad=0.192u pd=3.44m as=89.6n ps=1.712m w=1600 l=800
+C0 IBIAS a_n686_4246# 1.10147f
+C1 OUT a_n4022_7856# 2.57531f
+C2 a_n4022_7856# INN 0.47708f
+C3 a_n4022_7856# a_n686_4246# 0.77927f
+C4 VDD a_n4022_7856# 25.7562f
+C5 OUT INP 0.46169f
+C6 INP a_n686_4246# 0.42647f
+C7 OUT a_n686_4246# 0.92592f
+C8 INN a_n686_4246# 0.43338f
+C9 OUT VDD 5.59679f
+C10 IBIAS VSS 9.71761f
+C11 INP VSS 1.10688f
+C12 INN VSS 1.11825f
+C13 OUT VSS 2.61681f
+C14 VDD VSS 74.35439f
+C15 a_n686_4246# VSS 7.42269f ; **FLOATING
+C16 a_n4022_7856# VSS 3.21975f ; **FLOATING
+.ends

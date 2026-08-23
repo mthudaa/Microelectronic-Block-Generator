@@ -735,8 +735,44 @@ def build_design_context(config, pdk=None, name=None):
         ctx.nets[gate].is_critical = True
         ctx.nets[gate].weight = max(ctx.nets[gate].weight, 2.0)
 
-    # generic matched sets: identical devices sharing a gate, not yet grouped
+    # cross-coupled latch pairs: same geometry, gates swapped with drains.
+    # A regenerative latch (e.g. the cross-coupled pair of a comparator) has
+    # two devices whose gate net is the other device's drain net:
+    #     XA dA gA sA b,  XB dB gB sB b   with  gA == dB and gB == dA.
+    # They share no source and no gate, so neither the diff-pair nor the
+    # current-mirror detector sees them — but they are the most matching-
+    # critical devices in a latch, so leaving them ungrouped lets the placer
+    # break the very symmetry the layout needs.
     grouped = {n for g in ctx.matching_groups.values() for n in g.devices}
+    cc_id = 0
+    for i in range(len(mos)):
+        for j in range(i + 1, len(mos)):
+            a, b = mos[i], mos[j]
+            if a.name in grouped or b.name in grouped:
+                continue
+            if a.kind != b.kind or _geom_key(a) != _geom_key(b):
+                continue
+            ga = a.terminals.get("gate"); da = a.terminals.get("drain")
+            gb = b.terminals.get("gate"); db = b.terminals.get("drain")
+            if not (ga and gb and da and db):
+                continue
+            if ga == db and gb == da:
+                cc_id += 1
+                gname = f"latch_{cc_id}"
+                ctx.matching_groups[gname] = MatchingGroup(
+                    gname, "generic", [a.name, b.name], True)
+                ctx.symmetry_constraints.append(
+                    SymmetryConstraint(gname, a.name, b.name, "vertical"))
+                ctx.clusters[gname] = [a.name, b.name]
+                grouped.update({a.name, b.name})
+                # the output nets of a latch are sensitive
+                for n in (da, db):
+                    if n and not ctx.is_power_or_ground(n):
+                        ctx.sensitive_nets.add(n)
+                        ctx.nets[n].is_sensitive = True
+                        ctx.nets[n].weight = max(ctx.nets[n].weight, 2.0)
+
+    # generic matched sets: identical devices sharing a gate, not yet grouped
     gen_id = 0
     for gate, devs in by_gate.items():
         cand = [d for d in devs if d.name not in grouped]

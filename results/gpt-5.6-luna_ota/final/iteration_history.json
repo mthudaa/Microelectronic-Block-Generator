@@ -1,0 +1,182 @@
+{
+  "cell": "ota",
+  "status": "PASS",
+  "stage": "COMPLETE",
+  "failure": "NONE",
+  "message": "final design meets PEX-aware specifications",
+  "elapsed": 64.494,
+  "pre_layout": [
+    {
+      "phase": "pre_layout",
+      "iteration": 1,
+      "spec_pass": true,
+      "score": 0.0,
+      "status": "PASS",
+      "failure": "NONE",
+      "message": "",
+      "metrics": {
+        "source": "pre_layout",
+        "pass": true,
+        "score": 0.0,
+        "metrics": {
+          "gain_db": {
+            "value": 44.51958349528648,
+            "target": 35.0,
+            "op": ">=",
+            "unit": " dB",
+            "status": "PASS",
+            "margin": 9.519583495286483,
+            "margin_pct": 27.199
+          },
+          "ugf_hz": {
+            "value": 2238721.14,
+            "target": 1000000.0,
+            "op": ">=",
+            "unit": " Hz",
+            "status": "PASS",
+            "margin": 1238721.1400000001,
+            "margin_pct": 123.872
+          }
+        }
+      },
+      "degradation": [],
+      "elapsed": 0.244
+    }
+  ],
+  "pex": [
+    {
+      "phase": "pex",
+      "iteration": 1,
+      "spec_pass": true,
+      "score": 0.0,
+      "status": "PASS",
+      "drc": "PASS",
+      "lvs": "PASS",
+      "pex_extraction": "PASS",
+      "pex_simulation": "PASS",
+      "failure": "NONE",
+      "message": "",
+      "metrics": {
+        "source": "pex",
+        "pass": true,
+        "score": 0.0,
+        "metrics": {
+          "gain_db": {
+            "value": 44.50609904095559,
+            "target": 35.0,
+            "op": ">=",
+            "unit": " dB",
+            "status": "PASS",
+            "margin": 9.50609904095559,
+            "margin_pct": 27.16
+          },
+          "ugf_hz": {
+            "value": 2238721.14,
+            "target": 1000000.0,
+            "op": ">=",
+            "unit": " Hz",
+            "status": "PASS",
+            "margin": 1238721.1400000001,
+            "margin_pct": 123.872
+          }
+        }
+      },
+      "degradation": [
+        {
+          "name": "gain_db",
+          "pre": 44.51958349528648,
+          "post": 44.50609904095559,
+          "unit": " dB",
+          "delta": -0.013484454330892959,
+          "delta_pct": -0.03,
+          "status": "PASS",
+          "worsened": true
+        },
+        {
+          "name": "ugf_hz",
+          "pre": 2238721.14,
+          "post": 2238721.14,
+          "unit": " Hz",
+          "delta": 0.0,
+          "delta_pct": 0.0,
+          "status": "PASS",
+          "worsened": false
+        }
+      ],
+      "elapsed": 64.25
+    }
+  ],
+  "best_pre": {
+    "source": "pre_layout",
+    "pass": true,
+    "score": 0.0,
+    "metrics": {
+      "gain_db": {
+        "value": 44.51958349528648,
+        "target": 35.0,
+        "op": ">=",
+        "unit": " dB",
+        "status": "PASS",
+        "margin": 9.519583495286483,
+        "margin_pct": 27.199
+      },
+      "ugf_hz": {
+        "value": 2238721.14,
+        "target": 1000000.0,
+        "op": ">=",
+        "unit": " Hz",
+        "status": "PASS",
+        "margin": 1238721.1400000001,
+        "margin_pct": 123.872
+      }
+    }
+  },
+  "best_pex": {
+    "source": "pex",
+    "pass": true,
+    "score": 0.0,
+    "metrics": {
+      "gain_db": {
+        "value": 44.50609904095559,
+        "target": 35.0,
+        "op": ">=",
+        "unit": " dB",
+        "status": "PASS",
+        "margin": 9.50609904095559,
+        "margin_pct": 27.16
+      },
+      "ugf_hz": {
+        "value": 2238721.14,
+        "target": 1000000.0,
+        "op": ">=",
+        "unit": " Hz",
+        "status": "PASS",
+        "margin": 1238721.1400000001,
+        "margin_pct": 123.872
+      }
+    }
+  },
+  "best_pex_iteration": 1,
+  "degradation": [
+    {
+      "name": "gain_db",
+      "pre": 44.51958349528648,
+      "post": 44.50609904095559,
+      "unit": " dB",
+      "delta": -0.013484454330892959,
+      "delta_pct": -0.03,
+      "status": "PASS",
+      "worsened": true
+    },
+    {
+      "name": "ugf_hz",
+      "pre": 2238721.14,
+      "post": 2238721.14,
+      "unit": " Hz",
+      "delta": 0.0,
+      "delta_pct": 0.0,
+      "status": "PASS",
+      "worsened": false
+    }
+  ]
+}

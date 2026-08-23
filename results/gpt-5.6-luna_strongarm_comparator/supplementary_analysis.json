@@ -1,0 +1,28 @@
+{
+  "pre_layout": {
+    "status": "PASS",
+    "conditions": 90,
+    "decision_time_max_ns": 2.9252708,
+    "decision_correct_all": true,
+    "output_swing_ratio_min": 0.9999995027328844,
+    "reset_precharge_correct_all": true
+  },
+  "post_layout": {
+    "status": "NOT RUN",
+    "conditions": 90,
+    "not_run": 90,
+    "decision_time_max_ns": null,
+    "decision_correct_all": false,
+    "output_swing_ratio_min": null,
+    "reset_precharge_correct_all": false
+  },
+  "monte_carlo": {
+    "status": "NOT AVAILABLE",
+    "supported": false,
+    "reason": "bounded mismatch transient characterization did not complete",
+    "runs_completed": 0,
+    "runs_requested": 20,
+    "target_sigma_mV": 10.0,
+    "target_met": false
+  }
+}

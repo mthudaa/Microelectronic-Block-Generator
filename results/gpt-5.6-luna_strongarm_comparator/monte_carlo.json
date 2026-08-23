@@ -1,0 +1,9 @@
+{
+  "status": "NOT AVAILABLE",
+  "supported": false,
+  "reason": "bounded mismatch transient characterization did not complete",
+  "runs_completed": 0,
+  "runs_requested": 20,
+  "target_sigma_mV": 10.0,
+  "target_met": false
+}

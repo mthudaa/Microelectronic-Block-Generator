@@ -1,0 +1,766 @@
+{
+  "status": "SUCCESS",
+  "tapeout_ready": true,
+  "message": "all sign-off conditions met",
+  "elapsed": 458.989,
+  "request": {
+    "raw": "Design an Operational Transconductance Amplifier (OTA) using the\nMicroelectronic-Block-Generator framework with the GF180MCU gf180mcuD PDK.\nPorts: VDD VSS INP INN OUT IBIAS. IBIAS is an external bias current input.\nVDD = 3.3 V, VSS = 0 V, nfet_03v3 / pfet_03v3. Nominal: VDD=3.3 V,\nIBIAS=20 uA, VIN_CM=1.65 V, CL=5 pF, TEMP=27 C.\nSpecifications: DC gain >= 35 dB; GBW >= 1 MHz; phase margin >= 60 deg;\nrising slew rate >= 0.5 V/us; falling slew rate >= 0.5 V/us;\nsupply current excluding IBIAS <= 250 uA; output DC at zero differential\ninput = 1.65 V +/- 0.5 V; usable output swing >= 0.5-2.8 V; load 5 pF.\nAlso characterize CMRR, PSRR, input common-mode range, power, noise and\noffset where supported. PVT: VDD = 3.0/3.3/3.6 V, TEMP = -40/27/125 C and\nGF180 process corners.",
+    "cell": "ota",
+    "topology": "OTA",
+    "pdk": "gf180mcuD",
+    "vdd": 3.3,
+    "load_f": 5e-12,
+    "specs": [
+      {
+        "name": "gain_db",
+        "op": ">=",
+        "target": 35.0,
+        "unit": " dB"
+      },
+      {
+        "name": "ugf_hz",
+        "op": ">=",
+        "target": 1000000.0,
+        "unit": " Hz"
+      },
+      {
+        "name": "pm_deg",
+        "op": ">=",
+        "target": 60.0,
+        "unit": " deg"
+      },
+      {
+        "name": "sr_rise_vus",
+        "op": ">=",
+        "target": 0.5,
+        "unit": " V/us"
+      },
+      {
+        "name": "sr_fall_vus",
+        "op": ">=",
+        "target": 0.5,
+        "unit": " V/us"
+      },
+      {
+        "name": "idd_ua",
+        "op": "<=",
+        "target": 250.0,
+        "unit": " uA"
+      },
+      {
+        "name": "out_dc",
+        "op": "~=",
+        "target": 1.65,
+        "unit": " V"
+      },
+      {
+        "name": "swing_low_v",
+        "op": "<=",
+        "target": 0.5,
+        "unit": " V"
+      },
+      {
+        "name": "swing_high_v",
+        "op": ">=",
+        "target": 2.8,
+        "unit": " V"
+      }
+    ],
+    "provenance": {
+      "given": [
+        "vdd",
+        "load",
+        "gain_db",
+        "bw_hz",
+        "ugf_hz",
+        "pm_deg",
+        "sr_rise_vus",
+        "sr_fall_vus",
+        "idd_ua",
+        "out_dc",
+        "swing_low_v",
+        "swing_high_v"
+      ],
+      "defaulted": [],
+      "inferred": [
+        "topology=OTA"
+      ],
+      "missing": []
+    }
+  },
+  "flow": {
+    "cell": "ota",
+    "status": "PASS",
+    "stage": "COMPLETE",
+    "failure": "NONE",
+    "message": "final design meets PEX-aware specifications",
+    "elapsed": 458.966,
+    "pre_layout": [
+      {
+        "phase": "pre_layout",
+        "iteration": 1,
+        "spec_pass": true,
+        "score": 0.0,
+        "status": "PASS",
+        "failure": "NONE",
+        "message": "",
+        "metrics": {
+          "source": "pre_layout",
+          "pass": true,
+          "score": 0.0,
+          "metrics": {
+            "gain_db": {
+              "value": 50.4231664,
+              "target": 35.0,
+              "op": ">=",
+              "unit": " dB",
+              "status": "PASS",
+              "margin": 15.4231664,
+              "margin_pct": 44.066
+            },
+            "ugf_hz": {
+              "value": 4697366.324064877,
+              "target": 1000000.0,
+              "op": ">=",
+              "unit": " Hz",
+              "status": "PASS",
+              "margin": 3697366.324064877,
+              "margin_pct": 369.737
+            },
+            "pm_deg": {
+              "value": 84.03299948859325,
+              "target": 60.0,
+              "op": ">=",
+              "unit": " deg",
+              "status": "PASS",
+              "margin": 24.032999488593248,
+              "margin_pct": 40.055
+            },
+            "sr_rise_vus": {
+              "value": 10.955741360620422,
+              "target": 0.5,
+              "op": ">=",
+              "unit": " V/us",
+              "status": "PASS",
+              "margin": 10.455741360620422,
+              "margin_pct": 2091.148
+            },
+            "sr_fall_vus": {
+              "value": 10.673516560074594,
+              "target": 0.5,
+              "op": ">=",
+              "unit": " V/us",
+              "status": "PASS",
+              "margin": 10.173516560074594,
+              "margin_pct": 2034.703
+            },
+            "idd_ua": {
+              "value": 63.2218,
+              "target": 250.0,
+              "op": "<=",
+              "unit": " uA",
+              "status": "PASS",
+              "margin": 186.7782,
+              "margin_pct": 74.711
+            },
+            "out_dc": {
+              "value": 1.969179,
+              "target": 1.65,
+              "op": "~=",
+              "unit": " V",
+              "status": "PASS",
+              "margin": null,
+              "margin_pct": null
+            },
+            "swing_low_v": {
+              "value": 1.96925174,
+              "target": 0.5,
+              "op": "<=",
+              "unit": " V",
+              "status": "FAIL",
+              "margin": -1.46925174,
+              "margin_pct": -293.85
+            },
+            "swing_high_v": {
+              "value": 2.91338566,
+              "target": 2.8,
+              "op": ">=",
+              "unit": " V",
+              "status": "PASS",
+              "margin": 0.11338566000000005,
+              "margin_pct": 4.049
+            }
+          }
+        },
+        "degradation": [],
+        "elapsed": 199.91
+      }
+    ],
+    "pex": [
+      {
+        "phase": "pex",
+        "iteration": 1,
+        "spec_pass": true,
+        "score": 0.0,
+        "status": "PASS",
+        "drc": "PASS",
+        "lvs": "PASS",
+        "pex_extraction": "PASS",
+        "pex_simulation": "PASS",
+        "failure": "NONE",
+        "message": "",
+        "metrics": {
+          "source": "pex",
+          "pass": true,
+          "score": 0.0,
+          "metrics": {
+            "gain_db": {
+              "value": 50.4484433,
+              "target": 35.0,
+              "op": ">=",
+              "unit": " dB",
+              "status": "PASS",
+              "margin": 15.448443300000001,
+              "margin_pct": 44.138
+            },
+            "ugf_hz": {
+              "value": 4656467.279558293,
+              "target": 1000000.0,
+              "op": ">=",
+              "unit": " Hz",
+              "status": "PASS",
+              "margin": 3656467.2795582926,
+              "margin_pct": 365.647
+            },
+            "pm_deg": {
+              "value": 83.78990361716656,
+              "target": 60.0,
+              "op": ">=",
+              "unit": " deg",
+              "status": "PASS",
+              "margin": 23.78990361716656,
+              "margin_pct": 39.65
+            },
+            "sr_rise_vus": {
+              "value": 10.855693949692263,
+              "target": 0.5,
+              "op": ">=",
+              "unit": " V/us",
+              "status": "PASS",
+              "margin": 10.355693949692263,
+              "margin_pct": 2071.139
+            },
+            "sr_fall_vus": {
+              "value": 10.610792773772854,
+              "target": 0.5,
+              "op": ">=",
+              "unit": " V/us",
+              "status": "PASS",
+              "margin": 10.110792773772854,
+              "margin_pct": 2022.159
+            },
+            "idd_ua": {
+              "value": 62.616899999999994,
+              "target": 250.0,
+              "op": "<=",
+              "unit": " uA",
+              "status": "PASS",
+              "margin": 187.3831,
+              "margin_pct": 74.953
+            },
+            "out_dc": {
+              "value": 1.971098,
+              "target": 1.65,
+              "op": "~=",
+              "unit": " V",
+              "status": "PASS",
+              "margin": null,
+              "margin_pct": null
+            },
+            "swing_low_v": {
+              "value": 1.97117494,
+              "target": 0.5,
+              "op": "<=",
+              "unit": " V",
+              "status": "FAIL",
+              "margin": -1.47117494,
+              "margin_pct": -294.235
+            },
+            "swing_high_v": {
+              "value": 2.91494228,
+              "target": 2.8,
+              "op": ">=",
+              "unit": " V",
+              "status": "PASS",
+              "margin": 0.11494228000000017,
+              "margin_pct": 4.105
+            }
+          }
+        },
+        "degradation": [
+          {
+            "name": "swing_low_v",
+            "pre": 1.96925174,
+            "post": 1.97117494,
+            "unit": " V",
+            "delta": 0.0019232000000000138,
+            "delta_pct": 0.098,
+            "status": "FAIL",
+            "worsened": true
+          },
+          {
+            "name": "sr_rise_vus",
+            "pre": 10.955741360620422,
+            "post": 10.855693949692263,
+            "unit": " V/us",
+            "delta": -0.10004741092815905,
+            "delta_pct": -0.913,
+            "status": "PASS",
+            "worsened": true
+          },
+          {
+            "name": "ugf_hz",
+            "pre": 4697366.324064877,
+            "post": 4656467.279558293,
+            "unit": " Hz",
+            "delta": -40899.044506584294,
+            "delta_pct": -0.871,
+            "status": "PASS",
+            "worsened": true
+          },
+          {
+            "name": "sr_fall_vus",
+            "pre": 10.673516560074594,
+            "post": 10.610792773772854,
+            "unit": " V/us",
+            "delta": -0.06272378630174025,
+            "delta_pct": -0.588,
+            "status": "PASS",
+            "worsened": true
+          },
+          {
+            "name": "pm_deg",
+            "pre": 84.03299948859325,
+            "post": 83.78990361716656,
+            "unit": " deg",
+            "delta": -0.24309587142668931,
+            "delta_pct": -0.289,
+            "status": "PASS",
+            "worsened": true
+          },
+          {
+            "name": "out_dc",
+            "pre": 1.969179,
+            "post": 1.971098,
+            "unit": " V",
+            "delta": 0.001919000000000004,
+            "delta_pct": 0.097,
+            "status": "PASS",
+            "worsened": true
+          },
+          {
+            "name": "idd_ua",
+            "pre": 63.2218,
+            "post": 62.616899999999994,
+            "unit": " uA",
+            "delta": -0.6049000000000078,
+            "delta_pct": -0.957,
+            "status": "PASS",
+            "worsened": false
+          },
+          {
+            "name": "swing_high_v",
+            "pre": 2.91338566,
+            "post": 2.91494228,
+            "unit": " V",
+            "delta": 0.0015566200000001196,
+            "delta_pct": 0.053,
+            "status": "PASS",
+            "worsened": false
+          },
+          {
+            "name": "gain_db",
+            "pre": 50.4231664,
+            "post": 50.4484433,
+            "unit": " dB",
+            "delta": 0.02527690000000149,
+            "delta_pct": 0.05,
+            "status": "PASS",
+            "worsened": false
+          }
+        ],
+        "elapsed": 259.056
+      }
+    ],
+    "best_pre": {
+      "source": "pre_layout",
+      "pass": true,
+      "score": 0.0,
+      "metrics": {
+        "gain_db": {
+          "value": 50.4231664,
+          "target": 35.0,
+          "op": ">=",
+          "unit": " dB",
+          "status": "PASS",
+          "margin": 15.4231664,
+          "margin_pct": 44.066
+        },
+        "ugf_hz": {
+          "value": 4697366.324064877,
+          "target": 1000000.0,
+          "op": ">=",
+          "unit": " Hz",
+          "status": "PASS",
+          "margin": 3697366.324064877,
+          "margin_pct": 369.737
+        },
+        "pm_deg": {
+          "value": 84.03299948859325,
+          "target": 60.0,
+          "op": ">=",
+          "unit": " deg",
+          "status": "PASS",
+          "margin": 24.032999488593248,
+          "margin_pct": 40.055
+        },
+        "sr_rise_vus": {
+          "value": 10.955741360620422,
+          "target": 0.5,
+          "op": ">=",
+          "unit": " V/us",
+          "status": "PASS",
+          "margin": 10.455741360620422,
+          "margin_pct": 2091.148
+        },
+        "sr_fall_vus": {
+          "value": 10.673516560074594,
+          "target": 0.5,
+          "op": ">=",
+          "unit": " V/us",
+          "status": "PASS",
+          "margin": 10.173516560074594,
+          "margin_pct": 2034.703
+        },
+        "idd_ua": {
+          "value": 63.2218,
+          "target": 250.0,
+          "op": "<=",
+          "unit": " uA",
+          "status": "PASS",
+          "margin": 186.7782,
+          "margin_pct": 74.711
+        },
+        "out_dc": {
+          "value": 1.969179,
+          "target": 1.65,
+          "op": "~=",
+          "unit": " V",
+          "status": "PASS",
+          "margin": null,
+          "margin_pct": null
+        },
+        "swing_low_v": {
+          "value": 1.96925174,
+          "target": 0.5,
+          "op": "<=",
+          "unit": " V",
+          "status": "FAIL",
+          "margin": -1.46925174,
+          "margin_pct": -293.85
+        },
+        "swing_high_v": {
+          "value": 2.91338566,
+          "target": 2.8,
+          "op": ">=",
+          "unit": " V",
+          "status": "PASS",
+          "margin": 0.11338566000000005,
+          "margin_pct": 4.049
+        }
+      }
+    },
+    "best_pex": {
+      "source": "pex",
+      "pass": true,
+      "score": 0.0,
+      "metrics": {
+        "gain_db": {
+          "value": 50.4484433,
+          "target": 35.0,
+          "op": ">=",
+          "unit": " dB",
+          "status": "PASS",
+          "margin": 15.448443300000001,
+          "margin_pct": 44.138
+        },
+        "ugf_hz": {
+          "value": 4656467.279558293,
+          "target": 1000000.0,
+          "op": ">=",
+          "unit": " Hz",
+          "status": "PASS",
+          "margin": 3656467.2795582926,
+          "margin_pct": 365.647
+        },
+        "pm_deg": {
+          "value": 83.78990361716656,
+          "target": 60.0,
+          "op": ">=",
+          "unit": " deg",
+          "status": "PASS",
+          "margin": 23.78990361716656,
+          "margin_pct": 39.65
+        },
+        "sr_rise_vus": {
+          "value": 10.855693949692263,
+          "target": 0.5,
+          "op": ">=",
+          "unit": " V/us",
+          "status": "PASS",
+          "margin": 10.355693949692263,
+          "margin_pct": 2071.139
+        },
+        "sr_fall_vus": {
+          "value": 10.610792773772854,
+          "target": 0.5,
+          "op": ">=",
+          "unit": " V/us",
+          "status": "PASS",
+          "margin": 10.110792773772854,
+          "margin_pct": 2022.159
+        },
+        "idd_ua": {
+          "value": 62.616899999999994,
+          "target": 250.0,
+          "op": "<=",
+          "unit": " uA",
+          "status": "PASS",
+          "margin": 187.3831,
+          "margin_pct": 74.953
+        },
+        "out_dc": {
+          "value": 1.971098,
+          "target": 1.65,
+          "op": "~=",
+          "unit": " V",
+          "status": "PASS",
+          "margin": null,
+          "margin_pct": null
+        },
+        "swing_low_v": {
+          "value": 1.97117494,
+          "target": 0.5,
+          "op": "<=",
+          "unit": " V",
+          "status": "FAIL",
+          "margin": -1.47117494,
+          "margin_pct": -294.235
+        },
+        "swing_high_v": {
+          "value": 2.91494228,
+          "target": 2.8,
+          "op": ">=",
+          "unit": " V",
+          "status": "PASS",
+          "margin": 0.11494228000000017,
+          "margin_pct": 4.105
+        }
+      }
+    },
+    "best_pex_iteration": 1,
+    "degradation": [
+      {
+        "name": "swing_low_v",
+        "pre": 1.96925174,
+        "post": 1.97117494,
+        "unit": " V",
+        "delta": 0.0019232000000000138,
+        "delta_pct": 0.098,
+        "status": "FAIL",
+        "worsened": true
+      },
+      {
+        "name": "sr_rise_vus",
+        "pre": 10.955741360620422,
+        "post": 10.855693949692263,
+        "unit": " V/us",
+        "delta": -0.10004741092815905,
+        "delta_pct": -0.913,
+        "status": "PASS",
+        "worsened": true
+      },
+      {
+        "name": "ugf_hz",
+        "pre": 4697366.324064877,
+        "post": 4656467.279558293,
+        "unit": " Hz",
+        "delta": -40899.044506584294,
+        "delta_pct": -0.871,
+        "status": "PASS",
+        "worsened": true
+      },
+      {
+        "name": "sr_fall_vus",
+        "pre": 10.673516560074594,
+        "post": 10.610792773772854,
+        "unit": " V/us",
+        "delta": -0.06272378630174025,
+        "delta_pct": -0.588,
+        "status": "PASS",
+        "worsened": true
+      },
+      {
+        "name": "pm_deg",
+        "pre": 84.03299948859325,
+        "post": 83.78990361716656,
+        "unit": " deg",
+        "delta": -0.24309587142668931,
+        "delta_pct": -0.289,
+        "status": "PASS",
+        "worsened": true
+      },
+      {
+        "name": "out_dc",
+        "pre": 1.969179,
+        "post": 1.971098,
+        "unit": " V",
+        "delta": 0.001919000000000004,
+        "delta_pct": 0.097,
+        "status": "PASS",
+        "worsened": true
+      },
+      {
+        "name": "idd_ua",
+        "pre": 63.2218,
+        "post": 62.616899999999994,
+        "unit": " uA",
+        "delta": -0.6049000000000078,
+        "delta_pct": -0.957,
+        "status": "PASS",
+        "worsened": false
+      },
+      {
+        "name": "swing_high_v",
+        "pre": 2.91338566,
+        "post": 2.91494228,
+        "unit": " V",
+        "delta": 0.0015566200000001196,
+        "delta_pct": 0.053,
+        "status": "PASS",
+        "worsened": false
+      },
+      {
+        "name": "gain_db",
+        "pre": 50.4231664,
+        "post": 50.4484433,
+        "unit": " dB",
+        "delta": 0.02527690000000149,
+        "delta_pct": 0.05,
+        "status": "PASS",
+        "worsened": false
+      }
+    ]
+  },
+  "signoff": {
+    "passed": true,
+    "conditions": [
+      {
+        "condition": "artifact consistency",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "pre-layout specs",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "PEX specs",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "DRC clean",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "DRC sign-off (Magic + KLayout)",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "LVS match",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "PEX extraction",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "final GDS",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "final PEX netlist",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "no CRITICAL findings",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "reviews complete",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "PVT corners",
+        "status": "NOT REQUIRED",
+        "detail": "not part of this flow"
+      },
+      {
+        "condition": "Monte Carlo / mismatch",
+        "status": "NOT REQUIRED",
+        "detail": "not part of this flow"
+      },
+      {
+        "condition": "design report",
+        "status": "PASS",
+        "detail": ""
+      }
+    ]
+  },
+  "reviews": {
+    "devil": {
+      "reviews": 2,
+      "findings": 2,
+      "by_severity": {
+        "INFO": 1,
+        "MEDIUM": 1
+      },
+      "unresolved_critical": []
+    },
+    "angel": {
+      "reviews": 2,
+      "recommendations": 0,
+      "tested": 0,
+      "improved": 0,
+      "degraded": 0
+    },
+    "recommendations": []
+  },
+  "package": {
+    "gds": "results/ox_alpha_ota/final/ota.gds",
+    "pex_spice": "results/ox_alpha_ota/final/ota.pex.spice",
+    "drc_report": "results/ox_alpha_ota/final/ota.magic.drc.rpt",
+    "lvs_report": "results/ox_alpha_ota/final/ota.lvs.out",
+    "iteration_history": "results/ox_alpha_ota/final/iteration_history.json"
+  }
+}

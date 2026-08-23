@@ -1,0 +1,42 @@
+{
+  "status": "SUCCESS",
+  "tapeout_ready": true,
+  "message": "all sign-off conditions met",
+  "report_path": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/ox_alpha_vref_1v2/final_design_report.md",
+  "elapsed_s": 122.9,
+  "experiment": "vref_1v2_mos_only_gf180mcuD",
+  "model_identifier": "ox-alpha (opencode/x-preview-f-free)",
+  "pdk": "gf180mcuD",
+  "cell_ports": [
+    "VDD",
+    "VSS",
+    "VREF",
+    "IBIAS"
+  ],
+  "topology": "externally-biased PFET mirror + NFET self-cascode (VGS + triode VDS tempco cancellation), 4 MOS, MOSFET-only",
+  "pex_metrics_typical": {
+    "vref_nominal_v": 1.154,
+    "tempco_ppm_c": 245,
+    "line_reg_mv_per_v": 10.26,
+    "dvref_line_mv": 6.15,
+    "ivdd_uA_excl_ibias": 19.87
+  },
+  "ibias_sensitivity_uA": {
+    "10uA": 1.0,
+    "20uA": 1.154,
+    "30uA": 1.25
+  },
+  "pvt_characterization": {
+    "status": "PASS",
+    "evidence": "pvt_characterization.json",
+    "corner_vref_range_v": [
+      1.028,
+      1.279
+    ],
+    "corner_tempco_ppm_c_range": [
+      222,
+      250
+    ]
+  },
+  "monte_carlo": "NOT RUN"
+}

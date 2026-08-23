@@ -1,0 +1,30 @@
+{
+  "cell": "oscillator",
+  "files": {
+    "drc_report": "oscillator.magic.drc.rpt",
+    "extracted_spice": "oscillator_extracted.spice",
+    "gds": "oscillator.gds",
+    "lef": "oscillator.lef",
+    "lib": "oscillator.lib",
+    "lvs_report": "oscillator.lvs.out",
+    "pex_spice": "oscillator.pex.spice",
+    "sch_spice": "oscillator.spice",
+    "svg": "oscillator.svg",
+    "verilog": "oscillator.v"
+  },
+  "notes": [],
+  "ports": [
+    {
+      "direction": "power",
+      "name": "VDD"
+    },
+    {
+      "direction": "ground",
+      "name": "VSS"
+    },
+    {
+      "direction": "inout",
+      "name": "OSC_OUT"
+    }
+  ]
+}

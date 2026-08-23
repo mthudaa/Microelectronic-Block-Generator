@@ -1,0 +1,363 @@
+{
+  "label": "initial_schematic",
+  "nominal": {
+    "vref": 1.166621,
+    "supply_current_ua": 39.865
+  },
+  "ibias_uA": {
+    "10": {
+      "vref": 1.009363,
+      "supply_current_ua": 19.9931
+    },
+    "20": {
+      "vref": 1.166621,
+      "supply_current_ua": 39.865
+    },
+    "30": {
+      "vref": 1.264645,
+      "supply_current_ua": 57.6905
+    }
+  },
+  "supply_V": {
+    "2.7": {
+      "vref": 1.146455,
+      "supply_current_ua": 38.4122
+    },
+    "3.0": {
+      "vref": 1.161029,
+      "supply_current_ua": 39.4567
+    },
+    "3.3": {
+      "vref": 1.166621,
+      "supply_current_ua": 39.865
+    },
+    "3.6": {
+      "vref": 1.167709,
+      "supply_current_ua": 39.9449
+    }
+  },
+  "temperature_C": {
+    "-40": {
+      "vref": 1.141007,
+      "supply_current_ua": 39.9427
+    },
+    "-20": {
+      "vref": 1.148994,
+      "supply_current_ua": 39.93
+    },
+    "0": {
+      "vref": 1.156722,
+      "supply_current_ua": 39.911
+    },
+    "27": {
+      "vref": 1.166621,
+      "supply_current_ua": 39.865
+    },
+    "75": {
+      "vref": 1.181843,
+      "supply_current_ua": 39.6766
+    },
+    "100": {
+      "vref": 1.188325,
+      "supply_current_ua": 39.5204
+    },
+    "125": {
+      "vref": 1.193884,
+      "supply_current_ua": 39.3364
+    }
+  },
+  "corners": {
+    "typical": {
+      "3.0": {
+        "vref": 1.161029,
+        "supply_current_ua": 39.4567
+      },
+      "3.3": {
+        "vref": 1.166621,
+        "supply_current_ua": 39.865
+      },
+      "3.6": {
+        "vref": 1.167709,
+        "supply_current_ua": 39.9449
+      }
+    },
+    "ff": {
+      "3.0": {
+        "vref": 1.037991,
+        "supply_current_ua": 39.7851
+      },
+      "3.3": {
+        "vref": 1.039948,
+        "supply_current_ua": 39.934400000000004
+      },
+      "3.6": {
+        "vref": 1.040379,
+        "supply_current_ua": 39.9674
+      }
+    },
+    "ss": {
+      "3.0": {
+        "vref": 1.280825,
+        "supply_current_ua": 38.8975
+      },
+      "3.3": {
+        "vref": 1.291861,
+        "supply_current_ua": 39.665600000000005
+      },
+      "3.6": {
+        "vref": 1.295215,
+        "supply_current_ua": 39.902
+      }
+    },
+    "fs": {
+      "3.0": {
+        "vref": 1.072665,
+        "supply_current_ua": 39.5643
+      },
+      "3.3": {
+        "vref": 1.076946,
+        "supply_current_ua": 39.8846
+      },
+      "3.6": {
+        "vref": 1.077773,
+        "supply_current_ua": 39.9467
+      }
+    },
+    "sf": {
+      "3.0": {
+        "vref": 1.249373,
+        "supply_current_ua": 39.324
+      },
+      "3.3": {
+        "vref": 1.256566,
+        "supply_current_ua": 39.836200000000005
+      },
+      "3.6": {
+        "vref": 1.258039,
+        "supply_current_ua": 39.9419
+      }
+    }
+  },
+  "pvt_grid": {
+    "typical": {
+      "-40": {
+        "3.0": {
+          "vref": 1.140132,
+          "supply_current_ua": 39.862700000000004
+        },
+        "3.3": {
+          "vref": 1.141007,
+          "supply_current_ua": 39.9427
+        },
+        "3.6": {
+          "vref": 1.14128,
+          "supply_current_ua": 39.9676
+        }
+      },
+      "27": {
+        "3.0": {
+          "vref": 1.161029,
+          "supply_current_ua": 39.4567
+        },
+        "3.3": {
+          "vref": 1.166621,
+          "supply_current_ua": 39.865
+        },
+        "3.6": {
+          "vref": 1.167709,
+          "supply_current_ua": 39.9449
+        }
+      },
+      "125": {
+        "3.0": {
+          "vref": 1.176876,
+          "supply_current_ua": 38.3888
+        },
+        "3.3": {
+          "vref": 1.193884,
+          "supply_current_ua": 39.3364
+        },
+        "3.6": {
+          "vref": 1.202221,
+          "supply_current_ua": 39.8094
+        }
+      }
+    },
+    "ff": {
+      "-40": {
+        "3.0": {
+          "vref": 1.017359,
+          "supply_current_ua": 39.9302
+        },
+        "3.3": {
+          "vref": 1.017724,
+          "supply_current_ua": 39.965
+        },
+        "3.6": {
+          "vref": 1.017906,
+          "supply_current_ua": 39.982299999999995
+        }
+      },
+      "27": {
+        "3.0": {
+          "vref": 1.037991,
+          "supply_current_ua": 39.7851
+        },
+        "3.3": {
+          "vref": 1.039948,
+          "supply_current_ua": 39.934400000000004
+        },
+        "3.6": {
+          "vref": 1.040379,
+          "supply_current_ua": 39.9674
+        }
+      },
+      "125": {
+        "3.0": {
+          "vref": 1.055847,
+          "supply_current_ua": 39.0666
+        },
+        "3.3": {
+          "vref": 1.066853,
+          "supply_current_ua": 39.712799999999994
+        },
+        "3.6": {
+          "vref": 1.070366,
+          "supply_current_ua": 39.9212
+        }
+      }
+    },
+    "ss": {
+      "-40": {
+        "3.0": {
+          "vref": 1.261844,
+          "supply_current_ua": 39.6633
+        },
+        "3.3": {
+          "vref": 1.264584,
+          "supply_current_ua": 39.9032
+        },
+        "3.6": {
+          "vref": 1.265103,
+          "supply_current_ua": 39.9488
+        }
+      },
+      "27": {
+        "3.0": {
+          "vref": 1.280825,
+          "supply_current_ua": 38.8975
+        },
+        "3.3": {
+          "vref": 1.291861,
+          "supply_current_ua": 39.665600000000005
+        },
+        "3.6": {
+          "vref": 1.295215,
+          "supply_current_ua": 39.902
+        }
+      },
+      "125": {
+        "3.0": {
+          "vref": 1.294513,
+          "supply_current_ua": 37.5763
+        },
+        "3.3": {
+          "vref": 1.317277,
+          "supply_current_ua": 38.775800000000004
+        },
+        "3.6": {
+          "vref": 1.331363,
+          "supply_current_ua": 39.5373
+        }
+      }
+    },
+    "fs": {
+      "-40": {
+        "3.0": {
+          "vref": 1.052762,
+          "supply_current_ua": 39.882999999999996
+        },
+        "3.3": {
+          "vref": 1.053421,
+          "supply_current_ua": 39.944599999999994
+        },
+        "3.6": {
+          "vref": 1.053661,
+          "supply_current_ua": 39.967
+        }
+      },
+      "27": {
+        "3.0": {
+          "vref": 1.072665,
+          "supply_current_ua": 39.5643
+        },
+        "3.3": {
+          "vref": 1.076946,
+          "supply_current_ua": 39.8846
+        },
+        "3.6": {
+          "vref": 1.077773,
+          "supply_current_ua": 39.9467
+        }
+      },
+      "125": {
+        "3.0": {
+          "vref": 1.087764,
+          "supply_current_ua": 38.606399999999994
+        },
+        "3.3": {
+          "vref": 1.10254,
+          "supply_current_ua": 39.4523
+        },
+        "3.6": {
+          "vref": 1.109265,
+          "supply_current_ua": 39.843399999999995
+        }
+      }
+    },
+    "sf": {
+      "-40": {
+        "3.0": {
+          "vref": 1.227777,
+          "supply_current_ua": 39.8317
+        },
+        "3.3": {
+          "vref": 1.228987,
+          "supply_current_ua": 39.9395
+        },
+        "3.6": {
+          "vref": 1.229305,
+          "supply_current_ua": 39.9679
+        }
+      },
+      "27": {
+        "3.0": {
+          "vref": 1.249373,
+          "supply_current_ua": 39.324
+        },
+        "3.3": {
+          "vref": 1.256566,
+          "supply_current_ua": 39.836200000000005
+        },
+        "3.6": {
+          "vref": 1.258039,
+          "supply_current_ua": 39.9419
+        }
+      },
+      "125": {
+        "3.0": {
+          "vref": 1.265666,
+          "supply_current_ua": 38.145999999999994
+        },
+        "3.3": {
+          "vref": 1.285114,
+          "supply_current_ua": 39.2001
+        },
+        "3.6": {
+          "vref": 1.295294,
+          "supply_current_ua": 39.7633
+        }
+      }
+    }
+  }
+}

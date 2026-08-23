@@ -1,0 +1,66 @@
+.include '/home/huda/.volare/gf180mcuD/libs.tech/ngspice/design.ngspice'
+.lib '/home/huda/.volare/gf180mcuD/libs.tech/ngspice/sm141064.ngspice' typical
+.temp 27.0
+
+* PEX produced on Sun Aug 23 04:24:19 AM CST 2026 using /home/huda/opensource-project/Microelectronic-Block-Generator/designs/notebooks/chipathon2026-D/scripts/iic-pex.sh with m=2 and s=1
+* NGSPICE file created from ota.ext - technology: gf180mcuD
+
+.option scale=5n
+
+.subckt ota IBIAS OUT INN INP VSS VDD
+X0 a_n1742_3047# IBIAS VSS VSS nfet_03v3 ad=22.4n pd=0.512m as=22.4n ps=0.512m w=400 l=200
+X1 OUT a_n1622_5258# VDD VDD pfet_03v3 ad=6.72n pd=0.232m as=6.72n ps=0.232m w=120 l=200
+X2 VSS IBIAS IBIAS VSS nfet_03v3 ad=11.2n pd=0.312m as=11.2n ps=0.312m w=200 l=200
+X3 a_n1742_3047# INN OUT VSS nfet_03v3 ad=24n pd=0.64m as=11.2n ps=0.312m w=200 l=200
+X4 a_n1742_3047# INP a_n1622_5258# VSS nfet_03v3 ad=11.2n pd=0.312m as=11.2n ps=0.312m w=200 l=200
+X5 OUT a_n1622_5258# VDD VDD pfet_03v3 ad=6.72n pd=0.232m as=14.4n ps=0.48m w=120 l=200
+X6 a_n1742_3047# INN OUT VSS nfet_03v3 ad=11.2n pd=0.312m as=11.2n ps=0.312m w=200 l=200
+X7 a_n1622_5258# a_n1622_5258# VDD VDD pfet_03v3 ad=6.72n pd=0.232m as=14.4n ps=0.48m w=120 l=200
+X8 a_n1622_5258# a_n1622_5258# VDD VDD pfet_03v3 ad=6.72n pd=0.232m as=6.72n ps=0.232m w=120 l=200
+X9 a_n1742_3047# INP a_n1622_5258# VSS nfet_03v3 ad=24n pd=0.64m as=11.2n ps=0.312m w=200 l=200
+X10 VSS IBIAS a_n1742_3047# VSS nfet_03v3 ad=22.4n pd=0.512m as=22.4n ps=0.512m w=400 l=200
+X11 VDD a_n1622_5258# OUT VDD pfet_03v3 ad=14.4n pd=0.48m as=6.72n ps=0.232m w=120 l=200
+X12 VDD a_n1622_5258# a_n1622_5258# VDD pfet_03v3 ad=6.72n pd=0.232m as=6.72n ps=0.232m w=120 l=200
+X13 a_n1742_3047# IBIAS VSS VSS nfet_03v3 ad=22.4n pd=0.512m as=48n ps=1.04m w=400 l=200
+X14 IBIAS IBIAS VSS VSS nfet_03v3 ad=11.2n pd=0.312m as=11.2n ps=0.312m w=200 l=200
+X15 VDD a_n1622_5258# OUT VDD pfet_03v3 ad=6.72n pd=0.232m as=6.72n ps=0.232m w=120 l=200
+X16 OUT INN a_n1742_3047# VSS nfet_03v3 ad=11.2n pd=0.312m as=11.2n ps=0.312m w=200 l=200
+X17 OUT INN a_n1742_3047# VSS nfet_03v3 ad=11.2n pd=0.312m as=24n ps=0.64m w=200 l=200
+X18 VSS IBIAS IBIAS VSS nfet_03v3 ad=24n pd=0.64m as=11.2n ps=0.312m w=200 l=200
+X19 VSS IBIAS a_n1742_3047# VSS nfet_03v3 ad=48n pd=1.04m as=22.4n ps=0.512m w=400 l=200
+X20 VDD a_n1622_5258# a_n1622_5258# VDD pfet_03v3 ad=14.4n pd=0.48m as=6.72n ps=0.232m w=120 l=200
+X21 a_n1622_5258# INP a_n1742_3047# VSS nfet_03v3 ad=11.2n pd=0.312m as=24n ps=0.64m w=200 l=200
+X22 a_n1622_5258# INP a_n1742_3047# VSS nfet_03v3 ad=11.2n pd=0.312m as=11.2n ps=0.312m w=200 l=200
+X23 IBIAS IBIAS VSS VSS nfet_03v3 ad=11.2n pd=0.312m as=24n ps=0.64m w=200 l=200
+C0 OUT INN 0.27028f
+C1 INN a_n1742_3047# 0.41429f
+C2 OUT a_n1742_3047# 1.54261f
+C3 INP a_n1742_3047# 0.4931f
+C4 OUT VDD 2.90487f
+C5 IBIAS a_n1742_3047# 0.43136f
+C6 OUT a_n1622_5258# 0.52354f
+C7 a_n1622_5258# INP 0.26955f
+C8 a_n1622_5258# a_n1742_3047# 1.36242f
+C9 VDD a_n1622_5258# 8.9109f
+C10 IBIAS VSS 9.98368f
+C11 INN VSS 2.62879f
+C12 INP VSS 2.59455f
+C13 OUT VSS 2.07348f
+C14 VDD VSS 18.7528f
+C15 a_n1742_3047# VSS 6.84969f ; **FLOATING
+C16 a_n1622_5258# VSS 2.17826f ; **FLOATING
+.ends
+
+Vsupply0 VDD 0 3.3
+Vsupply1 VSS 0 0.0
+Vsrc0 INP 0 DC 1.35 PULSE(1.35 1.95 0 5n 5n 30u 60u)
+Vsrc1 INN 0 DC 1.65
+C_load_OUT OUT 0 5e-12
+Ibias_IBIAS 0 IBIAS DC 2e-05
+Xdut IBIAS OUT INN INP VSS VDD ota
+
+.control
+tran 10n 60u
+wrdata tr.dat v(OUT)
+.endc
+.end

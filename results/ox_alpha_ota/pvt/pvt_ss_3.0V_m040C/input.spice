@@ -1,0 +1,59 @@
+.include '/home/huda/.volare/gf180mcuD/libs.tech/ngspice/design.ngspice'
+.lib '/home/huda/.volare/gf180mcuD/libs.tech/ngspice/sm141064.ngspice' ss
+.temp -40
+* PEX produced on Sun Aug 23 04:53:23 AM CST 2026 using /home/huda/opensource-project/Microelectronic-Block-Generator/designs/notebooks/chipathon2026-D/scripts/iic-pex.sh with m=2 and s=1
+* NGSPICE file created from ota.ext - technology: gf180mcuD
+
+.option scale=5n
+
+.subckt ota IBIAS OUT INN INP VSS VDD
+X0 a_n4022_7056# a_n4022_7056# VDD VDD pfet_03v3 ad=84n pd=1.612m as=84n ps=1.612m w=1500 l=800
+X1 VDD a_n4022_7056# OUT VDD pfet_03v3 ad=0.18u pd=3.24m as=84n ps=1.612m w=1500 l=800
+X2 VDD a_n4022_7056# a_n4022_7056# VDD pfet_03v3 ad=84n pd=1.612m as=84n ps=1.612m w=1500 l=800
+X3 a_n4022_7056# INN a_n1006_3846# VSS nfet_03v3 ad=0.144u pd=2.64m as=0.144u ps=2.64m w=1200 l=400
+X4 OUT a_n4022_7056# VDD VDD pfet_03v3 ad=84n pd=1.612m as=0.18u ps=3.24m w=1500 l=800
+X5 VDD a_n4022_7056# OUT VDD pfet_03v3 ad=84n pd=1.612m as=84n ps=1.612m w=1500 l=800
+X6 IBIAS IBIAS VSS VSS nfet_03v3 ad=48n pd=1.04m as=48n ps=1.04m w=400 l=400
+X7 a_n1006_3846# IBIAS VSS VSS nfet_03v3 ad=67.2n pd=1.312m as=0.144u ps=2.64m w=1200 l=800
+X8 VDD a_n4022_7056# a_n4022_7056# VDD pfet_03v3 ad=0.18u pd=3.24m as=84n ps=1.612m w=1500 l=800
+X9 a_n4022_7056# a_n4022_7056# VDD VDD pfet_03v3 ad=84n pd=1.612m as=0.18u ps=3.24m w=1500 l=800
+X10 OUT a_n4022_7056# VDD VDD pfet_03v3 ad=84n pd=1.612m as=84n ps=1.612m w=1500 l=800
+X11 OUT INP a_n1006_3846# VSS nfet_03v3 ad=0.144u pd=2.64m as=0.144u ps=2.64m w=1200 l=400
+X12 VSS IBIAS a_n1006_3846# VSS nfet_03v3 ad=0.144u pd=2.64m as=67.2n ps=1.312m w=1200 l=800
+C0 INP a_n1006_3846# 0.38946f
+C1 OUT a_n1006_3846# 0.693f
+C2 INN a_n1006_3846# 0.40864f
+C3 OUT VDD 5.59854f
+C4 IBIAS a_n1006_3846# 0.83317f
+C5 OUT a_n4022_7056# 2.57144f
+C6 a_n4022_7056# INN 0.31333f
+C7 a_n4022_7056# a_n1006_3846# 0.76264f
+C8 VDD a_n4022_7056# 25.7218f
+C9 OUT INP 0.32108f
+C10 IBIAS VSS 9.64258f
+C11 INP VSS 1.08697f
+C12 INN VSS 1.08519f
+C13 OUT VSS 2.83354f
+C14 VDD VSS 74.3164f
+C15 a_n1006_3846# VSS 6.37999f ; **FLOATING
+C16 a_n4022_7056# VSS 3.42476f ; **FLOATING
+.ends
+XDUT IBIAS OUT INN INP VSS VDD ota
+VVDD VDD 0 3.0
+VVSS VSS 0 0
+VINP INP 0 PWL(0us 1.65 0.5us 1.65 0.51us 2.15
++ 2.5us 2.15 2.51us 1.15 4.5us 1.15 4.52us 1.65 6us 1.65) AC 1
+VINN INN 0 DC 1.65
+CLOAD OUT 0 5p
+IIB 0 ibias_inj DC 20u
+VMON ibias_inj IBIAS 0
+.control
+op
+print v(OUT) i(vvdd)
+ac dec 401 1 1G
+wrdata ac.dat vdb(OUT) vp(OUT)
+tran 1n 6u
+wrdata tran.dat v(OUT)
+quit
+.endc
+.end

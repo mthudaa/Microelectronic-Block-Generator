@@ -1,0 +1,14 @@
+Design a MOSFET-only Strong-Arm clocked comparator in GF180MCU gf180mcuD.
+Use VDD=3.3 V and VSS=0 V, with exactly the ports
+VDD VSS INP INN CLK OUTP OUTN. CLK is the evaluation clock and OUTP/OUTN
+are fully differential. Use nfet_03v3 and pfet_03v3 only, with no BJTs,
+explicit resistors, explicit capacitors in the core, or behavioral elements.
+Provide reset/precharge and regenerative evaluation. At VCM=1.65 V, 10 MHz,
+20 fF output loads, and 27 C, require correct decisions at both +/-5 mV,
+decision time <=5 ns, differential swing >=90 percent of VDD, approximately
+zero static current, and average current <=500 uA. Verify the 1.0 V to 2.3 V
+input common-mode endpoints. Characterize delay at 5, 10, 25, 50, and 100 mV
+for both polarities. Run PVT at VDD 3.0/3.3/3.6 V and -40/27/125 C over
+meaningful GF180 corners. Run mismatch Monte Carlo when supported and report
+mean, 1 sigma, 3 sigma, and run count. Continue bounded optimization through
+layout, dual DRC, LVS, PEX, post-layout simulation, and final reporting.

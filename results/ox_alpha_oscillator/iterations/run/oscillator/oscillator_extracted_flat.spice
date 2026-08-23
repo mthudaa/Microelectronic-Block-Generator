@@ -1,0 +1,23 @@
+* NGSPICE file created from oscillator.ext - technology: gf180mcuD
+
+.subckt oscillator VDD VSS OSC_OUT
+X0 a_5656_428# a_3844_428# VSS VSS nfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=2.2u
+X1 a_220_428# a_n1592_428# VDD VDD pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=2.2u
+X2 a_5656_428# a_3844_428# VDD VDD pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=2.2u
+X3 a_n5216_428# a_n7028_428# VDD VDD pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=2.2u
+X4 OSC_OUT a_5656_428# VSS VSS nfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=2.2u
+X5 a_n3404_428# a_n5216_428# VSS VSS nfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=2.2u
+X6 a_2032_428# a_220_428# VSS VSS nfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=2.2u
+X7 a_2032_428# a_220_428# VDD VDD pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=2.2u
+X8 a_n5216_428# a_n7028_428# VSS VSS nfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=2.2u
+X9 a_220_428# a_n1592_428# VSS VSS nfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=2.2u
+X10 a_n1592_428# a_n3404_428# VDD VDD pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=2.2u
+X11 a_3844_428# a_2032_428# VDD VDD pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=2.2u
+X12 OSC_OUT a_5656_428# VDD VDD pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=2.2u
+X13 a_n7028_428# OSC_OUT VDD VDD pfet_03v3 ad=2.28p pd=8.8u as=2.28p ps=8.8u w=3.8u l=2.2u
+X14 a_n3404_428# a_n5216_428# VDD VDD pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=2.2u
+X15 a_n7028_428# OSC_OUT VSS VSS nfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=2.2u
+X16 a_3844_428# a_2032_428# VSS VSS nfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=2.2u
+X17 a_n1592_428# a_n3404_428# VSS VSS nfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=2.2u
+.ends
+

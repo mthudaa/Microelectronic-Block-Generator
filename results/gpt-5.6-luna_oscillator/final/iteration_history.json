@@ -1,0 +1,558 @@
+{
+  "cell": "oscillator",
+  "status": "PASS",
+  "stage": "COMPLETE",
+  "failure": "NONE",
+  "message": "final design meets PEX-aware specifications",
+  "elapsed": 166.559,
+  "pre_layout": [
+    {
+      "phase": "pre_layout",
+      "iteration": 1,
+      "spec_pass": true,
+      "score": 0.0,
+      "status": "PASS",
+      "failure": "NONE",
+      "message": "",
+      "metrics": {
+        "source": "pre_layout",
+        "pass": true,
+        "score": 0.0,
+        "metrics": {
+          "autonomous_startup": {
+            "value": 1.0,
+            "target": 1.0,
+            "op": ">=",
+            "unit": "",
+            "status": "PASS",
+            "margin": 0.0,
+            "margin_pct": 0.0
+          },
+          "frequency_hz": {
+            "value": 75408033.03032263,
+            "target": 100000000.0,
+            "op": "<=",
+            "unit": " Hz",
+            "status": "PASS",
+            "margin": 24591966.969677374,
+            "margin_pct": 24.592
+          },
+          "startup_time_us": {
+            "value": 0.03698652440835351,
+            "target": 5.0,
+            "op": "<=",
+            "unit": " us",
+            "status": "PASS",
+            "margin": 4.963013475591646,
+            "margin_pct": 99.26
+          },
+          "duty_cycle": {
+            "value": 0.48082802001441144,
+            "target": 0.6,
+            "op": "<=",
+            "unit": "",
+            "status": "PASS",
+            "margin": 0.11917197998558854,
+            "margin_pct": 19.862
+          },
+          "osc_high_v": {
+            "value": 3.58093446,
+            "target": 2.97,
+            "op": ">=",
+            "unit": " V",
+            "status": "PASS",
+            "margin": 0.6109344599999997,
+            "margin_pct": 20.57
+          },
+          "osc_low_v": {
+            "value": -0.242020854,
+            "target": 0.33,
+            "op": "<=",
+            "unit": " V",
+            "status": "PASS",
+            "margin": 0.572020854,
+            "margin_pct": 173.34
+          },
+          "idd_ma": {
+            "value": 0.09022443506468286,
+            "target": 1.0,
+            "op": "<=",
+            "unit": " mA",
+            "status": "PASS",
+            "margin": 0.9097755649353172,
+            "margin_pct": 90.978
+          },
+          "sustained_cycles": {
+            "value": 118.0,
+            "target": 100.0,
+            "op": ">=",
+            "unit": "",
+            "status": "PASS",
+            "margin": 18.0,
+            "margin_pct": 18.0
+          }
+        }
+      },
+      "degradation": [],
+      "elapsed": 91.868
+    }
+  ],
+  "pex": [
+    {
+      "phase": "pex",
+      "iteration": 1,
+      "spec_pass": true,
+      "score": 0.0,
+      "status": "PASS",
+      "drc": "PASS",
+      "lvs": "PASS",
+      "pex_extraction": "PASS",
+      "pex_simulation": "PASS",
+      "failure": "NONE",
+      "message": "",
+      "metrics": {
+        "source": "pex",
+        "pass": true,
+        "score": 0.0,
+        "metrics": {
+          "autonomous_startup": {
+            "value": 1.0,
+            "target": 1.0,
+            "op": ">=",
+            "unit": "",
+            "status": "PASS",
+            "margin": 0.0,
+            "margin_pct": 0.0
+          },
+          "frequency_hz": {
+            "value": 64003185.133701116,
+            "target": 100000000.0,
+            "op": "<=",
+            "unit": " Hz",
+            "status": "PASS",
+            "margin": 35996814.866298884,
+            "margin_pct": 35.997
+          },
+          "startup_time_us": {
+            "value": 0.009601346339772217,
+            "target": 5.0,
+            "op": "<=",
+            "unit": " us",
+            "status": "PASS",
+            "margin": 4.990398653660228,
+            "margin_pct": 99.808
+          },
+          "duty_cycle": {
+            "value": 0.4786401403949535,
+            "target": 0.6,
+            "op": "<=",
+            "unit": "",
+            "status": "PASS",
+            "margin": 0.12135985960504647,
+            "margin_pct": 20.227
+          },
+          "osc_high_v": {
+            "value": 3.53409529,
+            "target": 2.97,
+            "op": ">=",
+            "unit": " V",
+            "status": "PASS",
+            "margin": 0.5640952899999996,
+            "margin_pct": 18.993
+          },
+          "osc_low_v": {
+            "value": -0.202329108,
+            "target": 0.33,
+            "op": "<=",
+            "unit": " V",
+            "status": "PASS",
+            "margin": 0.532329108,
+            "margin_pct": 161.312
+          },
+          "idd_ma": {
+            "value": 0.09092566462947456,
+            "target": 1.0,
+            "op": "<=",
+            "unit": " mA",
+            "status": "PASS",
+            "margin": 0.9090743353705254,
+            "margin_pct": 90.907
+          },
+          "sustained_cycles": {
+            "value": 103.0,
+            "target": 100.0,
+            "op": ">=",
+            "unit": "",
+            "status": "PASS",
+            "margin": 3.0,
+            "margin_pct": 3.0
+          }
+        }
+      },
+      "degradation": [
+        {
+          "name": "osc_low_v",
+          "pre": -0.242020854,
+          "post": -0.202329108,
+          "unit": " V",
+          "delta": 0.039691746,
+          "delta_pct": 16.4,
+          "status": "PASS",
+          "worsened": true
+        },
+        {
+          "name": "sustained_cycles",
+          "pre": 118.0,
+          "post": 103.0,
+          "unit": "",
+          "delta": -15.0,
+          "delta_pct": -12.712,
+          "status": "PASS",
+          "worsened": true
+        },
+        {
+          "name": "osc_high_v",
+          "pre": 3.58093446,
+          "post": 3.53409529,
+          "unit": " V",
+          "delta": -0.04683917000000015,
+          "delta_pct": -1.308,
+          "status": "PASS",
+          "worsened": true
+        },
+        {
+          "name": "idd_ma",
+          "pre": 0.09022443506468286,
+          "post": 0.09092566462947456,
+          "unit": " mA",
+          "delta": 0.0007012295647916972,
+          "delta_pct": 0.777,
+          "status": "PASS",
+          "worsened": true
+        },
+        {
+          "name": "startup_time_us",
+          "pre": 0.03698652440835351,
+          "post": 0.009601346339772217,
+          "unit": " us",
+          "delta": -0.027385178068581293,
+          "delta_pct": -74.041,
+          "status": "PASS",
+          "worsened": false
+        },
+        {
+          "name": "frequency_hz",
+          "pre": 75408033.03032263,
+          "post": 64003185.133701116,
+          "unit": " Hz",
+          "delta": -11404847.89662151,
+          "delta_pct": -15.124,
+          "status": "PASS",
+          "worsened": false
+        },
+        {
+          "name": "frequency_hz",
+          "pre": 75408033.03032263,
+          "post": 64003185.133701116,
+          "unit": " Hz",
+          "delta": -11404847.89662151,
+          "delta_pct": -15.124,
+          "status": "PASS",
+          "worsened": false
+        },
+        {
+          "name": "duty_cycle",
+          "pre": 0.48082802001441144,
+          "post": 0.4786401403949535,
+          "unit": "",
+          "delta": -0.002187879619457933,
+          "delta_pct": -0.455,
+          "status": "PASS",
+          "worsened": false
+        },
+        {
+          "name": "duty_cycle",
+          "pre": 0.48082802001441144,
+          "post": 0.4786401403949535,
+          "unit": "",
+          "delta": -0.002187879619457933,
+          "delta_pct": -0.455,
+          "status": "PASS",
+          "worsened": false
+        },
+        {
+          "name": "autonomous_startup",
+          "pre": 1.0,
+          "post": 1.0,
+          "unit": "",
+          "delta": 0.0,
+          "delta_pct": 0.0,
+          "status": "PASS",
+          "worsened": false
+        }
+      ],
+      "elapsed": 74.692
+    }
+  ],
+  "best_pre": {
+    "source": "pre_layout",
+    "pass": true,
+    "score": 0.0,
+    "metrics": {
+      "autonomous_startup": {
+        "value": 1.0,
+        "target": 1.0,
+        "op": ">=",
+        "unit": "",
+        "status": "PASS",
+        "margin": 0.0,
+        "margin_pct": 0.0
+      },
+      "frequency_hz": {
+        "value": 75408033.03032263,
+        "target": 100000000.0,
+        "op": "<=",
+        "unit": " Hz",
+        "status": "PASS",
+        "margin": 24591966.969677374,
+        "margin_pct": 24.592
+      },
+      "startup_time_us": {
+        "value": 0.03698652440835351,
+        "target": 5.0,
+        "op": "<=",
+        "unit": " us",
+        "status": "PASS",
+        "margin": 4.963013475591646,
+        "margin_pct": 99.26
+      },
+      "duty_cycle": {
+        "value": 0.48082802001441144,
+        "target": 0.6,
+        "op": "<=",
+        "unit": "",
+        "status": "PASS",
+        "margin": 0.11917197998558854,
+        "margin_pct": 19.862
+      },
+      "osc_high_v": {
+        "value": 3.58093446,
+        "target": 2.97,
+        "op": ">=",
+        "unit": " V",
+        "status": "PASS",
+        "margin": 0.6109344599999997,
+        "margin_pct": 20.57
+      },
+      "osc_low_v": {
+        "value": -0.242020854,
+        "target": 0.33,
+        "op": "<=",
+        "unit": " V",
+        "status": "PASS",
+        "margin": 0.572020854,
+        "margin_pct": 173.34
+      },
+      "idd_ma": {
+        "value": 0.09022443506468286,
+        "target": 1.0,
+        "op": "<=",
+        "unit": " mA",
+        "status": "PASS",
+        "margin": 0.9097755649353172,
+        "margin_pct": 90.978
+      },
+      "sustained_cycles": {
+        "value": 118.0,
+        "target": 100.0,
+        "op": ">=",
+        "unit": "",
+        "status": "PASS",
+        "margin": 18.0,
+        "margin_pct": 18.0
+      }
+    }
+  },
+  "best_pex": {
+    "source": "pex",
+    "pass": true,
+    "score": 0.0,
+    "metrics": {
+      "autonomous_startup": {
+        "value": 1.0,
+        "target": 1.0,
+        "op": ">=",
+        "unit": "",
+        "status": "PASS",
+        "margin": 0.0,
+        "margin_pct": 0.0
+      },
+      "frequency_hz": {
+        "value": 64003185.133701116,
+        "target": 100000000.0,
+        "op": "<=",
+        "unit": " Hz",
+        "status": "PASS",
+        "margin": 35996814.866298884,
+        "margin_pct": 35.997
+      },
+      "startup_time_us": {
+        "value": 0.009601346339772217,
+        "target": 5.0,
+        "op": "<=",
+        "unit": " us",
+        "status": "PASS",
+        "margin": 4.990398653660228,
+        "margin_pct": 99.808
+      },
+      "duty_cycle": {
+        "value": 0.4786401403949535,
+        "target": 0.6,
+        "op": "<=",
+        "unit": "",
+        "status": "PASS",
+        "margin": 0.12135985960504647,
+        "margin_pct": 20.227
+      },
+      "osc_high_v": {
+        "value": 3.53409529,
+        "target": 2.97,
+        "op": ">=",
+        "unit": " V",
+        "status": "PASS",
+        "margin": 0.5640952899999996,
+        "margin_pct": 18.993
+      },
+      "osc_low_v": {
+        "value": -0.202329108,
+        "target": 0.33,
+        "op": "<=",
+        "unit": " V",
+        "status": "PASS",
+        "margin": 0.532329108,
+        "margin_pct": 161.312
+      },
+      "idd_ma": {
+        "value": 0.09092566462947456,
+        "target": 1.0,
+        "op": "<=",
+        "unit": " mA",
+        "status": "PASS",
+        "margin": 0.9090743353705254,
+        "margin_pct": 90.907
+      },
+      "sustained_cycles": {
+        "value": 103.0,
+        "target": 100.0,
+        "op": ">=",
+        "unit": "",
+        "status": "PASS",
+        "margin": 3.0,
+        "margin_pct": 3.0
+      }
+    }
+  },
+  "best_pex_iteration": 1,
+  "degradation": [
+    {
+      "name": "osc_low_v",
+      "pre": -0.242020854,
+      "post": -0.202329108,
+      "unit": " V",
+      "delta": 0.039691746,
+      "delta_pct": 16.4,
+      "status": "PASS",
+      "worsened": true
+    },
+    {
+      "name": "sustained_cycles",
+      "pre": 118.0,
+      "post": 103.0,
+      "unit": "",
+      "delta": -15.0,
+      "delta_pct": -12.712,
+      "status": "PASS",
+      "worsened": true
+    },
+    {
+      "name": "osc_high_v",
+      "pre": 3.58093446,
+      "post": 3.53409529,
+      "unit": " V",
+      "delta": -0.04683917000000015,
+      "delta_pct": -1.308,
+      "status": "PASS",
+      "worsened": true
+    },
+    {
+      "name": "idd_ma",
+      "pre": 0.09022443506468286,
+      "post": 0.09092566462947456,
+      "unit": " mA",
+      "delta": 0.0007012295647916972,
+      "delta_pct": 0.777,
+      "status": "PASS",
+      "worsened": true
+    },
+    {
+      "name": "startup_time_us",
+      "pre": 0.03698652440835351,
+      "post": 0.009601346339772217,
+      "unit": " us",
+      "delta": -0.027385178068581293,
+      "delta_pct": -74.041,
+      "status": "PASS",
+      "worsened": false
+    },
+    {
+      "name": "frequency_hz",
+      "pre": 75408033.03032263,
+      "post": 64003185.133701116,
+      "unit": " Hz",
+      "delta": -11404847.89662151,
+      "delta_pct": -15.124,
+      "status": "PASS",
+      "worsened": false
+    },
+    {
+      "name": "frequency_hz",
+      "pre": 75408033.03032263,
+      "post": 64003185.133701116,
+      "unit": " Hz",
+      "delta": -11404847.89662151,
+      "delta_pct": -15.124,
+      "status": "PASS",
+      "worsened": false
+    },
+    {
+      "name": "duty_cycle",
+      "pre": 0.48082802001441144,
+      "post": 0.4786401403949535,
+      "unit": "",
+      "delta": -0.002187879619457933,
+      "delta_pct": -0.455,
+      "status": "PASS",
+      "worsened": false
+    },
+    {
+      "name": "duty_cycle",
+      "pre": 0.48082802001441144,
+      "post": 0.4786401403949535,
+      "unit": "",
+      "delta": -0.002187879619457933,
+      "delta_pct": -0.455,
+      "status": "PASS",
+      "worsened": false
+    },
+    {
+      "name": "autonomous_startup",
+      "pre": 1.0,
+      "post": 1.0,
+      "unit": "",
+      "delta": 0.0,
+      "delta_pct": 0.0,
+      "status": "PASS",
+      "worsened": false
+    }
+  ]
+}

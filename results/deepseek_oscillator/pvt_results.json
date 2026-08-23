@@ -1,0 +1,1123 @@
+{
+  "status": "PASS",
+  "scope": {
+    "netlist": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/deepseek_oscillator/final/oscillator.pex.spice",
+    "nominal_grid": "VDD=3.0/3.3/3.6 V x TEMP=-40/27/125 C at typical",
+    "process_corners": [
+      "typical",
+      "ff",
+      "ss",
+      "sf",
+      "fs"
+    ],
+    "corner_grid": "3.3 V, 27 C for ff/ss/sf/fs",
+    "startup": "normal VDD PWL ramp; no pulse or forced internal initial condition"
+  },
+  "records": [
+    {
+      "vdd": 3.0,
+      "temp_c": -40.0,
+      "corner": "typical",
+      "status": "PASS",
+      "metrics": {
+        "freq_mhz": 52.276,
+        "startup_us": 0.7177,
+        "duty_pct": 46.822,
+        "voh_v": 3.2045,
+        "vol_v": -0.5752,
+        "i_avg_ua": 54.9745,
+        "sustained": 595.0
+      },
+      "specs": {
+        "source": "vdd_3_temp_-40_typical",
+        "pass": true,
+        "score": 0.0,
+        "metrics": {
+          "freq_mhz": {
+            "value": 52.276,
+            "target": 100.0,
+            "op": "<=",
+            "unit": " MHz",
+            "status": "PASS",
+            "margin": 47.724,
+            "margin_pct": 47.724
+          },
+          "startup_us": {
+            "value": 0.7177,
+            "target": 5.0,
+            "op": "<=",
+            "unit": " us",
+            "status": "PASS",
+            "margin": 4.2823,
+            "margin_pct": 85.646
+          },
+          "duty_pct": {
+            "value": 46.822,
+            "target": 60.0,
+            "op": "<=",
+            "unit": " %",
+            "status": "PASS",
+            "margin": 13.177999999999997,
+            "margin_pct": 21.963
+          },
+          "voh_v": {
+            "value": 3.2045,
+            "target": 2.97,
+            "op": ">=",
+            "unit": " V",
+            "status": "PASS",
+            "margin": 0.2344999999999997,
+            "margin_pct": 7.896
+          },
+          "vol_v": {
+            "value": -0.5752,
+            "target": 0.33,
+            "op": "<=",
+            "unit": " V",
+            "status": "PASS",
+            "margin": 0.9052,
+            "margin_pct": 274.303
+          },
+          "i_avg_ua": {
+            "value": 54.9745,
+            "target": 1000.0,
+            "op": "<=",
+            "unit": " uA",
+            "status": "PASS",
+            "margin": 945.0255,
+            "margin_pct": 94.503
+          },
+          "sustained": {
+            "value": 595.0,
+            "target": 100.0,
+            "op": ">=",
+            "unit": " cycles",
+            "status": "PASS",
+            "margin": 495.0,
+            "margin_pct": 495.0
+          }
+        }
+      }
+    },
+    {
+      "vdd": 3.0,
+      "temp_c": 27.0,
+      "corner": "typical",
+      "status": "PASS",
+      "metrics": {
+        "freq_mhz": 41.8086,
+        "startup_us": 0.733,
+        "duty_pct": 47.649,
+        "voh_v": 3.1403,
+        "vol_v": -0.1118,
+        "i_avg_ua": 43.9442,
+        "sustained": 468.0
+      },
+      "specs": {
+        "source": "vdd_3_temp_27_typical",
+        "pass": true,
+        "score": 0.0,
+        "metrics": {
+          "freq_mhz": {
+            "value": 41.8086,
+            "target": 100.0,
+            "op": "<=",
+            "unit": " MHz",
+            "status": "PASS",
+            "margin": 58.1914,
+            "margin_pct": 58.191
+          },
+          "startup_us": {
+            "value": 0.733,
+            "target": 5.0,
+            "op": "<=",
+            "unit": " us",
+            "status": "PASS",
+            "margin": 4.267,
+            "margin_pct": 85.34
+          },
+          "duty_pct": {
+            "value": 47.649,
+            "target": 60.0,
+            "op": "<=",
+            "unit": " %",
+            "status": "PASS",
+            "margin": 12.350999999999999,
+            "margin_pct": 20.585
+          },
+          "voh_v": {
+            "value": 3.1403,
+            "target": 2.97,
+            "op": ">=",
+            "unit": " V",
+            "status": "PASS",
+            "margin": 0.17029999999999967,
+            "margin_pct": 5.734
+          },
+          "vol_v": {
+            "value": -0.1118,
+            "target": 0.33,
+            "op": "<=",
+            "unit": " V",
+            "status": "PASS",
+            "margin": 0.4418,
+            "margin_pct": 133.879
+          },
+          "i_avg_ua": {
+            "value": 43.9442,
+            "target": 1000.0,
+            "op": "<=",
+            "unit": " uA",
+            "status": "PASS",
+            "margin": 956.0558,
+            "margin_pct": 95.606
+          },
+          "sustained": {
+            "value": 468.0,
+            "target": 100.0,
+            "op": ">=",
+            "unit": " cycles",
+            "status": "PASS",
+            "margin": 368.0,
+            "margin_pct": 368.0
+          }
+        }
+      }
+    },
+    {
+      "vdd": 3.0,
+      "temp_c": 125.0,
+      "corner": "typical",
+      "status": "PASS",
+      "metrics": {
+        "freq_mhz": 31.7265,
+        "startup_us": 0.7493,
+        "duty_pct": 47.496,
+        "voh_v": 3.1322,
+        "vol_v": -0.1088,
+        "i_avg_ua": 34.8745,
+        "sustained": 357.0
+      },
+      "specs": {
+        "source": "vdd_3_temp_125_typical",
+        "pass": true,
+        "score": 0.0,
+        "metrics": {
+          "freq_mhz": {
+            "value": 31.7265,
+            "target": 100.0,
+            "op": "<=",
+            "unit": " MHz",
+            "status": "PASS",
+            "margin": 68.2735,
+            "margin_pct": 68.273
+          },
+          "startup_us": {
+            "value": 0.7493,
+            "target": 5.0,
+            "op": "<=",
+            "unit": " us",
+            "status": "PASS",
+            "margin": 4.2507,
+            "margin_pct": 85.014
+          },
+          "duty_pct": {
+            "value": 47.496,
+            "target": 60.0,
+            "op": "<=",
+            "unit": " %",
+            "status": "PASS",
+            "margin": 12.503999999999998,
+            "margin_pct": 20.84
+          },
+          "voh_v": {
+            "value": 3.1322,
+            "target": 2.97,
+            "op": ">=",
+            "unit": " V",
+            "status": "PASS",
+            "margin": 0.1621999999999999,
+            "margin_pct": 5.461
+          },
+          "vol_v": {
+            "value": -0.1088,
+            "target": 0.33,
+            "op": "<=",
+            "unit": " V",
+            "status": "PASS",
+            "margin": 0.4388,
+            "margin_pct": 132.97
+          },
+          "i_avg_ua": {
+            "value": 34.8745,
+            "target": 1000.0,
+            "op": "<=",
+            "unit": " uA",
+            "status": "PASS",
+            "margin": 965.1255,
+            "margin_pct": 96.513
+          },
+          "sustained": {
+            "value": 357.0,
+            "target": 100.0,
+            "op": ">=",
+            "unit": " cycles",
+            "status": "PASS",
+            "margin": 257.0,
+            "margin_pct": 257.0
+          }
+        }
+      }
+    },
+    {
+      "vdd": 3.3,
+      "temp_c": -40.0,
+      "corner": "typical",
+      "status": "PASS",
+      "metrics": {
+        "freq_mhz": 58.0836,
+        "startup_us": 0.6663,
+        "duty_pct": 45.155,
+        "voh_v": 3.4386,
+        "vol_v": -0.5778,
+        "i_avg_ua": 69.6546,
+        "sustained": 658.0
+      },
+      "specs": {
+        "source": "vdd_3.3_temp_-40_typical",
+        "pass": true,
+        "score": 0.0,
+        "metrics": {
+          "freq_mhz": {
+            "value": 58.0836,
+            "target": 100.0,
+            "op": "<=",
+            "unit": " MHz",
+            "status": "PASS",
+            "margin": 41.9164,
+            "margin_pct": 41.916
+          },
+          "startup_us": {
+            "value": 0.6663,
+            "target": 5.0,
+            "op": "<=",
+            "unit": " us",
+            "status": "PASS",
+            "margin": 4.3337,
+            "margin_pct": 86.674
+          },
+          "duty_pct": {
+            "value": 45.155,
+            "target": 60.0,
+            "op": "<=",
+            "unit": " %",
+            "status": "PASS",
+            "margin": 14.844999999999999,
+            "margin_pct": 24.742
+          },
+          "voh_v": {
+            "value": 3.4386,
+            "target": 2.97,
+            "op": ">=",
+            "unit": " V",
+            "status": "PASS",
+            "margin": 0.4685999999999999,
+            "margin_pct": 15.778
+          },
+          "vol_v": {
+            "value": -0.5778,
+            "target": 0.33,
+            "op": "<=",
+            "unit": " V",
+            "status": "PASS",
+            "margin": 0.9077999999999999,
+            "margin_pct": 275.091
+          },
+          "i_avg_ua": {
+            "value": 69.6546,
+            "target": 1000.0,
+            "op": "<=",
+            "unit": " uA",
+            "status": "PASS",
+            "margin": 930.3454,
+            "margin_pct": 93.035
+          },
+          "sustained": {
+            "value": 658.0,
+            "target": 100.0,
+            "op": ">=",
+            "unit": " cycles",
+            "status": "PASS",
+            "margin": 558.0,
+            "margin_pct": 558.0
+          }
+        }
+      }
+    },
+    {
+      "vdd": 3.3,
+      "temp_c": 27.0,
+      "corner": "typical",
+      "status": "PASS",
+      "metrics": {
+        "freq_mhz": 44.7526,
+        "startup_us": 0.685,
+        "duty_pct": 43.951,
+        "voh_v": 3.4621,
+        "vol_v": -0.4189,
+        "i_avg_ua": 55.7376,
+        "sustained": 517.0
+      },
+      "specs": {
+        "source": "vdd_3.3_temp_27_typical",
+        "pass": true,
+        "score": 0.0,
+        "metrics": {
+          "freq_mhz": {
+            "value": 44.7526,
+            "target": 100.0,
+            "op": "<=",
+            "unit": " MHz",
+            "status": "PASS",
+            "margin": 55.2474,
+            "margin_pct": 55.247
+          },
+          "startup_us": {
+            "value": 0.685,
+            "target": 5.0,
+            "op": "<=",
+            "unit": " us",
+            "status": "PASS",
+            "margin": 4.3149999999999995,
+            "margin_pct": 86.3
+          },
+          "duty_pct": {
+            "value": 43.951,
+            "target": 60.0,
+            "op": "<=",
+            "unit": " %",
+            "status": "PASS",
+            "margin": 16.049,
+            "margin_pct": 26.748
+          },
+          "voh_v": {
+            "value": 3.4621,
+            "target": 2.97,
+            "op": ">=",
+            "unit": " V",
+            "status": "PASS",
+            "margin": 0.49209999999999976,
+            "margin_pct": 16.569
+          },
+          "vol_v": {
+            "value": -0.4189,
+            "target": 0.33,
+            "op": "<=",
+            "unit": " V",
+            "status": "PASS",
+            "margin": 0.7489,
+            "margin_pct": 226.939
+          },
+          "i_avg_ua": {
+            "value": 55.7376,
+            "target": 1000.0,
+            "op": "<=",
+            "unit": " uA",
+            "status": "PASS",
+            "margin": 944.2624,
+            "margin_pct": 94.426
+          },
+          "sustained": {
+            "value": 517.0,
+            "target": 100.0,
+            "op": ">=",
+            "unit": " cycles",
+            "status": "PASS",
+            "margin": 417.0,
+            "margin_pct": 417.0
+          }
+        }
+      }
+    },
+    {
+      "vdd": 3.3,
+      "temp_c": 125.0,
+      "corner": "typical",
+      "status": "PASS",
+      "metrics": {
+        "freq_mhz": 34.943,
+        "startup_us": 0.7016,
+        "duty_pct": 44.017,
+        "voh_v": 3.4136,
+        "vol_v": -0.2782,
+        "i_avg_ua": 43.5285,
+        "sustained": 402.0
+      },
+      "specs": {
+        "source": "vdd_3.3_temp_125_typical",
+        "pass": true,
+        "score": 0.0,
+        "metrics": {
+          "freq_mhz": {
+            "value": 34.943,
+            "target": 100.0,
+            "op": "<=",
+            "unit": " MHz",
+            "status": "PASS",
+            "margin": 65.057,
+            "margin_pct": 65.057
+          },
+          "startup_us": {
+            "value": 0.7016,
+            "target": 5.0,
+            "op": "<=",
+            "unit": " us",
+            "status": "PASS",
+            "margin": 4.2984,
+            "margin_pct": 85.968
+          },
+          "duty_pct": {
+            "value": 44.017,
+            "target": 60.0,
+            "op": "<=",
+            "unit": " %",
+            "status": "PASS",
+            "margin": 15.982999999999997,
+            "margin_pct": 26.638
+          },
+          "voh_v": {
+            "value": 3.4136,
+            "target": 2.97,
+            "op": ">=",
+            "unit": " V",
+            "status": "PASS",
+            "margin": 0.4436,
+            "margin_pct": 14.936
+          },
+          "vol_v": {
+            "value": -0.2782,
+            "target": 0.33,
+            "op": "<=",
+            "unit": " V",
+            "status": "PASS",
+            "margin": 0.6082000000000001,
+            "margin_pct": 184.303
+          },
+          "i_avg_ua": {
+            "value": 43.5285,
+            "target": 1000.0,
+            "op": "<=",
+            "unit": " uA",
+            "status": "PASS",
+            "margin": 956.4715,
+            "margin_pct": 95.647
+          },
+          "sustained": {
+            "value": 402.0,
+            "target": 100.0,
+            "op": ">=",
+            "unit": " cycles",
+            "status": "PASS",
+            "margin": 302.0,
+            "margin_pct": 302.0
+          }
+        }
+      }
+    },
+    {
+      "vdd": 3.6,
+      "temp_c": -40.0,
+      "corner": "typical",
+      "status": "PASS",
+      "metrics": {
+        "freq_mhz": 65.1795,
+        "startup_us": 0.6264,
+        "duty_pct": 45.996,
+        "voh_v": 3.725,
+        "vol_v": -0.3513,
+        "i_avg_ua": 84.9607,
+        "sustained": 741.0
+      },
+      "specs": {
+        "source": "vdd_3.6_temp_-40_typical",
+        "pass": true,
+        "score": 0.0,
+        "metrics": {
+          "freq_mhz": {
+            "value": 65.1795,
+            "target": 100.0,
+            "op": "<=",
+            "unit": " MHz",
+            "status": "PASS",
+            "margin": 34.820499999999996,
+            "margin_pct": 34.82
+          },
+          "startup_us": {
+            "value": 0.6264,
+            "target": 5.0,
+            "op": "<=",
+            "unit": " us",
+            "status": "PASS",
+            "margin": 4.3736,
+            "margin_pct": 87.472
+          },
+          "duty_pct": {
+            "value": 45.996,
+            "target": 60.0,
+            "op": "<=",
+            "unit": " %",
+            "status": "PASS",
+            "margin": 14.003999999999998,
+            "margin_pct": 23.34
+          },
+          "voh_v": {
+            "value": 3.725,
+            "target": 2.97,
+            "op": ">=",
+            "unit": " V",
+            "status": "PASS",
+            "margin": 0.7549999999999999,
+            "margin_pct": 25.421
+          },
+          "vol_v": {
+            "value": -0.3513,
+            "target": 0.33,
+            "op": "<=",
+            "unit": " V",
+            "status": "PASS",
+            "margin": 0.6813,
+            "margin_pct": 206.455
+          },
+          "i_avg_ua": {
+            "value": 84.9607,
+            "target": 1000.0,
+            "op": "<=",
+            "unit": " uA",
+            "status": "PASS",
+            "margin": 915.0393,
+            "margin_pct": 91.504
+          },
+          "sustained": {
+            "value": 741.0,
+            "target": 100.0,
+            "op": ">=",
+            "unit": " cycles",
+            "status": "PASS",
+            "margin": 641.0,
+            "margin_pct": 641.0
+          }
+        }
+      }
+    },
+    {
+      "vdd": 3.6,
+      "temp_c": 27.0,
+      "corner": "typical",
+      "status": "PASS",
+      "metrics": {
+        "freq_mhz": 47.1085,
+        "startup_us": 0.6431,
+        "duty_pct": 48.612,
+        "voh_v": 3.7496,
+        "vol_v": -0.4255,
+        "i_avg_ua": 68.6571,
+        "sustained": 570.0
+      },
+      "specs": {
+        "source": "vdd_3.6_temp_27_typical",
+        "pass": true,
+        "score": 0.0,
+        "metrics": {
+          "freq_mhz": {
+            "value": 47.1085,
+            "target": 100.0,
+            "op": "<=",
+            "unit": " MHz",
+            "status": "PASS",
+            "margin": 52.8915,
+            "margin_pct": 52.891
+          },
+          "startup_us": {
+            "value": 0.6431,
+            "target": 5.0,
+            "op": "<=",
+            "unit": " us",
+            "status": "PASS",
+            "margin": 4.3568999999999996,
+            "margin_pct": 87.138
+          },
+          "duty_pct": {
+            "value": 48.612,
+            "target": 60.0,
+            "op": "<=",
+            "unit": " %",
+            "status": "PASS",
+            "margin": 11.387999999999998,
+            "margin_pct": 18.98
+          },
+          "voh_v": {
+            "value": 3.7496,
+            "target": 2.97,
+            "op": ">=",
+            "unit": " V",
+            "status": "PASS",
+            "margin": 0.7795999999999998,
+            "margin_pct": 26.249
+          },
+          "vol_v": {
+            "value": -0.4255,
+            "target": 0.33,
+            "op": "<=",
+            "unit": " V",
+            "status": "PASS",
+            "margin": 0.7555000000000001,
+            "margin_pct": 228.939
+          },
+          "i_avg_ua": {
+            "value": 68.6571,
+            "target": 1000.0,
+            "op": "<=",
+            "unit": " uA",
+            "status": "PASS",
+            "margin": 931.3429,
+            "margin_pct": 93.134
+          },
+          "sustained": {
+            "value": 570.0,
+            "target": 100.0,
+            "op": ">=",
+            "unit": " cycles",
+            "status": "PASS",
+            "margin": 470.0,
+            "margin_pct": 470.0
+          }
+        }
+      }
+    },
+    {
+      "vdd": 3.6,
+      "temp_c": 125.0,
+      "corner": "typical",
+      "status": "PASS",
+      "metrics": {
+        "freq_mhz": 39.2743,
+        "startup_us": 0.7015,
+        "duty_pct": 47.507,
+        "voh_v": 3.7015,
+        "vol_v": -0.1887,
+        "i_avg_ua": 53.5354,
+        "sustained": 443.0
+      },
+      "specs": {
+        "source": "vdd_3.6_temp_125_typical",
+        "pass": true,
+        "score": 0.0,
+        "metrics": {
+          "freq_mhz": {
+            "value": 39.2743,
+            "target": 100.0,
+            "op": "<=",
+            "unit": " MHz",
+            "status": "PASS",
+            "margin": 60.7257,
+            "margin_pct": 60.726
+          },
+          "startup_us": {
+            "value": 0.7015,
+            "target": 5.0,
+            "op": "<=",
+            "unit": " us",
+            "status": "PASS",
+            "margin": 4.2985,
+            "margin_pct": 85.97
+          },
+          "duty_pct": {
+            "value": 47.507,
+            "target": 60.0,
+            "op": "<=",
+            "unit": " %",
+            "status": "PASS",
+            "margin": 12.493000000000002,
+            "margin_pct": 20.822
+          },
+          "voh_v": {
+            "value": 3.7015,
+            "target": 2.97,
+            "op": ">=",
+            "unit": " V",
+            "status": "PASS",
+            "margin": 0.7314999999999996,
+            "margin_pct": 24.63
+          },
+          "vol_v": {
+            "value": -0.1887,
+            "target": 0.33,
+            "op": "<=",
+            "unit": " V",
+            "status": "PASS",
+            "margin": 0.5187,
+            "margin_pct": 157.182
+          },
+          "i_avg_ua": {
+            "value": 53.5354,
+            "target": 1000.0,
+            "op": "<=",
+            "unit": " uA",
+            "status": "PASS",
+            "margin": 946.4646,
+            "margin_pct": 94.646
+          },
+          "sustained": {
+            "value": 443.0,
+            "target": 100.0,
+            "op": ">=",
+            "unit": " cycles",
+            "status": "PASS",
+            "margin": 343.0,
+            "margin_pct": 343.0
+          }
+        }
+      }
+    },
+    {
+      "vdd": 3.3,
+      "temp_c": 27.0,
+      "corner": "ff",
+      "status": "PASS",
+      "metrics": {
+        "freq_mhz": 51.3733,
+        "startup_us": 0.6545,
+        "duty_pct": 45.31,
+        "voh_v": 3.3957,
+        "vol_v": -0.3249,
+        "i_avg_ua": 65.2348,
+        "sustained": 580.0
+      },
+      "specs": {
+        "source": "vdd_3.3_temp_27_ff",
+        "pass": true,
+        "score": 0.0,
+        "metrics": {
+          "freq_mhz": {
+            "value": 51.3733,
+            "target": 100.0,
+            "op": "<=",
+            "unit": " MHz",
+            "status": "PASS",
+            "margin": 48.6267,
+            "margin_pct": 48.627
+          },
+          "startup_us": {
+            "value": 0.6545,
+            "target": 5.0,
+            "op": "<=",
+            "unit": " us",
+            "status": "PASS",
+            "margin": 4.3455,
+            "margin_pct": 86.91
+          },
+          "duty_pct": {
+            "value": 45.31,
+            "target": 60.0,
+            "op": "<=",
+            "unit": " %",
+            "status": "PASS",
+            "margin": 14.689999999999998,
+            "margin_pct": 24.483
+          },
+          "voh_v": {
+            "value": 3.3957,
+            "target": 2.97,
+            "op": ">=",
+            "unit": " V",
+            "status": "PASS",
+            "margin": 0.42569999999999997,
+            "margin_pct": 14.333
+          },
+          "vol_v": {
+            "value": -0.3249,
+            "target": 0.33,
+            "op": "<=",
+            "unit": " V",
+            "status": "PASS",
+            "margin": 0.6549,
+            "margin_pct": 198.455
+          },
+          "i_avg_ua": {
+            "value": 65.2348,
+            "target": 1000.0,
+            "op": "<=",
+            "unit": " uA",
+            "status": "PASS",
+            "margin": 934.7652,
+            "margin_pct": 93.477
+          },
+          "sustained": {
+            "value": 580.0,
+            "target": 100.0,
+            "op": ">=",
+            "unit": " cycles",
+            "status": "PASS",
+            "margin": 480.0,
+            "margin_pct": 480.0
+          }
+        }
+      }
+    },
+    {
+      "vdd": 3.3,
+      "temp_c": 27.0,
+      "corner": "ss",
+      "status": "PASS",
+      "metrics": {
+        "freq_mhz": 41.9739,
+        "startup_us": 0.7491,
+        "duty_pct": 43.373,
+        "voh_v": 3.5113,
+        "vol_v": -0.4727,
+        "i_avg_ua": 46.1174,
+        "sustained": 471.0
+      },
+      "specs": {
+        "source": "vdd_3.3_temp_27_ss",
+        "pass": true,
+        "score": 0.0,
+        "metrics": {
+          "freq_mhz": {
+            "value": 41.9739,
+            "target": 100.0,
+            "op": "<=",
+            "unit": " MHz",
+            "status": "PASS",
+            "margin": 58.0261,
+            "margin_pct": 58.026
+          },
+          "startup_us": {
+            "value": 0.7491,
+            "target": 5.0,
+            "op": "<=",
+            "unit": " us",
+            "status": "PASS",
+            "margin": 4.2509,
+            "margin_pct": 85.018
+          },
+          "duty_pct": {
+            "value": 43.373,
+            "target": 60.0,
+            "op": "<=",
+            "unit": " %",
+            "status": "PASS",
+            "margin": 16.627000000000002,
+            "margin_pct": 27.712
+          },
+          "voh_v": {
+            "value": 3.5113,
+            "target": 2.97,
+            "op": ">=",
+            "unit": " V",
+            "status": "PASS",
+            "margin": 0.5412999999999997,
+            "margin_pct": 18.226
+          },
+          "vol_v": {
+            "value": -0.4727,
+            "target": 0.33,
+            "op": "<=",
+            "unit": " V",
+            "status": "PASS",
+            "margin": 0.8027,
+            "margin_pct": 243.242
+          },
+          "i_avg_ua": {
+            "value": 46.1174,
+            "target": 1000.0,
+            "op": "<=",
+            "unit": " uA",
+            "status": "PASS",
+            "margin": 953.8826,
+            "margin_pct": 95.388
+          },
+          "sustained": {
+            "value": 471.0,
+            "target": 100.0,
+            "op": ">=",
+            "unit": " cycles",
+            "status": "PASS",
+            "margin": 371.0,
+            "margin_pct": 371.0
+          }
+        }
+      }
+    },
+    {
+      "vdd": 3.3,
+      "temp_c": 27.0,
+      "corner": "sf",
+      "status": "PASS",
+      "metrics": {
+        "freq_mhz": 46.1768,
+        "startup_us": 0.6885,
+        "duty_pct": 47.026,
+        "voh_v": 3.5186,
+        "vol_v": -0.4658,
+        "i_avg_ua": 57.0825,
+        "sustained": 524.0
+      },
+      "specs": {
+        "source": "vdd_3.3_temp_27_sf",
+        "pass": true,
+        "score": 0.0,
+        "metrics": {
+          "freq_mhz": {
+            "value": 46.1768,
+            "target": 100.0,
+            "op": "<=",
+            "unit": " MHz",
+            "status": "PASS",
+            "margin": 53.8232,
+            "margin_pct": 53.823
+          },
+          "startup_us": {
+            "value": 0.6885,
+            "target": 5.0,
+            "op": "<=",
+            "unit": " us",
+            "status": "PASS",
+            "margin": 4.3115,
+            "margin_pct": 86.23
+          },
+          "duty_pct": {
+            "value": 47.026,
+            "target": 60.0,
+            "op": "<=",
+            "unit": " %",
+            "status": "PASS",
+            "margin": 12.973999999999997,
+            "margin_pct": 21.623
+          },
+          "voh_v": {
+            "value": 3.5186,
+            "target": 2.97,
+            "op": ">=",
+            "unit": " V",
+            "status": "PASS",
+            "margin": 0.5486,
+            "margin_pct": 18.471
+          },
+          "vol_v": {
+            "value": -0.4658,
+            "target": 0.33,
+            "op": "<=",
+            "unit": " V",
+            "status": "PASS",
+            "margin": 0.7958000000000001,
+            "margin_pct": 241.152
+          },
+          "i_avg_ua": {
+            "value": 57.0825,
+            "target": 1000.0,
+            "op": "<=",
+            "unit": " uA",
+            "status": "PASS",
+            "margin": 942.9175,
+            "margin_pct": 94.292
+          },
+          "sustained": {
+            "value": 524.0,
+            "target": 100.0,
+            "op": ">=",
+            "unit": " cycles",
+            "status": "PASS",
+            "margin": 424.0,
+            "margin_pct": 424.0
+          }
+        }
+      }
+    },
+    {
+      "vdd": 3.3,
+      "temp_c": 27.0,
+      "corner": "fs",
+      "status": "PASS",
+      "metrics": {
+        "freq_mhz": 46.4456,
+        "startup_us": 0.6844,
+        "duty_pct": 46.439,
+        "voh_v": 3.3577,
+        "vol_v": -0.1898,
+        "i_avg_ua": 54.6476,
+        "sustained": 525.0
+      },
+      "specs": {
+        "source": "vdd_3.3_temp_27_fs",
+        "pass": true,
+        "score": 0.0,
+        "metrics": {
+          "freq_mhz": {
+            "value": 46.4456,
+            "target": 100.0,
+            "op": "<=",
+            "unit": " MHz",
+            "status": "PASS",
+            "margin": 53.5544,
+            "margin_pct": 53.554
+          },
+          "startup_us": {
+            "value": 0.6844,
+            "target": 5.0,
+            "op": "<=",
+            "unit": " us",
+            "status": "PASS",
+            "margin": 4.3156,
+            "margin_pct": 86.312
+          },
+          "duty_pct": {
+            "value": 46.439,
+            "target": 60.0,
+            "op": "<=",
+            "unit": " %",
+            "status": "PASS",
+            "margin": 13.561,
+            "margin_pct": 22.602
+          },
+          "voh_v": {
+            "value": 3.3577,
+            "target": 2.97,
+            "op": ">=",
+            "unit": " V",
+            "status": "PASS",
+            "margin": 0.3876999999999997,
+            "margin_pct": 13.054
+          },
+          "vol_v": {
+            "value": -0.1898,
+            "target": 0.33,
+            "op": "<=",
+            "unit": " V",
+            "status": "PASS",
+            "margin": 0.5198,
+            "margin_pct": 157.515
+          },
+          "i_avg_ua": {
+            "value": 54.6476,
+            "target": 1000.0,
+            "op": "<=",
+            "unit": " uA",
+            "status": "PASS",
+            "margin": 945.3524,
+            "margin_pct": 94.535
+          },
+          "sustained": {
+            "value": 525.0,
+            "target": 100.0,
+            "op": ">=",
+            "unit": " cycles",
+            "status": "PASS",
+            "margin": 425.0,
+            "margin_pct": 425.0
+          }
+        }
+      }
+    }
+  ]
+}

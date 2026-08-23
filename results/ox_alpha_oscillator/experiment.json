@@ -1,0 +1,49 @@
+{
+  "experiment_id": "ox_alpha_oscillator",
+  "model_identifier": "ox-alpha (opencode/x-preview-f-free)",
+  "pdk": "gf180mcuD",
+  "supply_v": 3.3,
+  "design": {
+    "topology": "9-stage CMOS ring oscillator, single-ended, no output buffer",
+    "ports": ["VDD", "VSS", "OSC_OUT"],
+    "devices": 18,
+    "device_types": ["nfet_03v3", "pfet_03v3"],
+    "sizing": {"L_um": 2.2, "Wn_um": 2.0, "Wp_um": 4.0,
+               "stage1_Wp_um": 3.8},
+    "self_start_mechanism": "deliberate stage-1 PMOS width asymmetry (3.8u vs 4.0u); oscillation establishes ~16 ns after ideal DC power-up with no stimulus and no .ic/.nodeset/uic anywhere",
+    "complexity": "18 MOS / 11 nets / flat subckt"
+  },
+  "flow": {
+    "command": "/mbg-full-auto via mbg.full_auto.run_full_auto",
+    "effort": "normal (12 pre / 12 pex / 3 candidates)",
+    "status": "SUCCESS",
+    "tapeout_ready": true
+  },
+  "statuses": {
+    "netlist_validation": "PASS",
+    "pre_layout_simulation": "PASS",
+    "drc_magic": "PASS",
+    "drc_klayout_signoff": "PASS",
+    "lvs_netgen": "PASS",
+    "pex_extraction": "PASS",
+    "post_layout_simulation": "PASS",
+    "pvt_characterization": "PASS (90/90 points, supplementary - not a signoff gate condition)",
+    "monte_carlo": "NOT RUN"
+  },
+  "results_nominal_pex": {
+    "freq_hz": 45.33e6,
+    "startup_time_s": 4.23e-9,
+    "duty_cycle_pct": 48.68,
+    "volt_high_v": 3.527,
+    "volt_low_v": -0.208,
+    "i_avg_a": 104.4e-6,
+    "cycles_sustained": 565
+  },
+  "simulation_model_notes": [
+    "GF180MCU ngspice library flattened: quoted model-card parameter expressions pre-evaluated to identical IEEE doubles under nominal sw_stat switches; verified operating-point equality and bit-identical 20 ns device transient vs the original library. Required because the stock library's per-iteration expression re-evaluation makes transients ~1000x slower.",
+    "PEX netlist declares ports as OSC_OUT VSS VDD; the simulation harness maps port order by name before instantiation."
+  ],
+  "api_calls": 0,
+  "refinement_iterations": 0,
+  "notes": "All LLM-side design decisions made directly by the agent; no external API refinement loop. Flow needed one harness fix (port order) between run 1 (TOOL_FAILURE) and run 2 (SUCCESS); circuit unchanged."
+}

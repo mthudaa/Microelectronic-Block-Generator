@@ -1,0 +1,38 @@
+{
+  "verdict": "PASS",
+  "reason": "all configured DRC engines report clean",
+  "primary": "klayout",
+  "gds_sha256": "a7998403b3106bf3",
+  "results": [
+    {
+      "engine": "magic",
+      "status": "CLEAN",
+      "violations": 0,
+      "rules": {},
+      "report_path": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/ox_alpha_strongarm_comparator/iterations/run/strongarm_comparator/verification/strongarm_comparator.magic.drc.rpt",
+      "log_path": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/ox_alpha_strongarm_comparator/iterations/run/strongarm_comparator/verification/logs/magic_drc.log",
+      "tool": "/usr/local/bin/magic",
+      "tool_version": "8.3.669",
+      "deck": "/home/huda/.volare/gf180mcuD/libs.tech/magic/gf180mcuD.tech",
+      "gds": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/ox_alpha_strongarm_comparator/iterations/run/strongarm_comparator/strongarm_comparator.gds",
+      "gds_sha256": "a7998403b3106bf3",
+      "elapsed": 1.111,
+      "message": ""
+    },
+    {
+      "engine": "klayout",
+      "status": "CLEAN",
+      "violations": 0,
+      "rules": {},
+      "report_path": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/ox_alpha_strongarm_comparator/iterations/run/strongarm_comparator/verification/strongarm_comparator.klayout.lyrdb",
+      "log_path": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/ox_alpha_strongarm_comparator/iterations/run/strongarm_comparator/verification/logs/klayout_drc.log",
+      "tool": "/home/huda/.local/mbg-tools/klayout-0.30.9/bin/klayout",
+      "tool_version": "0.30.9",
+      "deck": "/home/huda/.volare/gf180mcuD/libs.tech/klayout/tech/drc/gf180mcu.drc",
+      "gds": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/ox_alpha_strongarm_comparator/iterations/run/strongarm_comparator/strongarm_comparator.gds",
+      "gds_sha256": "a7998403b3106bf3",
+      "elapsed": 11.823,
+      "message": ""
+    }
+  ]
+}

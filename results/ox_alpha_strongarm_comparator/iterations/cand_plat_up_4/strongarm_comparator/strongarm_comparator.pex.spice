@@ -1,0 +1,52 @@
+* PEX produced on Sun Aug 23 03:44:04 PM CST 2026 using /home/huda/opensource-project/Microelectronic-Block-Generator/designs/notebooks/chipathon2026-D/scripts/iic-pex.sh with m=2 and s=1
+* NGSPICE file created from strongarm_comparator.ext - technology: gf180mcuD
+
+.option scale=5n
+
+.subckt strongarm_comparator OUTN OUTP CLK INN INP VSS VDD
+X0 a_n2018_4046# CLK VSS VSS nfet_03v3 ad=0.168u pd=3.04m as=0.168u ps=3.04m w=1400 l=100
+X1 OUTN OUTP VDD VDD pfet_03v3 ad=93.6n pd=1.8m as=93.6n ps=1.8m w=780 l=100
+X2 a_n1958_6864# INN a_n2018_4046# VSS nfet_03v3 ad=72n pd=1.44m as=72n ps=1.44m w=600 l=140
+X3 OUTP OUTN a_n1958_6864# VSS nfet_03v3 ad=48n pd=1.04m as=48n ps=1.04m w=400 l=100
+X4 OUTN OUTP a_n3030_6864# VSS nfet_03v3 ad=48n pd=1.04m as=48n ps=1.04m w=400 l=100
+X5 OUTN CLK VDD VDD pfet_03v3 ad=38.4n pd=0.88m as=38.4n ps=0.88m w=320 l=100
+X6 OUTP CLK VDD VDD pfet_03v3 ad=38.4n pd=0.88m as=38.4n ps=0.88m w=320 l=100
+X7 a_n1958_6864# CLK VDD VDD pfet_03v3 ad=19.2n pd=0.56m as=19.2n ps=0.56m w=160 l=100
+X8 a_n3030_6864# CLK VDD VDD pfet_03v3 ad=19.2n pd=0.56m as=19.2n ps=0.56m w=160 l=100
+X9 a_n3030_6864# INP a_n2018_4046# VSS nfet_03v3 ad=72n pd=1.44m as=72n ps=1.44m w=600 l=140
+X10 OUTP OUTN VDD VDD pfet_03v3 ad=93.6n pd=1.8m as=93.6n ps=1.8m w=780 l=100
+C0 a_n2018_4046# OUTP 0.02249f
+C1 a_n2018_4046# CLK 0.82596f
+C2 a_n1958_6864# OUTP 0.65717f
+C3 a_n2018_4046# a_n3030_6864# 1.24586f
+C4 a_n2018_4046# OUTN 0.04963f
+C5 a_n1958_6864# CLK 0.18346f
+C6 a_n2018_4046# INP 0.1062f
+C7 a_n1958_6864# a_n3030_6864# 1.0287f
+C8 a_n1958_6864# OUTN 0.28484f
+C9 CLK OUTP 0.05574f
+C10 a_n3030_6864# OUTP 0.17206f
+C11 a_n1958_6864# VDD 1.8625f
+C12 OUTN OUTP 1.3698f
+C13 a_n3030_6864# CLK 0.53993f
+C14 CLK OUTN 0.06104f
+C15 a_n2018_4046# INN 0.10933f
+C16 a_n3030_6864# OUTN 0.5781f
+C17 INP CLK 0.01666f
+C18 VDD OUTP 4.7789f
+C19 a_n3030_6864# INP 0.09637f
+C20 a_n2018_4046# a_n1958_6864# 0.86999f
+C21 a_n1958_6864# INN 0.08213f
+C22 VDD CLK 3.76018f
+C23 a_n3030_6864# VDD 1.96748f
+C24 VDD OUTN 4.91563f
+C25 INP VSS 0.5311f
+C26 INN VSS 0.54801f
+C27 OUTP VSS 3.05655f
+C28 OUTN VSS 3.35306f
+C29 CLK VSS 2.96165f
+C30 VDD VSS 32.7417f
+C31 a_n2018_4046# VSS 5.87205f ; **FLOATING
+C32 a_n1958_6864# VSS 3.63857f ; **FLOATING
+C33 a_n3030_6864# VSS 2.33002f ; **FLOATING
+.ends

@@ -1,0 +1,19 @@
+.include '/home/huda/.volare/gf180mcuD/libs.tech/ngspice/design.ngspice'
+.lib '/home/huda/.volare/gf180mcuD/libs.tech/ngspice/sm141064.ngspice' typical
+.temp 27
+* diode-ish test devices, forced currents via supplies
+VD d 0 0.9
+VG g 0 0.8
+XN d g 0 0 nfet_03v3 W=2u L=2u
+XP2 s2 g3 d3 s2 pfet_03v3 W=6.6u L=4u
+VS2 s2 0 3.3
+VAM d3 0 1.65
+VG3 g3 0 2.0
+.control
+dc VG 0.4 1.6 0.005
+wrdata nf.dat i(VD)
+dc VG3 1.7 3.2 0.005
+wrdata pf.dat i(VAM)
+quit
+.endc
+.end

@@ -1,0 +1,74 @@
+.include '/home/huda/.volare/gf180mcuD/libs.tech/ngspice/design.ngspice'
+.lib '/home/huda/opensource-project/Microelectronic-Block-Generator/results/ox_alpha_oscillator/pdk_flat/sm141064.ngspice' sf
+.temp 27
+
+* PEX produced on Sun Aug 23 07:32:56 AM CST 2026 using /home/huda/opensource-project/Microelectronic-Block-Generator/designs/notebooks/chipathon2026-D/scripts/iic-pex.sh with m=2 and s=1
+* NGSPICE file created from oscillator.ext - technology: gf180mcuD
+
+.option scale=5n
+
+.subckt oscillator OSC_OUT VSS VDD
+X0 a_5656_428# a_3844_428# VSS VSS nfet_03v3 ad=48n pd=1.04m as=48n ps=1.04m w=400 l=440
+X1 a_220_428# a_n1592_428# VDD VDD pfet_03v3 ad=96n pd=1.84m as=96n ps=1.84m w=800 l=440
+X2 a_5656_428# a_3844_428# VDD VDD pfet_03v3 ad=96n pd=1.84m as=96n ps=1.84m w=800 l=440
+X3 a_n5216_428# a_n7028_428# VDD VDD pfet_03v3 ad=96n pd=1.84m as=96n ps=1.84m w=800 l=440
+X4 OSC_OUT a_5656_428# VSS VSS nfet_03v3 ad=48n pd=1.04m as=48n ps=1.04m w=400 l=440
+X5 a_n3404_428# a_n5216_428# VSS VSS nfet_03v3 ad=48n pd=1.04m as=48n ps=1.04m w=400 l=440
+X6 a_2032_428# a_220_428# VSS VSS nfet_03v3 ad=48n pd=1.04m as=48n ps=1.04m w=400 l=440
+X7 a_2032_428# a_220_428# VDD VDD pfet_03v3 ad=96n pd=1.84m as=96n ps=1.84m w=800 l=440
+X8 a_n5216_428# a_n7028_428# VSS VSS nfet_03v3 ad=48n pd=1.04m as=48n ps=1.04m w=400 l=440
+X9 a_220_428# a_n1592_428# VSS VSS nfet_03v3 ad=48n pd=1.04m as=48n ps=1.04m w=400 l=440
+X10 a_n1592_428# a_n3404_428# VDD VDD pfet_03v3 ad=96n pd=1.84m as=96n ps=1.84m w=800 l=440
+X11 a_3844_428# a_2032_428# VDD VDD pfet_03v3 ad=96n pd=1.84m as=96n ps=1.84m w=800 l=440
+X12 OSC_OUT a_5656_428# VDD VDD pfet_03v3 ad=96n pd=1.84m as=96n ps=1.84m w=800 l=440
+X13 a_n7028_428# OSC_OUT VDD VDD pfet_03v3 ad=91.2n pd=1.76m as=91.2n ps=1.76m w=760 l=440
+X14 a_n3404_428# a_n5216_428# VDD VDD pfet_03v3 ad=96n pd=1.84m as=96n ps=1.84m w=800 l=440
+X15 a_n7028_428# OSC_OUT VSS VSS nfet_03v3 ad=48n pd=1.04m as=48n ps=1.04m w=400 l=440
+X16 a_3844_428# a_2032_428# VSS VSS nfet_03v3 ad=48n pd=1.04m as=48n ps=1.04m w=400 l=440
+X17 a_n1592_428# a_n3404_428# VSS VSS nfet_03v3 ad=48n pd=1.04m as=48n ps=1.04m w=400 l=440
+C0 VDD a_3844_428# 4.13777f
+C1 OSC_OUT a_3844_428# 0.27798f
+C2 a_220_428# VDD 3.86963f
+C3 a_220_428# OSC_OUT 0.2846f
+C4 a_n7028_428# VDD 4.05033f
+C5 a_n1592_428# a_n3404_428# 0.72688f
+C6 VDD a_2032_428# 3.74457f
+C7 a_n7028_428# OSC_OUT 1.4157f
+C8 OSC_OUT a_2032_428# 0.28592f
+C9 a_2032_428# a_3844_428# 0.4637f
+C10 a_220_428# a_2032_428# 0.47484f
+C11 a_n1592_428# VDD 4.03278f
+C12 a_n5216_428# a_n3404_428# 0.56998f
+C13 a_n1592_428# OSC_OUT 0.20954f
+C14 a_n1592_428# a_220_428# 0.64647f
+C15 a_n5216_428# VDD 4.0009f
+C16 VDD a_5656_428# 3.72503f
+C17 VDD a_n3404_428# 3.90687f
+C18 a_n5216_428# OSC_OUT 0.28597f
+C19 OSC_OUT a_5656_428# 1.18627f
+C20 OSC_OUT a_n3404_428# 0.26714f
+C21 a_3844_428# a_5656_428# 0.38039f
+C22 a_n5216_428# a_n7028_428# 0.61928f
+C23 VDD OSC_OUT 3.47898f
+C24 OSC_OUT VSS 9.34779f
+C25 VDD VSS 78.5303f
+C26 a_5656_428# VSS 5.21172f ; **FLOATING
+C27 a_3844_428# VSS 5.4254f ; **FLOATING
+C28 a_2032_428# VSS 5.31475f ; **FLOATING
+C29 a_220_428# VSS 5.18271f ; **FLOATING
+C30 a_n1592_428# VSS 4.66969f ; **FLOATING
+C31 a_n3404_428# VSS 4.79541f ; **FLOATING
+C32 a_n5216_428# VSS 5.19896f ; **FLOATING
+C33 a_n7028_428# VSS 5.11024f ; **FLOATING
+.ends
+
+Vsfix VSS 0 0
+Vsup VDD 0 3.3
+Cprobe OSC_OUT 0 5f
+Xdut OSC_OUT VSS VDD oscillator
+
+.control
+tran 100p 12.5u
+wrdata osc.dat v(OSC_OUT) i(Vsup)
+.endc
+.end

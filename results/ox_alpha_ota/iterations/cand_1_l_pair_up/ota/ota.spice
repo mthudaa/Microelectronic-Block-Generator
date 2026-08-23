@@ -1,0 +1,12 @@
+* ox-alpha OTA -- 5T NMOS-input OTA, PMOS mirror load, IBIAS-driven tail
+* topology: differential pair XM1/XM2, mirror load XM3/XM4,
+* tail XMTAIL mirrored from external IBIAS via diode XMBIAS
+.lib "{PDK_LIB}" typical
+.subckt ota VDD VSS INP INN OUT IBIAS
+XMBIAS IBIAS IBIAS VSS VSS nfet_03v3 W=2.0u L=2.0u nf=1
+XMTAIL tail IBIAS VSS VSS nfet_03v3 W=12.0u L=4.0u nf=2
+XM1 n1 INN tail VSS nfet_03v3 W=6.0u L=3.0u nf=1
+XM2 OUT INP tail VSS nfet_03v3 W=6.0u L=3.0u nf=1
+XM3 n1 n1 VDD VDD pfet_03v3 W=30.0u L=4.0u nf=4
+XM4 OUT n1 VDD VDD pfet_03v3 W=30.0u L=4.0u nf=4
+.ends

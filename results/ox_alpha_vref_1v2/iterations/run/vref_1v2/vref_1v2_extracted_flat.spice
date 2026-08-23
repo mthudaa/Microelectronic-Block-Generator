@@ -1,0 +1,20 @@
+* NGSPICE file created from vref_1v2.ext - technology: gf180mcuD
+
+.subckt vref_1v2 VDD VSS VREF IBIAS
+X0 VREF VREF a_n777_428# VSS nfet_03v3 ad=0.224p pd=1.36u as=0.48p ps=2.8u w=0.8u l=0.35u
+X1 VREF VREF a_n777_428# VSS nfet_03v3 ad=0.224p pd=1.36u as=0.224p ps=1.36u w=0.8u l=0.35u
+X2 a_n777_428# VREF VREF VSS nfet_03v3 ad=0.224p pd=1.36u as=0.224p ps=1.36u w=0.8u l=0.35u
+X3 VREF VREF a_n777_428# VSS nfet_03v3 ad=0.224p pd=1.36u as=0.224p ps=1.36u w=0.8u l=0.35u
+X4 a_n777_428# VREF VREF VSS nfet_03v3 ad=0.48p pd=2.8u as=0.224p ps=1.36u w=0.8u l=0.35u
+X5 a_n777_428# VREF VREF VSS nfet_03v3 ad=0.224p pd=1.36u as=0.224p ps=1.36u w=0.8u l=0.35u
+X6 a_n777_428# VREF VREF VSS nfet_03v3 ad=0.224p pd=1.36u as=0.224p ps=1.36u w=0.8u l=0.35u
+X7 a_n777_428# VREF VSS VSS nfet_03v3 ad=5.7p pd=20.2u as=5.7p ps=20.2u w=9.5u l=7.45u
+X8 VREF VREF a_n777_428# VSS nfet_03v3 ad=0.224p pd=1.36u as=0.224p ps=1.36u w=0.8u l=0.35u
+X9 IBIAS IBIAS VDD VDD pfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=8u
+X10 VREF VREF a_n777_428# VSS nfet_03v3 ad=0.224p pd=1.36u as=0.224p ps=1.36u w=0.8u l=0.35u
+X11 a_n777_428# VREF VREF VSS nfet_03v3 ad=0.224p pd=1.36u as=0.224p ps=1.36u w=0.8u l=0.35u
+X12 a_n777_428# VREF VREF VSS nfet_03v3 ad=0.224p pd=1.36u as=0.224p ps=1.36u w=0.8u l=0.35u
+X13 VREF IBIAS VDD VDD pfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=8u
+X14 VREF VREF a_n777_428# VSS nfet_03v3 ad=0.224p pd=1.36u as=0.224p ps=1.36u w=0.8u l=0.35u
+.ends
+

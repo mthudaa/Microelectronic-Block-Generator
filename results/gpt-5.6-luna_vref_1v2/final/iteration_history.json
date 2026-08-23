@@ -1,0 +1,406 @@
+{
+  "cell": "vref_1v2",
+  "status": "PASS",
+  "stage": "COMPLETE",
+  "failure": "NONE",
+  "message": "final design meets PEX-aware specifications",
+  "elapsed": 106.706,
+  "pre_layout": [
+    {
+      "phase": "pre_layout",
+      "iteration": 1,
+      "spec_pass": true,
+      "score": 0.0,
+      "status": "PASS",
+      "failure": "NONE",
+      "message": "",
+      "metrics": {
+        "source": "pre_layout",
+        "pass": true,
+        "score": 0.0,
+        "metrics": {
+          "vref_low_limit": {
+            "value": 1.166621,
+            "target": 1.15,
+            "op": ">=",
+            "unit": " V",
+            "status": "PASS",
+            "margin": 0.016620999999999997,
+            "margin_pct": 1.445
+          },
+          "vref_high_limit": {
+            "value": 1.166621,
+            "target": 1.25,
+            "op": "<=",
+            "unit": " V",
+            "status": "PASS",
+            "margin": 0.08337900000000009,
+            "margin_pct": 6.67
+          },
+          "tempco_ppm": {
+            "value": 274.6964666902668,
+            "target": 300.0,
+            "op": "<=",
+            "unit": " ppm/C",
+            "status": "PASS",
+            "margin": 25.30353330973321,
+            "margin_pct": 8.435
+          },
+          "line_reg_mv_per_v": {
+            "value": 11.133333333333367,
+            "target": 100.0,
+            "op": "<=",
+            "unit": " mV/V",
+            "status": "PASS",
+            "margin": 88.86666666666663,
+            "margin_pct": 88.867
+          },
+          "vref_supply_span": {
+            "value": 0.006680000000000019,
+            "target": 0.06,
+            "op": "<=",
+            "unit": " V",
+            "status": "PASS",
+            "margin": 0.05331999999999998,
+            "margin_pct": 88.867
+          },
+          "supply_current_ua": {
+            "value": 39.865,
+            "target": 300.0,
+            "op": "<=",
+            "unit": " uA",
+            "status": "PASS",
+            "margin": 260.135,
+            "margin_pct": 86.712
+          }
+        }
+      },
+      "degradation": [],
+      "elapsed": 11.447
+    }
+  ],
+  "pex": [
+    {
+      "phase": "pex",
+      "iteration": 1,
+      "spec_pass": true,
+      "score": 0.0,
+      "status": "PASS",
+      "drc": "PASS",
+      "lvs": "PASS",
+      "pex_extraction": "PASS",
+      "pex_simulation": "PASS",
+      "failure": "NONE",
+      "message": "",
+      "metrics": {
+        "source": "pex",
+        "pass": true,
+        "score": 0.0,
+        "metrics": {
+          "vref_low_limit": {
+            "value": 1.166621,
+            "target": 1.15,
+            "op": ">=",
+            "unit": " V",
+            "status": "PASS",
+            "margin": 0.016620999999999997,
+            "margin_pct": 1.445
+          },
+          "vref_high_limit": {
+            "value": 1.166621,
+            "target": 1.25,
+            "op": "<=",
+            "unit": " V",
+            "status": "PASS",
+            "margin": 0.08337900000000009,
+            "margin_pct": 6.67
+          },
+          "tempco_ppm": {
+            "value": 274.6964666902668,
+            "target": 300.0,
+            "op": "<=",
+            "unit": " ppm/C",
+            "status": "PASS",
+            "margin": 25.30353330973321,
+            "margin_pct": 8.435
+          },
+          "line_reg_mv_per_v": {
+            "value": 11.133333333333367,
+            "target": 100.0,
+            "op": "<=",
+            "unit": " mV/V",
+            "status": "PASS",
+            "margin": 88.86666666666663,
+            "margin_pct": 88.867
+          },
+          "vref_supply_span": {
+            "value": 0.006680000000000019,
+            "target": 0.06,
+            "op": "<=",
+            "unit": " V",
+            "status": "PASS",
+            "margin": 0.05331999999999998,
+            "margin_pct": 88.867
+          },
+          "supply_current_ua": {
+            "value": 39.865,
+            "target": 300.0,
+            "op": "<=",
+            "unit": " uA",
+            "status": "PASS",
+            "margin": 260.135,
+            "margin_pct": 86.712
+          }
+        }
+      },
+      "degradation": [
+        {
+          "name": "vref_low_limit",
+          "pre": 1.166621,
+          "post": 1.166621,
+          "unit": " V",
+          "delta": 0.0,
+          "delta_pct": 0.0,
+          "status": "PASS",
+          "worsened": false
+        },
+        {
+          "name": "vref_high_limit",
+          "pre": 1.166621,
+          "post": 1.166621,
+          "unit": " V",
+          "delta": 0.0,
+          "delta_pct": 0.0,
+          "status": "PASS",
+          "worsened": false
+        },
+        {
+          "name": "tempco_ppm",
+          "pre": 274.6964666902668,
+          "post": 274.6964666902668,
+          "unit": " ppm/C",
+          "delta": 0.0,
+          "delta_pct": 0.0,
+          "status": "PASS",
+          "worsened": false
+        },
+        {
+          "name": "line_reg_mv_per_v",
+          "pre": 11.133333333333367,
+          "post": 11.133333333333367,
+          "unit": " mV/V",
+          "delta": 0.0,
+          "delta_pct": 0.0,
+          "status": "PASS",
+          "worsened": false
+        },
+        {
+          "name": "vref_supply_span",
+          "pre": 0.006680000000000019,
+          "post": 0.006680000000000019,
+          "unit": " V",
+          "delta": 0.0,
+          "delta_pct": 0.0,
+          "status": "PASS",
+          "worsened": false
+        },
+        {
+          "name": "supply_current_ua",
+          "pre": 39.865,
+          "post": 39.865,
+          "unit": " uA",
+          "delta": 0.0,
+          "delta_pct": 0.0,
+          "status": "PASS",
+          "worsened": false
+        }
+      ],
+      "elapsed": 95.259
+    }
+  ],
+  "best_pre": {
+    "source": "pre_layout",
+    "pass": true,
+    "score": 0.0,
+    "metrics": {
+      "vref_low_limit": {
+        "value": 1.166621,
+        "target": 1.15,
+        "op": ">=",
+        "unit": " V",
+        "status": "PASS",
+        "margin": 0.016620999999999997,
+        "margin_pct": 1.445
+      },
+      "vref_high_limit": {
+        "value": 1.166621,
+        "target": 1.25,
+        "op": "<=",
+        "unit": " V",
+        "status": "PASS",
+        "margin": 0.08337900000000009,
+        "margin_pct": 6.67
+      },
+      "tempco_ppm": {
+        "value": 274.6964666902668,
+        "target": 300.0,
+        "op": "<=",
+        "unit": " ppm/C",
+        "status": "PASS",
+        "margin": 25.30353330973321,
+        "margin_pct": 8.435
+      },
+      "line_reg_mv_per_v": {
+        "value": 11.133333333333367,
+        "target": 100.0,
+        "op": "<=",
+        "unit": " mV/V",
+        "status": "PASS",
+        "margin": 88.86666666666663,
+        "margin_pct": 88.867
+      },
+      "vref_supply_span": {
+        "value": 0.006680000000000019,
+        "target": 0.06,
+        "op": "<=",
+        "unit": " V",
+        "status": "PASS",
+        "margin": 0.05331999999999998,
+        "margin_pct": 88.867
+      },
+      "supply_current_ua": {
+        "value": 39.865,
+        "target": 300.0,
+        "op": "<=",
+        "unit": " uA",
+        "status": "PASS",
+        "margin": 260.135,
+        "margin_pct": 86.712
+      }
+    }
+  },
+  "best_pex": {
+    "source": "pex",
+    "pass": true,
+    "score": 0.0,
+    "metrics": {
+      "vref_low_limit": {
+        "value": 1.166621,
+        "target": 1.15,
+        "op": ">=",
+        "unit": " V",
+        "status": "PASS",
+        "margin": 0.016620999999999997,
+        "margin_pct": 1.445
+      },
+      "vref_high_limit": {
+        "value": 1.166621,
+        "target": 1.25,
+        "op": "<=",
+        "unit": " V",
+        "status": "PASS",
+        "margin": 0.08337900000000009,
+        "margin_pct": 6.67
+      },
+      "tempco_ppm": {
+        "value": 274.6964666902668,
+        "target": 300.0,
+        "op": "<=",
+        "unit": " ppm/C",
+        "status": "PASS",
+        "margin": 25.30353330973321,
+        "margin_pct": 8.435
+      },
+      "line_reg_mv_per_v": {
+        "value": 11.133333333333367,
+        "target": 100.0,
+        "op": "<=",
+        "unit": " mV/V",
+        "status": "PASS",
+        "margin": 88.86666666666663,
+        "margin_pct": 88.867
+      },
+      "vref_supply_span": {
+        "value": 0.006680000000000019,
+        "target": 0.06,
+        "op": "<=",
+        "unit": " V",
+        "status": "PASS",
+        "margin": 0.05331999999999998,
+        "margin_pct": 88.867
+      },
+      "supply_current_ua": {
+        "value": 39.865,
+        "target": 300.0,
+        "op": "<=",
+        "unit": " uA",
+        "status": "PASS",
+        "margin": 260.135,
+        "margin_pct": 86.712
+      }
+    }
+  },
+  "best_pex_iteration": 1,
+  "degradation": [
+    {
+      "name": "vref_low_limit",
+      "pre": 1.166621,
+      "post": 1.166621,
+      "unit": " V",
+      "delta": 0.0,
+      "delta_pct": 0.0,
+      "status": "PASS",
+      "worsened": false
+    },
+    {
+      "name": "vref_high_limit",
+      "pre": 1.166621,
+      "post": 1.166621,
+      "unit": " V",
+      "delta": 0.0,
+      "delta_pct": 0.0,
+      "status": "PASS",
+      "worsened": false
+    },
+    {
+      "name": "tempco_ppm",
+      "pre": 274.6964666902668,
+      "post": 274.6964666902668,
+      "unit": " ppm/C",
+      "delta": 0.0,
+      "delta_pct": 0.0,
+      "status": "PASS",
+      "worsened": false
+    },
+    {
+      "name": "line_reg_mv_per_v",
+      "pre": 11.133333333333367,
+      "post": 11.133333333333367,
+      "unit": " mV/V",
+      "delta": 0.0,
+      "delta_pct": 0.0,
+      "status": "PASS",
+      "worsened": false
+    },
+    {
+      "name": "vref_supply_span",
+      "pre": 0.006680000000000019,
+      "post": 0.006680000000000019,
+      "unit": " V",
+      "delta": 0.0,
+      "delta_pct": 0.0,
+      "status": "PASS",
+      "worsened": false
+    },
+    {
+      "name": "supply_current_ua",
+      "pre": 39.865,
+      "post": 39.865,
+      "unit": " uA",
+      "delta": 0.0,
+      "delta_pct": 0.0,
+      "status": "PASS",
+      "worsened": false
+    }
+  ]
+}

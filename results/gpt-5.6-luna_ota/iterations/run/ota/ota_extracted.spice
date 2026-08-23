@@ -1,0 +1,29 @@
+* NGSPICE file created from ota.ext - technology: gf180mcuD
+
+.subckt ota IBIAS OUT INN INP VSS VDD
+X0 VSS IBIAS IBIAS VSS nfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=1u
+X1 a_n1462_8060# a_n1462_8060# VDD VDD pfet_03v3 ad=0.42p pd=2.06u as=0.9p ps=4.2u w=1.5u l=0.8u
+X2 VDD a_n1462_8060# a_n1462_8060# VDD pfet_03v3 ad=0.42p pd=2.06u as=0.42p ps=2.06u w=1.5u l=0.8u
+X3 VSS IBIAS a_n1422_429# VSS nfet_03v3 ad=0.6p pd=3.2u as=0.28p ps=1.56u w=1u l=1u
+X4 a_n1462_8060# a_n1462_8060# VDD VDD pfet_03v3 ad=0.42p pd=2.06u as=0.42p ps=2.06u w=1.5u l=0.8u
+X5 OUT a_n1462_8060# VDD VDD pfet_03v3 ad=0.42p pd=2.06u as=0.42p ps=2.06u w=1.5u l=0.8u
+X6 a_n1422_429# INN OUT VSS nfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=0.6u
+X7 VDD a_n1462_8060# OUT VDD pfet_03v3 ad=0.42p pd=2.06u as=0.42p ps=2.06u w=1.5u l=0.8u
+X8 a_n1422_429# IBIAS VSS VSS nfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=1u
+X9 OUT INN a_n1422_429# VSS nfet_03v3 ad=0.28p pd=1.56u as=0.6p ps=3.2u w=1u l=0.6u
+X10 a_n1422_429# INP a_n1462_8060# VSS nfet_03v3 ad=0.6p pd=3.2u as=0.28p ps=1.56u w=1u l=0.6u
+X11 VDD a_n1462_8060# a_n1462_8060# VDD pfet_03v3 ad=0.9p pd=4.2u as=0.42p ps=2.06u w=1.5u l=0.8u
+X12 IBIAS IBIAS VSS VSS nfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=1u
+X13 a_n1462_8060# INP a_n1422_429# VSS nfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=0.6u
+X14 OUT INN a_n1422_429# VSS nfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=0.6u
+X15 OUT a_n1462_8060# VDD VDD pfet_03v3 ad=0.42p pd=2.06u as=0.9p ps=4.2u w=1.5u l=0.8u
+X16 a_n1422_429# INN OUT VSS nfet_03v3 ad=0.6p pd=3.2u as=0.28p ps=1.56u w=1u l=0.6u
+X17 VSS IBIAS a_n1422_429# VSS nfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=1u
+X18 a_n1422_429# INP a_n1462_8060# VSS nfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=0.6u
+X19 VSS IBIAS IBIAS VSS nfet_03v3 ad=0.6p pd=3.2u as=0.28p ps=1.56u w=1u l=1u
+X20 VDD a_n1462_8060# OUT VDD pfet_03v3 ad=0.9p pd=4.2u as=0.42p ps=2.06u w=1.5u l=0.8u
+X21 a_n1462_8060# INP a_n1422_429# VSS nfet_03v3 ad=0.28p pd=1.56u as=0.6p ps=3.2u w=1u l=0.6u
+X22 IBIAS IBIAS VSS VSS nfet_03v3 ad=0.28p pd=1.56u as=0.6p ps=3.2u w=1u l=1u
+X23 a_n1422_429# IBIAS VSS VSS nfet_03v3 ad=0.28p pd=1.56u as=0.6p ps=3.2u w=1u l=1u
+.ends
+

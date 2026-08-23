@@ -1,0 +1,731 @@
+{
+  "status": "NOT RUN",
+  "conditions": 90,
+  "not_run": 90,
+  "decision_time_max_ns": null,
+  "decision_correct_all": false,
+  "output_swing_ratio_min": null,
+  "reset_precharge_correct_all": false,
+  "cases": [
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.0,
+      "temp_C": -40,
+      "corner": "typical",
+      "polarity": "+",
+      "error": "RuntimeError: transient produced no data (post_layout/d85f28400225)"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.0,
+      "temp_C": -40,
+      "corner": "typical",
+      "polarity": "-",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.0,
+      "temp_C": -40,
+      "corner": "ff",
+      "polarity": "+",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.0,
+      "temp_C": -40,
+      "corner": "ff",
+      "polarity": "-",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.0,
+      "temp_C": -40,
+      "corner": "ss",
+      "polarity": "+",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.0,
+      "temp_C": -40,
+      "corner": "ss",
+      "polarity": "-",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.0,
+      "temp_C": -40,
+      "corner": "fs",
+      "polarity": "+",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.0,
+      "temp_C": -40,
+      "corner": "fs",
+      "polarity": "-",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.0,
+      "temp_C": -40,
+      "corner": "sf",
+      "polarity": "+",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.0,
+      "temp_C": -40,
+      "corner": "sf",
+      "polarity": "-",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.0,
+      "temp_C": 27,
+      "corner": "typical",
+      "polarity": "+",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.0,
+      "temp_C": 27,
+      "corner": "typical",
+      "polarity": "-",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.0,
+      "temp_C": 27,
+      "corner": "ff",
+      "polarity": "+",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.0,
+      "temp_C": 27,
+      "corner": "ff",
+      "polarity": "-",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.0,
+      "temp_C": 27,
+      "corner": "ss",
+      "polarity": "+",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.0,
+      "temp_C": 27,
+      "corner": "ss",
+      "polarity": "-",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.0,
+      "temp_C": 27,
+      "corner": "fs",
+      "polarity": "+",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.0,
+      "temp_C": 27,
+      "corner": "fs",
+      "polarity": "-",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.0,
+      "temp_C": 27,
+      "corner": "sf",
+      "polarity": "+",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.0,
+      "temp_C": 27,
+      "corner": "sf",
+      "polarity": "-",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.0,
+      "temp_C": 125,
+      "corner": "typical",
+      "polarity": "+",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.0,
+      "temp_C": 125,
+      "corner": "typical",
+      "polarity": "-",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.0,
+      "temp_C": 125,
+      "corner": "ff",
+      "polarity": "+",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.0,
+      "temp_C": 125,
+      "corner": "ff",
+      "polarity": "-",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.0,
+      "temp_C": 125,
+      "corner": "ss",
+      "polarity": "+",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.0,
+      "temp_C": 125,
+      "corner": "ss",
+      "polarity": "-",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.0,
+      "temp_C": 125,
+      "corner": "fs",
+      "polarity": "+",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.0,
+      "temp_C": 125,
+      "corner": "fs",
+      "polarity": "-",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.0,
+      "temp_C": 125,
+      "corner": "sf",
+      "polarity": "+",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.0,
+      "temp_C": 125,
+      "corner": "sf",
+      "polarity": "-",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.3,
+      "temp_C": -40,
+      "corner": "typical",
+      "polarity": "+",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.3,
+      "temp_C": -40,
+      "corner": "typical",
+      "polarity": "-",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.3,
+      "temp_C": -40,
+      "corner": "ff",
+      "polarity": "+",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.3,
+      "temp_C": -40,
+      "corner": "ff",
+      "polarity": "-",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.3,
+      "temp_C": -40,
+      "corner": "ss",
+      "polarity": "+",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.3,
+      "temp_C": -40,
+      "corner": "ss",
+      "polarity": "-",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.3,
+      "temp_C": -40,
+      "corner": "fs",
+      "polarity": "+",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.3,
+      "temp_C": -40,
+      "corner": "fs",
+      "polarity": "-",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.3,
+      "temp_C": -40,
+      "corner": "sf",
+      "polarity": "+",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.3,
+      "temp_C": -40,
+      "corner": "sf",
+      "polarity": "-",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.3,
+      "temp_C": 27,
+      "corner": "typical",
+      "polarity": "+",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.3,
+      "temp_C": 27,
+      "corner": "typical",
+      "polarity": "-",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.3,
+      "temp_C": 27,
+      "corner": "ff",
+      "polarity": "+",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.3,
+      "temp_C": 27,
+      "corner": "ff",
+      "polarity": "-",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.3,
+      "temp_C": 27,
+      "corner": "ss",
+      "polarity": "+",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.3,
+      "temp_C": 27,
+      "corner": "ss",
+      "polarity": "-",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.3,
+      "temp_C": 27,
+      "corner": "fs",
+      "polarity": "+",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.3,
+      "temp_C": 27,
+      "corner": "fs",
+      "polarity": "-",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.3,
+      "temp_C": 27,
+      "corner": "sf",
+      "polarity": "+",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.3,
+      "temp_C": 27,
+      "corner": "sf",
+      "polarity": "-",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.3,
+      "temp_C": 125,
+      "corner": "typical",
+      "polarity": "+",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.3,
+      "temp_C": 125,
+      "corner": "typical",
+      "polarity": "-",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.3,
+      "temp_C": 125,
+      "corner": "ff",
+      "polarity": "+",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.3,
+      "temp_C": 125,
+      "corner": "ff",
+      "polarity": "-",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.3,
+      "temp_C": 125,
+      "corner": "ss",
+      "polarity": "+",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.3,
+      "temp_C": 125,
+      "corner": "ss",
+      "polarity": "-",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.3,
+      "temp_C": 125,
+      "corner": "fs",
+      "polarity": "+",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.3,
+      "temp_C": 125,
+      "corner": "fs",
+      "polarity": "-",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.3,
+      "temp_C": 125,
+      "corner": "sf",
+      "polarity": "+",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.3,
+      "temp_C": 125,
+      "corner": "sf",
+      "polarity": "-",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.6,
+      "temp_C": -40,
+      "corner": "typical",
+      "polarity": "+",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.6,
+      "temp_C": -40,
+      "corner": "typical",
+      "polarity": "-",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.6,
+      "temp_C": -40,
+      "corner": "ff",
+      "polarity": "+",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.6,
+      "temp_C": -40,
+      "corner": "ff",
+      "polarity": "-",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.6,
+      "temp_C": -40,
+      "corner": "ss",
+      "polarity": "+",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.6,
+      "temp_C": -40,
+      "corner": "ss",
+      "polarity": "-",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.6,
+      "temp_C": -40,
+      "corner": "fs",
+      "polarity": "+",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.6,
+      "temp_C": -40,
+      "corner": "fs",
+      "polarity": "-",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.6,
+      "temp_C": -40,
+      "corner": "sf",
+      "polarity": "+",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.6,
+      "temp_C": -40,
+      "corner": "sf",
+      "polarity": "-",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.6,
+      "temp_C": 27,
+      "corner": "typical",
+      "polarity": "+",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.6,
+      "temp_C": 27,
+      "corner": "typical",
+      "polarity": "-",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.6,
+      "temp_C": 27,
+      "corner": "ff",
+      "polarity": "+",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.6,
+      "temp_C": 27,
+      "corner": "ff",
+      "polarity": "-",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.6,
+      "temp_C": 27,
+      "corner": "ss",
+      "polarity": "+",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.6,
+      "temp_C": 27,
+      "corner": "ss",
+      "polarity": "-",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.6,
+      "temp_C": 27,
+      "corner": "fs",
+      "polarity": "+",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.6,
+      "temp_C": 27,
+      "corner": "fs",
+      "polarity": "-",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.6,
+      "temp_C": 27,
+      "corner": "sf",
+      "polarity": "+",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.6,
+      "temp_C": 27,
+      "corner": "sf",
+      "polarity": "-",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.6,
+      "temp_C": 125,
+      "corner": "typical",
+      "polarity": "+",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.6,
+      "temp_C": 125,
+      "corner": "typical",
+      "polarity": "-",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.6,
+      "temp_C": 125,
+      "corner": "ff",
+      "polarity": "+",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.6,
+      "temp_C": 125,
+      "corner": "ff",
+      "polarity": "-",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.6,
+      "temp_C": 125,
+      "corner": "ss",
+      "polarity": "+",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.6,
+      "temp_C": 125,
+      "corner": "ss",
+      "polarity": "-",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.6,
+      "temp_C": 125,
+      "corner": "fs",
+      "polarity": "+",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.6,
+      "temp_C": 125,
+      "corner": "fs",
+      "polarity": "-",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.6,
+      "temp_C": 125,
+      "corner": "sf",
+      "polarity": "+",
+      "error": "aborted after an earlier bounded timeout"
+    },
+    {
+      "status": "NOT RUN",
+      "vdd_V": 3.6,
+      "temp_C": 125,
+      "corner": "sf",
+      "polarity": "-",
+      "error": "aborted after an earlier bounded timeout"
+    }
+  ]
+}

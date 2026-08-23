@@ -1,0 +1,515 @@
+{
+  "status": "SUCCESS",
+  "tapeout_ready": true,
+  "message": "all sign-off conditions met",
+  "elapsed": 70.61,
+  "request": {
+    "raw": "Design a Strong-Arm clocked comparator in GF180MCU gf180mcuD.\nVDD = 3.3 V, VSS = 0 V, VCM = 1.65 V, CLK = 10 MHz, CL = 20 fF per output.\nPorts exactly: VDD VSS INP INN CLK OUTP OUTN. Subckt: strongarm_comparator.\nMOSFET-only (nfet_03v3/pfet_03v3): no BJTs, resistors, capacitors or\nbehavioral elements. Targets given by the user:\n - minimum differential input <= 5 mV with correct decisions at +/-5 mV;\n - decision time <= 5 ns;\n - output differential swing >= 90% of VDD;\n - static current between comparisons approximately 0;\n - average current at 10 MHz <= 500 uA;\n - input common-mode range at least 1.0-2.3 V;\n - reset/precharge and regenerative evaluation required.\nCharacterize delay vs |VIN_DIFF| in {5,10,25,50,100} mV both polarities,\noffset by mismatch Monte Carlo where supported, PVT over VDD {3.0,3.3,3.6} V,\nTEMP {-40,27,125} C and GF180 process corners.\n",
+    "cell": "strongarm_comparator",
+    "topology": "comparator",
+    "pdk": "gf180mcuD",
+    "vdd": 3.3,
+    "load_f": null,
+    "specs": [
+      {
+        "name": "decision_time_s",
+        "op": "<=",
+        "target": 5e-09,
+        "unit": " s"
+      },
+      {
+        "name": "swing_ratio",
+        "op": ">=",
+        "target": 0.9,
+        "unit": " ratio"
+      },
+      {
+        "name": "correct_frac",
+        "op": ">=",
+        "target": 1.0,
+        "unit": " fraction"
+      },
+      {
+        "name": "iavg_a",
+        "op": "<=",
+        "target": 0.0005,
+        "unit": " A"
+      },
+      {
+        "name": "istatic_a",
+        "op": "<=",
+        "target": 5e-08,
+        "unit": " A"
+      }
+    ],
+    "provenance": {
+      "given": [
+        "vdd",
+        "decision_time_s",
+        "swing_ratio",
+        "correct_frac",
+        "iavg_a",
+        "istatic_a"
+      ],
+      "defaulted": [],
+      "inferred": [
+        "topology=comparator"
+      ],
+      "missing": [
+        "load capacitance"
+      ]
+    }
+  },
+  "flow": {
+    "cell": "strongarm_comparator",
+    "status": "PASS",
+    "stage": "COMPLETE",
+    "failure": "NONE",
+    "message": "final design meets PEX-aware specifications",
+    "elapsed": 70.603,
+    "pre_layout": [
+      {
+        "phase": "pre_layout",
+        "iteration": 1,
+        "spec_pass": true,
+        "score": 0.0,
+        "status": "PASS",
+        "failure": "NONE",
+        "message": "",
+        "metrics": {
+          "source": "pre_layout",
+          "pass": true,
+          "score": 0.0,
+          "metrics": {
+            "decision_time_s": {
+              "value": 3.090371929109519e-09,
+              "target": 5e-09,
+              "op": "<=",
+              "unit": " s",
+              "status": "PASS",
+              "margin": 1.909628070890481e-09,
+              "margin_pct": 38.193
+            },
+            "swing_ratio": {
+              "value": 0.9999999778325463,
+              "target": 0.9,
+              "op": ">=",
+              "unit": " ratio",
+              "status": "PASS",
+              "margin": 0.09999997783254633,
+              "margin_pct": 11.111
+            },
+            "correct_frac": {
+              "value": 1.0,
+              "target": 1.0,
+              "op": ">=",
+              "unit": " fraction",
+              "status": "PASS",
+              "margin": 0.0,
+              "margin_pct": 0.0
+            },
+            "iavg_a": {
+              "value": 4.641091789928104e-06,
+              "target": 0.0005,
+              "op": "<=",
+              "unit": " A",
+              "status": "PASS",
+              "margin": 0.0004953589082100719,
+              "margin_pct": 99.072
+            },
+            "istatic_a": {
+              "value": 6.906935878952619e-09,
+              "target": 5e-08,
+              "op": "<=",
+              "unit": " A",
+              "status": "PASS",
+              "margin": 4.309306412104738e-08,
+              "margin_pct": 86.186
+            }
+          }
+        },
+        "degradation": [],
+        "elapsed": 5.317
+      }
+    ],
+    "pex": [
+      {
+        "phase": "pex",
+        "iteration": 1,
+        "spec_pass": true,
+        "score": 0.0,
+        "status": "PASS",
+        "drc": "PASS",
+        "lvs": "PASS",
+        "pex_extraction": "PASS",
+        "pex_simulation": "PASS",
+        "failure": "NONE",
+        "message": "",
+        "metrics": {
+          "source": "pex",
+          "pass": true,
+          "score": 0.0,
+          "metrics": {
+            "decision_time_s": {
+              "value": 4.258084756977143e-09,
+              "target": 5e-09,
+              "op": "<=",
+              "unit": " s",
+              "status": "PASS",
+              "margin": 7.419152430228568e-10,
+              "margin_pct": 14.838
+            },
+            "swing_ratio": {
+              "value": 0.9999999778884876,
+              "target": 0.9,
+              "op": ">=",
+              "unit": " ratio",
+              "status": "PASS",
+              "margin": 0.09999997788848758,
+              "margin_pct": 11.111
+            },
+            "correct_frac": {
+              "value": 1.0,
+              "target": 1.0,
+              "op": ">=",
+              "unit": " fraction",
+              "status": "PASS",
+              "margin": 0.0,
+              "margin_pct": 0.0
+            },
+            "iavg_a": {
+              "value": 5.695870718532852e-06,
+              "target": 0.0005,
+              "op": "<=",
+              "unit": " A",
+              "status": "PASS",
+              "margin": 0.0004943041292814671,
+              "margin_pct": 98.861
+            },
+            "istatic_a": {
+              "value": 6.314493126874483e-09,
+              "target": 5e-08,
+              "op": "<=",
+              "unit": " A",
+              "status": "PASS",
+              "margin": 4.368550687312551e-08,
+              "margin_pct": 87.371
+            }
+          }
+        },
+        "degradation": [
+          {
+            "name": "decision_time_s",
+            "pre": 3.090371929109519e-09,
+            "post": 4.258084756977143e-09,
+            "unit": " s",
+            "delta": 1.1677128278676242e-09,
+            "delta_pct": 37.786,
+            "status": "PASS",
+            "worsened": true
+          },
+          {
+            "name": "iavg_a",
+            "pre": 4.641091789928104e-06,
+            "post": 5.695870718532852e-06,
+            "unit": " A",
+            "delta": 1.054778928604748e-06,
+            "delta_pct": 22.727,
+            "status": "PASS",
+            "worsened": true
+          },
+          {
+            "name": "istatic_a",
+            "pre": 6.906935878952619e-09,
+            "post": 6.314493126874483e-09,
+            "unit": " A",
+            "delta": -5.924427520781359e-10,
+            "delta_pct": -8.578,
+            "status": "PASS",
+            "worsened": false
+          },
+          {
+            "name": "swing_ratio",
+            "pre": 0.9999999778325463,
+            "post": 0.9999999778884876,
+            "unit": " ratio",
+            "delta": 5.594125163099761e-11,
+            "delta_pct": 0.0,
+            "status": "PASS",
+            "worsened": false
+          },
+          {
+            "name": "correct_frac",
+            "pre": 1.0,
+            "post": 1.0,
+            "unit": " fraction",
+            "delta": 0.0,
+            "delta_pct": 0.0,
+            "status": "PASS",
+            "worsened": false
+          }
+        ],
+        "elapsed": 65.285
+      }
+    ],
+    "best_pre": {
+      "source": "pre_layout",
+      "pass": true,
+      "score": 0.0,
+      "metrics": {
+        "decision_time_s": {
+          "value": 3.090371929109519e-09,
+          "target": 5e-09,
+          "op": "<=",
+          "unit": " s",
+          "status": "PASS",
+          "margin": 1.909628070890481e-09,
+          "margin_pct": 38.193
+        },
+        "swing_ratio": {
+          "value": 0.9999999778325463,
+          "target": 0.9,
+          "op": ">=",
+          "unit": " ratio",
+          "status": "PASS",
+          "margin": 0.09999997783254633,
+          "margin_pct": 11.111
+        },
+        "correct_frac": {
+          "value": 1.0,
+          "target": 1.0,
+          "op": ">=",
+          "unit": " fraction",
+          "status": "PASS",
+          "margin": 0.0,
+          "margin_pct": 0.0
+        },
+        "iavg_a": {
+          "value": 4.641091789928104e-06,
+          "target": 0.0005,
+          "op": "<=",
+          "unit": " A",
+          "status": "PASS",
+          "margin": 0.0004953589082100719,
+          "margin_pct": 99.072
+        },
+        "istatic_a": {
+          "value": 6.906935878952619e-09,
+          "target": 5e-08,
+          "op": "<=",
+          "unit": " A",
+          "status": "PASS",
+          "margin": 4.309306412104738e-08,
+          "margin_pct": 86.186
+        }
+      }
+    },
+    "best_pex": {
+      "source": "pex",
+      "pass": true,
+      "score": 0.0,
+      "metrics": {
+        "decision_time_s": {
+          "value": 4.258084756977143e-09,
+          "target": 5e-09,
+          "op": "<=",
+          "unit": " s",
+          "status": "PASS",
+          "margin": 7.419152430228568e-10,
+          "margin_pct": 14.838
+        },
+        "swing_ratio": {
+          "value": 0.9999999778884876,
+          "target": 0.9,
+          "op": ">=",
+          "unit": " ratio",
+          "status": "PASS",
+          "margin": 0.09999997788848758,
+          "margin_pct": 11.111
+        },
+        "correct_frac": {
+          "value": 1.0,
+          "target": 1.0,
+          "op": ">=",
+          "unit": " fraction",
+          "status": "PASS",
+          "margin": 0.0,
+          "margin_pct": 0.0
+        },
+        "iavg_a": {
+          "value": 5.695870718532852e-06,
+          "target": 0.0005,
+          "op": "<=",
+          "unit": " A",
+          "status": "PASS",
+          "margin": 0.0004943041292814671,
+          "margin_pct": 98.861
+        },
+        "istatic_a": {
+          "value": 6.314493126874483e-09,
+          "target": 5e-08,
+          "op": "<=",
+          "unit": " A",
+          "status": "PASS",
+          "margin": 4.368550687312551e-08,
+          "margin_pct": 87.371
+        }
+      }
+    },
+    "best_pex_iteration": 1,
+    "degradation": [
+      {
+        "name": "decision_time_s",
+        "pre": 3.090371929109519e-09,
+        "post": 4.258084756977143e-09,
+        "unit": " s",
+        "delta": 1.1677128278676242e-09,
+        "delta_pct": 37.786,
+        "status": "PASS",
+        "worsened": true
+      },
+      {
+        "name": "iavg_a",
+        "pre": 4.641091789928104e-06,
+        "post": 5.695870718532852e-06,
+        "unit": " A",
+        "delta": 1.054778928604748e-06,
+        "delta_pct": 22.727,
+        "status": "PASS",
+        "worsened": true
+      },
+      {
+        "name": "istatic_a",
+        "pre": 6.906935878952619e-09,
+        "post": 6.314493126874483e-09,
+        "unit": " A",
+        "delta": -5.924427520781359e-10,
+        "delta_pct": -8.578,
+        "status": "PASS",
+        "worsened": false
+      },
+      {
+        "name": "swing_ratio",
+        "pre": 0.9999999778325463,
+        "post": 0.9999999778884876,
+        "unit": " ratio",
+        "delta": 5.594125163099761e-11,
+        "delta_pct": 0.0,
+        "status": "PASS",
+        "worsened": false
+      },
+      {
+        "name": "correct_frac",
+        "pre": 1.0,
+        "post": 1.0,
+        "unit": " fraction",
+        "delta": 0.0,
+        "delta_pct": 0.0,
+        "status": "PASS",
+        "worsened": false
+      }
+    ]
+  },
+  "signoff": {
+    "passed": true,
+    "conditions": [
+      {
+        "condition": "artifact consistency",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "pre-layout specs",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "PEX specs",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "DRC clean",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "DRC sign-off (Magic + KLayout)",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "LVS match",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "PEX extraction",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "final GDS",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "final PEX netlist",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "no CRITICAL findings",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "reviews complete",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "PVT corners",
+        "status": "NOT REQUIRED",
+        "detail": "not part of this flow"
+      },
+      {
+        "condition": "Monte Carlo / mismatch",
+        "status": "NOT REQUIRED",
+        "detail": "not part of this flow"
+      },
+      {
+        "condition": "design report",
+        "status": "PASS",
+        "detail": ""
+      }
+    ]
+  },
+  "reviews": {
+    "devil": {
+      "reviews": 2,
+      "findings": 3,
+      "by_severity": {
+        "INFO": 1,
+        "MEDIUM": 1,
+        "HIGH": 1
+      },
+      "unresolved_critical": []
+    },
+    "angel": {
+      "reviews": 2,
+      "recommendations": 0,
+      "tested": 0,
+      "improved": 0,
+      "degraded": 0
+    },
+    "recommendations": []
+  },
+  "package": {
+    "gds": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/ox_alpha_strongarm_comparator/final/strongarm_comparator.gds",
+    "pex_spice": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/ox_alpha_strongarm_comparator/final/strongarm_comparator.pex.spice",
+    "drc_report": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/ox_alpha_strongarm_comparator/final/strongarm_comparator.magic.drc.rpt",
+    "lvs_report": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/ox_alpha_strongarm_comparator/final/strongarm_comparator.lvs.out",
+    "iteration_history": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/ox_alpha_strongarm_comparator/final/iteration_history.json"
+  }
+}

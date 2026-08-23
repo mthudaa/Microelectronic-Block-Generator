@@ -1,0 +1,28 @@
+{
+ "iteration": 4,
+ "pending": [],
+ "fails": {
+  "tail_up": 1,
+  "pair_w_up": 2,
+  "pair_L_down": 1,
+  "nlat_up": 2,
+  "plat_up": 2
+ },
+ "patience": 2,
+ "best": {
+  "netlist": ".lib \"/home/huda/.volare/gf180mcuD/libs.tech/ngspice/sm141064.ngspice\" typical\n.subckt strongarm_comparator VDD VSS INP INN CLK OUTP OUTN\nXMTAIL SN CLK VSS VSS nfet_03v3 L=0.5u W=9.1u nf=1\nXMINN SN_P INN SN VSS nfet_03v3 L=0.7u W=3u nf=1\nXMINP SN_N INP SN VSS nfet_03v3 L=0.7u W=3u nf=1\nXMLATN OUTN OUTP SN_N VSS nfet_03v3 L=0.5u W=2.3u nf=1\nXMLATP OUTP OUTN SN_P VSS nfet_03v3 L=0.5u W=2.3u nf=1\nXMPLTN OUTN OUTP VDD VDD pfet_03v3 L=0.5u W=3u nf=1\nXMPLTP OUTP OUTN VDD VDD pfet_03v3 L=0.5u W=3u nf=1\nXMPRSN SN_N CLK VDD VDD pfet_03v3 L=0.5u W=0.8u nf=1\nXMPRSP SN_P CLK VDD VDD pfet_03v3 L=0.5u W=0.8u nf=1\nXMPRON OUTN CLK VDD VDD pfet_03v3 L=0.5u W=1.6u nf=1\nXMPROP OUTP CLK VDD VDD pfet_03v3 L=0.5u W=1.6u nf=1\n.ends\n",
+  "iteration": 4,
+  "score": 0.0,
+  "passed": true,
+  "metrics": {
+   "decision_time_s": 4.258084756977143e-09,
+   "swing_ratio": 0.9999999778884873,
+   "correct_frac": 1.0,
+   "istatic_a": 6.314493126849538e-09,
+   "iavg_a": 5.695870718524205e-06
+  },
+  "move": "combo_tail_nlat"
+ },
+ "done": "PASS",
+ "last_promotion_iter": 1
+}

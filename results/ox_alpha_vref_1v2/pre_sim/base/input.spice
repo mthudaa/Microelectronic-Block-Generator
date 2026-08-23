@@ -1,0 +1,25 @@
+.include '/home/huda/.volare/gf180mcuD/libs.tech/ngspice/design.ngspice'
+.lib '/home/huda/.volare/gf180mcuD/libs.tech/ngspice/sm141064.ngspice' typical
+
+* 1.2-V MOS-only voltage reference (externally biased self-cascode)
+* VREF = VGS(XMT) + VDS(XMB); XMB is common-gate triode supplying the
+* positive-tempco term against the negative-tempco VGS(XMT) term.
+* IBIAS pin convention: pin delivers IBIAS out to a generator tied to VSS.
+.subckt vref_1v2 VDD VSS VREF IBIAS
+XM1 IBIAS IBIAS VDD VDD pfet_03v3 W=2u L=8u nf=1
+XM2 VREF  IBIAS VDD VDD pfet_03v3 W=2u L=8u nf=1
+XMT VREF  VREF  VMB  VSS nfet_03v3 W=9.6u L=0.35u nf=12
+XMB VMB   VREF  VSS  VSS nfet_03v3 W=9.5u L=7.45u nf=1
+.ends
+
+Vsupply0 VDD 0 3.3
+Vsupply1 VSS 0 0.0
+C_load_VREF VREF 0 1p
+IBIN IBIAS VSS DC 20u
+Xdut VDD VSS VREF IBIAS vref_1v2
+
+.control
+dc Vsupply0 2.7 3.6 0.02
+wrdata dc.dat v(VREF)
+.endc
+.end

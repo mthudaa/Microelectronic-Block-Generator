@@ -1,0 +1,26 @@
+.include '/home/huda/.volare/gf180mcuD/libs.tech/ngspice/design.ngspice'
+.lib '/home/huda/.volare/gf180mcuD/libs.tech/ngspice/sm141064.ngspice' typical
+.temp 27.0
+
+.subckt ota VDD VSS INP INN OUT IBIAS
+XM1  net1 INP net2 VSS nfet_03v3 L=1u W=4u nf=4
+XM2  OUT  INN net2 VSS nfet_03v3 L=1u W=4u nf=4
+XM3  net1 net1 VDD VDD pfet_03v3 L=1u W=2.4u nf=4
+XM4  OUT  net1 VDD VDD pfet_03v3 L=1u W=2.4u nf=4
+XM5  net2 IBIAS VSS VSS nfet_03v3 L=1u W=8u nf=4
+XM6  IBIAS IBIAS VSS VSS nfet_03v3 L=1u W=4u nf=4
+.ends
+
+Vsupply0 VDD 0 3.3
+Vsupply1 VSS 0 0.0
+Vsrc0 INP 0 DC 1.35 PULSE(1.35 1.95 0 5n 5n 30u 60u)
+Vsrc1 INN 0 DC 1.65
+C_load_OUT OUT 0 5e-12
+Ibias_IBIAS 0 IBIAS DC 2e-05
+Xdut VDD VSS INP INN OUT IBIAS ota
+
+.control
+tran 10n 60u
+wrdata tr.dat v(OUT)
+.endc
+.end

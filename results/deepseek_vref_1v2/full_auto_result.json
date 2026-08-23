@@ -1,0 +1,827 @@
+{
+  "status": "SUCCESS",
+  "tapeout_ready": true,
+  "message": "all sign-off conditions met",
+  "elapsed": 114.951,
+  "request": {
+    "raw": "Design a 1.2V MOS-only voltage reference in GF180MCU (gf180mcuD) with ports VDD VSS VREF IBIAS where IBIAS is an external bias current input. VDD = 3.3 V, VSS = 0 V, IBIAS = 20 uA nominal, CL = 1 pF, 27 C. Use MOSFET-only circuitry (nfet_03v3 / pfet_03v3) \u2014 no BJTs, no bandgap, no explicit resistors or reference-setting capacitors. VREF nominal 1.20 V and allowed 1.15-1.25 V; temperature coefficient <= 300 ppm/C over -40..125 C; line regulation <= 100 mV/V over 3.0-3.6 V; VREF variation over 3.0-3.6 V <= 60 mV; supply current excluding IBIAS <= 300 uA. Characterize IBIAS sensitivity at 10/20/30 uA, supply behaviour from ~2.7-3.6 V, and PVT (VDD 3.0/3.3/3.6 V, temp -40/27/125 C, gf180 typical/ff/ss corners).",
+    "cell": "vref_1v2",
+    "topology": "voltage reference",
+    "pdk": "gf180mcuD",
+    "vdd": 3.3,
+    "load_f": 1e-12,
+    "specs": [
+      {
+        "name": "vref",
+        "op": "==",
+        "target": 1.2,
+        "unit": " V"
+      },
+      {
+        "name": "tempco_ppmC",
+        "op": "<=",
+        "target": 300.0,
+        "unit": " ppm/C"
+      },
+      {
+        "name": "line_reg_mV_V",
+        "op": "<=",
+        "target": 100.0,
+        "unit": " mV/V"
+      },
+      {
+        "name": "vref_swing_mV",
+        "op": "<=",
+        "target": 60.0,
+        "unit": " mV"
+      },
+      {
+        "name": "idd_ua",
+        "op": "<=",
+        "target": 300.0,
+        "unit": " uA"
+      },
+      {
+        "name": "vref_10u",
+        "op": "==",
+        "target": 1.2,
+        "unit": " V"
+      },
+      {
+        "name": "vref_30u",
+        "op": "==",
+        "target": 1.2,
+        "unit": " V"
+      },
+      {
+        "name": "vref_2v7",
+        "op": "==",
+        "target": 1.2,
+        "unit": " V"
+      },
+      {
+        "name": "vref_min",
+        "op": ">=",
+        "target": 1.0,
+        "unit": " V"
+      },
+      {
+        "name": "vref_max",
+        "op": "<=",
+        "target": 1.4,
+        "unit": " V"
+      }
+    ],
+    "provenance": {
+      "given": [
+        "vdd",
+        "load",
+        "vref",
+        "tempco_ppmC",
+        "line_reg_mV_V",
+        "vref_swing_mV",
+        "idd_ua",
+        "vref_10u",
+        "vref_30u",
+        "vref_2v7",
+        "vref_min",
+        "vref_max"
+      ],
+      "defaulted": [],
+      "inferred": [
+        "topology=voltage reference"
+      ],
+      "missing": []
+    }
+  },
+  "flow": {
+    "cell": "vref_1v2",
+    "status": "PASS",
+    "stage": "COMPLETE",
+    "failure": "NONE",
+    "message": "final design meets PEX-aware specifications",
+    "elapsed": 114.93,
+    "pre_layout": [
+      {
+        "phase": "pre_layout",
+        "iteration": 1,
+        "spec_pass": true,
+        "score": 0.0,
+        "status": "PASS",
+        "failure": "NONE",
+        "message": "",
+        "metrics": {
+          "source": "pre_layout",
+          "pass": true,
+          "score": 0.0,
+          "metrics": {
+            "vref": {
+              "value": 1.22537783,
+              "target": 1.2,
+              "op": "==",
+              "unit": " V",
+              "status": "PASS",
+              "margin": null,
+              "margin_pct": null
+            },
+            "tempco_ppmC": {
+              "value": 59.94883838383812,
+              "target": 300.0,
+              "op": "<=",
+              "unit": " ppm/C",
+              "status": "PASS",
+              "margin": 240.0511616161619,
+              "margin_pct": 80.017
+            },
+            "line_reg_mV_V": {
+              "value": 5.26823333333352,
+              "target": 100.0,
+              "op": "<=",
+              "unit": " mV/V",
+              "status": "PASS",
+              "margin": 94.73176666666647,
+              "margin_pct": 94.732
+            },
+            "vref_swing_mV": {
+              "value": 5.092560000000024,
+              "target": 60.0,
+              "op": "<=",
+              "unit": " mV",
+              "status": "PASS",
+              "margin": 54.90743999999998,
+              "margin_pct": 91.512
+            },
+            "idd_ua": {
+              "value": 61.2998,
+              "target": 300.0,
+              "op": "<=",
+              "unit": " uA",
+              "status": "PASS",
+              "margin": 238.7002,
+              "margin_pct": 79.567
+            },
+            "vref_10u": {
+              "value": 1.04853865,
+              "target": 1.2,
+              "op": "==",
+              "unit": " V",
+              "status": "PASS",
+              "margin": null,
+              "margin_pct": null
+            },
+            "vref_30u": {
+              "value": 1.37059449,
+              "target": 1.2,
+              "op": "==",
+              "unit": " V",
+              "status": "PASS",
+              "margin": null,
+              "margin_pct": null
+            },
+            "vref_2v7": {
+              "value": 1.2217856,
+              "target": 1.2,
+              "op": "==",
+              "unit": " V",
+              "status": "PASS",
+              "margin": null,
+              "margin_pct": null
+            },
+            "vref_min": {
+              "value": 1.21945857,
+              "target": 1.0,
+              "op": ">=",
+              "unit": " V",
+              "status": "PASS",
+              "margin": 0.21945857000000002,
+              "margin_pct": 21.946
+            },
+            "vref_max": {
+              "value": 1.23132844,
+              "target": 1.4,
+              "op": "<=",
+              "unit": " V",
+              "status": "PASS",
+              "margin": 0.16867155999999994,
+              "margin_pct": 12.048
+            }
+          }
+        },
+        "degradation": [],
+        "elapsed": 7.24
+      }
+    ],
+    "pex": [
+      {
+        "phase": "pex",
+        "iteration": 1,
+        "spec_pass": true,
+        "score": 0.0,
+        "status": "PASS",
+        "drc": "PASS",
+        "lvs": "PASS",
+        "pex_extraction": "PASS",
+        "pex_simulation": "PASS",
+        "failure": "NONE",
+        "message": "",
+        "metrics": {
+          "source": "pex",
+          "pass": true,
+          "score": 0.0,
+          "metrics": {
+            "vref": {
+              "value": 1.22537783,
+              "target": 1.2,
+              "op": "==",
+              "unit": " V",
+              "status": "PASS",
+              "margin": null,
+              "margin_pct": null
+            },
+            "tempco_ppmC": {
+              "value": 59.94883838383812,
+              "target": 300.0,
+              "op": "<=",
+              "unit": " ppm/C",
+              "status": "PASS",
+              "margin": 240.0511616161619,
+              "margin_pct": 80.017
+            },
+            "line_reg_mV_V": {
+              "value": 5.268250000000085,
+              "target": 100.0,
+              "op": "<=",
+              "unit": " mV/V",
+              "status": "PASS",
+              "margin": 94.73174999999992,
+              "margin_pct": 94.732
+            },
+            "vref_swing_mV": {
+              "value": 5.092580000000124,
+              "target": 60.0,
+              "op": "<=",
+              "unit": " mV",
+              "status": "PASS",
+              "margin": 54.907419999999874,
+              "margin_pct": 91.512
+            },
+            "idd_ua": {
+              "value": 61.2998,
+              "target": 300.0,
+              "op": "<=",
+              "unit": " uA",
+              "status": "PASS",
+              "margin": 238.7002,
+              "margin_pct": 79.567
+            },
+            "vref_10u": {
+              "value": 1.04853867,
+              "target": 1.2,
+              "op": "==",
+              "unit": " V",
+              "status": "PASS",
+              "margin": null,
+              "margin_pct": null
+            },
+            "vref_30u": {
+              "value": 1.37059448,
+              "target": 1.2,
+              "op": "==",
+              "unit": " V",
+              "status": "PASS",
+              "margin": null,
+              "margin_pct": null
+            },
+            "vref_2v7": {
+              "value": 1.22178558,
+              "target": 1.2,
+              "op": "==",
+              "unit": " V",
+              "status": "PASS",
+              "margin": null,
+              "margin_pct": null
+            },
+            "vref_min": {
+              "value": 1.21945857,
+              "target": 1.0,
+              "op": ">=",
+              "unit": " V",
+              "status": "PASS",
+              "margin": 0.21945857000000002,
+              "margin_pct": 21.946
+            },
+            "vref_max": {
+              "value": 1.23132844,
+              "target": 1.4,
+              "op": "<=",
+              "unit": " V",
+              "status": "PASS",
+              "margin": 0.16867155999999994,
+              "margin_pct": 12.048
+            }
+          }
+        },
+        "degradation": [
+          {
+            "name": "line_reg_mV_V",
+            "pre": 5.26823333333352,
+            "post": 5.268250000000085,
+            "unit": " mV/V",
+            "delta": 1.6666666565079424e-05,
+            "delta_pct": 0.0,
+            "status": "PASS",
+            "worsened": true
+          },
+          {
+            "name": "vref_swing_mV",
+            "pre": 5.092560000000024,
+            "post": 5.092580000000124,
+            "unit": " mV",
+            "delta": 2.0000000100495186e-05,
+            "delta_pct": 0.0,
+            "status": "PASS",
+            "worsened": true
+          },
+          {
+            "name": "vref",
+            "pre": 1.22537783,
+            "post": 1.22537783,
+            "unit": " V",
+            "delta": 0.0,
+            "delta_pct": 0.0,
+            "status": "PASS",
+            "worsened": false
+          },
+          {
+            "name": "tempco_ppmC",
+            "pre": 59.94883838383812,
+            "post": 59.94883838383812,
+            "unit": " ppm/C",
+            "delta": 0.0,
+            "delta_pct": 0.0,
+            "status": "PASS",
+            "worsened": false
+          },
+          {
+            "name": "idd_ua",
+            "pre": 61.2998,
+            "post": 61.2998,
+            "unit": " uA",
+            "delta": 0.0,
+            "delta_pct": 0.0,
+            "status": "PASS",
+            "worsened": false
+          },
+          {
+            "name": "vref_10u",
+            "pre": 1.04853865,
+            "post": 1.04853867,
+            "unit": " V",
+            "delta": 1.999999987845058e-08,
+            "delta_pct": 0.0,
+            "status": "PASS",
+            "worsened": false
+          },
+          {
+            "name": "vref_30u",
+            "pre": 1.37059449,
+            "post": 1.37059448,
+            "unit": " V",
+            "delta": -9.99999993922529e-09,
+            "delta_pct": -0.0,
+            "status": "PASS",
+            "worsened": false
+          },
+          {
+            "name": "vref_2v7",
+            "pre": 1.2217856,
+            "post": 1.22178558,
+            "unit": " V",
+            "delta": -2.0000000100495186e-08,
+            "delta_pct": -0.0,
+            "status": "PASS",
+            "worsened": false
+          },
+          {
+            "name": "vref_min",
+            "pre": 1.21945857,
+            "post": 1.21945857,
+            "unit": " V",
+            "delta": 0.0,
+            "delta_pct": 0.0,
+            "status": "PASS",
+            "worsened": false
+          },
+          {
+            "name": "vref_max",
+            "pre": 1.23132844,
+            "post": 1.23132844,
+            "unit": " V",
+            "delta": 0.0,
+            "delta_pct": 0.0,
+            "status": "PASS",
+            "worsened": false
+          }
+        ],
+        "elapsed": 107.687
+      }
+    ],
+    "best_pre": {
+      "source": "pre_layout",
+      "pass": true,
+      "score": 0.0,
+      "metrics": {
+        "vref": {
+          "value": 1.22537783,
+          "target": 1.2,
+          "op": "==",
+          "unit": " V",
+          "status": "PASS",
+          "margin": null,
+          "margin_pct": null
+        },
+        "tempco_ppmC": {
+          "value": 59.94883838383812,
+          "target": 300.0,
+          "op": "<=",
+          "unit": " ppm/C",
+          "status": "PASS",
+          "margin": 240.0511616161619,
+          "margin_pct": 80.017
+        },
+        "line_reg_mV_V": {
+          "value": 5.26823333333352,
+          "target": 100.0,
+          "op": "<=",
+          "unit": " mV/V",
+          "status": "PASS",
+          "margin": 94.73176666666647,
+          "margin_pct": 94.732
+        },
+        "vref_swing_mV": {
+          "value": 5.092560000000024,
+          "target": 60.0,
+          "op": "<=",
+          "unit": " mV",
+          "status": "PASS",
+          "margin": 54.90743999999998,
+          "margin_pct": 91.512
+        },
+        "idd_ua": {
+          "value": 61.2998,
+          "target": 300.0,
+          "op": "<=",
+          "unit": " uA",
+          "status": "PASS",
+          "margin": 238.7002,
+          "margin_pct": 79.567
+        },
+        "vref_10u": {
+          "value": 1.04853865,
+          "target": 1.2,
+          "op": "==",
+          "unit": " V",
+          "status": "PASS",
+          "margin": null,
+          "margin_pct": null
+        },
+        "vref_30u": {
+          "value": 1.37059449,
+          "target": 1.2,
+          "op": "==",
+          "unit": " V",
+          "status": "PASS",
+          "margin": null,
+          "margin_pct": null
+        },
+        "vref_2v7": {
+          "value": 1.2217856,
+          "target": 1.2,
+          "op": "==",
+          "unit": " V",
+          "status": "PASS",
+          "margin": null,
+          "margin_pct": null
+        },
+        "vref_min": {
+          "value": 1.21945857,
+          "target": 1.0,
+          "op": ">=",
+          "unit": " V",
+          "status": "PASS",
+          "margin": 0.21945857000000002,
+          "margin_pct": 21.946
+        },
+        "vref_max": {
+          "value": 1.23132844,
+          "target": 1.4,
+          "op": "<=",
+          "unit": " V",
+          "status": "PASS",
+          "margin": 0.16867155999999994,
+          "margin_pct": 12.048
+        }
+      }
+    },
+    "best_pex": {
+      "source": "pex",
+      "pass": true,
+      "score": 0.0,
+      "metrics": {
+        "vref": {
+          "value": 1.22537783,
+          "target": 1.2,
+          "op": "==",
+          "unit": " V",
+          "status": "PASS",
+          "margin": null,
+          "margin_pct": null
+        },
+        "tempco_ppmC": {
+          "value": 59.94883838383812,
+          "target": 300.0,
+          "op": "<=",
+          "unit": " ppm/C",
+          "status": "PASS",
+          "margin": 240.0511616161619,
+          "margin_pct": 80.017
+        },
+        "line_reg_mV_V": {
+          "value": 5.268250000000085,
+          "target": 100.0,
+          "op": "<=",
+          "unit": " mV/V",
+          "status": "PASS",
+          "margin": 94.73174999999992,
+          "margin_pct": 94.732
+        },
+        "vref_swing_mV": {
+          "value": 5.092580000000124,
+          "target": 60.0,
+          "op": "<=",
+          "unit": " mV",
+          "status": "PASS",
+          "margin": 54.907419999999874,
+          "margin_pct": 91.512
+        },
+        "idd_ua": {
+          "value": 61.2998,
+          "target": 300.0,
+          "op": "<=",
+          "unit": " uA",
+          "status": "PASS",
+          "margin": 238.7002,
+          "margin_pct": 79.567
+        },
+        "vref_10u": {
+          "value": 1.04853867,
+          "target": 1.2,
+          "op": "==",
+          "unit": " V",
+          "status": "PASS",
+          "margin": null,
+          "margin_pct": null
+        },
+        "vref_30u": {
+          "value": 1.37059448,
+          "target": 1.2,
+          "op": "==",
+          "unit": " V",
+          "status": "PASS",
+          "margin": null,
+          "margin_pct": null
+        },
+        "vref_2v7": {
+          "value": 1.22178558,
+          "target": 1.2,
+          "op": "==",
+          "unit": " V",
+          "status": "PASS",
+          "margin": null,
+          "margin_pct": null
+        },
+        "vref_min": {
+          "value": 1.21945857,
+          "target": 1.0,
+          "op": ">=",
+          "unit": " V",
+          "status": "PASS",
+          "margin": 0.21945857000000002,
+          "margin_pct": 21.946
+        },
+        "vref_max": {
+          "value": 1.23132844,
+          "target": 1.4,
+          "op": "<=",
+          "unit": " V",
+          "status": "PASS",
+          "margin": 0.16867155999999994,
+          "margin_pct": 12.048
+        }
+      }
+    },
+    "best_pex_iteration": 1,
+    "degradation": [
+      {
+        "name": "line_reg_mV_V",
+        "pre": 5.26823333333352,
+        "post": 5.268250000000085,
+        "unit": " mV/V",
+        "delta": 1.6666666565079424e-05,
+        "delta_pct": 0.0,
+        "status": "PASS",
+        "worsened": true
+      },
+      {
+        "name": "vref_swing_mV",
+        "pre": 5.092560000000024,
+        "post": 5.092580000000124,
+        "unit": " mV",
+        "delta": 2.0000000100495186e-05,
+        "delta_pct": 0.0,
+        "status": "PASS",
+        "worsened": true
+      },
+      {
+        "name": "vref",
+        "pre": 1.22537783,
+        "post": 1.22537783,
+        "unit": " V",
+        "delta": 0.0,
+        "delta_pct": 0.0,
+        "status": "PASS",
+        "worsened": false
+      },
+      {
+        "name": "tempco_ppmC",
+        "pre": 59.94883838383812,
+        "post": 59.94883838383812,
+        "unit": " ppm/C",
+        "delta": 0.0,
+        "delta_pct": 0.0,
+        "status": "PASS",
+        "worsened": false
+      },
+      {
+        "name": "idd_ua",
+        "pre": 61.2998,
+        "post": 61.2998,
+        "unit": " uA",
+        "delta": 0.0,
+        "delta_pct": 0.0,
+        "status": "PASS",
+        "worsened": false
+      },
+      {
+        "name": "vref_10u",
+        "pre": 1.04853865,
+        "post": 1.04853867,
+        "unit": " V",
+        "delta": 1.999999987845058e-08,
+        "delta_pct": 0.0,
+        "status": "PASS",
+        "worsened": false
+      },
+      {
+        "name": "vref_30u",
+        "pre": 1.37059449,
+        "post": 1.37059448,
+        "unit": " V",
+        "delta": -9.99999993922529e-09,
+        "delta_pct": -0.0,
+        "status": "PASS",
+        "worsened": false
+      },
+      {
+        "name": "vref_2v7",
+        "pre": 1.2217856,
+        "post": 1.22178558,
+        "unit": " V",
+        "delta": -2.0000000100495186e-08,
+        "delta_pct": -0.0,
+        "status": "PASS",
+        "worsened": false
+      },
+      {
+        "name": "vref_min",
+        "pre": 1.21945857,
+        "post": 1.21945857,
+        "unit": " V",
+        "delta": 0.0,
+        "delta_pct": 0.0,
+        "status": "PASS",
+        "worsened": false
+      },
+      {
+        "name": "vref_max",
+        "pre": 1.23132844,
+        "post": 1.23132844,
+        "unit": " V",
+        "delta": 0.0,
+        "delta_pct": 0.0,
+        "status": "PASS",
+        "worsened": false
+      }
+    ]
+  },
+  "signoff": {
+    "passed": true,
+    "conditions": [
+      {
+        "condition": "artifact consistency",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "pre-layout specs",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "PEX specs",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "DRC clean",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "DRC sign-off (Magic + KLayout)",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "LVS match",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "PEX extraction",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "final GDS",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "final PEX netlist",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "no CRITICAL findings",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "reviews complete",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "PVT corners",
+        "status": "NOT REQUIRED",
+        "detail": "not part of this flow"
+      },
+      {
+        "condition": "Monte Carlo / mismatch",
+        "status": "NOT REQUIRED",
+        "detail": "not part of this flow"
+      },
+      {
+        "condition": "design report",
+        "status": "PASS",
+        "detail": ""
+      }
+    ]
+  },
+  "reviews": {
+    "devil": {
+      "reviews": 2,
+      "findings": 2,
+      "by_severity": {
+        "INFO": 2
+      },
+      "unresolved_critical": []
+    },
+    "angel": {
+      "reviews": 2,
+      "recommendations": 0,
+      "tested": 0,
+      "improved": 0,
+      "degraded": 0
+    },
+    "recommendations": []
+  },
+  "package": {
+    "gds": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/deepseek_vref_1v2/final/vref_1v2.gds",
+    "pex_spice": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/deepseek_vref_1v2/final/vref_1v2.pex.spice",
+    "drc_report": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/deepseek_vref_1v2/final/vref_1v2.magic.drc.rpt",
+    "lvs_report": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/deepseek_vref_1v2/final/vref_1v2.lvs.out",
+    "iteration_history": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/deepseek_vref_1v2/final/iteration_history.json"
+  }
+}

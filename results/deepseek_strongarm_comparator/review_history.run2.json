@@ -1,0 +1,193 @@
+{
+  "summary": {
+    "devil": {
+      "reviews": 2,
+      "findings": 6,
+      "by_severity": {
+        "INFO": 1,
+        "HIGH": 4,
+        "CRITICAL": 1
+      },
+      "unresolved_critical": [
+        "Sign-off requested while required specifications are unmet."
+      ]
+    },
+    "angel": {
+      "reviews": 2,
+      "recommendations": 0,
+      "tested": 0,
+      "improved": 0,
+      "degraded": 0
+    },
+    "recommendations": []
+  },
+  "decisions": [
+    {
+      "stage": "SPECIFICATION",
+      "verdict": "ACCEPT",
+      "reason": "measured results meet the required specifications",
+      "evidence_pass": true,
+      "blocking": [],
+      "accepted": [],
+      "reviews": [
+        {
+          "reviewer": "devil",
+          "stage": "SPECIFICATION",
+          "verdict": "ACCEPT",
+          "confidence": 0.55,
+          "status": "OK",
+          "error": "",
+          "elapsed": 0.0,
+          "findings": [
+            {
+              "severity": "INFO",
+              "category": "scope",
+              "finding": "No objection from the evidence provided. Note that corner and mismatch data were not part of this review.",
+              "evidence": {}
+            }
+          ],
+          "recommendations": []
+        },
+        {
+          "reviewer": "angel",
+          "stage": "SPECIFICATION",
+          "verdict": "ACCEPT",
+          "confidence": 0.8,
+          "status": "OK",
+          "error": "",
+          "elapsed": 0.0,
+          "findings": [
+            {
+              "severity": "INFO",
+              "category": "status",
+              "finding": "All required targets are met on the evidence supplied; no change recommended.",
+              "evidence": {}
+            }
+          ],
+          "recommendations": []
+        }
+      ],
+      "iteration": 0
+    },
+    {
+      "stage": "FINAL_SIGNOFF",
+      "verdict": "BLOCK",
+      "reason": "a hard verification gate failed; reviewer opinion cannot override DRC/LVS/PEX evidence",
+      "evidence_pass": false,
+      "blocking": [
+        {
+          "severity": "CRITICAL",
+          "category": "signoff",
+          "finding": "Sign-off requested while required specifications are unmet.",
+          "evidence": {
+            "failures": [
+              "n_correct",
+              "icmr_hi"
+            ]
+          }
+        }
+      ],
+      "accepted": [],
+      "reviews": [
+        {
+          "reviewer": "devil",
+          "stage": "FINAL_SIGNOFF",
+          "verdict": "BLOCK",
+          "confidence": 0.95,
+          "status": "OK",
+          "error": "",
+          "elapsed": 0.0,
+          "findings": [
+            {
+              "severity": "HIGH",
+              "category": "n_correct",
+              "finding": "n_correct misses its target (9 vs == 10).",
+              "evidence": {
+                "target": 10.0,
+                "measured": 9.0,
+                "margin_pct": null
+              }
+            },
+            {
+              "severity": "HIGH",
+              "category": "icmr_hi",
+              "finding": "icmr_hi misses its target (2.1 vs >= 2.3 V).",
+              "evidence": {
+                "target": 2.3,
+                "measured": 2.1,
+                "margin_pct": -8.696
+              }
+            },
+            {
+              "severity": "HIGH",
+              "category": "t_dec_ns",
+              "finding": "t_dec_ns degraded +63.0% from pre-layout to extraction. A shift that large means the schematic result was not predictive of silicon.",
+              "evidence": {
+                "pre": 0.6110850249404205,
+                "post": 0.9958447089251063,
+                "delta_pct": 62.963
+              }
+            },
+            {
+              "severity": "HIGH",
+              "category": "i_avg_ua",
+              "finding": "i_avg_ua degraded +26.9% from pre-layout to extraction. A shift that large means the schematic result was not predictive of silicon.",
+              "evidence": {
+                "pre": 5.269835802989866,
+                "post": 6.684836294786576,
+                "delta_pct": 26.851
+              }
+            },
+            {
+              "severity": "CRITICAL",
+              "category": "signoff",
+              "finding": "Sign-off requested while required specifications are unmet.",
+              "evidence": {
+                "failures": [
+                  "n_correct",
+                  "icmr_hi"
+                ]
+              }
+            }
+          ],
+          "recommendations": []
+        },
+        {
+          "reviewer": "angel",
+          "stage": "FINAL_SIGNOFF",
+          "verdict": "REVISE",
+          "confidence": 0.4,
+          "status": "OK",
+          "error": "",
+          "elapsed": 0.0,
+          "findings": [
+            {
+              "severity": "MEDIUM",
+              "category": "parasitics",
+              "finding": "icmr_hi, n_correct met target before layout and lost it after extraction, so the circuit topology is adequate and the problem is physical. Layout changes should be tried before resizing.",
+              "evidence": {
+                "degraded": [
+                  "icmr_hi",
+                  "n_correct"
+                ]
+              }
+            },
+            {
+              "severity": "MEDIUM",
+              "category": "coverage",
+              "finding": "No catalogued action addresses icmr_hi, n_correct; this needs a designer or a richer reviewer.",
+              "evidence": {
+                "unmet": [
+                  "icmr_hi",
+                  "n_correct"
+                ]
+              }
+            }
+          ],
+          "recommendations": []
+        }
+      ],
+      "iteration": 2
+    }
+  ]
+}

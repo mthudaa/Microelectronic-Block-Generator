@@ -1,0 +1,21 @@
+.include '/home/huda/.volare/gf180mcuD/libs.tech/ngspice/design.ngspice'
+.lib '/home/huda/.volare/gf180mcuD/libs.tech/ngspice/sm141064.ngspice' typical
+.temp 27.0
+
+.subckt oscillator VDD VSS OSC_OUT
+XINV0 n1 OSC_OUT VSS VSS nfet_03v3 L=4u W=2u nf=1
+XINV0P n1 OSC_OUT VDD VDD pfet_03v3 L=4u W=4u nf=1
+XINV1 n2 n1 VSS VSS nfet_03v3 L=4u W=2u nf=1
+XINV1P n2 n1 VDD VDD pfet_03v3 L=4u W=4u nf=1
+XINV2 OSC_OUT n2 VSS VSS nfet_03v3 L=4u W=2u nf=1
+XINV2P OSC_OUT n2 VDD VDD pfet_03v3 L=4u W=4u nf=1
+.ends
+
+Xosc VDD VSS OSC_OUT oscillator
+Vvdd VDD 0 PULSE(0 3.3 0 1u 1u 100u 100u)
+Vvss VSS 0 0
+.control
+tran 5n 12u 0 5n
+wrdata osc.dat v(OSC_OUT) v(vdd) i(Vvdd)
+.endc
+.end

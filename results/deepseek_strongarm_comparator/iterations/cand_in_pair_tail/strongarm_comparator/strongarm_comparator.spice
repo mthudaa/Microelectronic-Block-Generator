@@ -1,0 +1,14 @@
+.lib "/home/huda/.volare/gf180mcuD/libs.tech/ngspice/sm141064.ngspice" typical
+.subckt strongarm_comparator VDD VSS INP INN CLK OUTP OUTN
+XM1  TAIL CLK VSS VSS nfet_03v3 L=0.5u W=9.6u nf=4
+XM2  D1 INP TAIL VSS nfet_03v3 L=0.6u W=9.99u nf=5
+XM3  D2 INN TAIL VSS nfet_03v3 L=0.6u W=9.99u nf=5
+XM4  OUTN OUTP D1 VSS nfet_03v3 L=0.5u W=6u nf=3
+XM5  OUTP OUTN D2 VSS nfet_03v3 L=0.5u W=6u nf=3
+XM6  OUTN OUTP VDD VDD pfet_03v3 L=0.5u W=6u nf=3
+XM7  OUTP OUTN VDD VDD pfet_03v3 L=0.5u W=6u nf=3
+XM8  OUTN CLK VDD VDD pfet_03v3 L=0.5u W=2u nf=1
+XM9  OUTP CLK VDD VDD pfet_03v3 L=0.5u W=2u nf=1
+XM10 D1 CLK VDD VDD pfet_03v3 L=0.5u W=2u nf=1
+XM11 D2 CLK VDD VDD pfet_03v3 L=0.5u W=2u nf=1
+.ends

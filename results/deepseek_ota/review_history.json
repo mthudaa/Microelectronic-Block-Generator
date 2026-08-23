@@ -1,0 +1,121 @@
+{
+  "summary": {
+    "devil": {
+      "reviews": 2,
+      "findings": 2,
+      "by_severity": {
+        "INFO": 1,
+        "HIGH": 1
+      },
+      "unresolved_critical": []
+    },
+    "angel": {
+      "reviews": 2,
+      "recommendations": 0,
+      "tested": 0,
+      "improved": 0,
+      "degraded": 0
+    },
+    "recommendations": []
+  },
+  "decisions": [
+    {
+      "stage": "SPECIFICATION",
+      "verdict": "ACCEPT",
+      "reason": "measured results meet the required specifications",
+      "evidence_pass": true,
+      "blocking": [],
+      "accepted": [],
+      "reviews": [
+        {
+          "reviewer": "devil",
+          "stage": "SPECIFICATION",
+          "verdict": "ACCEPT",
+          "confidence": 0.55,
+          "status": "OK",
+          "error": "",
+          "elapsed": 0.0,
+          "findings": [
+            {
+              "severity": "INFO",
+              "category": "scope",
+              "finding": "No objection from the evidence provided. Note that corner and mismatch data were not part of this review.",
+              "evidence": {}
+            }
+          ],
+          "recommendations": []
+        },
+        {
+          "reviewer": "angel",
+          "stage": "SPECIFICATION",
+          "verdict": "ACCEPT",
+          "confidence": 0.8,
+          "status": "OK",
+          "error": "",
+          "elapsed": 0.0,
+          "findings": [
+            {
+              "severity": "INFO",
+              "category": "status",
+              "finding": "All required targets are met on the evidence supplied; no change recommended.",
+              "evidence": {}
+            }
+          ],
+          "recommendations": []
+        }
+      ],
+      "iteration": 0
+    },
+    {
+      "stage": "FINAL_SIGNOFF",
+      "verdict": "ACCEPT",
+      "reason": "measured results meet the required specifications; 1 HIGH concern(s) noted",
+      "evidence_pass": true,
+      "blocking": [],
+      "accepted": [],
+      "reviews": [
+        {
+          "reviewer": "devil",
+          "stage": "FINAL_SIGNOFF",
+          "verdict": "REVISE",
+          "confidence": 0.9,
+          "status": "OK",
+          "error": "",
+          "elapsed": 0.0,
+          "findings": [
+            {
+              "severity": "HIGH",
+              "category": "offset_mv",
+              "finding": "offset_mv degraded -235.5% from pre-layout to extraction. A shift that large means the schematic result was not predictive of silicon.",
+              "evidence": {
+                "pre": -0.21022381564628212,
+                "post": -0.7053839535882123,
+                "delta_pct": -235.54
+              }
+            }
+          ],
+          "recommendations": []
+        },
+        {
+          "reviewer": "angel",
+          "stage": "FINAL_SIGNOFF",
+          "verdict": "ACCEPT",
+          "confidence": 0.8,
+          "status": "OK",
+          "error": "",
+          "elapsed": 0.0,
+          "findings": [
+            {
+              "severity": "INFO",
+              "category": "status",
+              "finding": "All required targets are met on the evidence supplied; no change recommended.",
+              "evidence": {}
+            }
+          ],
+          "recommendations": []
+        }
+      ],
+      "iteration": 1
+    }
+  ]
+}

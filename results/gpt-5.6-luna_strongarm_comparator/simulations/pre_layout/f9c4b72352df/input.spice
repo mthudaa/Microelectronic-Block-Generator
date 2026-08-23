@@ -1,0 +1,33 @@
+.include '/home/huda/.volare/gf180mcuD/libs.tech/ngspice/design.ngspice'
+.lib '/home/huda/.volare/gf180mcuD/libs.tech/ngspice/sm141064.ngspice' ss
+
+.subckt strongarm_comparator VDD VSS INP INN CLK OUTP OUTN
+XM1 TAIL CLK  VSS VSS nfet_03v3 L=0.6u W=4u nf=4
+XM2 D1   INP  TAIL VSS nfet_03v3 L=0.6u W=3u nf=3
+XM3 D2   INN  TAIL VSS nfet_03v3 L=0.6u W=3u nf=3
+XM4 OUTN OUTP D1   VSS nfet_03v3 L=0.6u W=5u nf=5
+XM5 OUTP OUTN D2   VSS nfet_03v3 L=0.6u W=5u nf=5
+XM6 OUTN OUTP VDD  VDD pfet_03v3 L=0.6u W=3u nf=3
+XM7 OUTP OUTN VDD  VDD pfet_03v3 L=0.6u W=3u nf=3
+XM8 OUTN CLK  VDD  VDD pfet_03v3 L=0.6u W=3u nf=3
+XM9 OUTP CLK  VDD  VDD pfet_03v3 L=0.6u W=3u nf=3
+XM10 D1  CLK  VDD  VDD pfet_03v3 L=0.6u W=3u nf=3
+XM11 D2  CLK  VDD  VDD pfet_03v3 L=0.6u W=3u nf=3
+.ends strongarm_comparator
+
+Vsupply0 VDD 0 3.0
+Vsupply1 VSS 0 0.0
+Vsrc0 INP 0 DC 1.6524999999999999
+Vsrc1 INN 0 DC 1.6475
+Vsrc2 CLK 0 PULSE(0 3.0 10n 50p 50p 40n 100n)
+C_load_OUTP OUTP 0 20f
+C_load_OUTN OUTN 0 20f
+Xdut VDD VSS INP INN CLK OUTP OUTN strongarm_comparator
+
+.temp 125
+.control
+tran 20p 120n
+wrdata tran.dat v(OUTP) v(OUTN)
+meas tran avg_current AVG i(Vsupply0) from=10n to=110n
+.endc
+.end

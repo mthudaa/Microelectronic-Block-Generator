@@ -1,0 +1,325 @@
+{
+  "status": "SUCCESS",
+  "tapeout_ready": true,
+  "message": "all sign-off conditions met",
+  "elapsed": 64.504,
+  "request": {
+    "raw": "Design an Operational Transconductance Amplifier (OTA) using the Microelectronic-Block-Generator framework with the GF180MCU gf180mcuD PDK. Use exactly the ports VDD VSS INP INN OUT IBIAS and top-level .subckt ota VDD VSS INP INN OUT IBIAS. IBIAS is an external bias current input. Use VDD=3.3 V, VSS=0 V, nominal IBIAS=20 uA, VIN_CM=1.65 V, CL=5 pF, TEMP=27 C. Targets: DC gain >= 35 dB, GBW >= 1 MHz, phase margin >= 60 deg, rising slew rate >= 0.5 V/us, falling slew rate >= 0.5 V/us, supply current excluding IBIAS <= 250 uA, output DC at zero differential input 1.65 V +/- 0.5 V, usable output swing >= 0.5-2.8 V, load 5 pF. Also characterize CMRR, PSRR, input common-mode range, power, noise, and offset where supported. Characterize VDD=3.0, 3.3, 3.6 V and TEMP=-40, 27, 125 C with meaningful GF180 process corners. Choose the simplest OTA topology that can satisfy the specifications after post-layout extraction and do not simply copy an existing repository example.",
+    "cell": "ota",
+    "topology": "OTA",
+    "pdk": "gf180mcuD",
+    "vdd": 3.3,
+    "load_f": 5e-12,
+    "specs": [
+      {
+        "name": "gain_db",
+        "op": ">=",
+        "target": 35.0,
+        "unit": " dB"
+      },
+      {
+        "name": "ugf_hz",
+        "op": ">=",
+        "target": 1000000.0,
+        "unit": " Hz"
+      }
+    ],
+    "provenance": {
+      "given": [
+        "vdd",
+        "load",
+        "gain_db",
+        "bw_hz",
+        "ugf_hz",
+        "pm_deg"
+      ],
+      "defaulted": [],
+      "inferred": [
+        "topology=OTA"
+      ],
+      "missing": []
+    }
+  },
+  "flow": {
+    "cell": "ota",
+    "status": "PASS",
+    "stage": "COMPLETE",
+    "failure": "NONE",
+    "message": "final design meets PEX-aware specifications",
+    "elapsed": 64.494,
+    "pre_layout": [
+      {
+        "phase": "pre_layout",
+        "iteration": 1,
+        "spec_pass": true,
+        "score": 0.0,
+        "status": "PASS",
+        "failure": "NONE",
+        "message": "",
+        "metrics": {
+          "source": "pre_layout",
+          "pass": true,
+          "score": 0.0,
+          "metrics": {
+            "gain_db": {
+              "value": 44.51958349528648,
+              "target": 35.0,
+              "op": ">=",
+              "unit": " dB",
+              "status": "PASS",
+              "margin": 9.519583495286483,
+              "margin_pct": 27.199
+            },
+            "ugf_hz": {
+              "value": 2238721.14,
+              "target": 1000000.0,
+              "op": ">=",
+              "unit": " Hz",
+              "status": "PASS",
+              "margin": 1238721.1400000001,
+              "margin_pct": 123.872
+            }
+          }
+        },
+        "degradation": [],
+        "elapsed": 0.244
+      }
+    ],
+    "pex": [
+      {
+        "phase": "pex",
+        "iteration": 1,
+        "spec_pass": true,
+        "score": 0.0,
+        "status": "PASS",
+        "drc": "PASS",
+        "lvs": "PASS",
+        "pex_extraction": "PASS",
+        "pex_simulation": "PASS",
+        "failure": "NONE",
+        "message": "",
+        "metrics": {
+          "source": "pex",
+          "pass": true,
+          "score": 0.0,
+          "metrics": {
+            "gain_db": {
+              "value": 44.50609904095559,
+              "target": 35.0,
+              "op": ">=",
+              "unit": " dB",
+              "status": "PASS",
+              "margin": 9.50609904095559,
+              "margin_pct": 27.16
+            },
+            "ugf_hz": {
+              "value": 2238721.14,
+              "target": 1000000.0,
+              "op": ">=",
+              "unit": " Hz",
+              "status": "PASS",
+              "margin": 1238721.1400000001,
+              "margin_pct": 123.872
+            }
+          }
+        },
+        "degradation": [
+          {
+            "name": "gain_db",
+            "pre": 44.51958349528648,
+            "post": 44.50609904095559,
+            "unit": " dB",
+            "delta": -0.013484454330892959,
+            "delta_pct": -0.03,
+            "status": "PASS",
+            "worsened": true
+          },
+          {
+            "name": "ugf_hz",
+            "pre": 2238721.14,
+            "post": 2238721.14,
+            "unit": " Hz",
+            "delta": 0.0,
+            "delta_pct": 0.0,
+            "status": "PASS",
+            "worsened": false
+          }
+        ],
+        "elapsed": 64.25
+      }
+    ],
+    "best_pre": {
+      "source": "pre_layout",
+      "pass": true,
+      "score": 0.0,
+      "metrics": {
+        "gain_db": {
+          "value": 44.51958349528648,
+          "target": 35.0,
+          "op": ">=",
+          "unit": " dB",
+          "status": "PASS",
+          "margin": 9.519583495286483,
+          "margin_pct": 27.199
+        },
+        "ugf_hz": {
+          "value": 2238721.14,
+          "target": 1000000.0,
+          "op": ">=",
+          "unit": " Hz",
+          "status": "PASS",
+          "margin": 1238721.1400000001,
+          "margin_pct": 123.872
+        }
+      }
+    },
+    "best_pex": {
+      "source": "pex",
+      "pass": true,
+      "score": 0.0,
+      "metrics": {
+        "gain_db": {
+          "value": 44.50609904095559,
+          "target": 35.0,
+          "op": ">=",
+          "unit": " dB",
+          "status": "PASS",
+          "margin": 9.50609904095559,
+          "margin_pct": 27.16
+        },
+        "ugf_hz": {
+          "value": 2238721.14,
+          "target": 1000000.0,
+          "op": ">=",
+          "unit": " Hz",
+          "status": "PASS",
+          "margin": 1238721.1400000001,
+          "margin_pct": 123.872
+        }
+      }
+    },
+    "best_pex_iteration": 1,
+    "degradation": [
+      {
+        "name": "gain_db",
+        "pre": 44.51958349528648,
+        "post": 44.50609904095559,
+        "unit": " dB",
+        "delta": -0.013484454330892959,
+        "delta_pct": -0.03,
+        "status": "PASS",
+        "worsened": true
+      },
+      {
+        "name": "ugf_hz",
+        "pre": 2238721.14,
+        "post": 2238721.14,
+        "unit": " Hz",
+        "delta": 0.0,
+        "delta_pct": 0.0,
+        "status": "PASS",
+        "worsened": false
+      }
+    ]
+  },
+  "signoff": {
+    "passed": true,
+    "conditions": [
+      {
+        "condition": "artifact consistency",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "pre-layout specs",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "PEX specs",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "DRC clean",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "DRC sign-off (Magic + KLayout)",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "LVS match",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "PEX extraction",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "final GDS",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "final PEX netlist",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "no CRITICAL findings",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "reviews complete",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "PVT corners",
+        "status": "NOT REQUIRED",
+        "detail": "not part of this flow"
+      },
+      {
+        "condition": "Monte Carlo / mismatch",
+        "status": "NOT REQUIRED",
+        "detail": "not part of this flow"
+      },
+      {
+        "condition": "design report",
+        "status": "PASS",
+        "detail": ""
+      }
+    ]
+  },
+  "reviews": {
+    "devil": {
+      "reviews": 2,
+      "findings": 2,
+      "by_severity": {
+        "INFO": 2
+      },
+      "unresolved_critical": []
+    },
+    "angel": {
+      "reviews": 2,
+      "recommendations": 0,
+      "tested": 0,
+      "improved": 0,
+      "degraded": 0
+    },
+    "recommendations": []
+  },
+  "package": {
+    "gds": "results/gpt-5.6-luna_ota/final/ota.gds",
+    "pex_spice": "results/gpt-5.6-luna_ota/final/ota.pex.spice",
+    "drc_report": "results/gpt-5.6-luna_ota/final/ota.magic.drc.rpt",
+    "lvs_report": "results/gpt-5.6-luna_ota/final/ota.lvs.out",
+    "iteration_history": "results/gpt-5.6-luna_ota/final/iteration_history.json"
+  }
+}

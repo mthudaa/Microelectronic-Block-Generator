@@ -1,0 +1,76 @@
+* PEX produced on Sun Aug 23 10:51:00 AM CST 2026 using /home/huda/opensource-project/Microelectronic-Block-Generator/designs/notebooks/chipathon2026-D/scripts/iic-pex.sh with m=2 and s=1
+* NGSPICE file created from strongarm_comparator.ext - technology: gf180mcuD
+
+.option scale=5n
+
+.subckt strongarm_comparator OUTN OUTP CLK INN INP VSS VDD
+X0 a_n4546_4360# INN a_n3842_8290# VSS nfet_03v3 ad=11.76n pd=0.322m as=11.76n ps=0.322m w=210 l=120
+X1 OUTN OUTP a_n5398_8290# VSS nfet_03v3 ad=25.2n pd=0.66m as=11.76n ps=0.322m w=210 l=120
+X2 a_n3842_8290# CLK VDD VDD pfet_03v3 ad=11.76n pd=0.322m as=25.2n ps=0.66m w=210 l=120
+X3 a_n5398_8290# INP a_n4546_4360# VSS nfet_03v3 ad=11.76n pd=0.322m as=25.2n ps=0.66m w=210 l=120
+X4 a_n3842_8290# INN a_n4546_4360# VSS nfet_03v3 ad=11.76n pd=0.322m as=25.2n ps=0.66m w=210 l=120
+X5 OUTP OUTN VDD VDD pfet_03v3 ad=11.76n pd=0.322m as=25.2n ps=0.66m w=210 l=120
+X6 OUTN CLK VDD VDD pfet_03v3 ad=11.76n pd=0.322m as=25.2n ps=0.66m w=210 l=120
+X7 OUTP OUTN a_n3842_8290# VSS nfet_03v3 ad=11.76n pd=0.322m as=25.2n ps=0.66m w=210 l=120
+X8 a_n4546_4360# INP a_n5398_8290# VSS nfet_03v3 ad=11.76n pd=0.322m as=11.76n ps=0.322m w=210 l=120
+X9 OUTN OUTP a_n5398_8290# VSS nfet_03v3 ad=11.76n pd=0.322m as=25.2n ps=0.66m w=210 l=120
+X10 VDD CLK OUTN VDD pfet_03v3 ad=11.76n pd=0.322m as=11.76n ps=0.322m w=210 l=120
+X11 a_n3842_8290# OUTN OUTP VSS nfet_03v3 ad=11.76n pd=0.322m as=11.76n ps=0.322m w=210 l=120
+X12 VDD CLK OUTP VDD pfet_03v3 ad=11.76n pd=0.322m as=11.76n ps=0.322m w=210 l=120
+X13 OUTP OUTN a_n3842_8290# VSS nfet_03v3 ad=11.76n pd=0.322m as=11.76n ps=0.322m w=210 l=120
+X14 OUTP CLK VDD VDD pfet_03v3 ad=11.76n pd=0.322m as=25.2n ps=0.66m w=210 l=120
+X15 OUTP CLK VDD VDD pfet_03v3 ad=25.2n pd=0.66m as=11.76n ps=0.322m w=210 l=120
+X16 VSS CLK a_n4546_4360# VSS nfet_03v3 ad=25.2n pd=0.66m as=11.76n ps=0.322m w=210 l=120
+X17 VDD OUTN OUTP VDD pfet_03v3 ad=11.76n pd=0.322m as=11.76n ps=0.322m w=210 l=120
+X18 VSS CLK a_n4546_4360# VSS nfet_03v3 ad=11.76n pd=0.322m as=11.76n ps=0.322m w=210 l=120
+X19 a_n5398_8290# OUTP OUTN VSS nfet_03v3 ad=11.76n pd=0.322m as=11.76n ps=0.322m w=210 l=120
+X20 OUTN OUTP VDD VDD pfet_03v3 ad=25.2n pd=0.66m as=11.76n ps=0.322m w=210 l=120
+X21 OUTP OUTN VDD VDD pfet_03v3 ad=25.2n pd=0.66m as=11.76n ps=0.322m w=210 l=120
+X22 a_n5398_8290# OUTP OUTN VSS nfet_03v3 ad=11.76n pd=0.322m as=11.76n ps=0.322m w=210 l=120
+X23 VDD CLK a_n3842_8290# VDD pfet_03v3 ad=11.76n pd=0.322m as=11.76n ps=0.322m w=210 l=120
+X24 OUTN OUTP VDD VDD pfet_03v3 ad=11.76n pd=0.322m as=25.2n ps=0.66m w=210 l=120
+X25 OUTP OUTN a_n3842_8290# VSS nfet_03v3 ad=25.2n pd=0.66m as=11.76n ps=0.322m w=210 l=120
+X26 OUTN OUTP a_n5398_8290# VSS nfet_03v3 ad=11.76n pd=0.322m as=11.76n ps=0.322m w=210 l=120
+X27 VDD OUTP OUTN VDD pfet_03v3 ad=11.76n pd=0.322m as=11.76n ps=0.322m w=210 l=120
+X28 a_n5398_8290# INP a_n4546_4360# VSS nfet_03v3 ad=25.2n pd=0.66m as=11.76n ps=0.322m w=210 l=120
+X29 a_n4546_4360# CLK VSS VSS nfet_03v3 ad=11.76n pd=0.322m as=25.2n ps=0.66m w=210 l=120
+X30 a_n5398_8290# CLK VDD VDD pfet_03v3 ad=11.76n pd=0.322m as=25.2n ps=0.66m w=210 l=120
+X31 a_n3842_8290# OUTN OUTP VSS nfet_03v3 ad=11.76n pd=0.322m as=11.76n ps=0.322m w=210 l=120
+X32 a_n5398_8290# CLK VDD VDD pfet_03v3 ad=25.2n pd=0.66m as=11.76n ps=0.322m w=210 l=120
+X33 a_n3842_8290# CLK VDD VDD pfet_03v3 ad=25.2n pd=0.66m as=11.76n ps=0.322m w=210 l=120
+X34 OUTN CLK VDD VDD pfet_03v3 ad=25.2n pd=0.66m as=11.76n ps=0.322m w=210 l=120
+X35 a_n3842_8290# INN a_n4546_4360# VSS nfet_03v3 ad=25.2n pd=0.66m as=11.76n ps=0.322m w=210 l=120
+X36 a_n4546_4360# CLK VSS VSS nfet_03v3 ad=11.76n pd=0.322m as=11.76n ps=0.322m w=210 l=120
+X37 VDD CLK a_n5398_8290# VDD pfet_03v3 ad=11.76n pd=0.322m as=11.76n ps=0.322m w=210 l=120
+C0 a_n4546_4360# a_n3842_8290# 1.27319f
+C1 VDD CLK 8.39255f
+C2 a_n5398_8290# VDD 2.64296f
+C3 VDD OUTN 8.04763f
+C4 a_n4546_4360# CLK 0.3292f
+C5 a_n3842_8290# OUTP 1.93417f
+C6 a_n4546_4360# a_n5398_8290# 1.46999f
+C7 a_n5398_8290# INP 0.16127f
+C8 a_n3842_8290# CLK 0.58371f
+C9 a_n4546_4360# INN 0.31208f
+C10 a_n3842_8290# a_n5398_8290# 0.44681f
+C11 a_n3842_8290# OUTN 0.65952f
+C12 a_n3842_8290# INN 0.1572f
+C13 CLK OUTP 0.15416f
+C14 a_n5398_8290# OUTP 0.37899f
+C15 a_n3842_8290# VDD 2.76697f
+C16 OUTN OUTP 2.29231f
+C17 a_n5398_8290# CLK 0.3261f
+C18 CLK OUTN 0.21786f
+C19 a_n4546_4360# INP 0.33221f
+C20 a_n5398_8290# OUTN 1.7022f
+C21 VDD OUTP 7.20937f
+C22 INN VSS 1.46602f
+C23 INP VSS 1.43542f
+C24 OUTP VSS 7.26649f
+C25 OUTN VSS 7.07216f
+C26 CLK VSS 5.82793f
+C27 VDD VSS 43.7908f
+C28 a_n4546_4360# VSS 6.54072f ; **FLOATING
+C29 a_n3842_8290# VSS 4.72723f ; **FLOATING
+C30 a_n5398_8290# VSS 4.77813f ; **FLOATING
+.ends

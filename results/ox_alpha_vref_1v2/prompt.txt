@@ -1,0 +1,90 @@
+Design a **1.2-V MOS-only voltage reference** using the Microelectronic-Block-Generator framework with the **GF180MCU `gf180mcuD` PDK**.
+
+Follow the existing MBG SKILL for the complete workflow.
+
+## Result Directory
+
+Store all results in:
+
+```text
+results/{model_name}_vref_1v2
+```
+
+## Ports
+
+Use exactly:
+
+```text
+VDD VSS VREF IBIAS
+```
+
+Top-level:
+
+```spice
+.subckt vref_1v2 VDD VSS VREF IBIAS
+```
+
+`IBIAS` is an external bias current input.
+
+## Technology
+
+```text
+PDK : gf180mcuD
+VDD : 3.3 V
+VSS : 0 V
+```
+
+Use **MOSFET-only circuitry**, preferably `nfet_03v3` and `pfet_03v3`.
+
+Do NOT use:
+
+- BJTs;
+- parasitic bipolar devices;
+- bandgap architectures;
+- explicit resistors;
+- explicit capacitors as reference-setting elements.
+
+## Nominal Conditions
+
+```text
+VDD   = 3.3 V
+IBIAS = 20 µA
+CL    = 1 pF
+TEMP  = 27 °C
+```
+
+## Specifications
+
+| Parameter | Target |
+|---|---:|
+| Nominal VREF | 1.20 V |
+| Allowed VREF | 1.15–1.25 V |
+| Temperature coefficient | ≤ 300 ppm/°C |
+| Temperature range | -40 to 125 °C |
+| Line regulation, 3.0–3.6 V | ≤ 100 mV/V |
+| VREF variation over 3.0–3.6 V | ≤ 60 mV |
+| Supply current excluding IBIAS | ≤ 300 µA |
+| Load | 1 pF |
+
+Characterize IBIAS sensitivity at:
+
+```text
+10 µA
+20 µA
+30 µA
+```
+
+and supply behavior from approximately `2.7–3.6 V`.
+
+## PVT
+
+Characterize at:
+
+```text
+VDD  = 3.0, 3.3, 3.6 V
+TEMP = -40, 27, 125 °C
+```
+
+plus enough temperature points to calculate tempco, and meaningful GF180 process corners available in the PDK.
+
+Choose the simplest **MOS-only** topology capable of meeting the specifications after PEX. Do not simply copy an existing repository example.

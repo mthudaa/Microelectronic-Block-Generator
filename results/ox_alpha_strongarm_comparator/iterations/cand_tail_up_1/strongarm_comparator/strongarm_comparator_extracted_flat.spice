@@ -1,0 +1,16 @@
+* NGSPICE file created from strongarm_comparator.ext - technology: gf180mcuD
+
+.subckt strongarm_comparator VDD VSS INP INN CLK OUTP OUTN
+X0 OUTN OUTP VDD VDD pfet_03v3 ad=1.8p pd=7.2u as=1.8p ps=7.2u w=3u l=0.5u
+X1 a_n1958_7444# INN a_n2078_4626# VSS nfet_03v3 ad=1.8p pd=7.2u as=1.8p ps=7.2u w=3u l=1u
+X2 OUTP OUTN a_n1958_7444# VSS nfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=0.5u
+X3 a_n2078_4626# CLK VSS VSS nfet_03v3 ad=5.934p pd=20.98u as=5.934p ps=20.98u w=9.89u l=0.5u
+X4 OUTN CLK VDD VDD pfet_03v3 ad=0.96p pd=4.4u as=0.96p ps=4.4u w=1.6u l=0.5u
+X5 OUTP CLK VDD VDD pfet_03v3 ad=0.96p pd=4.4u as=0.96p ps=4.4u w=1.6u l=0.5u
+X6 OUTN OUTP a_n3030_7444# VSS nfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=0.5u
+X7 a_n1958_7444# CLK VDD VDD pfet_03v3 ad=0.48p pd=2.8u as=0.48p ps=2.8u w=0.8u l=0.5u
+X8 a_n3030_7444# CLK VDD VDD pfet_03v3 ad=0.48p pd=2.8u as=0.48p ps=2.8u w=0.8u l=0.5u
+X9 a_n3030_7444# INP a_n2078_4626# VSS nfet_03v3 ad=1.8p pd=7.2u as=1.8p ps=7.2u w=3u l=1u
+X10 OUTP OUTN VDD VDD pfet_03v3 ad=1.8p pd=7.2u as=1.8p ps=7.2u w=3u l=0.5u
+.ends
+

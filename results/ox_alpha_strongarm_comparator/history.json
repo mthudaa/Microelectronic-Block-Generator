@@ -1,0 +1,350 @@
+{
+  "cell": "strongarm_comparator",
+  "status": "PASS",
+  "stage": "COMPLETE",
+  "failure": "NONE",
+  "message": "final design meets PEX-aware specifications",
+  "elapsed": 70.603,
+  "pre_layout": [
+    {
+      "phase": "pre_layout",
+      "iteration": 1,
+      "spec_pass": true,
+      "score": 0.0,
+      "status": "PASS",
+      "failure": "NONE",
+      "message": "",
+      "metrics": {
+        "source": "pre_layout",
+        "pass": true,
+        "score": 0.0,
+        "metrics": {
+          "decision_time_s": {
+            "value": 3.090371929109519e-09,
+            "target": 5e-09,
+            "op": "<=",
+            "unit": " s",
+            "status": "PASS",
+            "margin": 1.909628070890481e-09,
+            "margin_pct": 38.193
+          },
+          "swing_ratio": {
+            "value": 0.9999999778325463,
+            "target": 0.9,
+            "op": ">=",
+            "unit": " ratio",
+            "status": "PASS",
+            "margin": 0.09999997783254633,
+            "margin_pct": 11.111
+          },
+          "correct_frac": {
+            "value": 1.0,
+            "target": 1.0,
+            "op": ">=",
+            "unit": " fraction",
+            "status": "PASS",
+            "margin": 0.0,
+            "margin_pct": 0.0
+          },
+          "iavg_a": {
+            "value": 4.641091789928104e-06,
+            "target": 0.0005,
+            "op": "<=",
+            "unit": " A",
+            "status": "PASS",
+            "margin": 0.0004953589082100719,
+            "margin_pct": 99.072
+          },
+          "istatic_a": {
+            "value": 6.906935878952619e-09,
+            "target": 5e-08,
+            "op": "<=",
+            "unit": " A",
+            "status": "PASS",
+            "margin": 4.309306412104738e-08,
+            "margin_pct": 86.186
+          }
+        }
+      },
+      "degradation": [],
+      "elapsed": 5.317
+    }
+  ],
+  "pex": [
+    {
+      "phase": "pex",
+      "iteration": 1,
+      "spec_pass": true,
+      "score": 0.0,
+      "status": "PASS",
+      "drc": "PASS",
+      "lvs": "PASS",
+      "pex_extraction": "PASS",
+      "pex_simulation": "PASS",
+      "failure": "NONE",
+      "message": "",
+      "metrics": {
+        "source": "pex",
+        "pass": true,
+        "score": 0.0,
+        "metrics": {
+          "decision_time_s": {
+            "value": 4.258084756977143e-09,
+            "target": 5e-09,
+            "op": "<=",
+            "unit": " s",
+            "status": "PASS",
+            "margin": 7.419152430228568e-10,
+            "margin_pct": 14.838
+          },
+          "swing_ratio": {
+            "value": 0.9999999778884876,
+            "target": 0.9,
+            "op": ">=",
+            "unit": " ratio",
+            "status": "PASS",
+            "margin": 0.09999997788848758,
+            "margin_pct": 11.111
+          },
+          "correct_frac": {
+            "value": 1.0,
+            "target": 1.0,
+            "op": ">=",
+            "unit": " fraction",
+            "status": "PASS",
+            "margin": 0.0,
+            "margin_pct": 0.0
+          },
+          "iavg_a": {
+            "value": 5.695870718532852e-06,
+            "target": 0.0005,
+            "op": "<=",
+            "unit": " A",
+            "status": "PASS",
+            "margin": 0.0004943041292814671,
+            "margin_pct": 98.861
+          },
+          "istatic_a": {
+            "value": 6.314493126874483e-09,
+            "target": 5e-08,
+            "op": "<=",
+            "unit": " A",
+            "status": "PASS",
+            "margin": 4.368550687312551e-08,
+            "margin_pct": 87.371
+          }
+        }
+      },
+      "degradation": [
+        {
+          "name": "decision_time_s",
+          "pre": 3.090371929109519e-09,
+          "post": 4.258084756977143e-09,
+          "unit": " s",
+          "delta": 1.1677128278676242e-09,
+          "delta_pct": 37.786,
+          "status": "PASS",
+          "worsened": true
+        },
+        {
+          "name": "iavg_a",
+          "pre": 4.641091789928104e-06,
+          "post": 5.695870718532852e-06,
+          "unit": " A",
+          "delta": 1.054778928604748e-06,
+          "delta_pct": 22.727,
+          "status": "PASS",
+          "worsened": true
+        },
+        {
+          "name": "istatic_a",
+          "pre": 6.906935878952619e-09,
+          "post": 6.314493126874483e-09,
+          "unit": " A",
+          "delta": -5.924427520781359e-10,
+          "delta_pct": -8.578,
+          "status": "PASS",
+          "worsened": false
+        },
+        {
+          "name": "swing_ratio",
+          "pre": 0.9999999778325463,
+          "post": 0.9999999778884876,
+          "unit": " ratio",
+          "delta": 5.594125163099761e-11,
+          "delta_pct": 0.0,
+          "status": "PASS",
+          "worsened": false
+        },
+        {
+          "name": "correct_frac",
+          "pre": 1.0,
+          "post": 1.0,
+          "unit": " fraction",
+          "delta": 0.0,
+          "delta_pct": 0.0,
+          "status": "PASS",
+          "worsened": false
+        }
+      ],
+      "elapsed": 65.285
+    }
+  ],
+  "best_pre": {
+    "source": "pre_layout",
+    "pass": true,
+    "score": 0.0,
+    "metrics": {
+      "decision_time_s": {
+        "value": 3.090371929109519e-09,
+        "target": 5e-09,
+        "op": "<=",
+        "unit": " s",
+        "status": "PASS",
+        "margin": 1.909628070890481e-09,
+        "margin_pct": 38.193
+      },
+      "swing_ratio": {
+        "value": 0.9999999778325463,
+        "target": 0.9,
+        "op": ">=",
+        "unit": " ratio",
+        "status": "PASS",
+        "margin": 0.09999997783254633,
+        "margin_pct": 11.111
+      },
+      "correct_frac": {
+        "value": 1.0,
+        "target": 1.0,
+        "op": ">=",
+        "unit": " fraction",
+        "status": "PASS",
+        "margin": 0.0,
+        "margin_pct": 0.0
+      },
+      "iavg_a": {
+        "value": 4.641091789928104e-06,
+        "target": 0.0005,
+        "op": "<=",
+        "unit": " A",
+        "status": "PASS",
+        "margin": 0.0004953589082100719,
+        "margin_pct": 99.072
+      },
+      "istatic_a": {
+        "value": 6.906935878952619e-09,
+        "target": 5e-08,
+        "op": "<=",
+        "unit": " A",
+        "status": "PASS",
+        "margin": 4.309306412104738e-08,
+        "margin_pct": 86.186
+      }
+    }
+  },
+  "best_pex": {
+    "source": "pex",
+    "pass": true,
+    "score": 0.0,
+    "metrics": {
+      "decision_time_s": {
+        "value": 4.258084756977143e-09,
+        "target": 5e-09,
+        "op": "<=",
+        "unit": " s",
+        "status": "PASS",
+        "margin": 7.419152430228568e-10,
+        "margin_pct": 14.838
+      },
+      "swing_ratio": {
+        "value": 0.9999999778884876,
+        "target": 0.9,
+        "op": ">=",
+        "unit": " ratio",
+        "status": "PASS",
+        "margin": 0.09999997788848758,
+        "margin_pct": 11.111
+      },
+      "correct_frac": {
+        "value": 1.0,
+        "target": 1.0,
+        "op": ">=",
+        "unit": " fraction",
+        "status": "PASS",
+        "margin": 0.0,
+        "margin_pct": 0.0
+      },
+      "iavg_a": {
+        "value": 5.695870718532852e-06,
+        "target": 0.0005,
+        "op": "<=",
+        "unit": " A",
+        "status": "PASS",
+        "margin": 0.0004943041292814671,
+        "margin_pct": 98.861
+      },
+      "istatic_a": {
+        "value": 6.314493126874483e-09,
+        "target": 5e-08,
+        "op": "<=",
+        "unit": " A",
+        "status": "PASS",
+        "margin": 4.368550687312551e-08,
+        "margin_pct": 87.371
+      }
+    }
+  },
+  "best_pex_iteration": 1,
+  "degradation": [
+    {
+      "name": "decision_time_s",
+      "pre": 3.090371929109519e-09,
+      "post": 4.258084756977143e-09,
+      "unit": " s",
+      "delta": 1.1677128278676242e-09,
+      "delta_pct": 37.786,
+      "status": "PASS",
+      "worsened": true
+    },
+    {
+      "name": "iavg_a",
+      "pre": 4.641091789928104e-06,
+      "post": 5.695870718532852e-06,
+      "unit": " A",
+      "delta": 1.054778928604748e-06,
+      "delta_pct": 22.727,
+      "status": "PASS",
+      "worsened": true
+    },
+    {
+      "name": "istatic_a",
+      "pre": 6.906935878952619e-09,
+      "post": 6.314493126874483e-09,
+      "unit": " A",
+      "delta": -5.924427520781359e-10,
+      "delta_pct": -8.578,
+      "status": "PASS",
+      "worsened": false
+    },
+    {
+      "name": "swing_ratio",
+      "pre": 0.9999999778325463,
+      "post": 0.9999999778884876,
+      "unit": " ratio",
+      "delta": 5.594125163099761e-11,
+      "delta_pct": 0.0,
+      "status": "PASS",
+      "worsened": false
+    },
+    {
+      "name": "correct_frac",
+      "pre": 1.0,
+      "post": 1.0,
+      "unit": " fraction",
+      "delta": 0.0,
+      "delta_pct": 0.0,
+      "status": "PASS",
+      "worsened": false
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+drc off
+gds read /home/huda/opensource-project/Microelectronic-Block-Generator/results/deepseek_oscillator/iterations/run/oscillator/oscillator.gds
+load oscillator
+select top cell
+lef write /home/huda/opensource-project/Microelectronic-Block-Generator/results/deepseek_oscillator/iterations/run/oscillator/oscillator.lef -hide
+quit -noprompt

@@ -1,0 +1,42 @@
+{
+  "cell": "ota",
+  "files": {
+    "drc_report": "ota.magic.drc.rpt",
+    "extracted_spice": "ota_extracted.spice",
+    "gds": "ota.gds",
+    "lef": "ota.lef",
+    "lib": "ota.lib",
+    "lvs_report": "ota.lvs.out",
+    "pex_spice": "ota.pex.spice",
+    "sch_spice": "ota.spice",
+    "svg": "ota.svg",
+    "verilog": "ota.v"
+  },
+  "notes": [],
+  "ports": [
+    {
+      "direction": "power",
+      "name": "VDD"
+    },
+    {
+      "direction": "ground",
+      "name": "VSS"
+    },
+    {
+      "direction": "inout",
+      "name": "INP"
+    },
+    {
+      "direction": "inout",
+      "name": "INN"
+    },
+    {
+      "direction": "inout",
+      "name": "OUT"
+    },
+    {
+      "direction": "inout",
+      "name": "IBIAS"
+    }
+  ]
+}

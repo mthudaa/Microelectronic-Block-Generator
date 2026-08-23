@@ -1,0 +1,49 @@
+.include '/home/huda/.volare/gf180mcuD/libs.tech/ngspice/design.ngspice'
+.lib '/home/huda/.volare/gf180mcuD/libs.tech/ngspice/sm141064.ngspice' typical
+.temp 27
+
+* PEX produced on Sun Aug 23 05:39:45 AM CST 2026 using /home/huda/opensource-project/Microelectronic-Block-Generator/designs/notebooks/chipathon2026-D/scripts/iic-pex.sh with m=2 and s=1
+* NGSPICE file created from oscillator.ext - technology: gf180mcuD
+
+.option scale=5n
+
+.subckt oscillator OSC_OUT VSS VDD
+X0 OSC_OUT a_2122_428# VDD VDD pfet_03v3 ad=96n pd=1.84m as=96n ps=1.84m w=800 l=500
+X1 a_n3494_428# OSC_OUT VDD VDD pfet_03v3 ad=96n pd=1.84m as=96n ps=1.84m w=800 l=500
+X2 a_250_428# a_n1622_428# VDD VDD pfet_03v3 ad=96n pd=1.84m as=96n ps=1.84m w=800 l=500
+X3 a_2122_428# a_250_428# VDD VDD pfet_03v3 ad=96n pd=1.84m as=96n ps=1.84m w=800 l=500
+X4 OSC_OUT a_2122_428# VSS VSS nfet_03v3 ad=48n pd=1.04m as=48n ps=1.04m w=400 l=500
+X5 a_n1622_428# a_n3494_428# VDD VDD pfet_03v3 ad=96n pd=1.84m as=96n ps=1.84m w=800 l=500
+X6 a_n3494_428# OSC_OUT VSS VSS nfet_03v3 ad=48n pd=1.04m as=48n ps=1.04m w=400 l=500
+X7 a_250_428# a_n1622_428# VSS VSS nfet_03v3 ad=48n pd=1.04m as=48n ps=1.04m w=400 l=500
+X8 a_n1622_428# a_n3494_428# VSS VSS nfet_03v3 ad=48n pd=1.04m as=48n ps=1.04m w=400 l=500
+X9 a_2122_428# a_250_428# VSS VSS nfet_03v3 ad=48n pd=1.04m as=48n ps=1.04m w=400 l=500
+C0 a_n1622_428# VDD 4.0794f
+C1 a_n1622_428# OSC_OUT 0.32056f
+C2 a_n1622_428# a_250_428# 0.66762f
+C3 VDD a_n3494_428# 3.97345f
+C4 a_n3494_428# OSC_OUT 1.33977f
+C5 VDD a_2122_428# 3.95474f
+C6 a_2122_428# OSC_OUT 1.03703f
+C7 a_2122_428# a_250_428# 0.46455f
+C8 a_n1622_428# a_n3494_428# 0.72698f
+C9 VDD OSC_OUT 3.80525f
+C10 VDD a_250_428# 4.38697f
+C11 OSC_OUT a_250_428# 0.21318f
+C12 OSC_OUT VSS 7.33894f
+C13 VDD VSS 46.2252f
+C14 a_2122_428# VSS 5.05716f ; **FLOATING
+C15 a_250_428# VSS 5.21864f ; **FLOATING
+C16 a_n1622_428# VSS 5.09714f ; **FLOATING
+C17 a_n3494_428# VSS 5.33795f ; **FLOATING
+.ends
+
+Vsupply0 VDD 0 PWL(0 0 10n 3)
+Vsupply1 VSS 0 0.0
+Xdut OSC_OUT VSS VDD oscillator
+
+.control
+tran 1n 3u
+wrdata tran.dat v(OSC_OUT) i(Vsupply0)
+.endc
+.end

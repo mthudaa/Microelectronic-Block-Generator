@@ -1,0 +1,38 @@
+* NGSPICE file created from strongarm_comparator.ext - technology: gf180mcuD
+
+.subckt strongarm_comparator OUTN OUTP CLK INN INP VSS VDD
+X0 OUTP OUTN VDD VDD pfet_03v3 ad=1.2p pd=5.2u as=0.56p ps=2.56u w=2u l=0.5u
+X1 a_n2550_3046# CLK VDD VDD pfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=0.5u
+X2 a_n2550_3046# INN a_n654_3046# VSS nfet_03v3 ad=0.56p pd=2.56u as=0.56p ps=2.56u w=2u l=0.6u
+X3 a_n654_3046# INP a_n4046_3046# VSS nfet_03v3 ad=1.2p pd=5.2u as=0.56p ps=2.56u w=2u l=0.6u
+X4 OUTN OUTP a_n4046_3046# VSS nfet_03v3 ad=1.2p pd=5.2u as=0.56p ps=2.56u w=2u l=0.5u
+X5 a_n2550_3046# OUTN OUTP VSS nfet_03v3 ad=0.56p pd=2.56u as=0.56p ps=2.56u w=2u l=0.5u
+X6 a_n654_3046# INN a_n2550_3046# VSS nfet_03v3 ad=1.2p pd=5.2u as=0.56p ps=2.56u w=2u l=0.6u
+X7 a_n654_3046# INP a_n4046_3046# VSS nfet_03v3 ad=0.56p pd=2.56u as=0.56p ps=2.56u w=2u l=0.6u
+X8 a_n654_3046# INN a_n2550_3046# VSS nfet_03v3 ad=0.56p pd=2.56u as=0.56p ps=2.56u w=2u l=0.6u
+X9 a_n654_3046# CLK VSS VSS nfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=0.5u
+X10 a_n4046_3046# INP a_n654_3046# VSS nfet_03v3 ad=0.56p pd=2.56u as=1.2p ps=5.2u w=2u l=0.6u
+X11 a_n2550_3046# INN a_n654_3046# VSS nfet_03v3 ad=0.56p pd=2.56u as=0.56p ps=2.56u w=2u l=0.6u
+X12 OUTP OUTN VDD VDD pfet_03v3 ad=0.56p pd=2.56u as=1.2p ps=5.2u w=2u l=0.5u
+X13 OUTN CLK VDD VDD pfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=0.5u
+X14 OUTN OUTP VDD VDD pfet_03v3 ad=0.56p pd=2.56u as=1.2p ps=5.2u w=2u l=0.5u
+X15 OUTN OUTP VDD VDD pfet_03v3 ad=1.2p pd=5.2u as=0.56p ps=2.56u w=2u l=0.5u
+X16 OUTP CLK VDD VDD pfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=0.5u
+X17 OUTP OUTN a_n2550_3046# VSS nfet_03v3 ad=1.2p pd=5.2u as=0.56p ps=2.56u w=2u l=0.5u
+X18 a_n654_3046# INN a_n2550_3046# VSS nfet_03v3 ad=0.56p pd=2.56u as=0.56p ps=2.56u w=2u l=0.6u
+X19 a_n2550_3046# INN a_n654_3046# VSS nfet_03v3 ad=0.56p pd=2.56u as=0.56p ps=2.56u w=2u l=0.6u
+X20 OUTN OUTP a_n4046_3046# VSS nfet_03v3 ad=0.56p pd=2.56u as=1.2p ps=5.2u w=2u l=0.5u
+X21 a_n2550_3046# INN a_n654_3046# VSS nfet_03v3 ad=0.56p pd=2.56u as=1.2p ps=5.2u w=2u l=0.6u
+X22 a_n654_3046# INN a_n2550_3046# VSS nfet_03v3 ad=0.56p pd=2.56u as=0.56p ps=2.56u w=2u l=0.6u
+X23 VDD OUTN OUTP VDD pfet_03v3 ad=0.56p pd=2.56u as=0.56p ps=2.56u w=2u l=0.5u
+X24 a_n654_3046# INP a_n4046_3046# VSS nfet_03v3 ad=0.56p pd=2.56u as=0.56p ps=2.56u w=2u l=0.6u
+X25 a_n654_3046# INP a_n4046_3046# VSS nfet_03v3 ad=0.56p pd=2.56u as=0.56p ps=2.56u w=2u l=0.6u
+X26 VDD OUTP OUTN VDD pfet_03v3 ad=0.56p pd=2.56u as=0.56p ps=2.56u w=2u l=0.5u
+X27 a_n4046_3046# INP a_n654_3046# VSS nfet_03v3 ad=0.56p pd=2.56u as=0.56p ps=2.56u w=2u l=0.6u
+X28 a_n4046_3046# CLK VDD VDD pfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=0.5u
+X29 OUTP OUTN a_n2550_3046# VSS nfet_03v3 ad=0.56p pd=2.56u as=1.2p ps=5.2u w=2u l=0.5u
+X30 a_n4046_3046# INP a_n654_3046# VSS nfet_03v3 ad=0.56p pd=2.56u as=0.56p ps=2.56u w=2u l=0.6u
+X31 a_n4046_3046# OUTP OUTN VSS nfet_03v3 ad=0.56p pd=2.56u as=0.56p ps=2.56u w=2u l=0.5u
+X32 a_n4046_3046# INP a_n654_3046# VSS nfet_03v3 ad=0.56p pd=2.56u as=0.56p ps=2.56u w=2u l=0.6u
+.ends
+

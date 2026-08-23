@@ -1,0 +1,9 @@
+.lib "/home/huda/.volare/gf180mcuD/libs.tech/ngspice/sm141064.ngspice" typical
+.subckt oscillator VDD VSS OSC_OUT
+XM1  n1 OSC_OUT VSS VSS nfet_03v3 L=4u W=2u nf=1
+XM1P n1 OSC_OUT VDD VDD pfet_03v3 L=4u W=4u nf=1
+XM2  n2 n1 VSS VSS nfet_03v3 L=4u W=2u nf=1
+XM2P n2 n1 VDD VDD pfet_03v3 L=4u W=4u nf=1
+XM3  OSC_OUT n2 VSS VSS nfet_03v3 L=4u W=2u nf=1
+XM3P OSC_OUT n2 VDD VDD pfet_03v3 L=4u W=4u nf=1
+.ends
