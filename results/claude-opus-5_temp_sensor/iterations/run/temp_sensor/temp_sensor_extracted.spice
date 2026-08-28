@@ -1,0 +1,25 @@
+* NGSPICE file created from temp_sensor.ext - technology: gf180mcuD
+
+.subckt temp_sensor TEMP_OUT VSS VDD
+X0 a_14_27788# VSS cap_mim_2f0_m4m5_noshield c_width=34u c_length=34u
+X1 a_n4870_24770# VSS VSS ppolyf_u r_width=1u r_length=100u
+X2 a_n5902_27790# VSS VDD VDD pfet_03v3 ad=0.36p pd=2.4u as=0.36p ps=2.4u w=0.6u l=9.5u
+X3 TEMP_OUT a_686_21744# VDD VDD pfet_03v3 ad=3.6p pd=13.2u as=3.6p ps=13.2u w=6u l=1u
+X4 a_14_27788# a_n4530_27580# VDD VDD pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=4u
+X5 a_n5902_27790# a_n6522_24563# VSS VSS nfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=0.6u
+X6 a_n2178_24770# a_n6522_24563# VSS VSS nfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=4u
+X7 VSS a_686_21744# a_3758_27788# VDD pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=4u
+X8 TEMP_OUT a_686_21744# VSS VSS nfet_03v3 ad=1.8p pd=7.2u as=1.8p ps=7.2u w=3u l=1u
+X9 a_n4530_27580# a_n4530_27580# VDD VDD pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=4u
+X10 a_2578_24771# a_14_27788# VSS VSS nfet_03v3 ad=0.6p pd=3.2u as=0.6p ps=3.2u w=1u l=4u
+X11 a_686_21744# a_14_27788# a_2578_24771# VSS nfet_03v3 ad=0.6p pd=3.2u as=0.6p ps=3.2u w=1u l=4u
+X12 a_n6522_24563# a_n4530_27580# VDD VDD pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=4u
+X13 a_n4530_27580# a_n6522_24563# a_n4870_24770# VSS nfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=4u
+X14 a_686_21744# a_14_27788# a_3758_27788# VDD pfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=4u
+X15 a_3758_27788# a_14_27788# VDD VDD pfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=4u
+X16 a_n4530_27580# a_n5902_27790# VSS VSS nfet_03v3 ad=0.6p pd=3.2u as=0.6p ps=3.2u w=1u l=1u
+X17 a_n6522_24563# a_n6522_24563# VSS VSS nfet_03v3 ad=0.6p pd=3.2u as=0.6p ps=3.2u w=1u l=4u
+X18 a_14_27788# TEMP_OUT a_n2178_24770# VSS nfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=0.6u
+X19 VDD a_686_21744# a_2578_24771# VSS nfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=4u
+.ends
+

@@ -71,7 +71,23 @@ class RouterConfig:
         # leaves sub-0.05um notches that Magic reports as spacing errors.
         self.drc_margin_grids: float = kw.get("drc_margin_grids", 4.0)
         self.max_expansions: int = kw.get("max_expansions", 400_000)
-        self.ripup_iterations: int = kw.get("ripup_iterations", 8)
+        # Negotiated-congestion sweeps. Raising this from 8 to 32 costs
+        # nothing for a design that converges: run() breaks the moment a
+        # sweep has no failures, so an easy net still exits on sweep 1.
+        #
+        # 8 was measured too low on a real block. The gpt-5.6-luna StrongArm
+        # comparator has two 5-terminal cross-coupled latch nets (OUTP/OUTN)
+        # spanning both device rows; OUTN wins the tracks and OUTP is BLOCKED.
+        # Sweeps 1-19 all report 7/8 routed with no measurable improvement --
+        # history costs are accumulating without yet opening a path -- and
+        # sweep 20 succeeds, escaping to met5, which no earlier sweep used at
+        # all. Measured: 8/10/12/14/16 fail, 20 succeeds, 24 succeeds and
+        # stops at 20.
+        #
+        # A "stop when the score stops improving" rule would be wrong here
+        # for exactly that reason: the score is flat across 19 sweeps and
+        # then jumps. Patience would have abandoned a routable design.
+        self.ripup_iterations: int = kw.get("ripup_iterations", 32)
         self.detour_limit: float = kw.get("detour_limit", 4.0)
 
         self.verbosity: int = kw.get("verbosity", 1)

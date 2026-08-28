@@ -1,0 +1,10 @@
+* 1.2-V MOS-only voltage reference (externally biased self-cascode)
+* VREF = VGS(XMT) + VDS(XMB); XMB is common-gate triode supplying the
+* positive-tempco term against the negative-tempco VGS(XMT) term.
+* IBIAS pin convention: pin delivers IBIAS out to a generator tied to VSS.
+.subckt ox_alpha_vref_1v2 VDD VSS VREF IBIAS
+XM1 IBIAS IBIAS VDD VDD pfet_03v3 W=2u L=8u nf=1
+XM2 VREF  IBIAS VDD VDD pfet_03v3 W=2u L=8u nf=1
+XMT VREF  VREF  VMB  VSS nfet_03v3 W=9.6u L=0.35u nf=12
+XMB VMB   VREF  VSS  VSS nfet_03v3 W=9.5u L=7.45u nf=1
+.ends ox_alpha_vref_1v2

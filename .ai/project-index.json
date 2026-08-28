@@ -18,7 +18,7 @@
         "path": "src/mbg/analysis.py"
       },
       {
-        "lines": 1210,
+        "lines": 1285,
         "path": "src/mbg/checks.py"
       },
       {
@@ -38,7 +38,7 @@
         "path": "src/mbg/design_context.py"
       },
       {
-        "lines": 551,
+        "lines": 599,
         "path": "src/mbg/drc.py"
       },
       {
@@ -78,7 +78,7 @@
         "path": "src/mbg/pdk_devices.py"
       },
       {
-        "lines": 366,
+        "lines": 392,
         "path": "src/mbg/pdk_rules.py"
       },
       {
@@ -90,7 +90,7 @@
         "path": "src/mbg/placement.py"
       },
       {
-        "lines": 647,
+        "lines": 787,
         "path": "src/mbg/placement_engine.py"
       },
       {
@@ -102,7 +102,7 @@
         "path": "src/mbg/reviewers.py"
       },
       {
-        "lines": 1437,
+        "lines": 1453,
         "path": "src/mbg/router.py"
       },
       {
@@ -122,7 +122,7 @@
         "path": "src/mbg/specs.py"
       },
       {
-        "lines": 766,
+        "lines": 802,
         "path": "src/mbg/spice_parser.py"
       },
       {
@@ -168,7 +168,7 @@
         "path": "src/mbg/pdk_devices.py"
       },
       {
-        "lines": 366,
+        "lines": 392,
         "path": "src/mbg/pdk_rules.py"
       }
     ],
@@ -178,7 +178,7 @@
         "path": "src/mbg/placement.py"
       },
       {
-        "lines": 647,
+        "lines": 787,
         "path": "src/mbg/placement_engine.py"
       },
       {
@@ -192,7 +192,7 @@
         "path": "src/mbg/connectivity.py"
       },
       {
-        "lines": 1437,
+        "lines": 1453,
         "path": "src/mbg/router.py"
       },
       {
@@ -206,7 +206,7 @@
         "path": "src/mbg/simulation.py"
       },
       {
-        "lines": 766,
+        "lines": 802,
         "path": "src/mbg/spice_parser.py"
       }
     ],
@@ -228,7 +228,7 @@
         "path": "tests/test_complexity_ladder.py"
       },
       {
-        "lines": 233,
+        "lines": 312,
         "path": "tests/test_drc_dual.py"
       },
       {
@@ -252,12 +252,20 @@
         "path": "tests/test_installer.py"
       },
       {
+        "lines": 47,
+        "path": "tests/test_integrate_modules_script.py"
+      },
+      {
         "lines": 167,
         "path": "tests/test_integration.py"
       },
       {
         "lines": 105,
         "path": "tests/test_notebooks.py"
+      },
+      {
+        "lines": 142,
+        "path": "tests/test_nwell_spacing.py"
       },
       {
         "lines": 150,
@@ -290,7 +298,7 @@
     ],
     "verification_modules": [
       {
-        "lines": 1210,
+        "lines": 1285,
         "path": "src/mbg/checks.py"
       },
       {

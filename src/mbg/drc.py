@@ -30,6 +30,7 @@ import os
 import re
 import shutil
 import subprocess
+import textwrap
 import time
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass, field
@@ -164,8 +165,19 @@ class DRCSignoff:
                 L.append(f"  Deck        {r.deck}")
             if r.message:
                 L.append(f"  Note        {r.message}")
+            hints = []
             for rule, n in sorted(r.rules.items(), key=lambda kv: -kv[1])[:8]:
                 L.append(f"    {rule:<24} {n}")
+                hint = rule_hint(rule)
+                if hint:
+                    hints.append((rule, hint))
+            # A rule whose threshold depends on extracted connectivity is
+            # reported with WHY it fired, because the obvious reading sends
+            # you to the wrong fix (see CONNECTIVITY_DEPENDENT_RULES).
+            for rule, hint in hints:
+                L.append(f"  Why {rule}:")
+                for line in textwrap.wrap(hint, 68):
+                    L.append(f"    {line}")
             L.append("")
         L.append("Final:")
         L.append(f"  {self.verdict}")
@@ -175,6 +187,42 @@ class DRCSignoff:
 
 
 # ── deck discovery ────────────────────────────────────────────────────
+
+#: Rules whose threshold depends on EXTRACTED CONNECTIVITY, not on geometry
+#: alone. The GF180 deck computes these with `conn_space`, which extracts
+#: nets and filters out same-net pairs (helper.rb: `get_nets` then
+#: `unconn_errors_check`), so the same physical spacing is legal or illegal
+#: depending on whether the two shapes are electrically joined.
+#:
+#: These are the rules where the obvious reaction is the wrong one. Reading
+#: "Min. Nwell Space [Different potential]: 1.4um" as a placement problem
+#: leads to spreading the wells, which costs area and does not address the
+#: cause: on a normal analog block every PMOS bulk belongs on VDD, and once
+#: the supply actually reaches every nwell tap the equi-potential threshold
+#: applies instead and the violation disappears with nothing moved.
+CONNECTIVITY_DEPENDENT_RULES = {
+    "NW.2b_LV": (
+        "nwell spacing at DIFFERENT potential (1.4um; equi-potential is "
+        "0.6um). The deck decides 'different' by extracting nets, so this "
+        "usually means two nwells are NOT electrically joined — most often "
+        "because VDD never reached their taps — rather than that they are "
+        "too close. Check that every PMOS bulk is connected to the supply "
+        "BEFORE moving any device: connecting them applies the 0.6um "
+        "threshold instead."),
+    "NW.2b_MV": (
+        "nwell spacing at different potential, 5V rules (1.7um; "
+        "equi-potential is 0.74um). Same cause and same first check as "
+        "NW.2b_LV."),
+    "NW.2a_LV": (
+        "nwell spacing at EQUI-potential (0.6um). Unlike NW.2b this is a "
+        "genuine spacing violation between wells that ARE connected."),
+}
+
+
+def rule_hint(rule: str) -> Optional[str]:
+    """Why a rule fired, when the rule name alone is misleading."""
+    return CONNECTIVITY_DEPENDENT_RULES.get((rule or "").strip().strip("'\""))
+
 
 def klayout_deck(cfg=None) -> Optional[str]:
     """Path to the GF180 KLayout DRC deck shipped with the PDK, if present.

@@ -1,0 +1,709 @@
+timestamp 0
+version 8.3
+tech gf180mcuD
+style ngspice()
+scale 1000 1 0.5
+resistclasses 1000000 3250000 6300 7000 6300 7000 7300 1000000 60000 185000 60000 185000 6300 7000 6300 7000 6800 7300 350000 310000 1000000 90 90 90 90 40
+parameters nfet_03v3_dss l=l w=w a1=as p1=ps a2=ad p2=pd l1=s_sab l2=d_sab
+parameters nfet_03v3 l=l w=w a1=as p1=ps a2=ad p2=pd
+parameters pfet_03v3_dss l=l w=w a1=as p1=ps a2=ad p2=pd l1=s_sab l2=d_sab
+parameters pfet_03v3 l=l w=w a1=as p1=ps a2=ad p2=pd
+parameters ppolyf_u l=r_length w=r_width
+parameters diode_pd2nw_03v3 a=area p=pj
+parameters diode_nd2ps_03v3 a=area p=pj
+parameters cap_mim_2f0_m4m5_noshield l=c_length w=c_width
+port "temp_out" 2 510400 302600 511400 303600 m2
+port "oxa_vref" 32 510400 322000 511400 323000 m2
+port "gpt_vref" 30 510400 341400 511400 342400 m2
+port "deepseek_vref" 28 510400 360800 511400 361800 m2
+port "oxa_cmp" 26 510400 380200 511400 381200 m2
+port "gpt_cmp" 24 510400 399600 511400 400600 m2
+port "deepseek_cmp" 22 510400 419000 511400 420000 m2
+port "oxa_ota" 20 510400 438400 511400 439400 m2
+port "gpt_ota" 18 510400 457800 511400 458800 m2
+port "deepseek_ota" 16 510400 477200 511400 478200 m2
+port "ibias" 10 477200 510400 478200 511400 m2
+port "inp" 6 457800 510400 458800 511400 m2
+port "inn" 8 438400 510400 439400 511400 m2
+port "clk" 4 419000 510400 420000 511400 m2
+port "vdd" 12 496600 509400 497600 510400 m2
+port "vss" 14 509400 496600 510400 497600 m2
+node "a_488570_299094#" 1400 0 488570 299094 rpp 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 16000000 20000 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+node "temp_out" 581 160645 510400 302600 m2 0 0 0 0 0 0 0 0 0 0 0 0 816000 16204 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 32562132 79800 144910800 167160 0 0 0 0 0 0
+equiv "temp_out" "io_secondary_3p3_0.to_gate"
+node "a_446824_294570#" 35000 0 446824 294570 rpp 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 4000000 40400 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+node "a_488570_318494#" 1400 0 488570 318494 rpp 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 16000000 20000 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+node "a_453622_319179#" 90 4436.19 453622 319179 ndif 0 0 0 0 96000 2320 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 152360 3828 464792 11382 157440 5544 85920 3016 136864 3280
+node "a_448866_319178#" 87 3644.13 448866 319178 ndif 0 0 0 0 144000 2880 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 172080 3992 307120 7576 140064 4976 0 0 0 0
+node "a_446174_319178#" 70 2839.85 446174 319178 ndif 0 0 0 0 96000 1840 0 0 0 0 0 0 20400 604 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 123800 3160 213336 5048 51648 1792 288576 10280 0 0
+node "a_454802_322196#" 141 1966.04 454802 322196 pdif 0 0 0 0 0 0 192000 3920 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 231080 5428 566184 13636 202816 7148 0 0 0 0
+node "temp_sensor_0.TEMP_OUT" 790 32081.1 451330 318970 p 0 0 0 0 72000 1440 144000 2640 0 0 0 0 942720 18556 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1298420 22192 24498212 127776 83072 3000 411616 14536 0 0
+equiv "temp_sensor_0.TEMP_OUT" "io_secondary_3p3_0.ASIG5V"
+node "a_451730_316152#" 207 10387.6 451730 316152 p 0 0 0 0 24000 640 48000 1040 0 0 0 0 1832000 12048 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 227760 7112 693384 17988 537568 18972 463264 16328 226624 5320
+node "a_451058_322196#" 236 32086.7 451058 322196 pdif 0 0 0 0 96000 1840 96000 1840 0 0 0 0 1779200 10848 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 386160 11512 864824 21716 761296 26816 47701552 51904 46297600 28160
+node "a_444522_318971#" 206 11884.1 444522 318971 p 0 0 0 0 24000 640 96000 1840 0 0 0 0 1861120 11488 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 297120 9112 742984 18212 425856 14880 242880 8648 0 0
+node "a_446514_321988#" 226 5386.7 446514 321988 p 0 0 0 0 120000 2480 96000 1840 0 0 0 0 2534400 11136 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 400200 11268 849672 20672 350256 12292 372944 13224 0 0
+node "a_445142_322198#" 93 6349.37 445142 322198 pdif 0 0 0 0 96000 1840 14400 480 0 0 0 0 91200 1312 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 169760 4152 457824 11304 311584 10980 371520 13216 0 0
+node "oxa_vref" 581 160645 510400 322000 m2 0 0 0 0 0 0 0 0 0 0 0 0 816000 16204 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 32562132 79800 144910800 167160 0 0 0 0 0 0
+equiv "oxa_vref" "io_secondary_3p3_4.to_gate"
+node "a_450261_333180#" 285 6137.82 450261 333180 ndif 0 0 0 0 356000 7880 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 472720 11448 771464 18216 277152 9872 0 0 0 0
+node "a_488570_337894#" 1400 0 488570 337894 rpp 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 16000000 20000 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+node "io_secondary_3p3_4.ASIG5V" 703 40743.3 448771 332972 p 0 0 0 0 107520 3264 48000 1040 0 0 0 0 4501080 35424 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1627180 34092 24709084 133358 140224 4860 258704 9144 0 0
+equiv "io_secondary_3p3_4.ASIG5V" "vref_1v2$2_0.VREF"
+node "gpt_vref" 581 160645 510400 341400 m2 0 0 0 0 0 0 0 0 0 0 0 0 816000 16204 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 32562132 79800 144910800 167160 0 0 0 0 0 0
+equiv "gpt_vref" "io_secondary_3p3_1.to_gate"
+node "a_449574_352580#" 205 5913.26 449574 352580 ndif 0 0 0 0 513000 8140 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 431760 9192 658960 14560 58672 2112 35824 1296 136864 3280
+node "a_488570_357294#" 1400 0 488570 357294 rpp 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 16000000 20000 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+node "vref_1v2$1_0.VREF" 458 37060.5 449702 352372 p 0 0 0 0 285000 4100 48000 1040 0 0 0 0 4390736 28228 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1438260 26792 24614148 130520 290160 10172 161488 5784 0 0
+equiv "vref_1v2$1_0.VREF" "io_secondary_3p3_1.ASIG5V"
+node "deepseek_vref" 581 160645 510400 360800 m2 0 0 0 0 0 0 0 0 0 0 0 0 816000 16204 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 32562132 79800 144910800 167160 0 0 0 0 0 0
+equiv "deepseek_vref" "io_secondary_3p3_2.to_gate"
+node "a_488570_376694#" 1400 0 488570 376694 rpp 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 16000000 20000 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+node "io_secondary_3p3_2.ASIG5V" 715 30273.5 451974 375618 pdif 0 0 0 0 28800 720 89600 1824 0 0 0 0 865600 17396 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1222100 20672 23987716 117860 67248 2504 240256 8416 0 0
+equiv "io_secondary_3p3_2.ASIG5V" "vref_1v2_0.VREF"
+node "a_449590_375410#" 185 3162.87 449590 375410 p 0 0 0 0 44800 1024 44800 1024 0 0 0 0 1392000 10096 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 247440 7512 587752 13960 254144 8912 0 0 0 0
+node "oxa_cmp" 581 160645 510400 380200 m2 0 0 0 0 0 0 0 0 0 0 0 0 816000 16204 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 32562132 79800 144910800 167160 0 0 0 0 0 0
+equiv "oxa_cmp" "io_secondary_3p3_3.to_gate"
+node "a_449020_392562#" 204 6224.71 449020 392562 ndif 0 0 0 0 362400 6760 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 373240 8268 491600 11736 282784 10004 0 0 0 0
+node "a_488570_396094#" 1400 0 488570 396094 rpp 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 16000000 20000 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+node "io_secondary_3p3_3.ASIG5V" 850 29863.8 451674 395380 pdif 0 0 0 0 55200 1160 110400 2320 0 0 0 0 973200 19748 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1299020 22708 24027924 119016 540096 18960 82944 2936 0 0
+equiv "io_secondary_3p3_3.ASIG5V" "strongarm_comparator$2_0.OUTP"
+node "strongarm_comparator$2_0.OUTN" 251 2983.64 450502 395380 pdif 0 0 0 0 55200 1160 110400 2320 0 0 0 0 157200 3544 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 257720 6428 369640 10172 359024 12648 230064 8052 0 0
+node "a_449030_395380#" 97 3334.79 449030 395380 pdif 0 0 0 0 127200 2600 19200 560 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 208280 4988 299712 8076 123168 4320 184336 6600 334336 7768
+node "a_447858_395380#" 99 2877.36 447858 395380 pdif 0 0 0 0 127200 2600 19200 560 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 208280 4988 292992 7836 274336 9676 151488 5384 0 0
+node "gpt_cmp" 581 160645 510400 399600 m2 0 0 0 0 0 0 0 0 0 0 0 0 816000 16204 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 32562132 79800 144910800 167160 0 0 0 0 0 0
+equiv "gpt_cmp" "io_secondary_3p3_13.to_gate"
+node "a_447160_411233#" 174 5756.95 447160 411233 ndif 0 0 0 0 137600 3776 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 265360 6856 456128 11704 168864 5952 304400 10776 0 0
+node "a_488570_415494#" 1400 0 488570 415494 rpp 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 16000000 20000 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+node "strongarm_comparator$3_0.OUTP" 1107 32464.2 451076 415153 pdif 0 0 0 0 68800 1888 92800 2528 0 0 0 0 1320960 25564 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1509580 29372 24204196 123660 417376 14732 240256 8416 0 0
+equiv "strongarm_comparator$3_0.OUTP" "io_secondary_3p3_13.ASIG5V"
+node "strongarm_comparator$3_0.OUTN" 517 7022.16 449420 415153 pdif 0 0 0 0 68800 1888 92800 2528 0 0 0 0 504960 9360 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 468280 13092 729216 18292 405952 14324 414080 14624 0 0
+node "a_447764_415153#" 201 4909.49 447764 415153 pdif 0 0 0 0 115200 3152 46400 1264 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 334120 8532 500864 12892 523008 18600 235856 8328 0 0
+node "a_446108_415153#" 196 4158.38 446108 415153 pdif 0 0 0 0 115200 3152 46400 1264 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 334120 8532 506384 12932 365728 12940 220032 7832 0 0
+node "deepseek_cmp" 581 160645 510400 419000 m2 0 0 0 0 0 0 0 0 0 0 0 0 816000 16204 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 32562132 79800 144910800 167160 0 0 0 0 0 0
+equiv "deepseek_cmp" "io_secondary_3p3_8.to_gate"
+node "a_450384_431778#" 419 6064.92 450384 431778 ndif 0 0 0 0 508800 11344 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 663720 16116 968672 23196 285760 10084 151488 5384 0 0
+node "a_488570_434894#" 1400 0 488570 434894 rpp 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 16000000 20000 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+node "a_448488_431778#" 258 3731.55 448488 431778 ndif 0 0 0 0 272000 6160 48000 1040 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 486600 11652 654304 15732 325824 11584 140064 4976 0 0
+node "a_446992_431778#" 258 3989.19 446992 431778 ndif 0 0 0 0 272000 6160 48000 1040 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 486600 11652 661248 15980 340224 12072 155888 5472 0 0
+node "strongarm_comparator_0.OUTN" 535 3941.13 447212 431778 ndif 0 0 0 0 92800 2064 140800 3104 0 0 0 0 438400 9168 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 408600 10380 581192 14592 579968 20496 191392 6740 0 0
+node "io_secondary_3p3_8.ASIG5V" 1138 32451.6 447112 431570 p 0 0 0 0 92800 2064 140800 3104 0 0 0 0 1254400 25372 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1449900 26660 24652684 131920 742560 26260 151488 5384 0 0
+equiv "io_secondary_3p3_8.ASIG5V" "strongarm_comparator_0.OUTP"
+node "oxa_ota" 581 160645 510400 438400 m2 0 0 0 0 0 0 0 0 0 0 0 0 816000 16204 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 32562132 79800 144910800 167160 0 0 0 0 0 0
+equiv "oxa_ota" "io_secondary_3p3_9.to_gate"
+node "a_450032_449122#" 241 6439.21 450032 449122 ndif 0 0 0 0 422400 7904 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 431720 9428 757104 17032 90320 3104 197184 7016 0 0
+node "a_488570_454294#" 1400 0 488570 454294 rpp 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 16000000 20000 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+node "ota$2_0.OUT" 872 28644 451924 449122 ndif 0 0 0 0 144000 2640 336000 6448 0 0 0 0 816000 16204 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1562780 27548 24487948 126960 95920 3416 224432 7920 0 0
+equiv "ota$2_0.OUT" "io_secondary_3p3_9.ASIG5V"
+node "a_446966_452332#" 567 3494.28 446966 452332 p 0 0 0 0 144000 2640 336000 6448 0 0 0 0 11305600 41040 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 941480 28068 1653180 35176 228640 8044 117216 4160 0 0
+node "a_449616_457872#" 228 6035.41 449616 457872 ndif 0 0 0 0 185600 5056 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 344000 8928 565088 14116 181712 6368 220032 7832 0 0
+node "gpt_ota" 581 160645 510400 457800 m2 0 0 0 0 0 0 0 0 0 0 0 0 816000 16204 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 32562132 79800 144910800 167160 0 0 0 0 0 0
+equiv "gpt_ota" "io_secondary_3p3_10.to_gate"
+node "io_secondary_3p3_10.ASIG5V" 698 26295.7 451644 461792 ndif 0 0 0 0 44800 1248 67200 1648 0 0 0 0 816000 16204 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1275860 22104 23234624 102266 130192 4640 235856 8328 0 0
+equiv "io_secondary_3p3_10.ASIG5V" "ota$1_0.OUT"
+node "a_449526_465503#" 421 2321.74 449526 465503 p 0 0 0 0 44800 1248 67200 1648 0 0 0 0 778880 11600 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 334560 9824 650768 15828 73072 2600 258704 9144 0 0
+node "a_449296_472055#" 244 6450.97 449296 472055 ndif 0 0 0 0 230400 5856 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 383360 9728 701072 17112 294208 10412 0 0 0 0
+node "a_488570_473694#" 1400 0 488570 473694 rpp 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 16000000 20000 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+node "ota_0.OUT" 684 26277.4 451724 472055 ndif 0 0 0 0 44800 1248 26880 928 0 0 0 0 816000 16204 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1242740 21384 23158604 100464 187312 6680 249744 8824 0 0
+equiv "ota_0.OUT" "io_secondary_3p3_11.ASIG5V"
+node "a_449366_474266#" 329 2354.5 449366 474266 p 0 0 0 0 44800 1248 26880 928 0 0 0 0 672000 9392 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 321440 9904 653344 15612 265568 9320 0 0 0 0
+node "deepseek_ota" 581 160645 510400 477200 m2 0 0 0 0 0 0 0 0 0 0 0 0 816000 16204 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 32562132 79800 144910800 167160 0 0 0 0 0 0
+equiv "deepseek_ota" "io_secondary_3p3_11.to_gate"
+node "vref_1v2$2_0.IBIAS" 1385 232441 448902 337090 p 0 0 0 0 182400 4560 96000 2080 0 0 0 0 10443200 76788 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2372340 61528 55643372 136252 60764784 141816 188016768 383168 17573400 352668
+equiv "vref_1v2$2_0.IBIAS" "io_secondary_3p3_7.ASIG5V"
+equiv "vref_1v2$2_0.IBIAS" "ota_0.IBIAS"
+equiv "vref_1v2$2_0.IBIAS" "ota$1_0.IBIAS"
+equiv "vref_1v2$2_0.IBIAS" "ota$2_0.IBIAS"
+equiv "vref_1v2$2_0.IBIAS" "vref_1v2_0.IBIAS"
+equiv "vref_1v2$2_0.IBIAS" "vref_1v2$1_0.IBIAS"
+node "a_473706_488570#" 1400 0 473706 488570 rpp 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 16000000 20000 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+node "strongarm_comparator$2_0.INP" 1459 166843 447280 411025 p 0 0 0 0 0 0 0 0 0 0 0 0 3063840 47996 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1301300 26680 40911908 59316 52387000 280360 189958000 384136 9173000 184060
+equiv "strongarm_comparator$2_0.INP" "io_secondary_3p3_12.ASIG5V"
+equiv "strongarm_comparator$2_0.INP" "ota_0.INP"
+equiv "strongarm_comparator$2_0.INP" "ota$1_0.INP"
+equiv "strongarm_comparator$2_0.INP" "strongarm_comparator_0.INP"
+equiv "strongarm_comparator$2_0.INP" "ota$2_0.INP"
+equiv "strongarm_comparator$2_0.INP" "strongarm_comparator$3_0.INP"
+node "a_454306_488570#" 1400 0 454306 488570 rpp 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 16000000 20000 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+node "strongarm_comparator$2_0.INN" 1475 159628 434906 488468 p 0 0 0 0 0 0 0 0 0 0 0 0 3063840 47996 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1301300 26680 29006508 49208 25620000 58220 192078000 391136 20612300 413446
+equiv "strongarm_comparator$2_0.INN" "io_secondary_3p3_5.ASIG5V"
+equiv "strongarm_comparator$2_0.INN" "ota_0.INN"
+equiv "strongarm_comparator$2_0.INN" "ota$1_0.INN"
+equiv "strongarm_comparator$2_0.INN" "strongarm_comparator_0.INN"
+equiv "strongarm_comparator$2_0.INN" "ota$2_0.INN"
+equiv "strongarm_comparator$2_0.INN" "strongarm_comparator$3_0.INN"
+node "a_434906_488570#" 1400 0 434906 488570 rpp 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 16000000 20000 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+node "strongarm_comparator$2_0.CLK" 1975 146739 415506 488468 p 0 0 0 0 0 0 0 0 0 0 0 0 2548720 51580 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1301300 26680 17232028 43388 8942416 50516 195029328 431176 10607400 212748
+equiv "strongarm_comparator$2_0.CLK" "io_secondary_3p3_6.ASIG5V"
+equiv "strongarm_comparator$2_0.CLK" "strongarm_comparator_0.CLK"
+equiv "strongarm_comparator$2_0.CLK" "strongarm_comparator$3_0.CLK"
+node "a_415506_488570#" 1400 0 415506 488570 rpp 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 16000000 20000 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+node "ibias" 581 160645 477200 510400 m2 0 0 0 0 0 0 0 0 0 0 0 0 816000 16204 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 32562132 79800 144910800 167160 0 0 0 0 0 0
+equiv "ibias" "io_secondary_3p3_7.to_gate"
+node "inp" 581 160645 457800 510400 m2 0 0 0 0 0 0 0 0 0 0 0 0 816000 16204 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 32562132 79800 144910800 167160 0 0 0 0 0 0
+equiv "inp" "io_secondary_3p3_12.to_gate"
+node "inn" 581 160645 438400 510400 m2 0 0 0 0 0 0 0 0 0 0 0 0 816000 16204 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 32562132 79800 144910800 167160 0 0 0 0 0 0
+equiv "inn" "io_secondary_3p3_5.to_gate"
+node "clk" 581 165449 419000 510400 m2 0 0 0 0 0 0 0 0 0 0 0 0 816000 16204 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 32562132 79800 144910800 167160 0 0 0 0 0 0
+equiv "clk" "io_secondary_3p3_6.to_gate"
+node "vdd" 342692 3.47711e+06 496600 509400 m2 697301400 860084 0 0 67330848 1809304 3241280 68496 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 608873738 2527062 425135416 855832 325101840 942104 214316096 461732 175696000 886684
+equiv "vdd" "io_secondary_3p3_7.VDD"
+equiv "vdd" "io_secondary_3p3_12.VDD"
+equiv "vdd" "io_secondary_3p3_5.VDD"
+equiv "vdd" "io_secondary_3p3_6.VDD"
+equiv "vdd" "io_secondary_3p3_11.VDD"
+equiv "vdd" "ota_0.VDD"
+equiv "vdd" "ota$1_0.VDD"
+equiv "vdd" "io_secondary_3p3_9.VDD"
+equiv "vdd" "io_secondary_3p3_10.VDD"
+equiv "vdd" "strongarm_comparator_0.VDD"
+equiv "vdd" "ota$2_0.VDD"
+equiv "vdd" "io_secondary_3p3_8.VDD"
+equiv "vdd" "io_secondary_3p3_13.VDD"
+equiv "vdd" "strongarm_comparator$3_0.VDD"
+equiv "vdd" "strongarm_comparator$2_0.VDD"
+equiv "vdd" "io_secondary_3p3_3.VDD"
+equiv "vdd" "vref_1v2_0.VDD"
+equiv "vdd" "io_secondary_3p3_1.VDD"
+equiv "vdd" "io_secondary_3p3_2.VDD"
+equiv "vdd" "vref_1v2$1_0.VDD"
+equiv "vdd" "vref_1v2$2_0.VDD"
+equiv "vdd" "io_secondary_3p3_0.VDD"
+equiv "vdd" "io_secondary_3p3_4.VDD"
+equiv "vdd" "temp_sensor_0.VDD"
+substrate "vss" 0 0 509400 496600 m2 0 0 0 0 1989600 41160 71392416 1921592 0 0 0 0 738600 5160 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1138519100 2398182 129959584 500158 323155664 978492 221941024 599980 167696000 846684
+equiv "vss" "io_secondary_3p3_7.VSS"
+equiv "vss" "io_secondary_3p3_12.VSS"
+equiv "vss" "io_secondary_3p3_5.VSS"
+equiv "vss" "io_secondary_3p3_6.VSS"
+equiv "vss" "io_secondary_3p3_11.VSS"
+equiv "vss" "ota_0.VSS"
+equiv "vss" "ota$1_0.VSS"
+equiv "vss" "io_secondary_3p3_9.VSS"
+equiv "vss" "io_secondary_3p3_10.VSS"
+equiv "vss" "strongarm_comparator_0.VSS"
+equiv "vss" "ota$2_0.VSS"
+equiv "vss" "io_secondary_3p3_8.VSS"
+equiv "vss" "io_secondary_3p3_13.VSS"
+equiv "vss" "strongarm_comparator$3_0.VSS"
+equiv "vss" "strongarm_comparator$2_0.VSS"
+equiv "vss" "io_secondary_3p3_3.VSS"
+equiv "vss" "vref_1v2_0.VSS"
+equiv "vss" "io_secondary_3p3_1.VSS"
+equiv "vss" "io_secondary_3p3_2.VSS"
+equiv "vss" "vref_1v2$1_0.VSS"
+equiv "vss" "vref_1v2$2_0.VSS"
+equiv "vss" "io_secondary_3p3_0.VSS"
+equiv "vss" "io_secondary_3p3_4.VSS"
+equiv "vss" "temp_sensor_0.VSS"
+cap "strongarm_comparator$2_0.CLK" "a_450384_431778#" 628.648
+cap "a_449020_392562#" "strongarm_comparator$2_0.INN" 150.179
+cap "strongarm_comparator$2_0.INN" "strongarm_comparator_0.OUTN" 0.499717
+cap "strongarm_comparator$2_0.CLK" "a_448488_431778#" 495.383
+cap "a_446174_319178#" "a_446514_321988#" 634.824
+cap "strongarm_comparator$2_0.CLK" "strongarm_comparator$3_0.OUTN" 218.881
+cap "strongarm_comparator$2_0.CLK" "a_446108_415153#" 303.692
+cap "a_446174_319178#" "a_444522_318971#" 856.74
+cap "a_449526_465503#" "strongarm_comparator$2_0.INP" 265.774
+cap "strongarm_comparator$2_0.CLK" "strongarm_comparator$2_0.OUTN" 172.697
+cap "a_449366_474266#" "a_449296_472055#" 1382.38
+cap "strongarm_comparator_0.OUTN" "a_446992_431778#" 2024.04
+cap "vdd" "a_445142_322198#" 2965.08
+cap "a_449020_392562#" "strongarm_comparator$2_0.INP" 179.056
+cap "strongarm_comparator_0.OUTN" "strongarm_comparator$2_0.INP" 112.482
+cap "vdd" "inn" 54226.3
+cap "strongarm_comparator_0.OUTN" "io_secondary_3p3_8.ASIG5V" 2664.46
+cap "vdd" "a_449296_472055#" 1.4025
+cap "vdd" "a_447858_395380#" 1773.9
+cap "strongarm_comparator$2_0.CLK" "a_449030_395380#" 291.636
+cap "vref_1v2$2_0.IBIAS" "a_450032_449122#" 843.384
+cap "strongarm_comparator$2_0.CLK" "io_secondary_3p3_3.ASIG5V" 119.513
+cap "vdd" "a_449366_474266#" 9040.42
+cap "ota_0.OUT" "strongarm_comparator$2_0.INN" 382.514
+cap "vdd" "a_449574_352580#" 13.6892
+cap "strongarm_comparator$2_0.INN" "a_449616_457872#" 358.603
+cap "vdd" "temp_out" 54226.3
+cap "strongarm_comparator$2_0.INN" "strongarm_comparator$2_0.CLK" 15483.1
+cap "vdd" "a_453622_319179#" 714.18
+cap "vdd" "a_450384_431778#" 2.47632
+cap "a_447160_411233#" "strongarm_comparator$2_0.CLK" 495.197
+cap "a_448866_319178#" "a_446514_321988#" 47.6027
+cap "a_447858_395380#" "strongarm_comparator$2_0.OUTN" 636.627
+cap "ota_0.OUT" "strongarm_comparator$2_0.INP" 5.39054
+cap "strongarm_comparator$2_0.INN" "vref_1v2$2_0.IBIAS" 3476.36
+cap "strongarm_comparator$2_0.CLK" "strongarm_comparator$3_0.OUTP" 177.862
+cap "vdd" "a_448488_431778#" 1737.01
+cap "a_448866_319178#" "a_444522_318971#" 181.569
+cap "strongarm_comparator$2_0.CLK" "a_446992_431778#" 282.666
+cap "vdd" "a_446966_452332#" 25712.7
+cap "a_449616_457872#" "strongarm_comparator$2_0.INP" 538.924
+cap "vdd" "strongarm_comparator$3_0.OUTN" 7921.9
+cap "a_447858_395380#" "a_449030_395380#" 730.464
+cap "strongarm_comparator$2_0.CLK" "strongarm_comparator$2_0.INP" 1817.32
+cap "vdd" "a_446108_415153#" 2656.84
+cap "vdd" "gpt_cmp" 54226.3
+cap "a_448866_319178#" "a_451058_322196#" 754.399
+cap "a_447858_395380#" "io_secondary_3p3_3.ASIG5V" 171.809
+cap "strongarm_comparator$2_0.CLK" "io_secondary_3p3_8.ASIG5V" 981.172
+cap "a_450384_431778#" "a_448488_431778#" 4175.29
+cap "vdd" "strongarm_comparator$2_0.OUTN" 4986.31
+cap "vdd" "a_450032_449122#" 0.0103655
+cap "vdd" "gpt_vref" 54226.3
+cap "vref_1v2$2_0.IBIAS" "strongarm_comparator$2_0.INP" 19044.7
+cap "vdd" "deepseek_cmp" 54226.3
+cap "a_450261_333180#" "vref_1v2$2_0.IBIAS" 7.4467
+cap "a_446174_319178#" "a_445142_322198#" 188.279
+cap "strongarm_comparator$2_0.CLK" "a_447764_415153#" 370.18
+cap "vdd" "a_449030_395380#" 1689.81
+cap "a_448866_319178#" "temp_sensor_0.TEMP_OUT" 126.448
+cap "strongarm_comparator$2_0.INN" "a_447858_395380#" 3.41675
+cap "strongarm_comparator$2_0.INN" "a_449296_472055#" 486.694
+cap "vdd" "io_secondary_3p3_3.ASIG5V" 23846.6
+cap "io_secondary_3p3_10.ASIG5V" "a_449526_465503#" 692.704
+cap "a_446108_415153#" "strongarm_comparator$3_0.OUTN" 1839.43
+cap "vdd" "deepseek_ota" 54226.3
+cap "strongarm_comparator$2_0.INN" "a_449366_474266#" 15.9728
+cap "vref_1v2$1_0.VREF" "vref_1v2$2_0.IBIAS" 626.122
+cap "a_446966_452332#" "a_450032_449122#" 734.004
+cap "vdd" "clk" 54480.1
+cap "vdd" "strongarm_comparator$2_0.INN" 28280.3
+cap "vdd" "oxa_ota" 54226.3
+cap "vdd" "a_446174_319178#" 0.0181397
+cap "a_447858_395380#" "strongarm_comparator$2_0.INP" 82.4754
+cap "a_449296_472055#" "strongarm_comparator$2_0.INP" 865.133
+cap "vref_1v2$2_0.IBIAS" "io_secondary_3p3_4.ASIG5V" 334.061
+cap "strongarm_comparator$2_0.OUTN" "a_449030_395380#" 230.787
+cap "a_449366_474266#" "strongarm_comparator$2_0.INP" 270.139
+cap "vdd" "strongarm_comparator$3_0.OUTP" 25630.1
+cap "strongarm_comparator$2_0.OUTN" "io_secondary_3p3_3.ASIG5V" 2480.2
+cap "strongarm_comparator$2_0.INN" "a_450384_431778#" 931.454
+cap "vdd" "a_446992_431778#" 1802.29
+cap "vdd" "ota$2_0.OUT" 24116.6
+cap "io_secondary_3p3_2.ASIG5V" "a_449590_375410#" 597.145
+cap "strongarm_comparator$2_0.INN" "a_448488_431778#" 707.718
+cap "a_446514_321988#" "a_444522_318971#" 1228.98
+cap "vdd" "strongarm_comparator$2_0.INP" 28280.3
+cap "vdd" "a_450261_333180#" 18.2295
+cap "strongarm_comparator$2_0.INN" "a_446966_452332#" 305.018
+cap "vdd" "io_secondary_3p3_8.ASIG5V" 27243.1
+cap "a_449030_395380#" "io_secondary_3p3_3.ASIG5V" 753.798
+cap "a_448866_319178#" "a_445142_322198#" 443.917
+cap "a_450384_431778#" "a_446992_431778#" 3738.92
+cap "a_446514_321988#" "a_451058_322196#" 266.56
+cap "strongarm_comparator$2_0.INN" "a_446108_415153#" 49.7511
+cap "a_450384_431778#" "strongarm_comparator$2_0.INP" 782.066
+cap "io_secondary_3p3_2.ASIG5V" "vref_1v2$2_0.IBIAS" 28.1387
+cap "strongarm_comparator$2_0.INN" "a_450032_449122#" 418.633
+cap "a_447160_411233#" "a_446108_415153#" 1367.71
+cap "a_446992_431778#" "a_448488_431778#" 936.049
+cap "a_446514_321988#" "a_451730_316152#" 4.98149
+cap "a_450384_431778#" "io_secondary_3p3_8.ASIG5V" 32.637
+cap "vdd" "a_447764_415153#" 2580.06
+cap "strongarm_comparator$3_0.OUTP" "strongarm_comparator$3_0.OUTN" 2313.53
+cap "strongarm_comparator$2_0.INP" "a_448488_431778#" 60.7787
+cap "io_secondary_3p3_10.ASIG5V" "a_449616_457872#" 1344.54
+cap "a_446108_415153#" "strongarm_comparator$3_0.OUTP" 372.716
+cap "vdd" "vref_1v2$1_0.VREF" 22007.3
+cap "vref_1v2$1_0.VREF" "a_449574_352580#" 2780.04
+cap "a_446966_452332#" "ota$2_0.OUT" 2491.9
+cap "a_446514_321988#" "temp_sensor_0.TEMP_OUT" 34.7093
+cap "strongarm_comparator$2_0.INN" "a_449030_395380#" 113.466
+cap "io_secondary_3p3_8.ASIG5V" "a_448488_431778#" 1915.95
+cap "a_446966_452332#" "strongarm_comparator$2_0.INP" 135.978
+cap "a_449526_465503#" "a_449616_457872#" 1580.29
+cap "a_446108_415153#" "strongarm_comparator$2_0.INP" 184.43
+cap "a_450032_449122#" "ota$2_0.OUT" 645.309
+cap "a_444522_318971#" "temp_sensor_0.TEMP_OUT" 5.37261
+cap "a_451058_322196#" "a_451730_316152#" 1047.4
+cap "strongarm_comparator$2_0.OUTN" "strongarm_comparator$2_0.INP" 0.0206891
+cap "vdd" "inp" 54226.3
+cap "vdd" "a_448866_319178#" 2.24468
+cap "a_449020_392562#" "strongarm_comparator$2_0.CLK" 491.13
+cap "strongarm_comparator$2_0.CLK" "strongarm_comparator_0.OUTN" 54.4622
+cap "a_450032_449122#" "strongarm_comparator$2_0.INP" 763.884
+cap "a_451058_322196#" "temp_sensor_0.TEMP_OUT" 1538.73
+cap "vdd" "io_secondary_3p3_4.ASIG5V" 21557.4
+cap "a_447764_415153#" "strongarm_comparator$3_0.OUTN" 589.839
+cap "vdd" "oxa_cmp" 54226.3
+cap "a_449030_395380#" "strongarm_comparator$2_0.INP" 25.8497
+cap "a_447764_415153#" "a_446108_415153#" 991.49
+cap "a_451058_322196#" "a_454802_322196#" 508.029
+cap "a_451730_316152#" "temp_sensor_0.TEMP_OUT" 546.463
+cap "io_secondary_3p3_3.ASIG5V" "strongarm_comparator$2_0.INP" 6.45906
+cap "strongarm_comparator$2_0.INN" "a_447160_411233#" 383.593
+cap "a_451730_316152#" "a_454802_322196#" 1422.5
+cap "strongarm_comparator$2_0.INN" "strongarm_comparator$3_0.OUTP" 4.56916
+cap "strongarm_comparator$2_0.INN" "a_446992_431778#" 14.8422
+cap "temp_sensor_0.TEMP_OUT" "a_454802_322196#" 4.18639
+cap "vdd" "ibias" 54226.3
+cap "strongarm_comparator$2_0.INN" "strongarm_comparator$2_0.INP" 39818.1
+cap "vdd" "io_secondary_3p3_2.ASIG5V" 20861.2
+cap "strongarm_comparator$2_0.INN" "io_secondary_3p3_8.ASIG5V" 40.8035
+cap "a_445142_322198#" "a_446514_321988#" 805.087
+cap "a_447160_411233#" "strongarm_comparator$2_0.INP" 365.207
+cap "vdd" "gpt_ota" 54226.3
+cap "a_449020_392562#" "a_447858_395380#" 1053.29
+cap "a_445142_322198#" "a_444522_318971#" 617.414
+cap "strongarm_comparator$2_0.INN" "a_447764_415153#" 203.653
+cap "vdd" "io_secondary_3p3_10.ASIG5V" 21547.1
+cap "a_446992_431778#" "strongarm_comparator$2_0.INP" 786.942
+cap "ota$2_0.OUT" "strongarm_comparator$2_0.INP" 393.512
+cap "a_446992_431778#" "io_secondary_3p3_8.ASIG5V" 622.567
+cap "vref_1v2$2_0.IBIAS" "a_449590_375410#" 410.011
+cap "a_445142_322198#" "a_451058_322196#" 3.86279
+cap "a_447160_411233#" "a_447764_415153#" 1370.05
+cap "vdd" "a_449526_465503#" 8665.44
+cap "strongarm_comparator$2_0.INP" "io_secondary_3p3_8.ASIG5V" 203.407
+cap "a_447764_415153#" "strongarm_comparator$3_0.OUTP" 2026.51
+cap "vref_1v2$2_0.IBIAS" "a_449616_457872#" 438.88
+cap "vref_1v2$2_0.IBIAS" "strongarm_comparator$2_0.CLK" 1679.93
+cap "vdd" "a_449020_392562#" 0.0421525
+cap "vdd" "strongarm_comparator_0.OUTN" 9145.28
+cap "a_445142_322198#" "a_451730_316152#" 4.86846
+cap "vdd" "a_446514_321988#" 10711.4
+cap "a_448866_319178#" "a_446174_319178#" 0.614017
+cap "a_445142_322198#" "temp_sensor_0.TEMP_OUT" 3.09287
+cap "vdd" "a_444522_318971#" 2411.28
+cap "a_450384_431778#" "strongarm_comparator_0.OUTN" 0.0277459
+cap "strongarm_comparator_0.OUTN" "a_448488_431778#" 655.29
+cap "vdd" "a_451058_322196#" 8642.78
+cap "ota_0.OUT" "a_449296_472055#" 1427.17
+cap "vdd" "deepseek_vref" 54226.3
+cap "vdd" "a_451730_316152#" 5390.78
+cap "ota_0.OUT" "a_449366_474266#" 672.839
+cap "a_453622_319179#" "a_451058_322196#" 484.785
+cap "a_449020_392562#" "strongarm_comparator$2_0.OUTN" 4.61909
+cap "a_450261_333180#" "io_secondary_3p3_4.ASIG5V" 6177.29
+cap "strongarm_comparator$2_0.CLK" "a_447858_395380#" 256.61
+cap "vdd" "temp_sensor_0.TEMP_OUT" 21842.1
+cap "a_453622_319179#" "a_451730_316152#" 1698.52
+cap "vdd" "ota_0.OUT" 21893.9
+cap "vdd" "a_454802_322196#" 3726.99
+cap "vref_1v2$2_0.IBIAS" "a_449296_472055#" 424.728
+cap "vdd" "a_449590_375410#" 7645.79
+cap "a_453622_319179#" "temp_sensor_0.TEMP_OUT" 17.3133
+cap "a_449020_392562#" "a_449030_395380#" 1001.81
+cap "a_449020_392562#" "io_secondary_3p3_3.ASIG5V" 48.3626
+cap "vdd" "strongarm_comparator$2_0.CLK" 43357.8
+cap "strongarm_comparator$2_0.INN" "io_secondary_3p3_10.ASIG5V" 311.08
+cap "vdd" "oxa_vref" 54226.3
+cap "strongarm_comparator$2_0.INN" "a_449526_465503#" 9.62023
+cap "vdd" "vref_1v2$2_0.IBIAS" 63293.7
+cap "vref_1v2$2_0.IBIAS" "a_449574_352580#" 0.29042
+device csubckt cap_mim_2f0_m4m5_noshield 448164 294528 448165 294529 l=6800 w=6800 "None" "a_451058_322196#" 26368 0 "vss" 27200 3350400,55840
+device pdiode diode_pd2nw_03v3 499662 296318 499663 296319 a=4000000 p=8000 "vdd" "temp_out" 7784 0 "vdd" 0 20694400,22480
+device pdiode diode_pd2nw_03v3 497462 296318 497463 296319 a=4000000 p=8000 "vdd" "temp_out" 7784 0 "vdd" 0 20694400,22480
+device pdiode diode_pd2nw_03v3 495262 296318 495263 296319 a=4000000 p=8000 "vdd" "temp_out" 7784 0 "vdd" 0 20694400,22480
+device pdiode diode_pd2nw_03v3 493062 296318 493063 296319 a=4000000 p=8000 "vdd" "temp_out" 7784 0 "vdd" 0 20694400,22480
+device rsubckt ppolyf_u 488570 299094 488571 299095 l=2000 w=8000 "vdd" "a_488570_299094#" 0 0 "temp_sensor_0.TEMP_OUT" 8000 816000,16204 "temp_out" 8000 816000,16204
+device ndiode diode_nd2ps_03v3 499634 307574 499635 307575 a=4000000 p=8000 "vss" "temp_out" 7784 0 "vss" 0 0
+device ndiode diode_nd2ps_03v3 497434 307574 497435 307575 a=4000000 p=8000 "vss" "temp_out" 7784 0 "vss" 0 0
+device ndiode diode_nd2ps_03v3 495234 307574 495235 307575 a=4000000 p=8000 "vss" "temp_out" 7784 0 "vss" 0 0
+device ndiode diode_nd2ps_03v3 493034 307574 493035 307575 a=4000000 p=8000 "vss" "temp_out" 7784 0 "vss" 0 0
+device rsubckt ppolyf_u 446824 294570 446825 294571 l=20000 w=200 "vss" "a_446824_294570#" 0 0 "a_446174_319178#" 200 20400,604 "vss" 200 20400,604
+device pdiode diode_pd2nw_03v3 499662 315718 499663 315719 a=4000000 p=8000 "vdd" "oxa_vref" 7784 0 "vdd" 0 20694400,22480
+device pdiode diode_pd2nw_03v3 497462 315718 497463 315719 a=4000000 p=8000 "vdd" "oxa_vref" 7784 0 "vdd" 0 20694400,22480
+device pdiode diode_pd2nw_03v3 495262 315718 495263 315719 a=4000000 p=8000 "vdd" "oxa_vref" 7784 0 "vdd" 0 20694400,22480
+device pdiode diode_pd2nw_03v3 493062 315718 493063 315719 a=4000000 p=8000 "vdd" "oxa_vref" 7784 0 "vdd" 0 20694400,22480
+device msubckt nfet_03v3 451730 316360 451731 316361 l=200 w=600 "vss" "a_451730_316152#" 400 0 "vss" 600 72000,1440 "temp_sensor_0.TEMP_OUT" 600 72000,1440
+device msubckt nfet_03v3 450158 316361 450159 316362 l=200 w=200 "vss" "a_445142_322198#" 400 0 "vss" 200 24000,640 "a_446514_321988#" 200 24000,640
+device rsubckt ppolyf_u 488570 318494 488571 318495 l=2000 w=8000 "vdd" "a_488570_318494#" 0 0 "io_secondary_3p3_4.ASIG5V" 8000 816000,16204 "oxa_vref" 8000 816000,16204
+device msubckt nfet_03v3 456766 319178 456767 319179 l=800 w=400 "vss" "a_451730_316152#" 1600 0 "a_453622_319179#" 400 48000,1040 "vdd" 400 48000,1040
+device msubckt nfet_03v3 454594 319179 454595 319180 l=800 w=200 "vss" "a_451058_322196#" 1600 0 "a_453622_319179#" 200 24000,640 "a_451730_316152#" 200 24000,640
+device msubckt nfet_03v3 452822 319179 452823 319180 l=800 w=200 "vss" "a_451058_322196#" 1600 0 "vss" 200 24000,640 "a_453622_319179#" 200 24000,640
+device msubckt nfet_03v3 451330 319178 451331 319179 l=120 w=800 "vss" "temp_sensor_0.TEMP_OUT" 240 0 "a_448866_319178#" 800 96000,1840 "a_451058_322196#" 800 96000,1840
+device msubckt nfet_03v3 449838 319178 449839 319179 l=120 w=800 "vss" "a_444522_318971#" 240 0 "vss" 800 96000,1840 "a_445142_322198#" 800 96000,1840
+device msubckt nfet_03v3 448066 319178 448067 319179 l=800 w=400 "vss" "a_444522_318971#" 1600 0 "vss" 400 48000,1040 "a_448866_319178#" 400 48000,1040
+device msubckt nfet_03v3 446294 319178 446295 319179 l=800 w=800 "vss" "a_444522_318971#" 1600 0 "a_446174_319178#" 800 96000,1840 "a_446514_321988#" 800 96000,1840
+device msubckt nfet_03v3 444522 319179 444523 319180 l=800 w=200 "vss" "a_444522_318971#" 1600 0 "vss" 200 24000,640 "a_444522_318971#" 200 24000,640
+device msubckt pfet_03v3 458046 322196 458047 322197 l=800 w=800 "vdd" "a_451730_316152#" 1600 0 "a_454802_322196#" 800 96000,1840 "vss" 800 96000,1840
+device msubckt pfet_03v3 455874 322196 455875 322197 l=800 w=400 "vdd" "a_451058_322196#" 1600 0 "a_454802_322196#" 400 48000,1040 "a_451730_316152#" 400 48000,1040
+device msubckt pfet_03v3 454002 322196 454003 322197 l=800 w=400 "vdd" "a_451058_322196#" 1600 0 "vdd" 400 48000,1040 "a_454802_322196#" 400 48000,1040
+device msubckt pfet_03v3 452430 322196 452431 322197 l=200 w=1200 "vdd" "a_451730_316152#" 400 0 "vdd" 1200 144000,2640 "temp_sensor_0.TEMP_OUT" 1200 144000,2640
+device msubckt pfet_03v3 450258 322196 450259 322197 l=800 w=800 "vdd" "a_446514_321988#" 1600 0 "vdd" 800 96000,1840 "a_451058_322196#" 800 96000,1840
+device msubckt pfet_03v3 448386 322196 448387 322197 l=800 w=800 "vdd" "a_446514_321988#" 1600 0 "vdd" 800 96000,1840 "a_446514_321988#" 800 96000,1840
+device msubckt pfet_03v3 446514 322196 446515 322197 l=800 w=800 "vdd" "a_446514_321988#" 1600 0 "vdd" 800 96000,1840 "a_444522_318971#" 800 96000,1840
+device msubckt pfet_03v3 443242 322198 443243 322199 l=1900 w=120 "vdd" "vss" 3800 0 "vdd" 120 14400,480 "a_445142_322198#" 120 14400,480
+device ndiode diode_nd2ps_03v3 499634 326974 499635 326975 a=4000000 p=8000 "vss" "oxa_vref" 7784 0 "vss" 0 0
+device ndiode diode_nd2ps_03v3 497434 326974 497435 326975 a=4000000 p=8000 "vss" "oxa_vref" 7784 0 "vss" 0 0
+device ndiode diode_nd2ps_03v3 495234 326974 495235 326975 a=4000000 p=8000 "vss" "oxa_vref" 7784 0 "vss" 0 0
+device ndiode diode_nd2ps_03v3 493034 326974 493035 326975 a=4000000 p=8000 "vss" "oxa_vref" 7784 0 "vss" 0 0
+device msubckt nfet_03v3 453235 333180 453236 333181 l=70 w=160 "vss" "io_secondary_3p3_4.ASIG5V" 140 0 "io_secondary_3p3_4.ASIG5V" 160 8960,272 "a_450261_333180#" 160 19200,560
+device msubckt nfet_03v3 453053 333180 453054 333181 l=70 w=160 "vss" "io_secondary_3p3_4.ASIG5V" 140 0 "a_450261_333180#" 160 8960,272 "io_secondary_3p3_4.ASIG5V" 160 8960,272
+device msubckt nfet_03v3 452871 333180 452872 333181 l=70 w=160 "vss" "io_secondary_3p3_4.ASIG5V" 140 0 "io_secondary_3p3_4.ASIG5V" 160 8960,272 "a_450261_333180#" 160 8960,272
+device msubckt nfet_03v3 452689 333180 452690 333181 l=70 w=160 "vss" "io_secondary_3p3_4.ASIG5V" 140 0 "a_450261_333180#" 160 8960,272 "io_secondary_3p3_4.ASIG5V" 160 8960,272
+device msubckt nfet_03v3 452507 333180 452508 333181 l=70 w=160 "vss" "io_secondary_3p3_4.ASIG5V" 140 0 "io_secondary_3p3_4.ASIG5V" 160 8960,272 "a_450261_333180#" 160 8960,272
+device msubckt nfet_03v3 452325 333180 452326 333181 l=70 w=160 "vss" "io_secondary_3p3_4.ASIG5V" 140 0 "a_450261_333180#" 160 8960,272 "io_secondary_3p3_4.ASIG5V" 160 8960,272
+device msubckt nfet_03v3 452143 333180 452144 333181 l=70 w=160 "vss" "io_secondary_3p3_4.ASIG5V" 140 0 "io_secondary_3p3_4.ASIG5V" 160 8960,272 "a_450261_333180#" 160 8960,272
+device msubckt nfet_03v3 451961 333180 451962 333181 l=70 w=160 "vss" "io_secondary_3p3_4.ASIG5V" 140 0 "a_450261_333180#" 160 8960,272 "io_secondary_3p3_4.ASIG5V" 160 8960,272
+device msubckt nfet_03v3 451779 333180 451780 333181 l=70 w=160 "vss" "io_secondary_3p3_4.ASIG5V" 140 0 "io_secondary_3p3_4.ASIG5V" 160 8960,272 "a_450261_333180#" 160 8960,272
+device msubckt nfet_03v3 451597 333180 451598 333181 l=70 w=160 "vss" "io_secondary_3p3_4.ASIG5V" 140 0 "a_450261_333180#" 160 8960,272 "io_secondary_3p3_4.ASIG5V" 160 8960,272
+device msubckt nfet_03v3 451415 333180 451416 333181 l=70 w=160 "vss" "io_secondary_3p3_4.ASIG5V" 140 0 "io_secondary_3p3_4.ASIG5V" 160 8960,272 "a_450261_333180#" 160 8960,272
+device msubckt nfet_03v3 451233 333180 451234 333181 l=70 w=160 "vss" "io_secondary_3p3_4.ASIG5V" 140 0 "a_450261_333180#" 160 19200,560 "io_secondary_3p3_4.ASIG5V" 160 8960,272
+device pdiode diode_pd2nw_03v3 499662 335118 499663 335119 a=4000000 p=8000 "vdd" "gpt_vref" 7784 0 "vdd" 0 20694400,22480
+device pdiode diode_pd2nw_03v3 497462 335118 497463 335119 a=4000000 p=8000 "vdd" "gpt_vref" 7784 0 "vdd" 0 20694400,22480
+device pdiode diode_pd2nw_03v3 495262 335118 495263 335119 a=4000000 p=8000 "vdd" "gpt_vref" 7784 0 "vdd" 0 20694400,22480
+device pdiode diode_pd2nw_03v3 493062 335118 493063 335119 a=4000000 p=8000 "vdd" "gpt_vref" 7784 0 "vdd" 0 20694400,22480
+device msubckt nfet_03v3 448771 333180 448772 333181 l=1490 w=1900 "vss" "io_secondary_3p3_4.ASIG5V" 2980 0 "vss" 1900 228000,4040 "a_450261_333180#" 1900 228000,4040
+device rsubckt ppolyf_u 488570 337894 488571 337895 l=2000 w=8000 "vdd" "a_488570_337894#" 0 0 "vref_1v2$1_0.VREF" 8000 816000,16204 "gpt_vref" 8000 816000,16204
+device msubckt pfet_03v3 451574 337298 451575 337299 l=1600 w=400 "vdd" "vref_1v2$2_0.IBIAS" 3200 0 "vdd" 400 48000,1040 "io_secondary_3p3_4.ASIG5V" 400 48000,1040
+device msubckt pfet_03v3 448902 337298 448903 337299 l=1600 w=400 "vdd" "vref_1v2$2_0.IBIAS" 3200 0 "vdd" 400 48000,1040 "vref_1v2$2_0.IBIAS" 400 48000,1040
+device ndiode diode_nd2ps_03v3 499634 346374 499635 346375 a=4000000 p=8000 "vss" "gpt_vref" 7784 0 "vss" 0 0
+device ndiode diode_nd2ps_03v3 497434 346374 497435 346375 a=4000000 p=8000 "vss" "gpt_vref" 7784 0 "vss" 0 0
+device ndiode diode_nd2ps_03v3 495234 346374 495235 346375 a=4000000 p=8000 "vss" "gpt_vref" 7784 0 "vss" 0 0
+device ndiode diode_nd2ps_03v3 493034 346374 493035 346375 a=4000000 p=8000 "vss" "gpt_vref" 7784 0 "vss" 0 0
+device pdiode diode_pd2nw_03v3 499662 354518 499663 354519 a=4000000 p=8000 "vdd" "deepseek_vref" 7784 0 "vdd" 0 20694400,22480
+device pdiode diode_pd2nw_03v3 497462 354518 497463 354519 a=4000000 p=8000 "vdd" "deepseek_vref" 7784 0 "vdd" 0 20694400,22480
+device pdiode diode_pd2nw_03v3 495262 354518 495263 354519 a=4000000 p=8000 "vdd" "deepseek_vref" 7784 0 "vdd" 0 20694400,22480
+device pdiode diode_pd2nw_03v3 493062 354518 493063 354519 a=4000000 p=8000 "vdd" "deepseek_vref" 7784 0 "vdd" 0 20694400,22480
+device msubckt nfet_03v3 450782 352580 450783 352581 l=1600 w=1900 "vss" "vref_1v2$1_0.VREF" 3200 0 "vss" 1900 228000,4040 "a_449574_352580#" 1900 228000,4040
+device msubckt nfet_03v3 449724 352580 449725 352581 l=56 w=1900 "vss" "vref_1v2$1_0.VREF" 112 0 "a_449574_352580#" 1900 285000,4100 "vref_1v2$1_0.VREF" 1900 285000,4100
+device rsubckt ppolyf_u 488570 357294 488571 357295 l=2000 w=8000 "vdd" "a_488570_357294#" 0 0 "io_secondary_3p3_2.ASIG5V" 8000 816000,16204 "deepseek_vref" 8000 816000,16204
+device msubckt pfet_03v3 451574 356698 451575 356699 l=1600 w=400 "vdd" "vref_1v2$2_0.IBIAS" 3200 0 "vdd" 400 48000,1040 "vref_1v2$1_0.VREF" 400 48000,1040
+device msubckt pfet_03v3 448902 356698 448903 356699 l=1600 w=400 "vdd" "vref_1v2$2_0.IBIAS" 3200 0 "vdd" 400 48000,1040 "vref_1v2$2_0.IBIAS" 400 48000,1040
+device ndiode diode_nd2ps_03v3 499634 365774 499635 365775 a=4000000 p=8000 "vss" "deepseek_vref" 7784 0 "vss" 0 0
+device ndiode diode_nd2ps_03v3 497434 365774 497435 365775 a=4000000 p=8000 "vss" "deepseek_vref" 7784 0 "vss" 0 0
+device ndiode diode_nd2ps_03v3 495234 365774 495235 365775 a=4000000 p=8000 "vss" "deepseek_vref" 7784 0 "vss" 0 0
+device ndiode diode_nd2ps_03v3 493034 365774 493035 365775 a=4000000 p=8000 "vss" "deepseek_vref" 7784 0 "vss" 0 0
+device pdiode diode_pd2nw_03v3 499662 373918 499663 373919 a=4000000 p=8000 "vdd" "oxa_cmp" 7784 0 "vdd" 0 20694400,22480
+device pdiode diode_pd2nw_03v3 497462 373918 497463 373919 a=4000000 p=8000 "vdd" "oxa_cmp" 7784 0 "vdd" 0 20694400,22480
+device pdiode diode_pd2nw_03v3 495262 373918 495263 373919 a=4000000 p=8000 "vdd" "oxa_cmp" 7784 0 "vdd" 0 20694400,22480
+device pdiode diode_pd2nw_03v3 493062 373918 493063 373919 a=4000000 p=8000 "vdd" "oxa_cmp" 7784 0 "vdd" 0 20694400,22480
+device msubckt nfet_03v3 453072 373000 453073 373001 l=100 w=240 "vss" "io_secondary_3p3_2.ASIG5V" 200 0 "vss" 240 28800,720 "io_secondary_3p3_2.ASIG5V" 240 28800,720
+device msubckt nfet_03v3 451300 373000 451301 373001 l=400 w=400 "vss" "vref_1v2$2_0.IBIAS" 800 0 "a_449590_375410#" 400 22400,512 "vss" 400 48000,1040
+device msubckt nfet_03v3 450788 373000 450789 373001 l=400 w=400 "vss" "vref_1v2$2_0.IBIAS" 800 0 "vss" 400 48000,1040 "a_449590_375410#" 400 22400,512
+device msubckt nfet_03v3 449416 373000 449417 373001 l=400 w=400 "vss" "vref_1v2$2_0.IBIAS" 800 0 "vref_1v2$2_0.IBIAS" 400 22400,512 "vss" 400 48000,1040
+device msubckt nfet_03v3 448904 373000 448905 373001 l=400 w=400 "vss" "vref_1v2$2_0.IBIAS" 800 0 "vss" 400 48000,1040 "vref_1v2$2_0.IBIAS" 400 22400,512
+device rsubckt ppolyf_u 488570 376694 488571 376695 l=2000 w=8000 "vdd" "a_488570_376694#" 0 0 "io_secondary_3p3_3.ASIG5V" 8000 816000,16204 "oxa_cmp" 8000 816000,16204
+device msubckt pfet_03v3 452086 375618 452087 375619 l=400 w=800 "vdd" "a_449590_375410#" 800 0 "io_secondary_3p3_2.ASIG5V" 800 44800,912 "vdd" 800 96000,1840
+device msubckt pfet_03v3 451574 375618 451575 375619 l=400 w=800 "vdd" "a_449590_375410#" 800 0 "vdd" 800 96000,1840 "io_secondary_3p3_2.ASIG5V" 800 44800,912
+device msubckt pfet_03v3 450102 375618 450103 375619 l=400 w=400 "vdd" "a_449590_375410#" 800 0 "a_449590_375410#" 400 22400,512 "vdd" 400 48000,1040
+device msubckt pfet_03v3 449590 375618 449591 375619 l=400 w=400 "vdd" "a_449590_375410#" 800 0 "vdd" 400 48000,1040 "a_449590_375410#" 400 22400,512
+device ndiode diode_nd2ps_03v3 499634 385174 499635 385175 a=4000000 p=8000 "vss" "oxa_cmp" 7784 0 "vss" 0 0
+device ndiode diode_nd2ps_03v3 497434 385174 497435 385175 a=4000000 p=8000 "vss" "oxa_cmp" 7784 0 "vss" 0 0
+device ndiode diode_nd2ps_03v3 495234 385174 495235 385175 a=4000000 p=8000 "vss" "oxa_cmp" 7784 0 "vss" 0 0
+device ndiode diode_nd2ps_03v3 493034 385174 493035 385175 a=4000000 p=8000 "vss" "oxa_cmp" 7784 0 "vss" 0 0
+device msubckt nfet_03v3 450988 388524 450989 388525 l=100 w=1820 "vss" "strongarm_comparator$2_0.CLK" 200 0 "vss" 1820 218400,3880 "a_449020_392562#" 1820 218400,3880
+device pdiode diode_pd2nw_03v3 499662 393318 499663 393319 a=4000000 p=8000 "vdd" "gpt_cmp" 7784 0 "vdd" 0 20694400,22480
+device pdiode diode_pd2nw_03v3 497462 393318 497463 393319 a=4000000 p=8000 "vdd" "gpt_cmp" 7784 0 "vdd" 0 20694400,22480
+device pdiode diode_pd2nw_03v3 495262 393318 495263 393319 a=4000000 p=8000 "vdd" "gpt_cmp" 7784 0 "vdd" 0 20694400,22480
+device pdiode diode_pd2nw_03v3 493062 393318 493063 393319 a=4000000 p=8000 "vdd" "gpt_cmp" 7784 0 "vdd" 0 20694400,22480
+device msubckt nfet_03v3 452836 392562 452837 392563 l=100 w=460 "vss" "strongarm_comparator$2_0.OUTN" 200 0 "a_449030_395380#" 460 55200,1160 "io_secondary_3p3_3.ASIG5V" 460 55200,1160
+device msubckt nfet_03v3 451764 392562 451765 392563 l=100 w=460 "vss" "io_secondary_3p3_3.ASIG5V" 200 0 "a_447858_395380#" 460 55200,1160 "strongarm_comparator$2_0.OUTN" 460 55200,1160
+device msubckt nfet_03v3 450252 392562 450253 392563 l=140 w=600 "vss" "strongarm_comparator$2_0.INP" 280 0 "a_449020_392562#" 600 72000,1440 "a_447858_395380#" 600 72000,1440
+device msubckt nfet_03v3 449140 392562 449141 392563 l=140 w=600 "vss" "strongarm_comparator$2_0.INN" 280 0 "a_449020_392562#" 600 72000,1440 "a_449030_395380#" 600 72000,1440
+device rsubckt ppolyf_u 488570 396094 488571 396095 l=2000 w=8000 "vdd" "a_488570_396094#" 0 0 "strongarm_comparator$3_0.OUTP" 8000 816000,16204 "gpt_cmp" 8000 816000,16204
+device msubckt pfet_03v3 454218 395380 454219 395381 l=100 w=600 "vdd" "strongarm_comparator$2_0.OUTN" 200 0 "vdd" 600 72000,1440 "io_secondary_3p3_3.ASIG5V" 600 72000,1440
+device msubckt pfet_03v3 453046 395380 453047 395381 l=100 w=600 "vdd" "io_secondary_3p3_3.ASIG5V" 200 0 "vdd" 600 72000,1440 "strongarm_comparator$2_0.OUTN" 600 72000,1440
+device msubckt pfet_03v3 451574 395380 451575 395381 l=100 w=320 "vdd" "strongarm_comparator$2_0.CLK" 200 0 "vdd" 320 38400,880 "io_secondary_3p3_3.ASIG5V" 320 38400,880
+device msubckt pfet_03v3 450402 395380 450403 395381 l=100 w=320 "vdd" "strongarm_comparator$2_0.CLK" 200 0 "vdd" 320 38400,880 "strongarm_comparator$2_0.OUTN" 320 38400,880
+device msubckt pfet_03v3 448930 395380 448931 395381 l=100 w=160 "vdd" "strongarm_comparator$2_0.CLK" 200 0 "vdd" 160 19200,560 "a_449030_395380#" 160 19200,560
+device msubckt pfet_03v3 447758 395380 447759 395381 l=100 w=160 "vdd" "strongarm_comparator$2_0.CLK" 200 0 "vdd" 160 19200,560 "a_447858_395380#" 160 19200,560
+device ndiode diode_nd2ps_03v3 499634 404574 499635 404575 a=4000000 p=8000 "vss" "gpt_cmp" 7784 0 "vss" 0 0
+device ndiode diode_nd2ps_03v3 497434 404574 497435 404575 a=4000000 p=8000 "vss" "gpt_cmp" 7784 0 "vss" 0 0
+device ndiode diode_nd2ps_03v3 495234 404574 495235 404575 a=4000000 p=8000 "vss" "gpt_cmp" 7784 0 "vss" 0 0
+device ndiode diode_nd2ps_03v3 493034 404574 493035 404575 a=4000000 p=8000 "vss" "gpt_cmp" 7784 0 "vss" 0 0
+device msubckt nfet_03v3 451326 407313 451327 407314 l=120 w=200 "vss" "strongarm_comparator$2_0.CLK" 240 0 "a_447160_411233#" 200 11200,312 "vss" 200 24000,640
+device msubckt nfet_03v3 451094 407313 451095 407314 l=120 w=200 "vss" "strongarm_comparator$2_0.CLK" 240 0 "vss" 200 11200,312 "a_447160_411233#" 200 11200,312
+device msubckt nfet_03v3 450862 407313 450863 407314 l=120 w=200 "vss" "strongarm_comparator$2_0.CLK" 240 0 "a_447160_411233#" 200 11200,312 "vss" 200 11200,312
+device msubckt nfet_03v3 450630 407313 450631 407314 l=120 w=200 "vss" "strongarm_comparator$2_0.CLK" 240 0 "vss" 200 24000,640 "a_447160_411233#" 200 11200,312
+device msubckt nfet_03v3 454676 411233 454677 411234 l=120 w=200 "vss" "strongarm_comparator$3_0.OUTN" 240 0 "a_447764_415153#" 200 11200,312 "strongarm_comparator$3_0.OUTP" 200 24000,640
+device msubckt nfet_03v3 454444 411233 454445 411234 l=120 w=200 "vss" "strongarm_comparator$3_0.OUTN" 240 0 "strongarm_comparator$3_0.OUTP" 200 11200,312 "a_447764_415153#" 200 11200,312
+device msubckt nfet_03v3 454212 411233 454213 411234 l=120 w=200 "vss" "strongarm_comparator$3_0.OUTN" 240 0 "a_447764_415153#" 200 11200,312 "strongarm_comparator$3_0.OUTP" 200 11200,312
+device msubckt nfet_03v3 453980 411233 453981 411234 l=120 w=200 "vss" "strongarm_comparator$3_0.OUTN" 240 0 "strongarm_comparator$3_0.OUTP" 200 11200,312 "a_447764_415153#" 200 11200,312
+device msubckt nfet_03v3 453748 411233 453749 411234 l=120 w=200 "vss" "strongarm_comparator$3_0.OUTN" 240 0 "a_447764_415153#" 200 24000,640 "strongarm_comparator$3_0.OUTP" 200 11200,312
+device msubckt nfet_03v3 452656 411233 452657 411234 l=120 w=200 "vss" "strongarm_comparator$3_0.OUTP" 240 0 "a_446108_415153#" 200 11200,312 "strongarm_comparator$3_0.OUTN" 200 24000,640
+device msubckt nfet_03v3 452424 411233 452425 411234 l=120 w=200 "vss" "strongarm_comparator$3_0.OUTP" 240 0 "strongarm_comparator$3_0.OUTN" 200 11200,312 "a_446108_415153#" 200 11200,312
+device msubckt nfet_03v3 452192 411233 452193 411234 l=120 w=200 "vss" "strongarm_comparator$3_0.OUTP" 240 0 "a_446108_415153#" 200 11200,312 "strongarm_comparator$3_0.OUTN" 200 11200,312
+device msubckt nfet_03v3 451960 411233 451961 411234 l=120 w=200 "vss" "strongarm_comparator$3_0.OUTP" 240 0 "strongarm_comparator$3_0.OUTN" 200 11200,312 "a_446108_415153#" 200 11200,312
+device msubckt nfet_03v3 451728 411233 451729 411234 l=120 w=200 "vss" "strongarm_comparator$3_0.OUTP" 240 0 "a_446108_415153#" 200 24000,640 "strongarm_comparator$3_0.OUTN" 200 11200,312
+device msubckt nfet_03v3 449300 411233 449301 411234 l=120 w=200 "vss" "strongarm_comparator$2_0.INN" 240 0 "a_447160_411233#" 200 11200,312 "a_447764_415153#" 200 24000,640
+device msubckt nfet_03v3 449068 411233 449069 411234 l=120 w=200 "vss" "strongarm_comparator$2_0.INN" 240 0 "a_447764_415153#" 200 11200,312 "a_447160_411233#" 200 11200,312
+device msubckt nfet_03v3 448836 411233 448837 411234 l=120 w=200 "vss" "strongarm_comparator$2_0.INN" 240 0 "a_447160_411233#" 200 24000,640 "a_447764_415153#" 200 11200,312
+device msubckt nfet_03v3 447744 411233 447745 411234 l=120 w=200 "vss" "strongarm_comparator$2_0.INP" 240 0 "a_447160_411233#" 200 11200,312 "a_446108_415153#" 200 24000,640
+device msubckt nfet_03v3 447512 411233 447513 411234 l=120 w=200 "vss" "strongarm_comparator$2_0.INP" 240 0 "a_446108_415153#" 200 11200,312 "a_447160_411233#" 200 11200,312
+device msubckt nfet_03v3 447280 411233 447281 411234 l=120 w=200 "vss" "strongarm_comparator$2_0.INP" 240 0 "a_447160_411233#" 200 24000,640 "a_446108_415153#" 200 11200,312
+device pdiode diode_pd2nw_03v3 499662 412718 499663 412719 a=4000000 p=8000 "vdd" "deepseek_cmp" 7784 0 "vdd" 0 20694400,22480
+device pdiode diode_pd2nw_03v3 497462 412718 497463 412719 a=4000000 p=8000 "vdd" "deepseek_cmp" 7784 0 "vdd" 0 20694400,22480
+device pdiode diode_pd2nw_03v3 495262 412718 495263 412719 a=4000000 p=8000 "vdd" "deepseek_cmp" 7784 0 "vdd" 0 20694400,22480
+device pdiode diode_pd2nw_03v3 493062 412718 493063 412719 a=4000000 p=8000 "vdd" "deepseek_cmp" 7784 0 "vdd" 0 20694400,22480
+device rsubckt ppolyf_u 488570 415494 488571 415495 l=2000 w=8000 "vdd" "a_488570_415494#" 0 0 "io_secondary_3p3_8.ASIG5V" 8000 816000,16204 "deepseek_cmp" 8000 816000,16204
+device msubckt pfet_03v3 455968 415153 455969 415154 l=120 w=200 "vdd" "strongarm_comparator$3_0.OUTN" 240 0 "vdd" 200 11200,312 "strongarm_comparator$3_0.OUTP" 200 24000,640
+device msubckt pfet_03v3 455736 415153 455737 415154 l=120 w=200 "vdd" "strongarm_comparator$3_0.OUTN" 240 0 "strongarm_comparator$3_0.OUTP" 200 11200,312 "vdd" 200 11200,312
+device msubckt pfet_03v3 455504 415153 455505 415154 l=120 w=200 "vdd" "strongarm_comparator$3_0.OUTN" 240 0 "vdd" 200 24000,640 "strongarm_comparator$3_0.OUTP" 200 11200,312
+device msubckt pfet_03v3 454312 415153 454313 415154 l=120 w=200 "vdd" "strongarm_comparator$3_0.OUTP" 240 0 "vdd" 200 11200,312 "strongarm_comparator$3_0.OUTN" 200 24000,640
+device msubckt pfet_03v3 454080 415153 454081 415154 l=120 w=200 "vdd" "strongarm_comparator$3_0.OUTP" 240 0 "strongarm_comparator$3_0.OUTN" 200 11200,312 "vdd" 200 11200,312
+device msubckt pfet_03v3 453848 415153 453849 415154 l=120 w=200 "vdd" "strongarm_comparator$3_0.OUTP" 240 0 "vdd" 200 24000,640 "strongarm_comparator$3_0.OUTN" 200 11200,312
+device msubckt pfet_03v3 451420 415153 451421 415154 l=120 w=200 "vdd" "strongarm_comparator$2_0.CLK" 240 0 "vdd" 200 11200,312 "strongarm_comparator$3_0.OUTP" 200 24000,640
+device msubckt pfet_03v3 451188 415153 451189 415154 l=120 w=200 "vdd" "strongarm_comparator$2_0.CLK" 240 0 "strongarm_comparator$3_0.OUTP" 200 11200,312 "vdd" 200 11200,312
+device msubckt pfet_03v3 450956 415153 450957 415154 l=120 w=200 "vdd" "strongarm_comparator$2_0.CLK" 240 0 "vdd" 200 24000,640 "strongarm_comparator$3_0.OUTP" 200 11200,312
+device msubckt pfet_03v3 449764 415153 449765 415154 l=120 w=200 "vdd" "strongarm_comparator$2_0.CLK" 240 0 "vdd" 200 11200,312 "strongarm_comparator$3_0.OUTN" 200 24000,640
+device msubckt pfet_03v3 449532 415153 449533 415154 l=120 w=200 "vdd" "strongarm_comparator$2_0.CLK" 240 0 "strongarm_comparator$3_0.OUTN" 200 11200,312 "vdd" 200 11200,312
+device msubckt pfet_03v3 449300 415153 449301 415154 l=120 w=200 "vdd" "strongarm_comparator$2_0.CLK" 240 0 "vdd" 200 24000,640 "strongarm_comparator$3_0.OUTN" 200 11200,312
+device msubckt pfet_03v3 448108 415153 448109 415154 l=120 w=200 "vdd" "strongarm_comparator$2_0.CLK" 240 0 "vdd" 200 11200,312 "a_447764_415153#" 200 24000,640
+device msubckt pfet_03v3 447876 415153 447877 415154 l=120 w=200 "vdd" "strongarm_comparator$2_0.CLK" 240 0 "a_447764_415153#" 200 11200,312 "vdd" 200 11200,312
+device msubckt pfet_03v3 447644 415153 447645 415154 l=120 w=200 "vdd" "strongarm_comparator$2_0.CLK" 240 0 "vdd" 200 24000,640 "a_447764_415153#" 200 11200,312
+device msubckt pfet_03v3 446452 415153 446453 415154 l=120 w=200 "vdd" "strongarm_comparator$2_0.CLK" 240 0 "vdd" 200 11200,312 "a_446108_415153#" 200 24000,640
+device msubckt pfet_03v3 446220 415153 446221 415154 l=120 w=200 "vdd" "strongarm_comparator$2_0.CLK" 240 0 "a_446108_415153#" 200 11200,312 "vdd" 200 11200,312
+device msubckt pfet_03v3 445988 415153 445989 415154 l=120 w=200 "vdd" "strongarm_comparator$2_0.CLK" 240 0 "vdd" 200 24000,640 "a_446108_415153#" 200 11200,312
+device ndiode diode_nd2ps_03v3 499634 423974 499635 423975 a=4000000 p=8000 "vss" "deepseek_cmp" 7784 0 "vss" 0 0
+device ndiode diode_nd2ps_03v3 497434 423974 497435 423975 a=4000000 p=8000 "vss" "deepseek_cmp" 7784 0 "vss" 0 0
+device ndiode diode_nd2ps_03v3 495234 423974 495235 423975 a=4000000 p=8000 "vss" "deepseek_cmp" 7784 0 "vss" 0 0
+device ndiode diode_nd2ps_03v3 493034 423974 493035 423975 a=4000000 p=8000 "vss" "deepseek_cmp" 7784 0 "vss" 0 0
+device msubckt nfet_03v3 450988 429160 450989 429161 l=100 w=400 "vss" "strongarm_comparator$2_0.CLK" 200 0 "vss" 400 48000,1040 "a_450384_431778#" 400 48000,1040
+device pdiode diode_pd2nw_03v3 499662 432118 499663 432119 a=4000000 p=8000 "vdd" "oxa_ota" 7784 0 "vdd" 0 20694400,22480
+device pdiode diode_pd2nw_03v3 497462 432118 497463 432119 a=4000000 p=8000 "vdd" "oxa_ota" 7784 0 "vdd" 0 20694400,22480
+device pdiode diode_pd2nw_03v3 495262 432118 495263 432119 a=4000000 p=8000 "vdd" "oxa_ota" 7784 0 "vdd" 0 20694400,22480
+device pdiode diode_pd2nw_03v3 493062 432118 493063 432119 a=4000000 p=8000 "vdd" "oxa_ota" 7784 0 "vdd" 0 20694400,22480
+device msubckt nfet_03v3 454844 431778 454845 431779 l=120 w=400 "vss" "strongarm_comparator$2_0.INN" 240 0 "a_448488_431778#" 400 22400,512 "a_450384_431778#" 400 48000,1040
+device msubckt nfet_03v3 454612 431778 454613 431779 l=120 w=400 "vss" "strongarm_comparator$2_0.INN" 240 0 "a_450384_431778#" 400 22400,512 "a_448488_431778#" 400 22400,512
+device msubckt nfet_03v3 454380 431778 454381 431779 l=120 w=400 "vss" "strongarm_comparator$2_0.INN" 240 0 "a_448488_431778#" 400 22400,512 "a_450384_431778#" 400 22400,512
+device msubckt nfet_03v3 454148 431778 454149 431779 l=120 w=400 "vss" "strongarm_comparator$2_0.INN" 240 0 "a_450384_431778#" 400 22400,512 "a_448488_431778#" 400 22400,512
+device msubckt nfet_03v3 453916 431778 453917 431779 l=120 w=400 "vss" "strongarm_comparator$2_0.INN" 240 0 "a_448488_431778#" 400 22400,512 "a_450384_431778#" 400 22400,512
+device msubckt nfet_03v3 453684 431778 453685 431779 l=120 w=400 "vss" "strongarm_comparator$2_0.INN" 240 0 "a_450384_431778#" 400 22400,512 "a_448488_431778#" 400 22400,512
+device msubckt nfet_03v3 453452 431778 453453 431779 l=120 w=400 "vss" "strongarm_comparator$2_0.INN" 240 0 "a_448488_431778#" 400 22400,512 "a_450384_431778#" 400 22400,512
+device msubckt nfet_03v3 453220 431778 453221 431779 l=120 w=400 "vss" "strongarm_comparator$2_0.INN" 240 0 "a_450384_431778#" 400 48000,1040 "a_448488_431778#" 400 22400,512
+device msubckt nfet_03v3 452128 431778 452129 431779 l=120 w=400 "vss" "strongarm_comparator$2_0.INP" 240 0 "a_446992_431778#" 400 22400,512 "a_450384_431778#" 400 48000,1040
+device msubckt nfet_03v3 451896 431778 451897 431779 l=120 w=400 "vss" "strongarm_comparator$2_0.INP" 240 0 "a_450384_431778#" 400 22400,512 "a_446992_431778#" 400 22400,512
+device msubckt nfet_03v3 451664 431778 451665 431779 l=120 w=400 "vss" "strongarm_comparator$2_0.INP" 240 0 "a_446992_431778#" 400 22400,512 "a_450384_431778#" 400 22400,512
+device msubckt nfet_03v3 451432 431778 451433 431779 l=120 w=400 "vss" "strongarm_comparator$2_0.INP" 240 0 "a_450384_431778#" 400 22400,512 "a_446992_431778#" 400 22400,512
+device msubckt nfet_03v3 451200 431778 451201 431779 l=120 w=400 "vss" "strongarm_comparator$2_0.INP" 240 0 "a_446992_431778#" 400 22400,512 "a_450384_431778#" 400 22400,512
+device msubckt nfet_03v3 450968 431778 450969 431779 l=120 w=400 "vss" "strongarm_comparator$2_0.INP" 240 0 "a_450384_431778#" 400 22400,512 "a_446992_431778#" 400 22400,512
+device msubckt nfet_03v3 450736 431778 450737 431779 l=120 w=400 "vss" "strongarm_comparator$2_0.INP" 240 0 "a_446992_431778#" 400 22400,512 "a_450384_431778#" 400 22400,512
+device msubckt nfet_03v3 450504 431778 450505 431779 l=120 w=400 "vss" "strongarm_comparator$2_0.INP" 240 0 "a_450384_431778#" 400 48000,1040 "a_446992_431778#" 400 22400,512
+device msubckt nfet_03v3 449032 431778 449033 431779 l=100 w=400 "vss" "strongarm_comparator_0.OUTN" 200 0 "a_448488_431778#" 400 22400,512 "io_secondary_3p3_8.ASIG5V" 400 48000,1040
+device msubckt nfet_03v3 448820 431778 448821 431779 l=100 w=400 "vss" "strongarm_comparator_0.OUTN" 200 0 "io_secondary_3p3_8.ASIG5V" 400 22400,512 "a_448488_431778#" 400 22400,512
+device msubckt nfet_03v3 448608 431778 448609 431779 l=100 w=400 "vss" "strongarm_comparator_0.OUTN" 200 0 "a_448488_431778#" 400 48000,1040 "io_secondary_3p3_8.ASIG5V" 400 22400,512
+device msubckt nfet_03v3 447536 431778 447537 431779 l=100 w=400 "vss" "io_secondary_3p3_8.ASIG5V" 200 0 "a_446992_431778#" 400 22400,512 "strongarm_comparator_0.OUTN" 400 48000,1040
+device msubckt nfet_03v3 447324 431778 447325 431779 l=100 w=400 "vss" "io_secondary_3p3_8.ASIG5V" 200 0 "strongarm_comparator_0.OUTN" 400 22400,512 "a_446992_431778#" 400 22400,512
+device msubckt nfet_03v3 447112 431778 447113 431779 l=100 w=400 "vss" "io_secondary_3p3_8.ASIG5V" 200 0 "a_446992_431778#" 400 48000,1040 "strongarm_comparator_0.OUTN" 400 22400,512
+device rsubckt ppolyf_u 488570 434894 488571 434895 l=2000 w=8000 "vdd" "a_488570_434894#" 0 0 "ota$2_0.OUT" 8000 816000,16204 "oxa_ota" 8000 816000,16204
+device msubckt pfet_03v3 454492 434396 454493 434397 l=100 w=400 "vdd" "strongarm_comparator$2_0.CLK" 200 0 "vdd" 400 48000,1040 "io_secondary_3p3_8.ASIG5V" 400 48000,1040
+device msubckt pfet_03v3 453320 434396 453321 434397 l=100 w=400 "vdd" "strongarm_comparator$2_0.CLK" 200 0 "vdd" 400 48000,1040 "strongarm_comparator_0.OUTN" 400 48000,1040
+device msubckt pfet_03v3 452148 434396 452149 434397 l=100 w=400 "vdd" "strongarm_comparator$2_0.CLK" 200 0 "vdd" 400 48000,1040 "a_448488_431778#" 400 48000,1040
+device msubckt pfet_03v3 450976 434396 450977 434397 l=100 w=400 "vdd" "strongarm_comparator$2_0.CLK" 200 0 "vdd" 400 48000,1040 "a_446992_431778#" 400 48000,1040
+device msubckt pfet_03v3 449504 434396 449505 434397 l=100 w=400 "vdd" "strongarm_comparator_0.OUTN" 200 0 "vdd" 400 22400,512 "io_secondary_3p3_8.ASIG5V" 400 48000,1040
+device msubckt pfet_03v3 449292 434396 449293 434397 l=100 w=400 "vdd" "strongarm_comparator_0.OUTN" 200 0 "io_secondary_3p3_8.ASIG5V" 400 22400,512 "vdd" 400 22400,512
+device msubckt pfet_03v3 449080 434396 449081 434397 l=100 w=400 "vdd" "strongarm_comparator_0.OUTN" 200 0 "vdd" 400 48000,1040 "io_secondary_3p3_8.ASIG5V" 400 22400,512
+device msubckt pfet_03v3 447908 434396 447909 434397 l=100 w=400 "vdd" "io_secondary_3p3_8.ASIG5V" 200 0 "vdd" 400 22400,512 "strongarm_comparator_0.OUTN" 400 48000,1040
+device msubckt pfet_03v3 447696 434396 447697 434397 l=100 w=400 "vdd" "io_secondary_3p3_8.ASIG5V" 200 0 "strongarm_comparator_0.OUTN" 400 22400,512 "vdd" 400 22400,512
+device msubckt pfet_03v3 447484 434396 447485 434397 l=100 w=400 "vdd" "io_secondary_3p3_8.ASIG5V" 200 0 "vdd" 400 48000,1040 "strongarm_comparator_0.OUTN" 400 22400,512
+device ndiode diode_nd2ps_03v3 499634 443374 499635 443375 a=4000000 p=8000 "vss" "oxa_ota" 7784 0 "vss" 0 0
+device ndiode diode_nd2ps_03v3 497434 443374 497435 443375 a=4000000 p=8000 "vss" "oxa_ota" 7784 0 "vss" 0 0
+device ndiode diode_nd2ps_03v3 495234 443374 495235 443375 a=4000000 p=8000 "vss" "oxa_ota" 7784 0 "vss" 0 0
+device ndiode diode_nd2ps_03v3 493034 443374 493035 443375 a=4000000 p=8000 "vss" "oxa_ota" 7784 0 "vss" 0 0
+device msubckt nfet_03v3 451780 445704 451781 445705 l=800 w=1200 "vss" "vref_1v2$2_0.IBIAS" 1600 0 "a_450032_449122#" 1200 67200,1312 "vss" 1200 144000,2640
+device msubckt nfet_03v3 450868 445704 450869 445705 l=800 w=1200 "vss" "vref_1v2$2_0.IBIAS" 1600 0 "vss" 1200 144000,2640 "a_450032_449122#" 1200 67200,1312
+device msubckt nfet_03v3 449496 445704 449497 445705 l=400 w=400 "vss" "vref_1v2$2_0.IBIAS" 800 0 "vss" 400 48000,1040 "vref_1v2$2_0.IBIAS" 400 48000,1040
+device msubckt nfet_03v3 451524 449122 451525 449123 l=400 w=1200 "vss" "strongarm_comparator$2_0.INP" 800 0 "a_450032_449122#" 1200 144000,2640 "ota$2_0.OUT" 1200 144000,2640
+device msubckt nfet_03v3 450152 449122 450153 449123 l=400 w=1200 "vss" "strongarm_comparator$2_0.INN" 800 0 "a_450032_449122#" 1200 144000,2640 "a_446966_452332#" 1200 144000,2640
+device pdiode diode_pd2nw_03v3 499662 451518 499663 451519 a=4000000 p=8000 "vdd" "gpt_ota" 7784 0 "vdd" 0 20694400,22480
+device pdiode diode_pd2nw_03v3 497462 451518 497463 451519 a=4000000 p=8000 "vdd" "gpt_ota" 7784 0 "vdd" 0 20694400,22480
+device pdiode diode_pd2nw_03v3 495262 451518 495263 451519 a=4000000 p=8000 "vdd" "gpt_ota" 7784 0 "vdd" 0 20694400,22480
+device pdiode diode_pd2nw_03v3 493062 451518 493063 451519 a=4000000 p=8000 "vdd" "gpt_ota" 7784 0 "vdd" 0 20694400,22480
+device rsubckt ppolyf_u 488570 454294 488571 454295 l=2000 w=8000 "vdd" "a_488570_454294#" 0 0 "io_secondary_3p3_10.ASIG5V" 8000 816000,16204 "gpt_ota" 8000 816000,16204
+device msubckt pfet_03v3 454310 452540 454311 452541 l=800 w=1500 "vdd" "a_446966_452332#" 1600 0 "ota$2_0.OUT" 1500 84000,1612 "vdd" 1500 180000,3240
+device msubckt pfet_03v3 453398 452540 453399 452541 l=800 w=1500 "vdd" "a_446966_452332#" 1600 0 "vdd" 1500 84000,1612 "ota$2_0.OUT" 1500 84000,1612
+device msubckt pfet_03v3 452486 452540 452487 452541 l=800 w=1500 "vdd" "a_446966_452332#" 1600 0 "ota$2_0.OUT" 1500 84000,1612 "vdd" 1500 84000,1612
+device msubckt pfet_03v3 451574 452540 451575 452541 l=800 w=1500 "vdd" "a_446966_452332#" 1600 0 "vdd" 1500 180000,3240 "ota$2_0.OUT" 1500 84000,1612
+device msubckt pfet_03v3 449702 452540 449703 452541 l=800 w=1500 "vdd" "a_446966_452332#" 1600 0 "a_446966_452332#" 1500 84000,1612 "vdd" 1500 180000,3240
+device msubckt pfet_03v3 448790 452540 448791 452541 l=800 w=1500 "vdd" "a_446966_452332#" 1600 0 "vdd" 1500 84000,1612 "a_446966_452332#" 1500 84000,1612
+device msubckt pfet_03v3 447878 452540 447879 452541 l=800 w=1500 "vdd" "a_446966_452332#" 1600 0 "a_446966_452332#" 1500 84000,1612 "vdd" 1500 84000,1612
+device msubckt pfet_03v3 446966 452540 446967 452541 l=800 w=1500 "vdd" "a_446966_452332#" 1600 0 "vdd" 1500 180000,3240 "a_446966_452332#" 1500 84000,1612
+device msubckt nfet_03v3 452460 457872 452461 457873 l=200 w=200 "vss" "vref_1v2$2_0.IBIAS" 400 0 "vref_1v2$2_0.IBIAS" 200 11200,312 "vss" 200 24000,640
+device msubckt nfet_03v3 452148 457872 452149 457873 l=200 w=200 "vss" "vref_1v2$2_0.IBIAS" 400 0 "vss" 200 11200,312 "vref_1v2$2_0.IBIAS" 200 11200,312
+device msubckt nfet_03v3 451836 457872 451837 457873 l=200 w=200 "vss" "vref_1v2$2_0.IBIAS" 400 0 "vref_1v2$2_0.IBIAS" 200 11200,312 "vss" 200 11200,312
+device msubckt nfet_03v3 451524 457872 451525 457873 l=200 w=200 "vss" "vref_1v2$2_0.IBIAS" 400 0 "vss" 200 24000,640 "vref_1v2$2_0.IBIAS" 200 11200,312
+device msubckt nfet_03v3 450352 457872 450353 457873 l=200 w=200 "vss" "vref_1v2$2_0.IBIAS" 400 0 "a_449616_457872#" 200 11200,312 "vss" 200 24000,640
+device msubckt nfet_03v3 450040 457872 450041 457873 l=200 w=200 "vss" "vref_1v2$2_0.IBIAS" 400 0 "vss" 200 11200,312 "a_449616_457872#" 200 11200,312
+device msubckt nfet_03v3 449728 457872 449729 457873 l=200 w=200 "vss" "vref_1v2$2_0.IBIAS" 400 0 "a_449616_457872#" 200 11200,312 "vss" 200 11200,312
+device msubckt nfet_03v3 449416 457872 449417 457873 l=200 w=200 "vss" "vref_1v2$2_0.IBIAS" 400 0 "vss" 200 24000,640 "a_449616_457872#" 200 11200,312
+device msubckt nfet_03v3 452220 461792 452221 461793 l=120 w=200 "vss" "strongarm_comparator$2_0.INN" 240 0 "io_secondary_3p3_10.ASIG5V" 200 11200,312 "a_449616_457872#" 200 24000,640
+device msubckt nfet_03v3 451988 461792 451989 461793 l=120 w=200 "vss" "strongarm_comparator$2_0.INN" 240 0 "a_449616_457872#" 200 11200,312 "io_secondary_3p3_10.ASIG5V" 200 11200,312
+device msubckt nfet_03v3 451756 461792 451757 461793 l=120 w=200 "vss" "strongarm_comparator$2_0.INN" 240 0 "io_secondary_3p3_10.ASIG5V" 200 11200,312 "a_449616_457872#" 200 11200,312
+device msubckt nfet_03v3 451524 461792 451525 461793 l=120 w=200 "vss" "strongarm_comparator$2_0.INN" 240 0 "a_449616_457872#" 200 24000,640 "io_secondary_3p3_10.ASIG5V" 200 11200,312
+device msubckt nfet_03v3 450432 461792 450433 461793 l=120 w=200 "vss" "strongarm_comparator$2_0.INP" 240 0 "a_449526_465503#" 200 11200,312 "a_449616_457872#" 200 24000,640
+device msubckt nfet_03v3 450200 461792 450201 461793 l=120 w=200 "vss" "strongarm_comparator$2_0.INP" 240 0 "a_449616_457872#" 200 11200,312 "a_449526_465503#" 200 11200,312
+device msubckt nfet_03v3 449968 461792 449969 461793 l=120 w=200 "vss" "strongarm_comparator$2_0.INP" 240 0 "a_449526_465503#" 200 11200,312 "a_449616_457872#" 200 11200,312
+device msubckt nfet_03v3 449736 461792 449737 461793 l=120 w=200 "vss" "strongarm_comparator$2_0.INP" 240 0 "a_449616_457872#" 200 24000,640 "a_449526_465503#" 200 11200,312
+device ndiode diode_nd2ps_03v3 499634 462774 499635 462775 a=4000000 p=8000 "vss" "gpt_ota" 7784 0 "vss" 0 0
+device ndiode diode_nd2ps_03v3 497434 462774 497435 462775 a=4000000 p=8000 "vss" "gpt_ota" 7784 0 "vss" 0 0
+device ndiode diode_nd2ps_03v3 495234 462774 495235 462775 a=4000000 p=8000 "vss" "gpt_ota" 7784 0 "vss" 0 0
+device ndiode diode_nd2ps_03v3 493034 462774 493035 462775 a=4000000 p=8000 "vss" "gpt_ota" 7784 0 "vss" 0 0
+device msubckt pfet_03v3 452390 465711 452391 465712 l=160 w=300 "vdd" "a_449526_465503#" 320 0 "io_secondary_3p3_10.ASIG5V" 300 16800,412 "vdd" 300 36000,840
+device msubckt pfet_03v3 452118 465711 452119 465712 l=160 w=300 "vdd" "a_449526_465503#" 320 0 "vdd" 300 16800,412 "io_secondary_3p3_10.ASIG5V" 300 16800,412
+device msubckt pfet_03v3 451846 465711 451847 465712 l=160 w=300 "vdd" "a_449526_465503#" 320 0 "io_secondary_3p3_10.ASIG5V" 300 16800,412 "vdd" 300 16800,412
+device msubckt pfet_03v3 451574 465711 451575 465712 l=160 w=300 "vdd" "a_449526_465503#" 320 0 "vdd" 300 36000,840 "io_secondary_3p3_10.ASIG5V" 300 16800,412
+device msubckt pfet_03v3 450342 465711 450343 465712 l=160 w=300 "vdd" "a_449526_465503#" 320 0 "a_449526_465503#" 300 16800,412 "vdd" 300 36000,840
+device msubckt pfet_03v3 450070 465711 450071 465712 l=160 w=300 "vdd" "a_449526_465503#" 320 0 "vdd" 300 16800,412 "a_449526_465503#" 300 16800,412
+device msubckt pfet_03v3 449798 465711 449799 465712 l=160 w=300 "vdd" "a_449526_465503#" 320 0 "a_449526_465503#" 300 16800,412 "vdd" 300 16800,412
+device msubckt pfet_03v3 449526 465711 449527 465712 l=160 w=300 "vdd" "a_449526_465503#" 320 0 "vdd" 300 36000,840 "a_449526_465503#" 300 16800,412
+device msubckt nfet_03v3 452460 469437 452461 469438 l=200 w=200 "vss" "vref_1v2$2_0.IBIAS" 400 0 "vref_1v2$2_0.IBIAS" 200 11200,312 "vss" 200 24000,640
+device msubckt nfet_03v3 452148 469437 452149 469438 l=200 w=200 "vss" "vref_1v2$2_0.IBIAS" 400 0 "vss" 200 11200,312 "vref_1v2$2_0.IBIAS" 200 11200,312
+device msubckt nfet_03v3 451836 469437 451837 469438 l=200 w=200 "vss" "vref_1v2$2_0.IBIAS" 400 0 "vref_1v2$2_0.IBIAS" 200 11200,312 "vss" 200 11200,312
+device msubckt nfet_03v3 451524 469437 451525 469438 l=200 w=200 "vss" "vref_1v2$2_0.IBIAS" 400 0 "vss" 200 24000,640 "vref_1v2$2_0.IBIAS" 200 11200,312
+device msubckt nfet_03v3 450352 469436 450353 469437 l=200 w=400 "vss" "vref_1v2$2_0.IBIAS" 400 0 "a_449296_472055#" 400 22400,512 "vss" 400 48000,1040
+device msubckt nfet_03v3 450040 469436 450041 469437 l=200 w=400 "vss" "vref_1v2$2_0.IBIAS" 400 0 "vss" 400 22400,512 "a_449296_472055#" 400 22400,512
+device msubckt nfet_03v3 449728 469436 449729 469437 l=200 w=400 "vss" "vref_1v2$2_0.IBIAS" 400 0 "a_449296_472055#" 400 22400,512 "vss" 400 22400,512
+device msubckt nfet_03v3 449416 469436 449417 469437 l=200 w=400 "vss" "vref_1v2$2_0.IBIAS" 400 0 "vss" 400 48000,1040 "a_449296_472055#" 400 22400,512
+device pdiode diode_pd2nw_03v3 499662 470918 499663 470919 a=4000000 p=8000 "vdd" "deepseek_ota" 7784 0 "vdd" 0 20694400,22480
+device pdiode diode_pd2nw_03v3 497462 470918 497463 470919 a=4000000 p=8000 "vdd" "deepseek_ota" 7784 0 "vdd" 0 20694400,22480
+device pdiode diode_pd2nw_03v3 495262 470918 495263 470919 a=4000000 p=8000 "vdd" "deepseek_ota" 7784 0 "vdd" 0 20694400,22480
+device pdiode diode_pd2nw_03v3 493062 470918 493063 470919 a=4000000 p=8000 "vdd" "deepseek_ota" 7784 0 "vdd" 0 20694400,22480
+device msubckt nfet_03v3 452460 472055 452461 472056 l=200 w=200 "vss" "strongarm_comparator$2_0.INN" 400 0 "ota_0.OUT" 200 11200,312 "a_449296_472055#" 200 24000,640
+device msubckt nfet_03v3 452148 472055 452149 472056 l=200 w=200 "vss" "strongarm_comparator$2_0.INN" 400 0 "a_449296_472055#" 200 11200,312 "ota_0.OUT" 200 11200,312
+device msubckt nfet_03v3 451836 472055 451837 472056 l=200 w=200 "vss" "strongarm_comparator$2_0.INN" 400 0 "ota_0.OUT" 200 11200,312 "a_449296_472055#" 200 11200,312
+device msubckt nfet_03v3 451524 472055 451525 472056 l=200 w=200 "vss" "strongarm_comparator$2_0.INN" 400 0 "a_449296_472055#" 200 24000,640 "ota_0.OUT" 200 11200,312
+device msubckt nfet_03v3 450352 472055 450353 472056 l=200 w=200 "vss" "strongarm_comparator$2_0.INP" 400 0 "a_449366_474266#" 200 11200,312 "a_449296_472055#" 200 24000,640
+device msubckt nfet_03v3 450040 472055 450041 472056 l=200 w=200 "vss" "strongarm_comparator$2_0.INP" 400 0 "a_449296_472055#" 200 11200,312 "a_449366_474266#" 200 11200,312
+device msubckt nfet_03v3 449728 472055 449729 472056 l=200 w=200 "vss" "strongarm_comparator$2_0.INP" 400 0 "a_449366_474266#" 200 11200,312 "a_449296_472055#" 200 11200,312
+device msubckt nfet_03v3 449416 472055 449417 472056 l=200 w=200 "vss" "strongarm_comparator$2_0.INP" 400 0 "a_449296_472055#" 200 24000,640 "a_449366_474266#" 200 11200,312
+device rsubckt ppolyf_u 488570 473694 488571 473695 l=2000 w=8000 "vdd" "a_488570_473694#" 0 0 "ota_0.OUT" 8000 816000,16204 "deepseek_ota" 8000 816000,16204
+device msubckt pfet_03v3 452510 474476 452511 474477 l=200 w=120 "vdd" "a_449366_474266#" 400 0 "ota_0.OUT" 120 6720,232 "vdd" 120 14400,480
+device msubckt pfet_03v3 452198 474476 452199 474477 l=200 w=120 "vdd" "a_449366_474266#" 400 0 "vdd" 120 6720,232 "ota_0.OUT" 120 6720,232
+device msubckt pfet_03v3 451886 474476 451887 474477 l=200 w=120 "vdd" "a_449366_474266#" 400 0 "ota_0.OUT" 120 6720,232 "vdd" 120 6720,232
+device msubckt pfet_03v3 451574 474476 451575 474477 l=200 w=120 "vdd" "a_449366_474266#" 400 0 "vdd" 120 14400,480 "ota_0.OUT" 120 6720,232
+device msubckt pfet_03v3 450302 474476 450303 474477 l=200 w=120 "vdd" "a_449366_474266#" 400 0 "a_449366_474266#" 120 6720,232 "vdd" 120 14400,480
+device msubckt pfet_03v3 449990 474476 449991 474477 l=200 w=120 "vdd" "a_449366_474266#" 400 0 "vdd" 120 6720,232 "a_449366_474266#" 120 6720,232
+device msubckt pfet_03v3 449678 474476 449679 474477 l=200 w=120 "vdd" "a_449366_474266#" 400 0 "a_449366_474266#" 120 6720,232 "vdd" 120 6720,232
+device msubckt pfet_03v3 449366 474476 449367 474477 l=200 w=120 "vdd" "a_449366_474266#" 400 0 "vdd" 120 14400,480 "a_449366_474266#" 120 6720,232
+device ndiode diode_nd2ps_03v3 499634 482174 499635 482175 a=4000000 p=8000 "vss" "deepseek_ota" 7784 0 "vss" 0 0
+device ndiode diode_nd2ps_03v3 497434 482174 497435 482175 a=4000000 p=8000 "vss" "deepseek_ota" 7784 0 "vss" 0 0
+device ndiode diode_nd2ps_03v3 495234 482174 495235 482175 a=4000000 p=8000 "vss" "deepseek_ota" 7784 0 "vss" 0 0
+device ndiode diode_nd2ps_03v3 493034 482174 493035 482175 a=4000000 p=8000 "vss" "deepseek_ota" 7784 0 "vss" 0 0
+device rsubckt ppolyf_u 473706 488570 473707 488571 l=2000 w=8000 "vdd" "a_473706_488570#" 0 0 "ibias" 8000 816000,16204 "vref_1v2$2_0.IBIAS" 8000 816000,16204
+device rsubckt ppolyf_u 454306 488570 454307 488571 l=2000 w=8000 "vdd" "a_454306_488570#" 0 0 "inp" 8000 816000,16204 "strongarm_comparator$2_0.INP" 8000 816000,16204
+device rsubckt ppolyf_u 434906 488570 434907 488571 l=2000 w=8000 "vdd" "a_434906_488570#" 0 0 "inn" 8000 816000,16204 "strongarm_comparator$2_0.INN" 8000 816000,16204
+device rsubckt ppolyf_u 415506 488570 415507 488571 l=2000 w=8000 "vdd" "a_415506_488570#" 0 0 "clk" 8000 816000,16204 "strongarm_comparator$2_0.CLK" 8000 816000,16204
+device pdiode diode_pd2nw_03v3 482482 493062 482483 493063 a=4000000 p=8000 "vdd" "ibias" 7784 0 "vdd" 0 20694400,22480
+device pdiode diode_pd2nw_03v3 482482 495262 482483 495263 a=4000000 p=8000 "vdd" "ibias" 7784 0 "vdd" 0 20694400,22480
+device pdiode diode_pd2nw_03v3 482482 497462 482483 497463 a=4000000 p=8000 "vdd" "ibias" 7784 0 "vdd" 0 20694400,22480
+device pdiode diode_pd2nw_03v3 482482 499662 482483 499663 a=4000000 p=8000 "vdd" "ibias" 7784 0 "vdd" 0 20694400,22480
+device ndiode diode_nd2ps_03v3 471226 493034 471227 493035 a=4000000 p=8000 "vss" "ibias" 7784 0 "vss" 0 0
+device ndiode diode_nd2ps_03v3 471226 495234 471227 495235 a=4000000 p=8000 "vss" "ibias" 7784 0 "vss" 0 0
+device ndiode diode_nd2ps_03v3 471226 497434 471227 497435 a=4000000 p=8000 "vss" "ibias" 7784 0 "vss" 0 0
+device ndiode diode_nd2ps_03v3 471226 499634 471227 499635 a=4000000 p=8000 "vss" "ibias" 7784 0 "vss" 0 0
+device pdiode diode_pd2nw_03v3 463082 493062 463083 493063 a=4000000 p=8000 "vdd" "inp" 7784 0 "vdd" 0 20694400,22480
+device pdiode diode_pd2nw_03v3 463082 495262 463083 495263 a=4000000 p=8000 "vdd" "inp" 7784 0 "vdd" 0 20694400,22480
+device pdiode diode_pd2nw_03v3 463082 497462 463083 497463 a=4000000 p=8000 "vdd" "inp" 7784 0 "vdd" 0 20694400,22480
+device pdiode diode_pd2nw_03v3 463082 499662 463083 499663 a=4000000 p=8000 "vdd" "inp" 7784 0 "vdd" 0 20694400,22480
+device ndiode diode_nd2ps_03v3 451826 493034 451827 493035 a=4000000 p=8000 "vss" "inp" 7784 0 "vss" 0 0
+device ndiode diode_nd2ps_03v3 451826 495234 451827 495235 a=4000000 p=8000 "vss" "inp" 7784 0 "vss" 0 0
+device ndiode diode_nd2ps_03v3 451826 497434 451827 497435 a=4000000 p=8000 "vss" "inp" 7784 0 "vss" 0 0
+device ndiode diode_nd2ps_03v3 451826 499634 451827 499635 a=4000000 p=8000 "vss" "inp" 7784 0 "vss" 0 0
+device pdiode diode_pd2nw_03v3 443682 493062 443683 493063 a=4000000 p=8000 "vdd" "inn" 7784 0 "vdd" 0 20694400,22480
+device pdiode diode_pd2nw_03v3 443682 495262 443683 495263 a=4000000 p=8000 "vdd" "inn" 7784 0 "vdd" 0 20694400,22480
+device pdiode diode_pd2nw_03v3 443682 497462 443683 497463 a=4000000 p=8000 "vdd" "inn" 7784 0 "vdd" 0 20694400,22480
+device pdiode diode_pd2nw_03v3 443682 499662 443683 499663 a=4000000 p=8000 "vdd" "inn" 7784 0 "vdd" 0 20694400,22480
+device ndiode diode_nd2ps_03v3 432426 493034 432427 493035 a=4000000 p=8000 "vss" "inn" 7784 0 "vss" 0 0
+device ndiode diode_nd2ps_03v3 432426 495234 432427 495235 a=4000000 p=8000 "vss" "inn" 7784 0 "vss" 0 0
+device ndiode diode_nd2ps_03v3 432426 497434 432427 497435 a=4000000 p=8000 "vss" "inn" 7784 0 "vss" 0 0
+device ndiode diode_nd2ps_03v3 432426 499634 432427 499635 a=4000000 p=8000 "vss" "inn" 7784 0 "vss" 0 0
+device pdiode diode_pd2nw_03v3 424282 493062 424283 493063 a=4000000 p=8000 "vdd" "clk" 7784 0 "vdd" 0 20694400,22480
+device pdiode diode_pd2nw_03v3 424282 495262 424283 495263 a=4000000 p=8000 "vdd" "clk" 7784 0 "vdd" 0 20694400,22480
+device pdiode diode_pd2nw_03v3 424282 497462 424283 497463 a=4000000 p=8000 "vdd" "clk" 7784 0 "vdd" 0 20694400,22480
+device pdiode diode_pd2nw_03v3 424282 499662 424283 499663 a=4000000 p=8000 "vdd" "clk" 7784 0 "vdd" 0 20694400,22480
+device ndiode diode_nd2ps_03v3 413026 493034 413027 493035 a=4000000 p=8000 "vss" "clk" 7784 0 "vss" 0 0
+device ndiode diode_nd2ps_03v3 413026 495234 413027 495235 a=4000000 p=8000 "vss" "clk" 7784 0 "vss" 0 0
+device ndiode diode_nd2ps_03v3 413026 497434 413027 497435 a=4000000 p=8000 "vss" "clk" 7784 0 "vss" 0 0
+device ndiode diode_nd2ps_03v3 413026 499634 413027 499635 a=4000000 p=8000 "vss" "clk" 7784 0 "vss" 0 0

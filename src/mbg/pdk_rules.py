@@ -318,6 +318,32 @@ class PDKRules:
         return self.snap(x), self.snap(y)
 
     # ── misc ────────────────────────────────────────────────────────
+    #: GF180 n-well spacing, from the shipped KLayout deck
+    #: (rule_decks/nwell.rb): ``conn_space(nwell, 0.6, 1.4, euclidian)``.
+    #: The deck picks between the two by EXTRACTED CONNECTIVITY -- it builds
+    #: nets and filters same-net pairs -- so two wells tied to the same
+    #: supply are checked at 0.6um and two isolated wells at 1.4um.
+    NWELL_SPACE_EQUIPOTENTIAL = 0.6      # NW.2a_LV
+    NWELL_SPACE_DIFFERENT = 1.4          # NW.2b_LV
+
+    def nwell_spacing(self, equipotential: bool = False) -> float:
+        """Minimum n-well to n-well spacing, in microns.
+
+        ``equipotential`` selects NW.2a (wells that are electrically joined)
+        over NW.2b (wells that are not). Placement cannot know whether the
+        supply will actually reach a tap, so it should assume the
+        conservative value unless the wells are genuinely shared -- see
+        ``PlacementConfig.nwell_spacing``.
+        """
+        if equipotential:
+            # The deck is authoritative here. glayout reports a single
+            # nwell min_separation (1.4um, the different-potential number),
+            # so max()-ing against it would force 1.4 on wells that are
+            # electrically joined and legal at 0.6.
+            return self.NWELL_SPACE_EQUIPOTENTIAL
+        pdk_value = float(self._grule("nwell").get("min_separation", 0.0) or 0.0)
+        return max(pdk_value, self.NWELL_SPACE_DIFFERENT)
+
     def dnwell_spacing(self) -> float:
         """Clearance a deep n-well needs from neighbouring wells.
 

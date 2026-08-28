@@ -43,6 +43,33 @@ class PlacementConfig:
         self.channel_x: float = kw.get("channel_x", 3.0)      # gap between clusters in a row
         self.channel_y: float = kw.get("channel_y", 6.0)      # gap between rows
         self.intra_cluster_gap: float = kw.get("intra_cluster_gap", 1.0)
+
+        # ── n-well separation between PFETs ───────────────────────────
+        # Every gLayout PMOS carries its own n-well, so two adjacent PFETs
+        # are two wells. The GF180 deck checks well spacing by EXTRACTED
+        # CONNECTIVITY (rule_decks/nwell.rb, conn_space(nwell, 0.6, 1.4)):
+        # wells that are electrically joined get 0.6um (NW.2a_LV), wells
+        # that are not get 1.4um (NW.2b_LV). Placement cannot know whether
+        # the supply will actually reach a well tap, so it assumes the
+        # conservative case.
+        #
+        # intra_cluster_gap alone is 1.0um -- BELOW the 1.4um the deck
+        # requires -- which is precisely how a matched PFET pair lands in
+        # NW.2b_LV. This gap is applied between horizontally adjacent PMOS
+        # devices, on top of the ordinary cluster/channel gap.
+        #
+        # 1.5um rather than the deck's 1.4um is a deliberate 0.1um guard
+        # band: the device bounding box and its n-well edge are not the
+        # same line, and grid snapping moves both.
+        # This is a HARD FLOOR between any two n-well islands, not a target.
+        # There is deliberately no "they share a well" exemption: nothing in
+        # this flow merges n-wells, so every PFET is its own island and an
+        # exemption could only ever promise a merge that does not happen —
+        # which produced two islands at the bare 1.0um cluster gap and a
+        # guaranteed NW.2b_LV. If a device generator that genuinely merges
+        # wells is added later, the post-placement measurement below will
+        # report a single island and this spacing simply stops applying.
+        self.nwell_spacing: float = kw.get("nwell_spacing", 1.5)
         self.max_channel_x: float = kw.get("max_channel_x", 14.0)
         self.max_channel_y: float = kw.get("max_channel_y", 24.0)
 
@@ -360,6 +387,27 @@ def harvest_obstacles(ctx, dev_name: str, ref, cfg: PlacementConfig) -> int:
 
 # ── floorplan ──────────────────────────────────────────────────────────
 
+def _needs_nwell_gap(ctx, a: str, b: str, cfg) -> bool:
+    """Do these two horizontally adjacent devices sit in DIFFERENT n-wells?
+
+    Every gLayout PMOS brings its own n-well, so two PFETs side by side are
+    two wells and the deck's NW.2 spacing applies between them. NMOS sit in
+    the shared p-substrate and have no n-well to space.
+
+    There is no exemption. Nothing in this flow merges n-wells, so two PFETs
+    are always two islands and the gap always applies.
+    """
+    da, db = ctx.devices.get(a), ctx.devices.get(b)
+    return bool(da and db and da.kind == "pmos" and db.kind == "pmos")
+
+
+def _gap_between(ctx, a: str, b: str, cfg, base: float) -> float:
+    """Edge-to-edge gap to leave between two adjacent devices."""
+    if _needs_nwell_gap(ctx, a, b, cfg):
+        return max(base, cfg.nwell_spacing)
+    return base
+
+
 def _row_of(dev: Device) -> int:
     """PMOS on top, NMOS with a floating source in the middle, NMOS sitting
     on the rail at the bottom, passives below that."""
@@ -425,16 +473,25 @@ def plan_floorplan(ctx, sizes: Dict[str, Tuple[float, float]],
         rows.setdefault(_cluster_row(ctx, cl), []).append(cl)
 
     def cluster_width(cl):
-        return (sum(sizes[d][0] for d in cl)
-                + cfg.intra_cluster_gap * (len(cl) - 1))
+        members = _symmetric_order(ctx, cl)
+        gaps = sum(_gap_between(ctx, members[i], members[i + 1], cfg,
+                                cfg.intra_cluster_gap)
+                   for i in range(len(members) - 1))
+        return sum(sizes[d][0] for d in cl) + gaps
 
     def layout(rows_map) -> Dict[str, Placement]:
         placements: Dict[str, Placement] = {}
         row_heights = {r: max(sizes[d][1] for cl in cls for d in cl)
                        for r, cls in rows_map.items()}
-        row_widths = {r: (sum(cluster_width(cl) for cl in cls)
-                          + cfg.channel_x * max(0, len(cls) - 1))
-                      for r, cls in rows_map.items()}
+        def row_width(cls):
+            total = sum(cluster_width(cl) for cl in cls)
+            for i in range(len(cls) - 1):
+                a = _symmetric_order(ctx, cls[i])[-1]
+                b = _symmetric_order(ctx, cls[i + 1])[0]
+                total += _gap_between(ctx, a, b, cfg, cfg.channel_x)
+            return total
+
+        row_widths = {r: row_width(cls) for r, cls in rows_map.items()}
         max_w = max(row_widths.values()) if row_widths else 0.0
 
         y = 0.0
@@ -442,12 +499,25 @@ def plan_floorplan(ctx, sizes: Dict[str, Tuple[float, float]],
             x = -row_widths[r] / 2.0
             for cl in rows_map[r]:
                 members = _symmetric_order(ctx, cl)
-                for d in members:
+                for i, d in enumerate(members):
                     w, h = sizes[d]
                     placements[d] = Placement(instance=d, x=x, y=y,
                                               orientation="R0", row=r)
-                    x += w + cfg.intra_cluster_gap
-                x += cfg.channel_x - cfg.intra_cluster_gap
+                    x += w
+                    if i + 1 < len(members):
+                        x += _gap_between(ctx, d, members[i + 1], cfg,
+                                          cfg.intra_cluster_gap)
+                    else:
+                        last_in_cluster = d
+                # Between clusters the channel is usually wider than the well
+                # rule, but a PMOS ending one cluster and a PMOS starting the
+                # next are still two neighbouring wells.
+                nxt = rows_map[r][rows_map[r].index(cl) + 1] if \
+                    rows_map[r].index(cl) + 1 < len(rows_map[r]) else None
+                if nxt:
+                    first_of_next = _symmetric_order(ctx, nxt)[0]
+                    x += _gap_between(ctx, last_in_cluster, first_of_next,
+                                      cfg, cfg.channel_x)
             y += row_heights[r] + cfg.channel_y
         return placements
 
@@ -584,9 +654,79 @@ def place(ctx, pdk, cfg: Optional[PlacementConfig] = None) -> Component:
                        f"geometry mismatch = {err:.3f}um")
             ctx.metrics[f"symmetry_err_{sc.group}"] = round(err, 4)
 
+    _report_nwell_spacing(ctx, top, cfg)
+
     cfg.log(1, f"  [PLACEMENT] {len(ctx.references)} devices, {n_ap} access points, "
                f"{n_ob} obstacle shapes, {len(ctx.reserved_zones)} reserved zones")
     return top
+
+
+def _report_nwell_spacing(ctx, top, cfg) -> None:
+    """Measure the n-well islands the floorplan actually produced.
+
+    Placement reasons about device bounding boxes, but NW.2 is a rule about
+    n-well polygons, and the two are not the same line. This measures the
+    real geometry and records it, so the spacing claim is evidence rather
+    than an assumption.
+
+    It is also what would notice if a well-merging device generator were
+    added later: the island count would drop and the spacing would stop
+    applying on its own, without anyone having to remember to flip a flag.
+    """
+    import itertools
+    from shapely.geometry import Polygon
+    from shapely.ops import unary_union
+
+    try:
+        spec = tuple(ctx.pdk.get_glayer("nwell"))
+    except Exception as e:                                  # noqa: BLE001
+        cfg.log(1, f"  [PLACEMENT] n-well check skipped: no nwell layer ({e})")
+        return
+    # gdsfactory's by_spec mapping, the same idiom harvest_obstacles uses.
+    # Reading the whole placed component (not per-ref) is deliberate: wells
+    # only merge across device boundaries, which is exactly what is measured.
+    polys = []
+    try:
+        for ref in ctx.references.values():
+            by_spec = ref.get_polygons(by_spec=True)
+            for pts in by_spec.get(spec, ()):
+                if len(pts) >= 3:
+                    polys.append(Polygon([(float(x), float(y)) for x, y in pts]))
+    except Exception as e:                                  # noqa: BLE001
+        cfg.log(1, f"  [PLACEMENT] n-well check skipped: {type(e).__name__}: {e}")
+        return
+    if not polys:
+        cfg.log(2, "  [PLACEMENT] n-well check: no nwell geometry placed")
+        return
+    merged = unary_union(polys)
+    islands = list(getattr(merged, "geoms", (merged,)))
+    gaps = sorted(a.distance(b) for a, b in itertools.combinations(islands, 2)
+                  if a.distance(b) > 1e-9)
+    ctx.metrics["nwell_islands"] = len(islands)
+    if gaps:
+        ctx.metrics["nwell_min_gap_um"] = round(gaps[0], 4)
+    # The floor is the PLACEMENT target (1.5um), not the deck minimum
+    # (1.4um): the extra 0.1um is the guard band that absorbs the difference
+    # between a device bounding box and its n-well edge after grid snapping.
+    floor = float(cfg.nwell_spacing)
+    deck = ctx.rules.nwell_spacing()
+    if len(islands) <= 1:
+        cfg.log(1, "  [PLACEMENT] n-well: one island — no well-to-well "
+                   "spacing to rule on")
+        return
+    if not gaps:
+        return
+    worst = gaps[0]
+    ctx.metrics["nwell_spacing_ok"] = bool(worst >= floor - 1e-6)
+    if worst < floor - 1e-6:
+        severity = "VIOLATION" if worst < deck - 1e-6 else "below target"
+        cfg.log(0, f"  [PLACEMENT] n-well {severity}: {len(islands)} islands, "
+                   f"min gap {worst:.3f}um < {floor}um floor "
+                   f"(deck NW.2b_LV is {deck}um)")
+    else:
+        cfg.log(1, f"  [PLACEMENT] n-well: {len(islands)} islands, "
+                   f"min gap {worst:.3f}um >= {floor}um floor "
+                   f"(deck NW.2b_LV {deck}um)")
 
 
 def place_with_routability(ctx, pdk, cfg: Optional[PlacementConfig] = None,

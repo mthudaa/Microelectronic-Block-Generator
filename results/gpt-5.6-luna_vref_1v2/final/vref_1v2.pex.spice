@@ -1,19 +1,20 @@
-* PEX produced on Sun Aug 23 05:52:43 AM CST 2026 using /home/huda/opensource-project/Microelectronic-Block-Generator/designs/notebooks/chipathon2026-D/scripts/iic-pex.sh with m=2 and s=1
+* PEX produced on Thu Aug 27 11:20:41 AM CST 2026 using /home/huda/opensource-project/Microelectronic-Block-Generator/designs/notebooks/chipathon2026-D/scripts/iic-pex.sh with m=2 and s=1
 * NGSPICE file created from vref_1v2.ext - technology: gf180mcuD
 
 .option scale=5n
 
 .subckt vref_1v2 IBIAS VREF VSS VDD
-X0 VREF VREF a_n1464_428# VSS nfet_03v3 ad=0.285u pd=4.1m as=0.285u ps=4.1m w=1900 l=56
-X1 IBIAS IBIAS VDD VDD pfet_03v3 ad=48n pd=1.04m as=48n ps=1.04m w=400 l=1600
-X2 a_n1464_428# VREF VSS VSS nfet_03v3 ad=0.228u pd=4.04m as=0.228u ps=4.04m w=1900 l=1600
-X3 VREF IBIAS VDD VDD pfet_03v3 ad=48n pd=1.04m as=48n ps=1.04m w=400 l=1600
-C0 VDD VREF 3.27151f
-C1 IBIAS VREF 0.59006f
-C2 a_n1464_428# VREF 2.73817f
-C3 VDD IBIAS 11.5556f
-C4 VREF VSS 9.86226f
-C5 IBIAS VSS 0.79225f
-C6 VDD VSS 26.5518f
-C7 a_n1464_428# VSS 5.25135f ; **FLOATING
+X0 VREF IBIAS VDD VDD pfet_03v3 ad=48n pd=1.04m as=48n ps=1.04m w=400 l=1600
+X1 VREF VREF a_n1464_428# VSS nfet_03v3 ad=0.285u pd=4.1m as=0.285u ps=4.1m w=1900 l=56
+X2 IBIAS IBIAS VDD VDD pfet_03v3 ad=48n pd=1.04m as=48n ps=1.04m w=400 l=1600
+X3 a_n1464_428# VREF VSS VSS nfet_03v3 ad=0.228u pd=4.04m as=0.228u ps=4.04m w=1900 l=1600
+C0 VDD VREF 3.27034f
+C1 IBIAS VREF 0.59317f
+C2 a_n1464_428# VREF 2.76503f
+C3 VDD IBIAS 11.5331f
+C4 VDD a_n1464_428# 0.01757f
+C5 VREF VSS 9.81148f
+C6 IBIAS VSS 0.84046f
+C7 VDD VSS 26.6809f
+C8 a_n1464_428# VSS 5.92281f ; **FLOATING
 .ends

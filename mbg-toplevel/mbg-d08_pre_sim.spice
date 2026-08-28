@@ -1,0 +1,80 @@
+* Pre-simulation netlist reconstructed from layout/mbg-d08.gds.
+* Technology: GF180MCU-D, 5LM, nominal 3.3 V.
+*
+* GDS-to-subcircuit mapping:
+*   ota, ota$1, ota$2                 -> deepseek, gpt-5.6-luna, ox-alpha OTA
+*   strongarm_comparator, $3, $2      -> deepseek, gpt-5.6-luna, ox-alpha SA
+*   vref_1v2, $1, $2                  -> deepseek, gpt-5.6-luna, ox-alpha VREF
+*   io_secondary_3p3                  -> io_secondary_3p3
+*
+* The three oscillator subcircuits are included because they are part of the
+* supplied module library; the GDS has no oscillator instance to instantiate.
+
+.include "/foss/pdks/ciel/gf180mcu/versions/7b70722e33c03fcb5dabcf4d479fb0822d9251c9/gf180mcuD/libs.tech/ngspice/design.ngspice"
+.lib "/foss/pdks/ciel/gf180mcu/versions/7b70722e33c03fcb5dabcf4d479fb0822d9251c9/gf180mcuD/libs.tech/ngspice/sm141064.ngspice" typical
+.lib "/foss/pdks/ciel/gf180mcu/versions/7b70722e33c03fcb5dabcf4d479fb0822d9251c9/gf180mcuD/libs.tech/ngspice/sm141064.ngspice" diode_typical
+.lib "/foss/pdks/ciel/gf180mcu/versions/7b70722e33c03fcb5dabcf4d479fb0822d9251c9/gf180mcuD/libs.tech/ngspice/sm141064.ngspice" res_typical
+.lib "/foss/pdks/ciel/gf180mcu/versions/7b70722e33c03fcb5dabcf4d479fb0822d9251c9/gf180mcuD/libs.tech/ngspice/sm141064.ngspice" mimcap_typical
+
+* Every supplied module file is referenced here.
+.include "spice/deepseek_ota.spice"
+.include "spice/deepseek_strongarm_comparator.spice"
+.include "spice/deepseek_vref_1v2.spice"
+.include "spice/deepseek_oscillator.spice"
+.include "spice/gpt-5.6-luna_ota.spice"
+.include "spice/gpt-5.6-luna_strongarm_comparator.spice"
+.include "spice/gpt-5.6-luna_vref_1v2.spice"
+.include "spice/gpt-5.6-luna_oscillator.spice"
+.include "spice/ox_alpha_ota.spice"
+.include "spice/ox_alpha_strongarm_comparator.spice"
+.include "spice/ox_alpha_vref_1v2.spice"
+.include "spice/ox_alpha_oscillator.spice"
+.include "spice/claude-opus-5_temp_sensor.spice"
+.include "spice/io_secondary_3p3.spice"
+
+* External pins follow the named pads in the GDS.
+* VDD VSS CLK INP INN IBIAS temp_out
+* deepseek_ota gpt_ota oxa_ota
+* deepseek_cmp gpt_cmp oxa_cmp
+* deepseek_vref gpt_vref oxa_vref
+.subckt mbg-d08 VDD VSS CLK INP INN IBIAS temp_out
++ deepseek_ota gpt_ota oxa_ota
++ deepseek_cmp gpt_cmp oxa_cmp
++ deepseek_vref gpt_vref oxa_vref
+
+* Four input pads.  ASIG3V3 is the core-side node.
+XIO_CLK  VDD CLK  clk_core  VSS io_secondary_3p3
+XIO_INP  VDD INP  inp_core  VSS io_secondary_3p3
+XIO_INN  VDD INN  inn_core  VSS io_secondary_3p3
+XIO_IBIAS VDD IBIAS ibias_core VSS io_secondary_3p3
+
+* The three GDS OTA cells.
+XOTA_DS  VDD VSS inp_core inn_core deepseek_ota_core ibias_core deepseek_ota
+XOTA_GPT VDD VSS inp_core inn_core gpt_ota_core ibias_core gpt-5.6-luna_ota
+XOTA_OXA VDD VSS inp_core inn_core oxa_ota_core ibias_core ox_alpha_ota
+
+* The three GDS strong-arm comparator cells.  OUTN remains internal.
+XCMP_DS  VDD VSS inp_core inn_core clk_core deepseek_cmp_core deepseek_cmp_n deepseek_strongarm_comparator
+XCMP_GPT VDD VSS inp_core inn_core clk_core gpt_cmp_core gpt_cmp_n gpt-5.6-luna_strongarm_comparator
+XCMP_OXA VDD VSS inp_core inn_core clk_core oxa_cmp_core oxa_cmp_n ox_alpha_strongarm_comparator
+
+* The three GDS reference cells.
+XVREF_DS  VDD VSS deepseek_vref_core ibias_core deepseek_vref_1v2
+XVREF_GPT VDD VSS gpt_vref_core ibias_core gpt-5.6-luna_vref_1v2
+XVREF_OXA VDD VSS oxa_vref_core ibias_core ox_alpha_vref_1v2
+
+* The RO temperature sensor cell.
+XTEMP_CLAUDE VDD VSS temp_out_core claude-opus-5_temp_sensor
+
+* Nine named analog output pads plus the named temp_out pad.
+XIO_DS_OTA  VDD deepseek_ota  deepseek_ota_core  VSS io_secondary_3p3
+XIO_GPT_OTA VDD gpt_ota       gpt_ota_core       VSS io_secondary_3p3
+XIO_OXA_OTA VDD oxa_ota       oxa_ota_core       VSS io_secondary_3p3
+XIO_DS_CMP  VDD deepseek_cmp  deepseek_cmp_core   VSS io_secondary_3p3
+XIO_GPT_CMP VDD gpt_cmp       gpt_cmp_core       VSS io_secondary_3p3
+XIO_OXA_CMP VDD oxa_cmp       oxa_cmp_core       VSS io_secondary_3p3
+XIO_DS_VREF VDD deepseek_vref deepseek_vref_core  VSS io_secondary_3p3
+XIO_GPT_VREF VDD gpt_vref     gpt_vref_core      VSS io_secondary_3p3
+XIO_OXA_VREF VDD oxa_vref     oxa_vref_core      VSS io_secondary_3p3
+XIO_TEMP     VDD temp_out     temp_out_core      VSS io_secondary_3p3
+.ends mbg-d08

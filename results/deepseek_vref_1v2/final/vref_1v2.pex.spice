@@ -1,25 +1,25 @@
-* PEX produced on Sun Aug 23 05:59:01 AM CST 2026 using /home/huda/opensource-project/Microelectronic-Block-Generator/designs/notebooks/chipathon2026-D/scripts/iic-pex.sh with m=2 and s=1
+* PEX produced on Thu Aug 27 11:17:19 AM CST 2026 using /home/huda/opensource-project/Microelectronic-Block-Generator/designs/notebooks/chipathon2026-D/scripts/iic-pex.sh with m=2 and s=1
 * NGSPICE file created from vref_1v2.ext - technology: gf180mcuD
 
 .option scale=5n
 
 .subckt vref_1v2 IBIAS VREF VSS VDD
-X0 VDD a_n1398_2838# VREF VDD pfet_03v3 ad=96n pd=1.84m as=44.8n ps=0.912m w=800 l=400
-X1 VREF a_n1398_2838# VDD VDD pfet_03v3 ad=44.8n pd=0.912m as=96n ps=1.84m w=800 l=400
-X2 VREF VREF VSS VSS nfet_03v3 ad=28.8n pd=0.72m as=28.8n ps=0.72m w=240 l=100
-X3 VSS IBIAS IBIAS VSS nfet_03v3 ad=48n pd=1.04m as=22.4n ps=0.512m w=400 l=400
-X4 VDD a_n1398_2838# a_n1398_2838# VDD pfet_03v3 ad=48n pd=1.04m as=22.4n ps=0.512m w=400 l=400
-X5 a_n1398_2838# a_n1398_2838# VDD VDD pfet_03v3 ad=22.4n pd=0.512m as=48n ps=1.04m w=400 l=400
-X6 a_n1398_2838# IBIAS VSS VSS nfet_03v3 ad=22.4n pd=0.512m as=48n ps=1.04m w=400 l=400
+X0 VREF VREF VSS VSS nfet_03v3 ad=28.8n pd=0.72m as=28.8n ps=0.72m w=240 l=100
+X1 VSS IBIAS IBIAS VSS nfet_03v3 ad=48n pd=1.04m as=22.4n ps=0.512m w=400 l=400
+X2 VDD a_n1448_2838# VREF VDD pfet_03v3 ad=96n pd=1.84m as=44.8n ps=0.912m w=800 l=400
+X3 VREF a_n1448_2838# VDD VDD pfet_03v3 ad=44.8n pd=0.912m as=96n ps=1.84m w=800 l=400
+X4 a_n1448_2838# IBIAS VSS VSS nfet_03v3 ad=22.4n pd=0.512m as=48n ps=1.04m w=400 l=400
+X5 VDD a_n1448_2838# a_n1448_2838# VDD pfet_03v3 ad=48n pd=1.04m as=22.4n ps=0.512m w=400 l=400
+X6 a_n1448_2838# a_n1448_2838# VDD VDD pfet_03v3 ad=22.4n pd=0.512m as=48n ps=1.04m w=400 l=400
 X7 IBIAS IBIAS VSS VSS nfet_03v3 ad=22.4n pd=0.512m as=48n ps=1.04m w=400 l=400
-X8 VSS IBIAS a_n1398_2838# VSS nfet_03v3 ad=48n pd=1.04m as=22.4n ps=0.512m w=400 l=400
-C0 VREF IBIAS 0.03213f
-C1 a_n1398_2838# IBIAS 0.41076f
-C2 VDD VREF 2.21373f
-C3 VDD a_n1398_2838# 7.7726f
-C4 VREF a_n1398_2838# 0.57212f
-C5 IBIAS VSS 8.23145f
-C6 VREF VSS 3.68002f
-C7 VDD VSS 23.2465f
-C8 a_n1398_2838# VSS 3.0291f ; **FLOATING
+X8 VSS IBIAS a_n1448_2838# VSS nfet_03v3 ad=48n pd=1.04m as=22.4n ps=0.512m w=400 l=400
+C0 a_n1448_2838# IBIAS 0.40941f
+C1 VDD VREF 2.21492f
+C2 VDD a_n1448_2838# 7.64579f
+C3 VREF a_n1448_2838# 0.58232f
+C4 VREF IBIAS 0.02814f
+C5 IBIAS VSS 8.2586f
+C6 VREF VSS 3.65459f
+C7 VDD VSS 23.4502f
+C8 a_n1448_2838# VSS 3.16829f ; **FLOATING
 .ends

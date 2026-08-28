@@ -1,0 +1,30 @@
+{
+  "cell": "temp_sensor",
+  "files": {
+    "drc_report": "temp_sensor.magic.drc.rpt",
+    "extracted_spice": "temp_sensor_extracted.spice",
+    "gds": "temp_sensor.gds",
+    "lef": "temp_sensor.lef",
+    "lib": "temp_sensor.lib",
+    "lvs_report": "temp_sensor.lvs.out",
+    "pex_spice": "temp_sensor.pex.spice",
+    "sch_spice": "temp_sensor.spice",
+    "svg": "temp_sensor.svg",
+    "verilog": "temp_sensor.v"
+  },
+  "notes": [],
+  "ports": [
+    {
+      "direction": "power",
+      "name": "VDD"
+    },
+    {
+      "direction": "ground",
+      "name": "VSS"
+    },
+    {
+      "direction": "inout",
+      "name": "TEMP_OUT"
+    }
+  ]
+}

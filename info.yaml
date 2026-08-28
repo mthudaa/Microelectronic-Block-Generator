@@ -12,13 +12,124 @@
 # Project metadata (used for documentation / review)
 # ======================================================
 project:
-  title: "AI-generated analog blocks: 5T-OTA, Comparator, VREF"  # Project title (e.g. "Simple CPU", "PLL", "ADC")
-  team: "D08 Microelectronic Block Generator"      # Your Team name
-  discord: ""                    # Optional: Discord username (for support / communication)
-  description: "AI/LLM-generated analog layouts (gLayout track): 5-transistor OTA, comparator core, 1.2V voltage reference"  # Short one-line description
+  title: "MBG-D08: AI-generated analog block array"   # Project title
+  team: "D08 Microelectronic Block Generator"         # Your Team name
+  discord: ""                                         # Optional: Discord username
+  description: "Integrated top-level GDS combining nine AI/LLM-generated analog blocks (3x 5T-OTA, 3x StrongArm comparator, 3x 1.2V reference) plus a relaxation-oscillator temperature sensor, behind 14 ESD pad cells (gLayout track, GF180MCU-D)"
+
   # Relative paths to the lvs_config.json files used for integration.
-  # Pin data will be added here going forward.
+  # Submission is the single integrated top level `mbg-d08`; the earlier
+  # block-level configs (lvs_config_ota_5t.json, lvs_config_comparator_core.json,
+  # lvs_config_vref_1v2.json) are superseded by it and are retained in the
+  # repository for reference only.
   lvs_config:
-    - "lvs_config_comparator_core.json"
-    - "lvs_config_ota_5t.json"
-    - "lvs_config_vref_1v2.json"
+    - "lvs_config_mbg_d08.json"
+
+# ======================================================
+# Integrated top level
+# ======================================================
+top_level:
+  cell_name: "mbg-d08"          # identical in GDS and SPICE
+  layout: "mbg-toplevel/layout/mbg-d08.gds"
+  netlist: "mbg-toplevel/mbg-d08_pre_sim.spice"
+  pdk: "gf180mcuD"
+  variant: "D"                  # metal_top=11K, mim_option=B, metal_level=5LM
+  supply: "3.3 V single"
+  devices: 94                   # LVS-reconciled device count
+  nets: 60
+
+# ======================================================
+# Pin plan  (16 top-level pins; GDS labels are lower-case,
+# SPICE pin names upper-case for supplies/inputs — LVS is
+# case-insensitive and both engines match 16/16)
+# ======================================================
+  pins:
+    - name: "vdd"
+      direction: "power"
+      description: "3.3 V supply, common to all blocks and all 14 pad cells"
+    - name: "vss"
+      direction: "ground"
+      description: "Ground, common to all blocks and all 14 pad cells"
+
+    - name: "clk"
+      direction: "input"
+      description: "Comparator sampling clock. Drives the CLK input of all three StrongArm comparators through an io_secondary_3p3 ESD pad; core-side node is clk_core"
+    - name: "inp"
+      direction: "input"
+      description: "Differential input, positive. Shared by the three OTAs and the three comparators; core-side node is inp_core"
+    - name: "inn"
+      direction: "input"
+      description: "Differential input, negative. Shared by the three OTAs and the three comparators; core-side node is inn_core"
+    - name: "ibias"
+      direction: "input"
+      description: "Bias current input. Feeds the IBIAS pin of all three OTAs AND all three 1.2 V references; core-side node is ibias_core"
+
+    - name: "temp_out"
+      direction: "output"
+      description: "Relaxation-oscillator temperature sensor output (claude-opus-5 candidate), rail-to-rail digital waveform. Pin 7 in the top-level port order, before the nine block outputs"
+
+    - name: "deepseek_ota"
+      direction: "output"
+      description: "5T-OTA output (deepseek candidate), single-ended OUT"
+    - name: "gpt_ota"
+      direction: "output"
+      description: "5T-OTA output (gpt-5.6-luna candidate), single-ended OUT"
+    - name: "oxa_ota"
+      direction: "output"
+      description: "5T-OTA output (ox_alpha candidate), single-ended OUT"
+
+    - name: "deepseek_cmp"
+      direction: "output"
+      description: "StrongArm comparator output (deepseek candidate). The comparator is differential (OUTP/OUTN); OUTP is brought to this pad, OUTN stays internal"
+    - name: "gpt_cmp"
+      direction: "output"
+      description: "StrongArm comparator output (gpt-5.6-luna candidate). Differential OUTP/OUTN; OUTP bonded out, OUTN internal"
+    - name: "oxa_cmp"
+      direction: "output"
+      description: "StrongArm comparator output (ox_alpha candidate). Differential OUTP/OUTN; OUTP bonded out, OUTN internal"
+
+    - name: "deepseek_vref"
+      direction: "output"
+      description: "1.2 V reference output (deepseek candidate). Block interface is VDD/VSS/VREF/IBIAS — it consumes the shared ibias input"
+    - name: "gpt_vref"
+      direction: "output"
+      description: "1.2 V reference output (gpt-5.6-luna candidate). Block interface is VDD/VSS/VREF/IBIAS"
+    - name: "oxa_vref"
+      direction: "output"
+      description: "1.2 V reference output (ox_alpha candidate). Block interface is VDD/VSS/VREF/IBIAS"
+
+
+# ======================================================
+# Frozen block candidates inside mbg-d08
+# (GDS cell -> SPICE subcircuit -> generating model)
+# ======================================================
+  blocks:
+    - {gds_cell: "ota",                      subckt: "deepseek_ota",                      model: "deepseek",       pins: "VDD VSS INP INN OUT IBIAS"}
+    - {gds_cell: "ota$1",                    subckt: "gpt-5.6-luna_ota",                  model: "gpt-5.6-luna",   pins: "VDD VSS INP INN OUT IBIAS"}
+    - {gds_cell: "ota$2",                    subckt: "ox_alpha_ota",                      model: "ox_alpha",       pins: "VDD VSS INP INN OUT IBIAS"}
+    - {gds_cell: "strongarm_comparator",     subckt: "deepseek_strongarm_comparator",     model: "deepseek",       pins: "VDD VSS INP INN CLK OUTP OUTN"}
+    - {gds_cell: "strongarm_comparator$3",   subckt: "gpt-5.6-luna_strongarm_comparator", model: "gpt-5.6-luna",   pins: "VDD VSS INP INN CLK OUTP OUTN"}
+    - {gds_cell: "strongarm_comparator$2",   subckt: "ox_alpha_strongarm_comparator",     model: "ox_alpha",       pins: "VDD VSS INP INN CLK OUTP OUTN"}
+    - {gds_cell: "vref_1v2",                 subckt: "deepseek_vref_1v2",                 model: "deepseek",       pins: "VDD VSS VREF IBIAS"}
+    - {gds_cell: "vref_1v2$1",               subckt: "gpt-5.6-luna_vref_1v2",             model: "gpt-5.6-luna",   pins: "VDD VSS VREF IBIAS"}
+    - {gds_cell: "vref_1v2$2",               subckt: "ox_alpha_vref_1v2",                 model: "ox_alpha",       pins: "VDD VSS VREF IBIAS"}
+    - {gds_cell: "temp_sensor",              subckt: "claude-opus-5_temp_sensor",         model: "claude-opus-5",  pins: "VDD VSS TEMP_OUT"}
+    - {gds_cell: "io_secondary_3p3",         subckt: "io_secondary_3p3",                  model: "Chipathon pad",  pins: "VDD TO_GATE ASIG3V3 VSS", instances: 14}
+
+# ======================================================
+# Verification status of the exact submitted layout
+# (see README.md "MBG-D08 top-level integration" for logs)
+# ======================================================
+  verification:
+    drc_magic: "PASS"          # 0 violations
+    drc_klayout: "PASS"        # 0 violations, 728 rules / 168 decks
+    drc_antenna: "PASS"        # 13 antenna decks, 0 violations
+    drc_esd: "PASS"            # esd deck, 0 violations
+    drc_substrate: "PASS"      # dnwell + lvpwell + guard_ring, 0 violations
+    drc_current_density: "PASS"  # cup deck (CUP.2, CUP.3), 0 violations
+    drc_metal_density: "PARTIAL" # 8 global die-coverage minima unmet; needs die-level dummy fill at integration
+    lvs_netgen: "PASS"         # mbg-d08.gds vs mbg-d08_pre_sim.spice: circuits match uniquely
+    lvs_klayout: "PASS"        # mbg-d08.gds vs mbg-d08_lvs.spice: netlists match
+    pex: "PASS"                # extracted, post_sim/mbg-d08.pex.spice
+    pre_layout_simulation: "PASS"
+    post_layout_simulation: "PASS"

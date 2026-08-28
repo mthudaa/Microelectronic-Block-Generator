@@ -1,8 +1,0 @@
-.lib "/home/huda/.volare/gf180mcuD/libs.tech/ngspice/sm141064.ngspice" typical
-.subckt ota_5t vdd vss inp inm out vb
-XM1  net1 inp net2 vss nfet_03v3 L=1u W=4u nf=4
-XM2  out  inm net2 vss nfet_03v3 L=1u W=4u nf=4
-XM3  net1 net1 vdd vdd pfet_03v3 L=1u W=4u nf=4
-XM4  out  net1 vdd vdd pfet_03v3 L=1u W=4u nf=4
-XM5  net2 vb  vss vss nfet_03v3 L=1u W=4u nf=4
-.ends

@@ -1,0 +1,8 @@
+.subckt gpt-5.6-luna_ota VDD VSS INP INN OUT IBIAS
+XM1 NLEFT INP NTAIL VSS nfet_03v3 L=0.6u W=4u nf=4
+XM2 OUT INN NTAIL VSS nfet_03v3 L=0.6u W=4u nf=4
+XM3 NLEFT NLEFT VDD VDD pfet_03v3 L=0.8u W=6u nf=4
+XM4 OUT NLEFT VDD VDD pfet_03v3 L=0.8u W=6u nf=4
+XM5 NTAIL IBIAS VSS VSS nfet_03v3 L=1u W=4u nf=4
+XM6 IBIAS IBIAS VSS VSS nfet_03v3 L=1u W=4u nf=4
+.ends gpt-5.6-luna_ota

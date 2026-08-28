@@ -1,8 +1,0 @@
-* PMOS-input 5T-OTA (schematic — pre-layout)
-.subckt ota_5t vdd vss inp inm out vb
-XM1 tail vb vdd vdd pfet_03v3 L=1u W=4u nf=1
-XM2 d1 inp tail vdd pfet_03v3 L=1u W=4u nf=1
-XM3 out inm tail vdd pfet_03v3 L=1u W=4u nf=1
-XM4 d1 d1 vss vss nfet_03v3 L=1u W=2u nf=1
-XM5 out d1 vss vss nfet_03v3 L=1u W=2u nf=1
-.ends

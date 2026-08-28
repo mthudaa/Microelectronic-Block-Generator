@@ -1,0 +1,38 @@
+{
+  "verdict": "PASS",
+  "reason": "all configured DRC engines report clean",
+  "primary": "klayout",
+  "gds_sha256": "b5a4f520a96b0659",
+  "results": [
+    {
+      "engine": "magic",
+      "status": "CLEAN",
+      "violations": 0,
+      "rules": {},
+      "report_path": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/claude-opus-5_temp_sensor/iterations/run/temp_sensor/verification/temp_sensor.magic.drc.rpt",
+      "log_path": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/claude-opus-5_temp_sensor/iterations/run/temp_sensor/verification/logs/magic_drc.log",
+      "tool": "/usr/local/bin/magic",
+      "tool_version": "8.3.669",
+      "deck": "/home/huda/.volare/gf180mcuD/libs.tech/magic/gf180mcuD.tech",
+      "gds": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/claude-opus-5_temp_sensor/iterations/run/temp_sensor/temp_sensor.gds",
+      "gds_sha256": "b5a4f520a96b0659",
+      "elapsed": 1.152,
+      "message": ""
+    },
+    {
+      "engine": "klayout",
+      "status": "CLEAN",
+      "violations": 0,
+      "rules": {},
+      "report_path": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/claude-opus-5_temp_sensor/iterations/run/temp_sensor/verification/temp_sensor.klayout.lyrdb",
+      "log_path": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/claude-opus-5_temp_sensor/iterations/run/temp_sensor/verification/logs/klayout_drc.log",
+      "tool": "/home/huda/.local/mbg-tools/klayout-0.30.9/bin/klayout",
+      "tool_version": "0.30.9",
+      "deck": "/home/huda/.volare/gf180mcuD/libs.tech/klayout/tech/drc/gf180mcu.drc",
+      "gds": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/claude-opus-5_temp_sensor/iterations/run/temp_sensor/temp_sensor.gds",
+      "gds_sha256": "b5a4f520a96b0659",
+      "elapsed": 12.36,
+      "message": ""
+    }
+  ]
+}

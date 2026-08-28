@@ -1,4 +1,4 @@
-* PEX produced on Sun Aug 23 05:39:45 AM CST 2026 using /home/huda/opensource-project/Microelectronic-Block-Generator/designs/notebooks/chipathon2026-D/scripts/iic-pex.sh with m=2 and s=1
+* PEX produced on Thu Aug 27 11:17:51 AM CST 2026 using /home/huda/opensource-project/Microelectronic-Block-Generator/designs/notebooks/chipathon2026-D/scripts/iic-pex.sh with m=2 and s=1
 * NGSPICE file created from oscillator.ext - technology: gf180mcuD
 
 .option scale=5n
@@ -14,18 +14,18 @@ X6 a_n3494_428# OSC_OUT VSS VSS nfet_03v3 ad=48n pd=1.04m as=48n ps=1.04m w=400 
 X7 a_250_428# a_n1622_428# VSS VSS nfet_03v3 ad=48n pd=1.04m as=48n ps=1.04m w=400 l=500
 X8 a_n1622_428# a_n3494_428# VSS VSS nfet_03v3 ad=48n pd=1.04m as=48n ps=1.04m w=400 l=500
 X9 a_2122_428# a_250_428# VSS VSS nfet_03v3 ad=48n pd=1.04m as=48n ps=1.04m w=400 l=500
-C0 a_n1622_428# VDD 4.0794f
-C1 a_n1622_428# OSC_OUT 0.32056f
-C2 a_n1622_428# a_250_428# 0.66762f
-C3 VDD a_n3494_428# 3.97345f
-C4 a_n3494_428# OSC_OUT 1.33977f
-C5 VDD a_2122_428# 3.95474f
-C6 a_2122_428# OSC_OUT 1.03703f
-C7 a_2122_428# a_250_428# 0.46455f
-C8 a_n1622_428# a_n3494_428# 0.72698f
-C9 VDD OSC_OUT 3.80525f
-C10 VDD a_250_428# 4.38697f
-C11 OSC_OUT a_250_428# 0.21318f
+C0 VDD OSC_OUT 3.80525f
+C1 VDD a_250_428# 4.38697f
+C2 OSC_OUT a_250_428# 0.21318f
+C3 a_n1622_428# VDD 4.0794f
+C4 a_n1622_428# OSC_OUT 0.32056f
+C5 a_n1622_428# a_250_428# 0.66762f
+C6 VDD a_n3494_428# 3.97345f
+C7 a_n3494_428# OSC_OUT 1.33977f
+C8 VDD a_2122_428# 3.95474f
+C9 a_2122_428# OSC_OUT 1.03703f
+C10 a_2122_428# a_250_428# 0.46455f
+C11 a_n1622_428# a_n3494_428# 0.72698f
 C12 OSC_OUT VSS 7.33894f
 C13 VDD VSS 46.2252f
 C14 a_2122_428# VSS 5.05716f ; **FLOATING

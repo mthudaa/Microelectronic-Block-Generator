@@ -1,48 +1,48 @@
-* PEX produced on Sun Aug 23 04:17:01 AM CST 2026 using /home/huda/opensource-project/Microelectronic-Block-Generator/designs/notebooks/chipathon2026-D/scripts/iic-pex.sh with m=2 and s=1
+* PEX produced on Thu Aug 27 11:18:35 AM CST 2026 using /home/huda/opensource-project/Microelectronic-Block-Generator/designs/notebooks/chipathon2026-D/scripts/iic-pex.sh with m=2 and s=1
 * NGSPICE file created from ota.ext - technology: gf180mcuD
 
 .option scale=5n
 
 .subckt ota IBIAS OUT INN INP VSS VDD
-X0 VSS IBIAS IBIAS VSS nfet_03v3 ad=11.2n pd=0.312m as=11.2n ps=0.312m w=200 l=200
-X1 a_n1462_8060# a_n1462_8060# VDD VDD pfet_03v3 ad=16.8n pd=0.412m as=36n ps=0.84m w=300 l=160
-X2 VDD a_n1462_8060# a_n1462_8060# VDD pfet_03v3 ad=16.8n pd=0.412m as=16.8n ps=0.412m w=300 l=160
-X3 VSS IBIAS a_n1422_429# VSS nfet_03v3 ad=24n pd=0.64m as=11.2n ps=0.312m w=200 l=200
-X4 a_n1462_8060# a_n1462_8060# VDD VDD pfet_03v3 ad=16.8n pd=0.412m as=16.8n ps=0.412m w=300 l=160
-X5 OUT a_n1462_8060# VDD VDD pfet_03v3 ad=16.8n pd=0.412m as=16.8n ps=0.412m w=300 l=160
-X6 a_n1422_429# INN OUT VSS nfet_03v3 ad=11.2n pd=0.312m as=11.2n ps=0.312m w=200 l=120
-X7 VDD a_n1462_8060# OUT VDD pfet_03v3 ad=16.8n pd=0.412m as=16.8n ps=0.412m w=300 l=160
-X8 a_n1422_429# IBIAS VSS VSS nfet_03v3 ad=11.2n pd=0.312m as=11.2n ps=0.312m w=200 l=200
-X9 OUT INN a_n1422_429# VSS nfet_03v3 ad=11.2n pd=0.312m as=24n ps=0.64m w=200 l=120
-X10 a_n1422_429# INP a_n1462_8060# VSS nfet_03v3 ad=24n pd=0.64m as=11.2n ps=0.312m w=200 l=120
-X11 VDD a_n1462_8060# a_n1462_8060# VDD pfet_03v3 ad=36n pd=0.84m as=16.8n ps=0.412m w=300 l=160
-X12 IBIAS IBIAS VSS VSS nfet_03v3 ad=11.2n pd=0.312m as=11.2n ps=0.312m w=200 l=200
-X13 a_n1462_8060# INP a_n1422_429# VSS nfet_03v3 ad=11.2n pd=0.312m as=11.2n ps=0.312m w=200 l=120
-X14 OUT INN a_n1422_429# VSS nfet_03v3 ad=11.2n pd=0.312m as=11.2n ps=0.312m w=200 l=120
-X15 OUT a_n1462_8060# VDD VDD pfet_03v3 ad=16.8n pd=0.412m as=36n ps=0.84m w=300 l=160
+X0 VDD a_n1512_8060# a_n1512_8060# VDD pfet_03v3 ad=36n pd=0.84m as=16.8n ps=0.412m w=300 l=160
+X1 VSS IBIAS IBIAS VSS nfet_03v3 ad=11.2n pd=0.312m as=11.2n ps=0.312m w=200 l=200
+X2 VSS IBIAS a_n1422_429# VSS nfet_03v3 ad=24n pd=0.64m as=11.2n ps=0.312m w=200 l=200
+X3 a_n1422_429# INN OUT VSS nfet_03v3 ad=11.2n pd=0.312m as=11.2n ps=0.312m w=200 l=120
+X4 a_n1512_8060# a_n1512_8060# VDD VDD pfet_03v3 ad=16.8n pd=0.412m as=36n ps=0.84m w=300 l=160
+X5 a_n1422_429# IBIAS VSS VSS nfet_03v3 ad=11.2n pd=0.312m as=11.2n ps=0.312m w=200 l=200
+X6 VDD a_n1512_8060# OUT VDD pfet_03v3 ad=36n pd=0.84m as=16.8n ps=0.412m w=300 l=160
+X7 VDD a_n1512_8060# a_n1512_8060# VDD pfet_03v3 ad=16.8n pd=0.412m as=16.8n ps=0.412m w=300 l=160
+X8 OUT INN a_n1422_429# VSS nfet_03v3 ad=11.2n pd=0.312m as=24n ps=0.64m w=200 l=120
+X9 a_n1422_429# INP a_n1512_8060# VSS nfet_03v3 ad=24n pd=0.64m as=11.2n ps=0.312m w=200 l=120
+X10 IBIAS IBIAS VSS VSS nfet_03v3 ad=11.2n pd=0.312m as=11.2n ps=0.312m w=200 l=200
+X11 VDD a_n1512_8060# OUT VDD pfet_03v3 ad=16.8n pd=0.412m as=16.8n ps=0.412m w=300 l=160
+X12 a_n1512_8060# INP a_n1422_429# VSS nfet_03v3 ad=11.2n pd=0.312m as=11.2n ps=0.312m w=200 l=120
+X13 OUT INN a_n1422_429# VSS nfet_03v3 ad=11.2n pd=0.312m as=11.2n ps=0.312m w=200 l=120
+X14 a_n1512_8060# a_n1512_8060# VDD VDD pfet_03v3 ad=16.8n pd=0.412m as=16.8n ps=0.412m w=300 l=160
+X15 OUT a_n1512_8060# VDD VDD pfet_03v3 ad=16.8n pd=0.412m as=16.8n ps=0.412m w=300 l=160
 X16 a_n1422_429# INN OUT VSS nfet_03v3 ad=24n pd=0.64m as=11.2n ps=0.312m w=200 l=120
 X17 VSS IBIAS a_n1422_429# VSS nfet_03v3 ad=11.2n pd=0.312m as=11.2n ps=0.312m w=200 l=200
-X18 a_n1422_429# INP a_n1462_8060# VSS nfet_03v3 ad=11.2n pd=0.312m as=11.2n ps=0.312m w=200 l=120
+X18 a_n1422_429# INP a_n1512_8060# VSS nfet_03v3 ad=11.2n pd=0.312m as=11.2n ps=0.312m w=200 l=120
 X19 VSS IBIAS IBIAS VSS nfet_03v3 ad=24n pd=0.64m as=11.2n ps=0.312m w=200 l=200
-X20 VDD a_n1462_8060# OUT VDD pfet_03v3 ad=36n pd=0.84m as=16.8n ps=0.412m w=300 l=160
-X21 a_n1462_8060# INP a_n1422_429# VSS nfet_03v3 ad=11.2n pd=0.312m as=24n ps=0.64m w=200 l=120
-X22 IBIAS IBIAS VSS VSS nfet_03v3 ad=11.2n pd=0.312m as=24n ps=0.64m w=200 l=200
-X23 a_n1422_429# IBIAS VSS VSS nfet_03v3 ad=11.2n pd=0.312m as=24n ps=0.64m w=200 l=200
-C0 OUT a_n1462_8060# 0.64326f
-C1 a_n1462_8060# INP 0.25825f
-C2 a_n1462_8060# a_n1422_429# 1.58029f
-C3 VDD a_n1462_8060# 8.39542f
-C4 OUT INN 0.26424f
-C5 INN a_n1422_429# 0.24925f
-C6 OUT a_n1422_429# 1.34454f
-C7 INP a_n1422_429# 0.33602f
-C8 OUT VDD 3.14794f
-C9 IBIAS a_n1422_429# 0.38937f
+X20 a_n1512_8060# INP a_n1422_429# VSS nfet_03v3 ad=11.2n pd=0.312m as=24n ps=0.64m w=200 l=120
+X21 IBIAS IBIAS VSS VSS nfet_03v3 ad=11.2n pd=0.312m as=24n ps=0.64m w=200 l=200
+X22 a_n1422_429# IBIAS VSS VSS nfet_03v3 ad=11.2n pd=0.312m as=24n ps=0.64m w=200 l=200
+X23 OUT a_n1512_8060# VDD VDD pfet_03v3 ad=16.8n pd=0.412m as=36n ps=0.84m w=300 l=160
+C0 OUT VDD 2.99911f
+C1 IBIAS a_n1422_429# 0.38937f
+C2 OUT a_n1512_8060# 0.69175f
+C3 a_n1512_8060# INP 0.25825f
+C4 a_n1512_8060# a_n1422_429# 1.58029f
+C5 VDD a_n1512_8060# 8.66544f
+C6 OUT INN 0.26424f
+C7 INN a_n1422_429# 0.24925f
+C8 OUT a_n1422_429# 1.34454f
+C9 INP a_n1422_429# 0.33602f
 C10 IBIAS VSS 9.78926f
 C11 INN VSS 1.9486f
 C12 INP VSS 1.88947f
-C13 OUT VSS 2.37172f
-C14 VDD VSS 19.9961f
+C13 OUT VSS 2.39656f
+C14 VDD VSS 19.9597f
 C15 a_n1422_429# VSS 6.16706f ; **FLOATING
-C16 a_n1462_8060# VSS 2.21703f ; **FLOATING
+C16 a_n1512_8060# VSS 2.32181f ; **FLOATING
 .ends

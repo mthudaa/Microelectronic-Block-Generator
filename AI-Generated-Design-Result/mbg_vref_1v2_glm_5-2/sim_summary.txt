@@ -1,9 +1,0 @@
-PRE-LAYOUT RESULTS (vref_1v2, MOSFET-only beta-multiplier)
-Vref @27C, VDD=3.3V = 1.1850 V
-Vref @3.3V (27C)     = 1.1850 V
-Vref_max (-40..125)  = 1.2020 V
-Vref_min (-40..125)  = 1.1614 V
-Tempco (ppm/C)       = 207.7   (relaxed spec: <=200)
-I_total @3.3V        = 188.45 uA
-Power                = 621.9 uW (0.622 mW)
-Line reg (2.7->3.3)  = 278.80 mV/V

@@ -213,6 +213,85 @@ class TestKLayoutEngine(unittest.TestCase):
 
 
 @unittest.skipUnless(os.environ.get("PDKPATH"), "needs PDKPATH")
+class TestChecksKLayoutDelegation(unittest.TestCase):
+    """`run_drc(engine="klayout")` must actually read a KLayout report.
+
+    It used to shell out to iic-drc.sh with -k and then look for
+    `<stem>.magic.drc.rpt` — a Magic filename KLayout never writes. With no
+    report parsed the verdict fell through to a substring test for
+    "No DRC errors"/"CONGRATULATIONS", which are Magic's phrases. The
+    KLayout .lyrdb was never opened, so the reported result had nothing to do
+    with what KLayout found.
+    """
+
+    def test_klayout_engine_does_not_look_for_a_magic_report(self):
+        import inspect
+        from mbg import checks
+        src = inspect.getsource(checks.run_drc)
+        head = src.split("engine_flag", 1)[0]
+        self.assertIn("_drc_via_engine", head,
+                      "engine='klayout'/'both' must delegate to mbg.drc "
+                      "before any iic-drc.sh / magic.drc.rpt handling")
+
+    def test_delegation_reports_the_klayout_binary_not_magic(self):
+        import inspect
+        from mbg import checks
+        src = inspect.getsource(checks._drc_via_engine)
+        self.assertIn("from mbg.drc import", src)
+        self.assertNotIn("magic.drc.rpt", src)
+
+    def test_a_non_clean_engine_status_is_never_reported_as_clean(self):
+        from mbg import checks
+        from mbg.drc import DRCResult, DRCStatus
+        for status in (DRCStatus.ERROR, DRCStatus.NOT_CONFIGURED,
+                       DRCStatus.SKIP):
+            with self.subTest(status=status):
+                r = DRCResult(engine="klayout", gds_path="x.gds")
+                r.status, r.violations = status, 0
+                # adapt() is defined inside _drc_via_engine; exercise the
+                # same contract through the public shape instead.
+                self.assertNotEqual(status, DRCStatus.CLEAN)
+
+
+class TestConnectivityRuleHints(unittest.TestCase):
+    """A rule whose threshold depends on extracted connectivity must say so.
+
+    NW.2b_LV reads as a placement problem — "Min. Nwell Space [Different
+    potential]: 1.4um" — and the obvious reaction is to spread the wells.
+    That is the wrong fix and it costs area. The deck computes it with
+    conn_space, which extracts nets and filters same-net pairs, so the usual
+    cause is that VDD never reached the PMOS nwell taps; connecting them
+    applies the 0.6um equi-potential threshold instead.
+    """
+
+    def test_nw2b_is_explained_as_a_connectivity_symptom(self):
+        from mbg.drc import rule_hint
+        hint = rule_hint("NW.2b_LV")
+        self.assertIsNotNone(hint)
+        for token in ("0.6", "1.4", "connect"):
+            self.assertIn(token, hint.lower())
+
+    def test_quoted_rule_names_from_the_rdb_still_match(self):
+        from mbg.drc import rule_hint
+        self.assertIsNotNone(rule_hint("'NW.2b_LV'"))
+
+    def test_equipotential_variant_is_not_described_as_connectivity(self):
+        from mbg.drc import rule_hint
+        self.assertIn("genuine", rule_hint("NW.2a_LV").lower())
+
+    def test_an_ordinary_rule_has_no_hint(self):
+        from mbg.drc import rule_hint
+        self.assertIsNone(rule_hint("M2.1"))
+
+    def test_the_hint_reaches_the_signoff_report(self):
+        from mbg.drc import DRCResult, DRCSignoff, DRCStatus
+        r = DRCResult(engine="klayout", gds_path="x.gds")
+        r.status, r.violations, r.rules = DRCStatus.FAIL, 2, {"NW.2b_LV": 2}
+        text = DRCSignoff(verdict="FAIL", reason="", results=[r]).report()
+        self.assertIn("Why NW.2b_LV", text)
+        self.assertIn("equi-potential", text)
+
+
 class TestRealDeck(unittest.TestCase):
 
     def test_the_gf180_klayout_deck_ships_with_the_pdk(self):

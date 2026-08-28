@@ -394,6 +394,159 @@ See [`tests/notebooks/`](tests/notebooks/) for the end-to-end notebooks
 (`spice_to_gds.ipynb`, `llm_to_gds.ipynb`) and [`tests/`](tests/) for the
 regression suites that exercise the full design flow.
 
+### MBG-D08 — the frozen integrated top level
+
+The Chipathon review of 2026-08-28 ([issue #20](https://github.com/sscs-ose/sscs-chipathon-2026/issues/20#issuecomment-5447570437))
+asked for one thing above all: the tapeout package was still *block-level*, and
+needed to become a single integrated top level with a complete `info.yaml`,
+valid configuration files, and DRC/LVS run **on the exact layout intended for
+submission**. `mbg-toplevel/` is that package.
+
+`mbg-d08` integrates ten generated blocks behind fourteen ESD pad cells:
+
+| Block | Candidates | Interface |
+| :--- | :--- | :--- |
+| 5T-OTA | deepseek · gpt-5.6-luna · ox_alpha | `VDD VSS INP INN OUT IBIAS` |
+| StrongArm comparator | deepseek · gpt-5.6-luna · ox_alpha | `VDD VSS INP INN CLK OUTP OUTN` |
+| 1.2 V reference | deepseek · gpt-5.6-luna · ox_alpha | `VDD VSS VREF IBIAS` |
+| Temperature sensor | claude-opus-5 | `VDD VSS TEMP_OUT` |
+| ESD pad (`io_secondary_3p3`) | Chipathon 2025 pad cell | `VDD TO_GATE ASIG3V3 VSS` ×14 |
+
+94 devices, 60 nets, GF180MCU-D, 3.3 V single supply.
+
+**The interfaces the review flagged are now documented explicitly.** The
+comparator really does take a `CLK` and produce differential `OUTP`/`OUTN`
+(`OUTP` is bonded out, `OUTN` stays internal), and the reference really does
+consume `IBIAS`. All sixteen top-level pins — direction and function — are
+described in [`info.yaml`](info.yaml), and the sixteen GDS labels correspond
+one-to-one with the sixteen SPICE pins.
+
+The top-level port order is the one `mbg-d08_pre_sim.spice` declares, and
+`temp_out` sits at position **7** — directly after `IBIAS`, *before* the nine
+block outputs, not at the end:
+
+```text
+1  vdd        5  inn        9  gpt_ota       13  oxa_cmp
+2  vss        6  ibias     10  oxa_ota       14  deepseek_vref
+3  clk        7  temp_out  11  deepseek_cmp  15  gpt_vref
+4  inp        8  deepseek_ota  12  gpt_cmp   16  oxa_vref
+```
+
+The die measures **501.50 × 1090.90 µm (0.547 mm²)** with fourteen
+`io_secondary_3p3` pad cells. Two departures from the pad rule set in the first
+review round — four shared input pads, and no power pad cells — are tabulated
+in [Chip Size & Pin List](#-chip-size--pin-list-per-judge-request--issue-20).
+
+#### One name, both views
+
+The GDS top cell and the SPICE top subcircuit are now both `mbg-d08`, so
+`TOP_SOURCE` and `TOP_LAYOUT` are the same string in
+[`lvs_config_mbg_d08.json`](lvs_config_mbg_d08.json).
+
+One caveat is worth recording, because it is silent rather than loud:
+**KLayout's SPICE reader truncates `mbg-d08` to `MBG`** — it treats `-` as a
+delimiter and upper-cases what it keeps. It does not warn; LVS simply fails to
+find a schematic counterpart for the top cell. `mbg-d08_lvs.spice`, which
+exists only to feed the KLayout deck, therefore keeps the underscore form
+`mbg_d08` and is bound to the layout with an explicit
+`same_circuits("mbg-d08", "mbg_d08")`. Magic, netgen and ngspice all handle the
+hyphen correctly, so `mbg-d08_pre_sim.spice` — the netlist named in the LVS
+config — carries the hyphenated name the review asked for.
+
+#### Verification of the submitted layout
+
+Everything below was re-run **on the host** against
+`mbg-toplevel/layout/mbg-d08.gds`, not inherited from an earlier report.
+
+| Check | Engine | Result |
+| :--- | :--- | :--- |
+| DRC | Magic 8.3.669 | **CLEAN** — 0 violations |
+| DRC | KLayout 0.30.9, GF180 deck | **CLEAN** — 0 violations, 728 rules over 168 decks |
+| Antenna | KLayout, 13 antenna decks | **CLEAN** — contact, metal1–5, metaltop, poly2, via1–5 |
+| ESD | KLayout `esd` deck | **CLEAN** |
+| Substrate / well | KLayout `dnwell`, `lvpwell`, `guard_ring` | **CLEAN** |
+| Current density | KLayout `cup` deck (CUP.2, CUP.3) | **CLEAN** |
+| Metal / poly density | KLayout `density` deck | **8 items — see below** |
+| LVS | netgen 1.5.322 — GDS vs `mbg-d08_pre_sim.spice` | **Circuits match uniquely**, 94/94 devices, 60/60 nets, no property errors |
+| LVS | KLayout — GDS vs `mbg-d08_lvs.spice` | **Netlists match** |
+
+The four ESD/antenna/substrate/current-density checks the review asked for are
+covered by the same 728-rule run, and are listed separately above only because
+the review named them.
+
+**The density result is not a pass, and is not reported as one.** The `density`
+deck flags eight *global die-coverage* minima that the block does not meet on
+its own:
+
+```
+DCF.1b  active (COMP + dummy COMP) >= 25%
+PL.8    poly2   >= 14%
+M1.4 M2.4 M3.4 M4.4 M5.4  metal1..metal5 > 30%
+MT.3    metaltop > 30%
+```
+
+Every one of these is a *whole-die* coverage rule satisfied by dummy fill at
+chip integration, not by a macro occupying part of the die — the rule text
+itself says "Customer needs to ensure enough dummy metal". They are recorded as
+`PARTIAL` in `info.yaml` rather than waved through, and they are the
+integrator's to close once the shuttle die is assembled.
+
+An earlier container-side run had also logged a KLayout exception in the
+optional `mslot` rule table (`undefined method sized for nil`) and continued
+past it, which made that run's "clean" conditional. On the host deck with
+KLayout 0.30.9 the `mslot` tables execute normally (MSLOT1.1–1.9 and siblings)
+and the log contains no exceptions, so that caveat is resolved rather than
+inherited.
+
+#### One netlist fix
+
+`spice/io_secondary_3p3.spice` described the pad's ESD series resistor as
+16 µm × 4 µm while the layout extracts 40 µm × 10 µm — a real geometric
+misdescription that netgen reported as a property error. Both are 0.25 squares,
+so the resistance and every simulation result are unchanged; the schematic now
+states the geometry the layout actually has, and LVS matches with no property
+errors at all.
+
+#### Submission files
+
+```text
+info.yaml                     project metadata, 16-pin plan, frozen block list,
+                              per-check verification status
+lvs_config_mbg_d08.json       TOP_SOURCE/TOP_LAYOUT = mbg-d08
+                              LVS_SPICE_FILES = mbg-toplevel/mbg-d08_pre_sim.spice
+                              LAYOUT_FILE     = mbg-toplevel/layout/mbg-d08.gds
+```
+
+`info.yaml` now lists `lvs_config_mbg_d08.json` alone. The three earlier
+block-level configs (`lvs_config_ota_5t.json`, `lvs_config_comparator_core.json`,
+`lvs_config_vref_1v2.json`) remain in the repository but are no longer listed
+for submission, since the review asked for the integrated top level in their
+place.
+
+#### Still open
+
+- **Density fill** — the eight global-coverage rules above, closed at die
+  integration.
+- **Shared input pads** — `inp`, `inn`, `ibias` and `clk` each feed several
+  blocks, as tabulated above. Intentional for a comparison array, but it does
+  not satisfy the dedicated-pad rule stated for the standalone blocks.
+- **Matched-device and sensitive-net constraints** — the review also asked the
+  generator to *demonstrate* that it recognises matched devices and sensitive
+  analog nets and constrains placement and routing accordingly, through
+  regenerated layouts rather than manual GDS edits. The placer does carry
+  matching groups, symmetry constraints and an n-well spacing floor, but
+  `mbg-d08` does not yet ship evidence of that per block. This is not claimed
+  as done.
+- **`$$$CONTEXT_INFO$$$`** — `mbg-d08.gds` carries a second top-level cell of
+  that name holding zero geometry (a KLayout PCell-context artifact). It is
+  inert for DRC and LVS but means the file has two top cells; worth stripping
+  before final submission so the top cell is unambiguous.
+- Pre- and post-layout ngspice results are cited from the team's runs in
+  [`mbg-toplevel/mbg-d08_report.md`](mbg-toplevel/mbg-d08_report.md) with their
+  logs and 35 MB transient datasets present; the DRC and LVS numbers above are
+  the ones re-run for this section.
+
+
 ---
 
 ## 🧩 Complex Subcircuit Support
@@ -1823,7 +1976,107 @@ find it.
 Performance characterisation (gain/GBW/phase margin over PVT, offset, TC) is
 separate from layout sign-off and is **not** covered by the table above.
 
-### 📏 Chip Size & Pin List (per judge request — [Issue #20](https://github.com/sscs-ose/sscs-chipathon-2026/issues/20#issuecomment-5138077347))
+### 📏 Chip Size & Pin List (per judge request — [Issue #20](https://github.com/sscs-ose/sscs-chipathon-2026/issues/20))
+
+**The submitted design is the integrated top level `mbg-d08`.** Every number
+below is measured from `mbg-toplevel/layout/mbg-d08.gds`, the exact file named
+in [`lvs_config_mbg_d08.json`](lvs_config_mbg_d08.json).
+
+| | Value |
+| :--- | ---: |
+| **Chip size** | **501.50 × 1090.90 µm** |
+| **Die area** | **547,086 µm² = 0.547 mm²** |
+| **Top-level pins** | **16** |
+| **Pad cells** | **14 × `io_secondary_3p3`** |
+| Core blocks | 10 (9 analog candidates + 1 temperature sensor) |
+| Devices / nets | 94 / 60 |
+
+Unlike the block-level estimate further down, this is a *real* pad-framed
+layout, not a core area plus an allowance — the 0.547 mm² includes the pads and
+the routing between them.
+
+#### Block inventory
+
+| GDS cell | Block | Candidate | Size (µm) | Area (µm²) |
+| :--- | :--- | :--- | :--- | ---: |
+| `ota` | 5T-OTA | deepseek | 27.08 × 38.72 | 1,049 |
+| `ota$1` | 5T-OTA | gpt-5.6-luna | 26.30 × 54.02 | 1,421 |
+| `ota$2` | 5T-OTA | ox_alpha | 50.80 × 55.04 | 2,796 |
+| `strongarm_comparator` | StrongArm comparator | deepseek | 49.52 × 40.76 | 2,018 |
+| `strongarm_comparator$3` | StrongArm comparator | gpt-5.6-luna | 60.74 × 53.30 | 3,237 |
+| `strongarm_comparator$2` | StrongArm comparator | ox_alpha | 42.88 × 49.94 | 2,141 |
+| `vref_1v2` | 1.2 V reference | deepseek | 31.42 × 30.56 | 960 |
+| `vref_1v2$1` | 1.2 V reference | gpt-5.6-luna | 31.44 × 35.66 | 1,121 |
+| `vref_1v2$2` | 1.2 V reference | ox_alpha | 32.74 × 35.66 | 1,168 |
+| `temp_sensor` | RO temperature sensor | claude-opus-5 | 88.28 × 156.02 | 13,773 |
+| **Core subtotal** | | | | **29,685** |
+| `io_secondary_3p3` | ESD pad cell ×14 | Chipathon 2025 | 121.56 × 85.35 | 10,375 each |
+| **Pad subtotal** | | | | **145,251** |
+
+#### Pin list — `mbg-d08`
+
+Order is the `.subckt mbg-d08` port order; `temp_out` is pin 7, before the nine
+block outputs.
+
+| # | Pin | Dir | Function | Pad |
+| ---: | :--- | :--- | :--- | :--- |
+| 1 | `vdd` | PWR | 3.3 V rail, all blocks and all 14 pad cells | *none — see below* |
+| 2 | `vss` | GND | Ground rail, all blocks and all 14 pad cells | *none — see below* |
+| 3 | `clk` | IN | Comparator sampling clock → `clk_core` | `io_secondary_3p3` |
+| 4 | `inp` | IN | Differential input + → `inp_core` | `io_secondary_3p3` |
+| 5 | `inn` | IN | Differential input − → `inn_core` | `io_secondary_3p3` |
+| 6 | `ibias` | IN | Bias current → `ibias_core` | `io_secondary_3p3` |
+| 7 | `temp_out` | OUT | Temperature-sensor relaxation output | `io_secondary_3p3` |
+| 8 | `deepseek_ota` | OUT | OTA output, deepseek | `io_secondary_3p3` |
+| 9 | `gpt_ota` | OUT | OTA output, gpt-5.6-luna | `io_secondary_3p3` |
+| 10 | `oxa_ota` | OUT | OTA output, ox_alpha | `io_secondary_3p3` |
+| 11 | `deepseek_cmp` | OUT | Comparator `OUTP`, deepseek (`OUTN` internal) | `io_secondary_3p3` |
+| 12 | `gpt_cmp` | OUT | Comparator `OUTP`, gpt-5.6-luna (`OUTN` internal) | `io_secondary_3p3` |
+| 13 | `oxa_cmp` | OUT | Comparator `OUTP`, ox_alpha (`OUTN` internal) | `io_secondary_3p3` |
+| 14 | `deepseek_vref` | OUT | 1.2 V reference, deepseek | `io_secondary_3p3` |
+| 15 | `gpt_vref` | OUT | 1.2 V reference, gpt-5.6-luna | `io_secondary_3p3` |
+| 16 | `oxa_vref` | OUT | 1.2 V reference, ox_alpha | `io_secondary_3p3` |
+| | **Total** | | **16 pins** | **14 pads** |
+
+Block interfaces are `VDD VSS INP INN OUT IBIAS` (OTA),
+`VDD VSS INP INN CLK OUTP OUTN` (comparator), `VDD VSS VREF IBIAS` (reference)
+and `VDD VSS TEMP_OUT` (sensor) — the `CLK`, differential-output and `IBIAS`
+pins the review asked to see stated.
+
+#### Two gaps against the stated pad rule
+
+The first review round set the rule quoted below: *no shared signal I/O pads
+across designs; only VDD and VSS may share.* `mbg-d08` departs from it twice,
+and both are stated here rather than left for a reviewer to find.
+
+**1 — Four input pads are shared.** Deliberate, so the nine candidates see
+identical stimulus:
+
+| Pad | Core net | Shared by |
+| :--- | :--- | :--- |
+| `inp` | `inp_core` | 3 OTAs + 3 comparators |
+| `inn` | `inn_core` | 3 OTAs + 3 comparators |
+| `ibias` | `ibias_core` | 3 OTAs + 3 VREFs |
+| `clk` | `clk_core` | 3 comparators |
+
+All ten outputs keep a dedicated pad. Enforcing the rule on the input side
+would add ten pads and require a re-run — a floorplan change, not a netlist
+edit.
+
+**2 — There are no power pad cells.** `vdd` and `vss` are top-level labels and
+rails feeding all fourteen `io_secondary_3p3` cells, but the GDS contains no
+`gf180mcu_fd_io__vdd` / `__vss` instance. They must be added at padframe
+integration; the layout as submitted is not bondable on its own.
+
+<details>
+<summary><b>Superseded: standalone block-level pin list (first review round)</b></summary>
+
+These three standalone blocks under
+[`AI-Generated-Design-Result/`](AI-Generated-Design-Result/) were the earlier
+submission and are **no longer the tapeout package** — the review asked for the
+integrated top level in their place. They are a different, earlier set from the
+candidates inside `mbg-d08`, with different interfaces, and are kept here only
+so the first-round numbers remain checkable.
 
 | Design | Pins | Count | Chip Size (µm) | Area (µm²) |
 | :--- | :--- | ---: | :--- | ---: |
@@ -1832,7 +2085,10 @@ separate from layout sign-off and is **not** covered by the table above.
 | **VREF 1.2V** | `vdd` `vss` `vref` | 3 | 46 × 54 | 2,484 |
 | **TOTAL** | — | **15** | — | **6,719** |
 
-#### Pin Assignments
+Pin lists are the `.subckt` interfaces of the netlists named in the three
+block-level `lvs_config_*.json` files; sizes are GDS bounding boxes rounded
+down. Measured exactly: 35.36 × 23.09, 35.11 × 98.09 and 46.36 × 54.09 µm —
+6,768 µm² against the 6,719 µm² of the rounded figures.
 
 > **⚠️ No shared signal I/O pads across designs.** Each pin gets its own
 > dedicated `gf180mcu_fd_io__asign` pad. Only VDD and VSS may share pads
@@ -1853,8 +2109,6 @@ separate from layout sign-off and is **not** covered by the table above.
 | `vref_out` | OUT | — | — | ✅ | `gf180mcu_fd_io__asign` |
 | **Subtotal** | | **6** | **6** | **3** | **9×asign + 1×vdd + 1×vss** |
 
-#### Total Area Estimation
-
 | Metric | Value |
 | :--- | ---: |
 | **Core area (3 designs)** | 6,719 µm² (0.0067 mm²) |
@@ -1862,10 +2116,10 @@ separate from layout sign-off and is **not** covered by the table above.
 | **Est. with I/O pads** (~200×200 µm each) | ~0.09 mm² (11 pads) |
 | **Est. with I/O pads + seal ring + scribe** | ~0.20 mm² |
 
-Core dimensions are extracted from GDS bounding boxes reported by the pipeline.
-I/O pad area is an estimate based on typical GF180MCU I/O cell dimensions
-(~200 × 200 µm per pad). Actual tapeout area depends on pad frame arrangement
-and seal ring.
+Those last two rows were *estimates*. The integrated `mbg-d08` above supersedes
+them with a measured 0.547 mm².
+
+</details>
 
 ---
 

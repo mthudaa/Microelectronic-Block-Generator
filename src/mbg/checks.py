@@ -529,6 +529,67 @@ def permute_mosfet_sd(spice_content, models=None, swap_params=True):
 
 # ── DRC ──────────────────────────────────────────────────────────────
 
+def _drc_via_engine(gds_path, cell_name, engine, workdir, timeout):
+    """Run KLayout (or both engines) through mbg.drc and adapt the result.
+
+    Returns run_drc()'s dict shape so callers do not have to care which
+    implementation answered. A verdict is only ever CLEAN when a report was
+    actually parsed; NOT_CONFIGURED and ERROR stay distinct from FAIL,
+    because "the checker did not run" is not "the layout is clean".
+    """
+    from mbg.drc import DRCStatus, SignoffVerdict, get_engine, run_dual_drc
+
+    workdir = os.path.abspath(workdir) if workdir else os.getcwd()
+    os.makedirs(workdir, exist_ok=True)
+
+    def adapt(res, summary=None):
+        clean = res.status == DRCStatus.CLEAN
+        status = {DRCStatus.CLEAN: PASS, DRCStatus.FAIL: FAIL}.get(
+            res.status, ERROR)
+        return {
+            "clean": clean,
+            "status": status,
+            "stage": "drc",
+            "report_path": res.report_path,
+            "error_count": res.violations if res.status in (
+                DRCStatus.CLEAN, DRCStatus.FAIL) else -1,
+            "rules_violated": sorted(res.rules or {}),
+            "rule_counts": dict(res.rules or {}),
+            "layout_load_errors": ([res.message]
+                                   if res.status == DRCStatus.ERROR and res.message
+                                   else []),
+            "log": res.message or "",
+            "log_path": res.log_path,
+            "tool": res.tool,
+            "engine": res.engine,
+            "summary": summary or f"DRC: {res.summary()}",
+        }
+
+    if engine == "klayout":
+        res = get_engine("klayout").run(gds_path, cell_name=cell_name,
+                                        workdir=workdir, timeout=timeout)
+        return adapt(res)
+
+    signoff = run_dual_drc(gds_path, cell_name=cell_name, workdir=workdir,
+                           verbosity=0)
+    primary = signoff.get("klayout") or (signoff.results[0]
+                                         if signoff.results else None)
+    if primary is None:
+        return {"clean": False, "status": ERROR, "stage": "drc",
+                "report_path": None, "error_count": -1, "rules_violated": [],
+                "layout_load_errors": ["no DRC engine produced a result"],
+                "log": signoff.reason, "log_path": None, "tool": "",
+                "engine": "both",
+                "summary": "DRC: NO ENGINE AVAILABLE"}
+    out = adapt(primary, summary=f"DRC: {signoff.verdict} — {signoff.reason}")
+    # On "both", the reconciled verdict decides, not either engine alone.
+    out["clean"] = signoff.verdict == SignoffVerdict.PASS
+    out["status"] = PASS if out["clean"] else FAIL
+    out["engine"] = "both"
+    out["signoff"] = signoff.as_dict()
+    return out
+
+
 def run_drc(gds_path, cell_name=None, engine="magic", workdir=None,
             clean=False, timeout=600):
     """Run Design Rule Check via iic-drc.sh.
@@ -554,15 +615,29 @@ def run_drc(gds_path, cell_name=None, engine="magic", workdir=None,
         raise ValueError(f"GDS is empty: {gds_path}")
     cell = cell_name or os.path.splitext(os.path.basename(gds_path))[0]
 
-    engine_flag = {"magic": "-m", "klayout": "-k", "both": "-b"}.get(engine, "-m")
     if engine in ("klayout", "both"):
-        kl = _config.resolve_klayout()
-        if not kl.ok:
-            return {"clean": False, "status": ERROR, "stage": "drc",
-                    "report_path": None, "error_count": -1,
-                    "rules_violated": [], "layout_load_errors": [],
-                    "log": kl.reason,
-                    "summary": f"DRC: KLAYOUT NOT AVAILABLE (engine={engine})"}
+        # Delegate to mbg.drc, which is the real KLayout implementation.
+        #
+        # This used to shell out to iic-drc.sh with -k/-b, and every part of
+        # that path was broken:
+        #   * the script finds KLayout with `command -v klayout`, ignoring
+        #     $MBG_KLAYOUT -- and the project pins KLayout by absolute path
+        #     precisely because distributions ship no `klayout` package;
+        #   * it reads the deck from libs.tech/klayout/drc/<pdk>_mr.drc,
+        #     which this PDK does not contain (the deck is under
+        #     libs.tech/klayout/tech/drc/gf180mcu.drc);
+        #   * it writes <cell>.klayout.drc.{feol,beol,density}.xml, while
+        #     this function only ever looked for <stem>.magic.drc.rpt, so a
+        #     KLayout report was never read even when one existed;
+        #   * with no report parsed, the verdict fell through to a log
+        #     substring test for "No DRC errors"/"CONGRATULATIONS" -- Magic's
+        #     phrases. On engine="both" a Magic-clean run could therefore
+        #     report DRC: CLEAN while KLayout had failed or found violations.
+        # mbg.drc.KLayoutDRC does it correctly: it honours the resolved
+        # binary, uses the shipped deck, and reads the .lyrdb it produces.
+        return _drc_via_engine(gds_path, cell, engine, workdir, timeout)
+
+    engine_flag = "-m"
     cmd = ["bash", IIC_DRC, engine_flag]
     if clean: cmd += ["-c"]
     if workdir: cmd += ["-w", os.path.abspath(workdir)]

@@ -1,0 +1,12 @@
+.subckt gpt-5.6-luna_oscillator VDD VSS OSC_OUT
+XM1p n1 OSC_OUT VDD VDD pfet_03v3 L=2.5u W=4u nf=1
+XM1n n1 OSC_OUT VSS VSS nfet_03v3 L=2.5u W=2u nf=1
+XM2p n2 n1 VDD VDD pfet_03v3 L=2.5u W=4u nf=1
+XM2n n2 n1 VSS VSS nfet_03v3 L=2.5u W=2u nf=1
+XM3p n3 n2 VDD VDD pfet_03v3 L=2.5u W=4u nf=1
+XM3n n3 n2 VSS VSS nfet_03v3 L=2.5u W=2u nf=1
+XM4p n4 n3 VDD VDD pfet_03v3 L=2.5u W=4u nf=1
+XM4n n4 n3 VSS VSS nfet_03v3 L=2.5u W=2u nf=1
+XM5p OSC_OUT n4 VDD VDD pfet_03v3 L=2.5u W=4u nf=1
+XM5n OSC_OUT n4 VSS VSS nfet_03v3 L=2.5u W=2u nf=1
+.ends gpt-5.6-luna_oscillator

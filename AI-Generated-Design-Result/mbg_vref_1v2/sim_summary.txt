@@ -1,7 +1,0 @@
-Vref_27C = 1.2272 V
-Vref_max = 1.2322 V
-Vref_min = 1.2200 V
-Tempco = 60 ppm/C
-I_total = 114.0 uA
-Power = 376.2 uW
-Line_reg = 304.17 mV/V

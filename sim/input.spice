@@ -1,0 +1,22 @@
+.include '/home/huda/.volare/gf180mcuD/libs.tech/ngspice/design.ngspice'
+.lib '/home/huda/.volare/gf180mcuD/libs.tech/ngspice/sm141064.ngspice' typical
+
+* Inverter.
+*
+* Smallest possible CMOS block: one PMOS, one NMOS.
+* complexity: 2 MOS, 4 nets, max net degree 7
+.subckt inverter vdd vss in out
+XM1p out in vdd vdd pfet_03v3 L=1u W=4u nf=1
+XM1n out in vss vss nfet_03v3 L=1u W=2u nf=1
+.ends
+
+Vsupply0 vdd 0 3.3
+Vsupply1 vss 0 0.0
+Vsrc0 in 0 DC 0
+Xdut vdd vss in out inverter
+
+.control
+dc Vsrc0 0 3.3 0.02
+wrdata dc.dat v(vdd) v(vss) v(in) v(out)
+.endc
+.end

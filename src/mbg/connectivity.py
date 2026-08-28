@@ -346,6 +346,31 @@ def verify(ctx, stage: str = "routing", spacing: bool = True,
     return result
 
 
+def _is_substrate_terminal(ctx, dev, term: str, net: str) -> bool:
+    """True for a native passive's bulk pin, which the substrate itself makes.
+
+    ``ppolyf_u`` extracts with three terminals — the two resistor ends plus the
+    p-substrate it sits in — so a schematic that declares only two makes netgen
+    invent a proxy net and the LVS fails on net count.  Declaring the third
+    terminal on ground fixes the LVS, but ``mbg.passives.poly_resistor`` builds
+    no substrate contact and has no port for one: the connection is formed by
+    the p-substrate under the device, held at ground by the substrate taps of
+    its neighbours, which is exactly how Magic extracts it.
+
+    Demanding a routed access point for that pin would therefore report a
+    missing connection that no router could ever satisfy.  This is narrow on
+    purpose: only the bulk of a ``res``/``cap`` primitive, and only when it
+    sits on the ground net.  A passive whose bulk is on any other net needs an
+    isolating well and a real contact, and is still reported.
+    """
+    if term != "body" or getattr(dev, "kind", None) not in ("res", "cap"):
+        return False
+    n = ctx.nets.get(net)
+    if n is not None and getattr(n, "is_ground", False):
+        return True
+    return str(net).strip().lower() in ("vss", "gnd", "0", "vssa")
+
+
 def compare_with_netlist(ctx) -> Dict[str, object]:
     """Expected (SPICE) vs physical connectivity, terminal by terminal.
 
@@ -356,6 +381,8 @@ def compare_with_netlist(ctx) -> Dict[str, object]:
     for dev in ctx.devices.values():
         for term, net in dev.terminals.items():
             if not net:
+                continue
+            if _is_substrate_terminal(ctx, dev, term, net):
                 continue
             aps = [a for a in ctx.net_to_access.get(net, [])
                    if a.instance == dev.name and a.terminal == term]

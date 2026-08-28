@@ -1,0 +1,881 @@
+{
+  "status": "SUCCESS",
+  "tapeout_ready": true,
+  "message": "all sign-off conditions met",
+  "elapsed": 137.409,
+  "request": {
+    "raw": "Design a **self-starting relaxation-oscillator-based temperature sensor** using the Microelectronic-Block-Generator framework with the **GF180MCU `gf180mcuD` PDK**.\n\nFollow the existing MBG SKILL for the complete workflow.\n\n## Result Directory\n\nStore all results in:\n\n```text\nresults/{model_name}_temp_sensor\n```\n\nExamples: `deepseek_temp_sensor`, `ox_alpha_temp_sensor`, `chatgpt_temp_sensor`.\n\n## Ports\n\nUse exactly:\n\n```text\nVDD VSS TEMP_OUT\n```\n\nTop-level:\n\n```spice\n.subckt temp_sensor VDD VSS TEMP_OUT\n```\n\nDo not add CLK, START, ENABLE, RESET, IBIAS, VBIAS, or TRIM.\n\nThe sensor must self-bias and self-start from normal power-up \u2014 no external reference current, no forced initial condition, no calibration input.\n\n## Technology\n\n```text\nPDK : gf180mcuD\nVDD : 3.3 V\nVSS : 0 V\n```\n\nUse MOSFET devices supported by GF180MCU (`nfet_03v3` / `pfet_03v3`). Native passives (`ppolyf_u` resistor, metal4/metal5 MIM cap, or MOS cap) are expected for the timing element and/or bias generator \u2014 this is a required stress point for the framework's native-passive support, not optional.\n\n## Nominal Conditions\n\n```text\nVDD  = 3.3 V\nTEMP = 27 \u00b0C\n```\n\n## Specifications\n\n| Parameter | Target |\n|---|---:|\n| Autonomous startup | Required (no external pulse or forced IC) |\n| Nominal frequency @ 27 \u00b0C | 100 kHz \u2013 2 MHz |\n| Frequency vs. temperature | Strictly monotonic, -40 \u00b0C to 125 \u00b0C |\n| Temperature sensitivity | 2000-6000 ppm/\u00b0C (uncalibrated, single-point) |\n| Startup time | < 10 \u00b5s |\n| Duty cycle | 40-60% |\n| TEMP_OUT high | > 2.97 V |\n| TEMP_OUT low | < 0.33 V |\n| Average supply current | < 200 \u00b5A |\n| Sustained oscillation | >= 100 cycles at every corner |\n\nThe final acceptance simulation must not depend on an external startup pulse or forced internal initial condition. The design report must include the measured **F(T) curve** \u2014 frequency at every characterized temperature point, per corner \u2014 not just a pass/fail at nominal.\n\n## PVT\n\nCharacterize at:\n\n```text\nVDD  = 3.0, 3.3, 3.6 V\nTEMP = -40, -15, 10, 27, 50, 75, 100, 125 \u00b0C\n```\n\nand meaningful available process corners. Report monotonicity and sensitivity (ppm/\u00b0C) at each VDD, not only at 3.3 V.\n\n## Preferred Topology\n\nA relaxation oscillator built from:\n\n1. A PTAT/CTAT (or beta-multiplier-style) bias generator setting a temperature-dependent charge/discharge current \u2014 no external `IBIAS`/`VBIAS` pin; the reference is internal.\n2. A native-passive RC (or MOS-cap) timing core charged/discharged by that current through switch devices.\n3. A hysteresis comparator (Schmitt-trigger style) sensing the timing-cap voltage.\n4. A cross-coupled latch / inverter buffer closing the feedback loop and driving `TEMP_OUT` rail-to-rail.\n\nIndependently choose stage sizing, comparator threshold spacing, and bias-generator topology. Keep the design flat (single `.subckt` \u2014 MBG does not flatten nested subcircuits). Prefer the simplest topology that remains self-starting and monotonic after PEX; do not over-optimize frequency stability at the expense of temperature sensitivity \u2014 unlike a clock-reference oscillator, drift-with-temperature here is the signal, not the error.\n",
+    "cell": "temp_sensor",
+    "topology": "comparator",
+    "pdk": "gf180mcuD",
+    "vdd": 3.3,
+    "load_f": null,
+    "specs": [
+      {
+        "name": "freq_hz",
+        "op": ">=",
+        "target": 100000.0,
+        "unit": " Hz"
+      },
+      {
+        "name": "freq_hz",
+        "op": "<=",
+        "target": 2000000.0,
+        "unit": " Hz"
+      },
+      {
+        "name": "tc_ppm_per_c",
+        "op": ">=",
+        "target": 2000.0,
+        "unit": " ppm/C"
+      },
+      {
+        "name": "tc_ppm_per_c",
+        "op": "<=",
+        "target": 6000.0,
+        "unit": " ppm/C"
+      },
+      {
+        "name": "f_monotonic",
+        "op": ">=",
+        "target": 1.0,
+        "unit": ""
+      },
+      {
+        "name": "startup_time_s",
+        "op": "<=",
+        "target": 1e-05,
+        "unit": " s"
+      },
+      {
+        "name": "duty_min_pct",
+        "op": ">=",
+        "target": 40.0,
+        "unit": " %"
+      },
+      {
+        "name": "duty_max_pct",
+        "op": "<=",
+        "target": 60.0,
+        "unit": " %"
+      },
+      {
+        "name": "volt_high_v",
+        "op": ">=",
+        "target": 2.97,
+        "unit": " V"
+      },
+      {
+        "name": "volt_low_v",
+        "op": "<=",
+        "target": 0.33,
+        "unit": " V"
+      },
+      {
+        "name": "i_avg_a",
+        "op": "<=",
+        "target": 0.0002,
+        "unit": " A"
+      },
+      {
+        "name": "cycles_sustained",
+        "op": ">=",
+        "target": 100.0,
+        "unit": ""
+      }
+    ],
+    "provenance": {
+      "given": [
+        "vdd",
+        "freq_hz",
+        "tc_ppm_per_c",
+        "f_monotonic",
+        "startup_time_s",
+        "duty_min_pct",
+        "duty_max_pct",
+        "volt_high_v",
+        "volt_low_v",
+        "i_avg_a",
+        "cycles_sustained"
+      ],
+      "defaulted": [],
+      "inferred": [
+        "topology=comparator"
+      ],
+      "missing": [
+        "load capacitance"
+      ]
+    }
+  },
+  "flow": {
+    "cell": "temp_sensor",
+    "status": "PASS",
+    "stage": "COMPLETE",
+    "failure": "NONE",
+    "message": "final design meets PEX-aware specifications",
+    "elapsed": 137.402,
+    "pre_layout": [
+      {
+        "phase": "pre_layout",
+        "iteration": 1,
+        "spec_pass": true,
+        "score": 0.0,
+        "status": "PASS",
+        "failure": "NONE",
+        "message": "",
+        "metrics": {
+          "source": "pre_layout",
+          "pass": true,
+          "score": 0.0,
+          "metrics": {
+            "freq_hz": {
+              "value": 1081670.215291634,
+              "target": 2000000.0,
+              "op": "<=",
+              "unit": " Hz",
+              "status": "PASS",
+              "margin": 918329.784708366,
+              "margin_pct": 45.916
+            },
+            "tc_ppm_per_c": {
+              "value": 3949.8561611699565,
+              "target": 6000.0,
+              "op": "<=",
+              "unit": " ppm/C",
+              "status": "PASS",
+              "margin": 2050.1438388300435,
+              "margin_pct": 34.169
+            },
+            "f_monotonic": {
+              "value": 1.0,
+              "target": 1.0,
+              "op": ">=",
+              "unit": "",
+              "status": "PASS",
+              "margin": 0.0,
+              "margin_pct": 0.0
+            },
+            "startup_time_s": {
+              "value": 1.416172505938858e-06,
+              "target": 1e-05,
+              "op": "<=",
+              "unit": " s",
+              "status": "PASS",
+              "margin": 8.583827494061143e-06,
+              "margin_pct": 85.838
+            },
+            "duty_min_pct": {
+              "value": 45.52619375310963,
+              "target": 40.0,
+              "op": ">=",
+              "unit": " %",
+              "status": "PASS",
+              "margin": 5.526193753109631,
+              "margin_pct": 13.815
+            },
+            "duty_max_pct": {
+              "value": 48.53928341860581,
+              "target": 60.0,
+              "op": "<=",
+              "unit": " %",
+              "status": "PASS",
+              "margin": 11.460716581394188,
+              "margin_pct": 19.101
+            },
+            "volt_high_v": {
+              "value": 3.30105745,
+              "target": 2.97,
+              "op": ">=",
+              "unit": " V",
+              "status": "PASS",
+              "margin": 0.33105744999999986,
+              "margin_pct": 11.147
+            },
+            "volt_low_v": {
+              "value": -0.00135438029,
+              "target": 0.33,
+              "op": "<=",
+              "unit": " V",
+              "status": "PASS",
+              "margin": 0.33135438029000003,
+              "margin_pct": 100.41
+            },
+            "i_avg_a": {
+              "value": 5.5938920695669503e-05,
+              "target": 0.0002,
+              "op": "<=",
+              "unit": " A",
+              "status": "PASS",
+              "margin": 0.0001440610793043305,
+              "margin_pct": 72.031
+            },
+            "cycles_sustained": {
+              "value": 117.0,
+              "target": 100.0,
+              "op": ">=",
+              "unit": "",
+              "status": "PASS",
+              "margin": 17.0,
+              "margin_pct": 17.0
+            }
+          }
+        },
+        "degradation": [],
+        "elapsed": 36.72
+      }
+    ],
+    "pex": [
+      {
+        "phase": "pex",
+        "iteration": 1,
+        "spec_pass": true,
+        "score": 0.0,
+        "status": "PASS",
+        "drc": "PASS",
+        "lvs": "PASS",
+        "pex_extraction": "PASS",
+        "pex_simulation": "PASS",
+        "failure": "NONE",
+        "message": "",
+        "metrics": {
+          "source": "pex",
+          "pass": true,
+          "score": 0.0,
+          "metrics": {
+            "freq_hz": {
+              "value": 1030760.5513756636,
+              "target": 2000000.0,
+              "op": "<=",
+              "unit": " Hz",
+              "status": "PASS",
+              "margin": 969239.4486243364,
+              "margin_pct": 48.462
+            },
+            "tc_ppm_per_c": {
+              "value": 3868.0609221410423,
+              "target": 6000.0,
+              "op": "<=",
+              "unit": " ppm/C",
+              "status": "PASS",
+              "margin": 2131.9390778589577,
+              "margin_pct": 35.532
+            },
+            "f_monotonic": {
+              "value": 1.0,
+              "target": 1.0,
+              "op": ">=",
+              "unit": "",
+              "status": "PASS",
+              "margin": 0.0,
+              "margin_pct": 0.0
+            },
+            "startup_time_s": {
+              "value": 1.4390675789862827e-06,
+              "target": 1e-05,
+              "op": "<=",
+              "unit": " s",
+              "status": "PASS",
+              "margin": 8.560932421013719e-06,
+              "margin_pct": 85.609
+            },
+            "duty_min_pct": {
+              "value": 45.49702584309337,
+              "target": 40.0,
+              "op": ">=",
+              "unit": " %",
+              "status": "PASS",
+              "margin": 5.497025843093368,
+              "margin_pct": 13.743
+            },
+            "duty_max_pct": {
+              "value": 48.68080027024098,
+              "target": 60.0,
+              "op": "<=",
+              "unit": " %",
+              "status": "PASS",
+              "margin": 11.31919972975902,
+              "margin_pct": 18.865
+            },
+            "volt_high_v": {
+              "value": 3.30089203,
+              "target": 2.97,
+              "op": ">=",
+              "unit": " V",
+              "status": "PASS",
+              "margin": 0.3308920299999998,
+              "margin_pct": 11.141
+            },
+            "volt_low_v": {
+              "value": -0.00115470943,
+              "target": 0.33,
+              "op": "<=",
+              "unit": " V",
+              "status": "PASS",
+              "margin": 0.33115470943,
+              "margin_pct": 100.35
+            },
+            "i_avg_a": {
+              "value": 5.628043564112751e-05,
+              "target": 0.0002,
+              "op": "<=",
+              "unit": " A",
+              "status": "PASS",
+              "margin": 0.0001437195643588725,
+              "margin_pct": 71.86
+            },
+            "cycles_sustained": {
+              "value": 117.0,
+              "target": 100.0,
+              "op": ">=",
+              "unit": "",
+              "status": "PASS",
+              "margin": 17.0,
+              "margin_pct": 17.0
+            }
+          }
+        },
+        "degradation": [
+          {
+            "name": "volt_low_v",
+            "pre": -0.00135438029,
+            "post": -0.00115470943,
+            "unit": " V",
+            "delta": 0.00019967085999999992,
+            "delta_pct": 14.743,
+            "status": "PASS",
+            "worsened": true
+          },
+          {
+            "name": "startup_time_s",
+            "pre": 1.416172505938858e-06,
+            "post": 1.4390675789862827e-06,
+            "unit": " s",
+            "delta": 2.2895073047424575e-08,
+            "delta_pct": 1.617,
+            "status": "PASS",
+            "worsened": true
+          },
+          {
+            "name": "i_avg_a",
+            "pre": 5.5938920695669503e-05,
+            "post": 5.628043564112751e-05,
+            "unit": " A",
+            "delta": 3.41514945458008e-07,
+            "delta_pct": 0.611,
+            "status": "PASS",
+            "worsened": true
+          },
+          {
+            "name": "duty_max_pct",
+            "pre": 48.53928341860581,
+            "post": 48.68080027024098,
+            "unit": " %",
+            "delta": 0.14151685163516703,
+            "delta_pct": 0.292,
+            "status": "PASS",
+            "worsened": true
+          },
+          {
+            "name": "duty_min_pct",
+            "pre": 45.52619375310963,
+            "post": 45.49702584309337,
+            "unit": " %",
+            "delta": -0.02916791001626251,
+            "delta_pct": -0.064,
+            "status": "PASS",
+            "worsened": true
+          },
+          {
+            "name": "volt_high_v",
+            "pre": 3.30105745,
+            "post": 3.30089203,
+            "unit": " V",
+            "delta": -0.00016542000000008272,
+            "delta_pct": -0.005,
+            "status": "PASS",
+            "worsened": true
+          },
+          {
+            "name": "freq_hz",
+            "pre": 1081670.215291634,
+            "post": 1030760.5513756636,
+            "unit": " Hz",
+            "delta": -50909.66391597036,
+            "delta_pct": -4.707,
+            "status": "PASS",
+            "worsened": false
+          },
+          {
+            "name": "freq_hz",
+            "pre": 1081670.215291634,
+            "post": 1030760.5513756636,
+            "unit": " Hz",
+            "delta": -50909.66391597036,
+            "delta_pct": -4.707,
+            "status": "PASS",
+            "worsened": false
+          },
+          {
+            "name": "tc_ppm_per_c",
+            "pre": 3949.8561611699565,
+            "post": 3868.0609221410423,
+            "unit": " ppm/C",
+            "delta": -81.79523902891424,
+            "delta_pct": -2.071,
+            "status": "PASS",
+            "worsened": false
+          },
+          {
+            "name": "tc_ppm_per_c",
+            "pre": 3949.8561611699565,
+            "post": 3868.0609221410423,
+            "unit": " ppm/C",
+            "delta": -81.79523902891424,
+            "delta_pct": -2.071,
+            "status": "PASS",
+            "worsened": false
+          },
+          {
+            "name": "f_monotonic",
+            "pre": 1.0,
+            "post": 1.0,
+            "unit": "",
+            "delta": 0.0,
+            "delta_pct": 0.0,
+            "status": "PASS",
+            "worsened": false
+          },
+          {
+            "name": "cycles_sustained",
+            "pre": 117.0,
+            "post": 117.0,
+            "unit": "",
+            "delta": 0.0,
+            "delta_pct": 0.0,
+            "status": "PASS",
+            "worsened": false
+          }
+        ],
+        "elapsed": 100.682
+      }
+    ],
+    "best_pre": {
+      "source": "pre_layout",
+      "pass": true,
+      "score": 0.0,
+      "metrics": {
+        "freq_hz": {
+          "value": 1081670.215291634,
+          "target": 2000000.0,
+          "op": "<=",
+          "unit": " Hz",
+          "status": "PASS",
+          "margin": 918329.784708366,
+          "margin_pct": 45.916
+        },
+        "tc_ppm_per_c": {
+          "value": 3949.8561611699565,
+          "target": 6000.0,
+          "op": "<=",
+          "unit": " ppm/C",
+          "status": "PASS",
+          "margin": 2050.1438388300435,
+          "margin_pct": 34.169
+        },
+        "f_monotonic": {
+          "value": 1.0,
+          "target": 1.0,
+          "op": ">=",
+          "unit": "",
+          "status": "PASS",
+          "margin": 0.0,
+          "margin_pct": 0.0
+        },
+        "startup_time_s": {
+          "value": 1.416172505938858e-06,
+          "target": 1e-05,
+          "op": "<=",
+          "unit": " s",
+          "status": "PASS",
+          "margin": 8.583827494061143e-06,
+          "margin_pct": 85.838
+        },
+        "duty_min_pct": {
+          "value": 45.52619375310963,
+          "target": 40.0,
+          "op": ">=",
+          "unit": " %",
+          "status": "PASS",
+          "margin": 5.526193753109631,
+          "margin_pct": 13.815
+        },
+        "duty_max_pct": {
+          "value": 48.53928341860581,
+          "target": 60.0,
+          "op": "<=",
+          "unit": " %",
+          "status": "PASS",
+          "margin": 11.460716581394188,
+          "margin_pct": 19.101
+        },
+        "volt_high_v": {
+          "value": 3.30105745,
+          "target": 2.97,
+          "op": ">=",
+          "unit": " V",
+          "status": "PASS",
+          "margin": 0.33105744999999986,
+          "margin_pct": 11.147
+        },
+        "volt_low_v": {
+          "value": -0.00135438029,
+          "target": 0.33,
+          "op": "<=",
+          "unit": " V",
+          "status": "PASS",
+          "margin": 0.33135438029000003,
+          "margin_pct": 100.41
+        },
+        "i_avg_a": {
+          "value": 5.5938920695669503e-05,
+          "target": 0.0002,
+          "op": "<=",
+          "unit": " A",
+          "status": "PASS",
+          "margin": 0.0001440610793043305,
+          "margin_pct": 72.031
+        },
+        "cycles_sustained": {
+          "value": 117.0,
+          "target": 100.0,
+          "op": ">=",
+          "unit": "",
+          "status": "PASS",
+          "margin": 17.0,
+          "margin_pct": 17.0
+        }
+      }
+    },
+    "best_pex": {
+      "source": "pex",
+      "pass": true,
+      "score": 0.0,
+      "metrics": {
+        "freq_hz": {
+          "value": 1030760.5513756636,
+          "target": 2000000.0,
+          "op": "<=",
+          "unit": " Hz",
+          "status": "PASS",
+          "margin": 969239.4486243364,
+          "margin_pct": 48.462
+        },
+        "tc_ppm_per_c": {
+          "value": 3868.0609221410423,
+          "target": 6000.0,
+          "op": "<=",
+          "unit": " ppm/C",
+          "status": "PASS",
+          "margin": 2131.9390778589577,
+          "margin_pct": 35.532
+        },
+        "f_monotonic": {
+          "value": 1.0,
+          "target": 1.0,
+          "op": ">=",
+          "unit": "",
+          "status": "PASS",
+          "margin": 0.0,
+          "margin_pct": 0.0
+        },
+        "startup_time_s": {
+          "value": 1.4390675789862827e-06,
+          "target": 1e-05,
+          "op": "<=",
+          "unit": " s",
+          "status": "PASS",
+          "margin": 8.560932421013719e-06,
+          "margin_pct": 85.609
+        },
+        "duty_min_pct": {
+          "value": 45.49702584309337,
+          "target": 40.0,
+          "op": ">=",
+          "unit": " %",
+          "status": "PASS",
+          "margin": 5.497025843093368,
+          "margin_pct": 13.743
+        },
+        "duty_max_pct": {
+          "value": 48.68080027024098,
+          "target": 60.0,
+          "op": "<=",
+          "unit": " %",
+          "status": "PASS",
+          "margin": 11.31919972975902,
+          "margin_pct": 18.865
+        },
+        "volt_high_v": {
+          "value": 3.30089203,
+          "target": 2.97,
+          "op": ">=",
+          "unit": " V",
+          "status": "PASS",
+          "margin": 0.3308920299999998,
+          "margin_pct": 11.141
+        },
+        "volt_low_v": {
+          "value": -0.00115470943,
+          "target": 0.33,
+          "op": "<=",
+          "unit": " V",
+          "status": "PASS",
+          "margin": 0.33115470943,
+          "margin_pct": 100.35
+        },
+        "i_avg_a": {
+          "value": 5.628043564112751e-05,
+          "target": 0.0002,
+          "op": "<=",
+          "unit": " A",
+          "status": "PASS",
+          "margin": 0.0001437195643588725,
+          "margin_pct": 71.86
+        },
+        "cycles_sustained": {
+          "value": 117.0,
+          "target": 100.0,
+          "op": ">=",
+          "unit": "",
+          "status": "PASS",
+          "margin": 17.0,
+          "margin_pct": 17.0
+        }
+      }
+    },
+    "best_pex_iteration": 1,
+    "degradation": [
+      {
+        "name": "volt_low_v",
+        "pre": -0.00135438029,
+        "post": -0.00115470943,
+        "unit": " V",
+        "delta": 0.00019967085999999992,
+        "delta_pct": 14.743,
+        "status": "PASS",
+        "worsened": true
+      },
+      {
+        "name": "startup_time_s",
+        "pre": 1.416172505938858e-06,
+        "post": 1.4390675789862827e-06,
+        "unit": " s",
+        "delta": 2.2895073047424575e-08,
+        "delta_pct": 1.617,
+        "status": "PASS",
+        "worsened": true
+      },
+      {
+        "name": "i_avg_a",
+        "pre": 5.5938920695669503e-05,
+        "post": 5.628043564112751e-05,
+        "unit": " A",
+        "delta": 3.41514945458008e-07,
+        "delta_pct": 0.611,
+        "status": "PASS",
+        "worsened": true
+      },
+      {
+        "name": "duty_max_pct",
+        "pre": 48.53928341860581,
+        "post": 48.68080027024098,
+        "unit": " %",
+        "delta": 0.14151685163516703,
+        "delta_pct": 0.292,
+        "status": "PASS",
+        "worsened": true
+      },
+      {
+        "name": "duty_min_pct",
+        "pre": 45.52619375310963,
+        "post": 45.49702584309337,
+        "unit": " %",
+        "delta": -0.02916791001626251,
+        "delta_pct": -0.064,
+        "status": "PASS",
+        "worsened": true
+      },
+      {
+        "name": "volt_high_v",
+        "pre": 3.30105745,
+        "post": 3.30089203,
+        "unit": " V",
+        "delta": -0.00016542000000008272,
+        "delta_pct": -0.005,
+        "status": "PASS",
+        "worsened": true
+      },
+      {
+        "name": "freq_hz",
+        "pre": 1081670.215291634,
+        "post": 1030760.5513756636,
+        "unit": " Hz",
+        "delta": -50909.66391597036,
+        "delta_pct": -4.707,
+        "status": "PASS",
+        "worsened": false
+      },
+      {
+        "name": "freq_hz",
+        "pre": 1081670.215291634,
+        "post": 1030760.5513756636,
+        "unit": " Hz",
+        "delta": -50909.66391597036,
+        "delta_pct": -4.707,
+        "status": "PASS",
+        "worsened": false
+      },
+      {
+        "name": "tc_ppm_per_c",
+        "pre": 3949.8561611699565,
+        "post": 3868.0609221410423,
+        "unit": " ppm/C",
+        "delta": -81.79523902891424,
+        "delta_pct": -2.071,
+        "status": "PASS",
+        "worsened": false
+      },
+      {
+        "name": "tc_ppm_per_c",
+        "pre": 3949.8561611699565,
+        "post": 3868.0609221410423,
+        "unit": " ppm/C",
+        "delta": -81.79523902891424,
+        "delta_pct": -2.071,
+        "status": "PASS",
+        "worsened": false
+      },
+      {
+        "name": "f_monotonic",
+        "pre": 1.0,
+        "post": 1.0,
+        "unit": "",
+        "delta": 0.0,
+        "delta_pct": 0.0,
+        "status": "PASS",
+        "worsened": false
+      },
+      {
+        "name": "cycles_sustained",
+        "pre": 117.0,
+        "post": 117.0,
+        "unit": "",
+        "delta": 0.0,
+        "delta_pct": 0.0,
+        "status": "PASS",
+        "worsened": false
+      }
+    ]
+  },
+  "signoff": {
+    "passed": true,
+    "conditions": [
+      {
+        "condition": "artifact consistency",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "pre-layout specs",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "PEX specs",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "DRC clean",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "DRC sign-off (Magic + KLayout)",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "LVS match",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "PEX extraction",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "final GDS",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "final PEX netlist",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "no CRITICAL findings",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "reviews complete",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "condition": "PVT corners",
+        "status": "NOT REQUIRED",
+        "detail": "not part of this flow"
+      },
+      {
+        "condition": "Monte Carlo / mismatch",
+        "status": "NOT REQUIRED",
+        "detail": "not part of this flow"
+      },
+      {
+        "condition": "design report",
+        "status": "PASS",
+        "detail": ""
+      }
+    ]
+  },
+  "reviews": {
+    "devil": {
+      "reviews": 2,
+      "findings": 2,
+      "by_severity": {
+        "INFO": 1,
+        "MEDIUM": 1
+      },
+      "unresolved_critical": []
+    },
+    "angel": {
+      "reviews": 2,
+      "recommendations": 0,
+      "tested": 0,
+      "improved": 0,
+      "degraded": 0
+    },
+    "recommendations": []
+  },
+  "package": {
+    "gds": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/claude-opus-5_temp_sensor/final/temp_sensor.gds",
+    "pex_spice": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/claude-opus-5_temp_sensor/final/temp_sensor.pex.spice",
+    "drc_report": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/claude-opus-5_temp_sensor/final/temp_sensor.magic.drc.rpt",
+    "lvs_report": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/claude-opus-5_temp_sensor/final/temp_sensor.lvs.out",
+    "iteration_history": "/home/huda/opensource-project/Microelectronic-Block-Generator/results/claude-opus-5_temp_sensor/final/iteration_history.json"
+  }
+}

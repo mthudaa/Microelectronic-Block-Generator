@@ -107,11 +107,25 @@ def _load_config(config_path: Path) -> dict[str, Any]:
     return config
 
 
+def _resolve_top_layout(config: dict[str, Any]) -> str:
+    """Resolve the Chipathon ``$TOP_SOURCE`` alias to a GDS cell name."""
+
+    top_layout = str(config["TOP_LAYOUT"])
+    top_source = config.get("TOP_SOURCE")
+    if "$TOP_SOURCE" in top_layout:
+        if not isinstance(top_source, str) or not top_source:
+            raise ValueError(
+                "TOP_LAYOUT references $TOP_SOURCE but TOP_SOURCE is missing"
+            )
+        top_layout = top_layout.replace("$TOP_SOURCE", top_source)
+    return top_layout
+
+
 def _fallback_gds_candidates(config: dict[str, Any], root: Path) -> list[Path]:
     """Find preserved GDS alternatives when a historical config path is stale."""
 
     result_root = root / "AI-Generated-Design-Result"
-    top = str(config["TOP_LAYOUT"])
+    top = _resolve_top_layout(config)
     candidates = [result_root / top / f"{top}.gds"]
     if result_root.is_dir():
         candidates.extend(sorted(result_root.glob(f"*/{top}.gds")))
@@ -289,7 +303,7 @@ def build_wrapper(
         config = _load_config(config_path)
         gds_path, resolution = resolve_gds(config_path, root)
         source_lib = gdstk.read_gds(str(gds_path))
-        source_top = _top_cell(source_lib, str(config["TOP_LAYOUT"]), gds_path)
+        source_top = _top_cell(source_lib, _resolve_top_layout(config), gds_path)
         source_cells = list(source_lib.cells)
         duplicate_names = imported_names.intersection(cell.name for cell in source_cells)
         if duplicate_names:

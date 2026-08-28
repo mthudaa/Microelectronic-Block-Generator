@@ -1,0 +1,11 @@
+* 1.2V MOS-only voltage reference, GF180MCU 3.3V, ports VDD VSS VREF IBIAS.
+* IBIAS -> diode (XM0) -> mirror (XM0b) -> PMOS diode (XM1) -> output diode
+* (XM3). XM3's Vgs IS the reference; sizing tuned for VREF ~ 1.2 V and a
+* near-flat temperature coefficient at IBIAS = 20 uA.
+.subckt deepseek_vref_1v2 VDD VSS VREF IBIAS
+XM0  IBIAS IBIAS VSS  VSS  nfet_03v3 L=2u W=4u nf=2
+XM0b pm   IBIAS VSS  VSS  nfet_03v3 L=2u W=4u nf=2
+XM1  pm   pm   VDD  VDD  pfet_03v3 L=2u W=4u nf=2
+XM2  vref pm   VDD  VDD  pfet_03v3 L=2u W=8u nf=2
+XM3  vref vref VSS  VSS  nfet_03v3 L=0.5u W=1.2u nf=1
+.ends deepseek_vref_1v2

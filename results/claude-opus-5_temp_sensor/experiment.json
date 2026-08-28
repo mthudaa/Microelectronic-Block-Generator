@@ -1,0 +1,79 @@
+{
+  "experiment_id": "claude-opus-5_temp_sensor",
+  "title": "Self-starting relaxation-oscillator temperature sensor (GF180MCU)",
+  "model_identifier": "claude-opus-5",
+  "agent_harness": "Claude Code / /mbg-full-auto",
+  "pdk_identifier": "gf180mcuD",
+  "pdk_path": "/home/huda/.volare/gf180mcuD",
+  "cell": "temp_sensor",
+  "ports": [
+    "VDD",
+    "VSS",
+    "TEMP_OUT"
+  ],
+  "prompt_detail_level": "detailed (topology guidance + full spec table + PVT grid)",
+  "prompt_file": "prompt.txt",
+  "api_calls": null,
+  "api_calls_note": "not applicable: the design agent is the model itself, no external LLM API was called",
+  "refinement_iterations": {
+    "framework_pre_layout": 1,
+    "framework_pex": 1,
+    "max_pre_iterations": 12,
+    "max_pex_iterations": 12,
+    "pre_framework_design_exploration": 9,
+    "pre_framework_note": "bounded manual exploration before the automated flow: Schmitt crowbar current, beta-multiplier inversion level for TC, MIM size, duty-cycle mirror ratio, minimum buildable device width"
+  },
+  "netlist_validation_status": "PASS",
+  "device_model_validation": "PASS - nfet_03v3, pfet_03v3, ppolyf_u, cap_mim_2f0_m4m5_noshield are all GF180MCU primitives",
+  "structural_metrics": {
+    "devices": 20,
+    "mos": 18,
+    "native_passives": 2,
+    "nets": 12,
+    "flat_single_subckt": true
+  },
+  "gds_generation_status": "PASS",
+  "layout_size_um": [
+    88,
+    156
+  ],
+  "drc_status": "PASS",
+  "drc_engines": {
+    "magic": "CLEAN (0)",
+    "klayout": "CLEAN (0)",
+    "reconciled_verdict": "PASS"
+  },
+  "lvs_status": "PASS (Circuits match uniquely; 20 devices, 12 nets both sides)",
+  "pex_status": "PASS (extraction produced C-coupled netlist)",
+  "pre_simulation_status": "PASS",
+  "post_simulation_status": "PASS",
+  "internal_connectivity": "CLEAN (opens=0 shorts=0 drc=0 missing_access=0)",
+  "monte_carlo_status": "NOT RUN",
+  "pvt_status": "see pvt_summary.json / pvt_summary.md",
+  "runtime_s": {
+    "full_auto_flow": 137.409
+  },
+  "final_status": "PASS",
+  "tapeout_ready": true,
+  "artifacts": {
+    "gds": "final/temp_sensor.gds",
+    "pex_spice": "final/temp_sensor.pex.spice",
+    "drc_report": "final/temp_sensor.magic.drc.rpt",
+    "lvs_report": "final/temp_sensor.lvs.out",
+    "iteration_history": "final/iteration_history.json"
+  },
+  "artifact_digests_sha256_16": {
+    "final/temp_sensor.gds": "b5a4f520a96b0659",
+    "final/temp_sensor.pex.spice": "179a34e72aedf41b",
+    "generated_netlist.spice": "40d239e1f750097d"
+  },
+  "framework_changes_required": [
+    {
+      "file": "src/mbg/connectivity.py",
+      "change": "compare_with_netlist() no longer demands a routed access point for a native passive's bulk terminal when that terminal sits on ground",
+      "why": "ppolyf_u extracts with a substrate pin; declaring it is required for LVS (12 vs 13 nets otherwise) but mbg.passives.poly_resistor builds no substrate contact, so the connection is made by the p-substrate itself",
+      "regression": "tests/test_all_designs.py 8/8 designs pass all four legs after the change"
+    }
+  ],
+  "recorded": "2026-08-29T00:15:50"
+}

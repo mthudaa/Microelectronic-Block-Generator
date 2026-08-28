@@ -1,0 +1,8 @@
+.subckt gpt-5.6-luna_vref_1v2 VDD VSS VREF IBIAS
+* External IBIAS sinks the PMOS mirror reference current.
+XM1 IBIAS IBIAS VDD  VDD  pfet_03v3 L=8u    W=2u   nf=1
+XM2 VREF  IBIAS VDD  VDD  pfet_03v3 L=8u    W=2u   nf=1
+* XM3 is the CTAT diode-connected device; XM4 adds opposing TC in triode.
+XM3 VREF  VREF  VMB  VSS  nfet_03v3 L=0.28u W=9.5u nf=1
+XM4 VMB   VREF  VSS  VSS  nfet_03v3 L=8u    W=9.5u nf=1
+.ends gpt-5.6-luna_vref_1v2
