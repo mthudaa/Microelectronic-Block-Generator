@@ -1,9 +1,9 @@
 .include '/home/huda/.volare/gf180mcuD/libs.tech/ngspice/design.ngspice'
-.lib '/home/huda/opensource-project/Microelectronic-Block-Generator/results/claude-opus-5_temp_sensor/pdk_flat/sm141064.ngspice' sf
+.lib '/home/huda/opensource-project/Microelectronic-Block-Generator/results/claude-opus-5_temp_sensor/pdk_flat/sm141064.ngspice' fs
 .lib '/home/huda/.volare/gf180mcuD/libs.tech/ngspice/sm141064.ngspice' res_typical
 .lib '/home/huda/.volare/gf180mcuD/libs.tech/ngspice/sm141064.ngspice' mimcap_typical
 .options reltol=1e-4 vntol=1e-8 abstol=1e-15 chgtol=1e-16 trtol=1
-.temp -40
+.temp -15
 
 * Self-starting relaxation-oscillator temperature sensor, gf180mcuD 3.3V
 * Ports: VDD VSS TEMP_OUT.  Internal PTAT beta-multiplier reference,
@@ -38,12 +38,12 @@ XMB2 TEMP_OUT nst VSS VSS nfet_03v3 L=1u W=3u nf=1
 .ends
 
 Vsfix VSS 0 0
-Vsup VDD 0 PWL(0 0 1e-06 3.6)
+Vsup VDD 0 PWL(0 0 1e-06 3.3)
 Cprobe TEMP_OUT 0 10f
 Xdut VDD VSS TEMP_OUT temp_sensor
 
 .control
-tran 7.60677e-09 0.000152135 uic
+tran 6.97357e-09 0.000139471 uic
 wrdata ts.dat v(TEMP_OUT) i(Vsup) v(Xdut.ncap)
 .endc
 .end

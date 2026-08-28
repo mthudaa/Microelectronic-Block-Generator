@@ -1,5 +1,5 @@
 .include '/home/huda/.volare/gf180mcuD/libs.tech/ngspice/design.ngspice'
-.lib '/home/huda/opensource-project/Microelectronic-Block-Generator/results/claude-opus-5_temp_sensor/pdk_flat/sm141064.ngspice' sf
+.lib '/home/huda/opensource-project/Microelectronic-Block-Generator/results/claude-opus-5_temp_sensor/pdk_flat/sm141064.ngspice' fs
 .lib '/home/huda/.volare/gf180mcuD/libs.tech/ngspice/sm141064.ngspice' res_typical
 .lib '/home/huda/.volare/gf180mcuD/libs.tech/ngspice/sm141064.ngspice' mimcap_typical
 .options reltol=1e-4 vntol=1e-8 abstol=1e-15 chgtol=1e-16 trtol=1
@@ -43,7 +43,7 @@ Cprobe TEMP_OUT 0 10f
 Xdut VDD VSS TEMP_OUT temp_sensor
 
 .control
-tran 7.60677e-09 0.000152135 uic
+tran 8.28091e-09 0.000165618 uic
 wrdata ts.dat v(TEMP_OUT) i(Vsup) v(Xdut.ncap)
 .endc
 .end

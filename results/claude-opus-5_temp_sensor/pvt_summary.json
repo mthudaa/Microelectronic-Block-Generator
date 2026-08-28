@@ -1738,5 +1738,505 @@
   "stop_s": null,
   "wall_s": 133.7,
   "err": ""
+ },
+ {
+  "netlist": "sch",
+  "corner": "sf",
+  "vdd": 3.3,
+  "temp": 125,
+  "metrics": {
+   "startup_time_s": 1.0009769495503026e-06,
+   "freq_hz": 1576200.7188353185,
+   "duty_cycle_pct": 48.46994273360218,
+   "volt_high_v": 3.30130962,
+   "volt_low_v": -0.00113714567,
+   "i_avg_a": 5.8037778201506016e-05,
+   "cycles_sustained": 118.0
+  },
+  "fail_flags": [],
+  "nominal_point": false,
+  "stop_s": null,
+  "wall_s": 192.7,
+  "err": ""
+ },
+ {
+  "netlist": "sch",
+  "corner": "sf",
+  "vdd": 3.6,
+  "temp": -40,
+  "metrics": {
+   "startup_time_s": 1.4132109632216718e-06,
+   "freq_hz": 789201.1885800478,
+   "duty_cycle_pct": 45.45600699233678,
+   "volt_high_v": 3.60161508,
+   "volt_low_v": -0.00156611421,
+   "i_avg_a": 4.2970436008292754e-05,
+   "cycles_sustained": 117.0
+  },
+  "fail_flags": [],
+  "nominal_point": false,
+  "stop_s": null,
+  "wall_s": 276.0,
+  "err": ""
+ },
+ {
+  "netlist": "sch",
+  "corner": "sf",
+  "vdd": 3.6,
+  "temp": -15,
+  "metrics": {
+   "startup_time_s": 1.2882032418110012e-06,
+   "freq_hz": 896669.9494865723,
+   "duty_cycle_pct": 45.859161839040055,
+   "volt_high_v": 3.60157887,
+   "volt_low_v": -0.00147831859,
+   "i_avg_a": 4.4386272146747044e-05,
+   "cycles_sustained": 117.0
+  },
+  "fail_flags": [],
+  "nominal_point": false,
+  "stop_s": null,
+  "wall_s": 216.8,
+  "err": ""
+ },
+ {
+  "netlist": "sch",
+  "corner": "sf",
+  "vdd": 3.6,
+  "temp": 10,
+  "metrics": {
+   "startup_time_s": 1.1939044176054947e-06,
+   "freq_hz": 1007121.5386410959,
+   "duty_cycle_pct": 46.20659730828678,
+   "volt_high_v": 3.60154077,
+   "volt_low_v": -0.00139543611,
+   "i_avg_a": 4.6457303799041336e-05,
+   "cycles_sustained": 117.0
+  },
+  "fail_flags": [],
+  "nominal_point": false,
+  "stop_s": null,
+  "wall_s": 186.1,
+  "err": ""
+ },
+ {
+  "netlist": "sch",
+  "corner": "sf",
+  "vdd": 3.6,
+  "temp": 27,
+  "metrics": {
+   "startup_time_s": 1.1437327791798208e-06,
+   "freq_hz": 1083117.0682918332,
+   "duty_cycle_pct": 46.42126165581697,
+   "volt_high_v": 3.60151313,
+   "volt_low_v": -0.00134426711,
+   "i_avg_a": 4.817967653205643e-05,
+   "cycles_sustained": 117.0
+  },
+  "fail_flags": [],
+  "nominal_point": false,
+  "stop_s": null,
+  "wall_s": 169.9,
+  "err": ""
+ },
+ {
+  "netlist": "sch",
+  "corner": "sf",
+  "vdd": 3.6,
+  "temp": 50,
+  "metrics": {
+   "startup_time_s": 1.0899344013241278e-06,
+   "freq_hz": 1186288.2055721772,
+   "duty_cycle_pct": 46.696884006774035,
+   "volt_high_v": 3.60147209,
+   "volt_low_v": -0.00127970376,
+   "i_avg_a": 5.0857886250847243e-05,
+   "cycles_sustained": 117.0
+  },
+  "fail_flags": [],
+  "nominal_point": false,
+  "stop_s": null,
+  "wall_s": 150.2,
+  "err": ""
+ },
+ {
+  "netlist": "sch",
+  "corner": "sf",
+  "vdd": 3.6,
+  "temp": 75,
+  "metrics": {
+   "startup_time_s": 1.0419014051543248e-06,
+   "freq_hz": 1298184.930475272,
+   "duty_cycle_pct": 47.015124480181434,
+   "volt_high_v": 3.601422,
+   "volt_low_v": -0.00121416466,
+   "i_avg_a": 5.416010501761032e-05,
+   "cycles_sustained": 117.0
+  },
+  "fail_flags": [],
+  "nominal_point": false,
+  "stop_s": null,
+  "wall_s": 151.0,
+  "err": ""
+ },
+ {
+  "netlist": "sch",
+  "corner": "sf",
+  "vdd": 3.6,
+  "temp": 125,
+  "metrics": {
+   "startup_time_s": 9.721102696325774e-07,
+   "freq_hz": 1519267.092950247,
+   "duty_cycle_pct": 47.99428385413115,
+   "volt_high_v": 3.60127757,
+   "volt_low_v": -0.00109207576,
+   "i_avg_a": 6.173486079136324e-05,
+   "cycles_sustained": 118.0
+  },
+  "fail_flags": [],
+  "nominal_point": false,
+  "stop_s": null,
+  "wall_s": 170.0,
+  "err": ""
+ },
+ {
+  "netlist": "sch",
+  "corner": "sf",
+  "vdd": 3.6,
+  "temp": 100,
+  "metrics": {
+   "startup_time_s": 9.975892245131727e-07,
+   "freq_hz": 1409773.5940093384,
+   "duty_cycle_pct": 47.43282520586269,
+   "volt_high_v": 3.6013603,
+   "volt_low_v": -0.00115414442,
+   "i_avg_a": 5.781536497385194e-05,
+   "cycles_sustained": 117.0
+  },
+  "fail_flags": [],
+  "nominal_point": false,
+  "stop_s": null,
+  "wall_s": 171.4,
+  "err": ""
+ },
+ {
+  "netlist": "sch",
+  "corner": "fs",
+  "vdd": 3.0,
+  "temp": -15,
+  "metrics": {
+   "startup_time_s": 1.3260238875673435e-06,
+   "freq_hz": 899242.2067492264,
+   "duty_cycle_pct": 46.01608309233661,
+   "volt_high_v": 3.00125176,
+   "volt_low_v": -0.00223977668,
+   "i_avg_a": 3.344646647795738e-05,
+   "cycles_sustained": 117.0
+  },
+  "fail_flags": [],
+  "nominal_point": false,
+  "stop_s": null,
+  "wall_s": 203.9,
+  "err": ""
+ },
+ {
+  "netlist": "sch",
+  "corner": "fs",
+  "vdd": 3.0,
+  "temp": -40,
+  "metrics": {
+   "startup_time_s": 1.4322210878361108e-06,
+   "freq_hz": 794259.7639724099,
+   "duty_cycle_pct": 45.6033042647026,
+   "volt_high_v": 3.00129915,
+   "volt_low_v": -0.00239788696,
+   "i_avg_a": 3.164322058174809e-05,
+   "cycles_sustained": 117.0
+  },
+  "fail_flags": [],
+  "nominal_point": false,
+  "stop_s": null,
+  "wall_s": 204.4,
+  "err": ""
+ },
+ {
+  "netlist": "sch",
+  "corner": "fs",
+  "vdd": 3.0,
+  "temp": 10,
+  "metrics": {
+   "startup_time_s": 1.2469115437354543e-06,
+   "freq_hz": 1007040.2690217324,
+   "duty_cycle_pct": 46.382113144216405,
+   "volt_high_v": 3.00120164,
+   "volt_low_v": -0.00210017662,
+   "i_avg_a": 3.573118539264009e-05,
+   "cycles_sustained": 117.0
+  },
+  "fail_flags": [],
+  "nominal_point": false,
+  "stop_s": null,
+  "wall_s": 115.4,
+  "err": ""
+ },
+ {
+  "netlist": "sch",
+  "corner": "fs",
+  "vdd": 3.0,
+  "temp": 27,
+  "metrics": {
+   "startup_time_s": 1.2054474994874194e-06,
+   "freq_hz": 1081877.6437183137,
+   "duty_cycle_pct": 46.639904102391625,
+   "volt_high_v": 3.00116476,
+   "volt_low_v": -0.00201625042,
+   "i_avg_a": 3.753036982068629e-05,
+   "cycles_sustained": 117.0
+  },
+  "fail_flags": [],
+  "nominal_point": false,
+  "stop_s": null,
+  "wall_s": 146.3,
+  "err": ""
+ },
+ {
+  "netlist": "sch",
+  "corner": "fs",
+  "vdd": 3.0,
+  "temp": 50,
+  "metrics": {
+   "startup_time_s": 1.162228297045458e-06,
+   "freq_hz": 1185169.1593036538,
+   "duty_cycle_pct": 47.0684006684477,
+   "volt_high_v": 3.00110751,
+   "volt_low_v": -0.00191558996,
+   "i_avg_a": 4.0249533686707024e-05,
+   "cycles_sustained": 117.0
+  },
+  "fail_flags": [],
+  "nominal_point": false,
+  "stop_s": null,
+  "wall_s": 129.5,
+  "err": ""
+ },
+ {
+  "netlist": "sch",
+  "corner": "fs",
+  "vdd": 3.0,
+  "temp": 75,
+  "metrics": {
+   "startup_time_s": 1.1289511596793086e-06,
+   "freq_hz": 1298612.9626167535,
+   "duty_cycle_pct": 47.688096484076624,
+   "volt_high_v": 3.00102856,
+   "volt_low_v": -0.0018202399,
+   "i_avg_a": 4.3527347790487285e-05,
+   "cycles_sustained": 117.0
+  },
+  "fail_flags": [],
+  "nominal_point": false,
+  "stop_s": null,
+  "wall_s": 148.4,
+  "err": ""
+ },
+ {
+  "netlist": "sch",
+  "corner": "fs",
+  "vdd": 3.0,
+  "temp": 100,
+  "metrics": {
+   "startup_time_s": 1.1074995558909918e-06,
+   "freq_hz": 1409798.7905888373,
+   "duty_cycle_pct": 48.48293779267721,
+   "volt_high_v": 3.0009291,
+   "volt_low_v": -0.00173430834,
+   "i_avg_a": 4.706288001754057e-05,
+   "cycles_sustained": 117.0
+  },
+  "fail_flags": [],
+  "nominal_point": false,
+  "stop_s": null,
+  "wall_s": 166.6,
+  "err": ""
+ },
+ {
+  "netlist": "sch",
+  "corner": "fs",
+  "vdd": 3.0,
+  "temp": 125,
+  "metrics": {
+   "startup_time_s": 1.0960200895189406e-06,
+   "freq_hz": 1509962.1425032008,
+   "duty_cycle_pct": 49.460812540940694,
+   "volt_high_v": 3.00081334,
+   "volt_low_v": -0.00165114514,
+   "i_avg_a": 5.060942206569683e-05,
+   "cycles_sustained": 118.0
+  },
+  "fail_flags": [],
+  "nominal_point": false,
+  "stop_s": null,
+  "wall_s": 221.7,
+  "err": ""
+ },
+ {
+  "netlist": "sch",
+  "corner": "fs",
+  "vdd": 3.3,
+  "temp": -40,
+  "metrics": {
+   "startup_time_s": 1.4595196934054524e-06,
+   "freq_hz": 759673.6786712598,
+   "duty_cycle_pct": 45.54515986103708,
+   "volt_high_v": 3.30124598,
+   "volt_low_v": -0.00217816753,
+   "i_avg_a": 3.637002390102664e-05,
+   "cycles_sustained": 117.0
+  },
+  "fail_flags": [],
+  "nominal_point": false,
+  "stop_s": null,
+  "wall_s": 157.8,
+  "err": ""
+ },
+ {
+  "netlist": "sch",
+  "corner": "fs",
+  "vdd": 3.3,
+  "temp": -15,
+  "metrics": {
+   "startup_time_s": 1.341140522336685e-06,
+   "freq_hz": 861251.6898320011,
+   "duty_cycle_pct": 45.95601808494126,
+   "volt_high_v": 3.30119984,
+   "volt_low_v": -0.00204105482,
+   "i_avg_a": 3.7773144013023375e-05,
+   "cycles_sustained": 117.0
+  },
+  "fail_flags": [],
+  "nominal_point": false,
+  "stop_s": null,
+  "wall_s": 161.5,
+  "err": ""
+ },
+ {
+  "netlist": "sch",
+  "corner": "fs",
+  "vdd": 3.3,
+  "temp": 10,
+  "metrics": {
+   "startup_time_s": 1.2517180466901009e-06,
+   "freq_hz": 965798.4015465117,
+   "duty_cycle_pct": 46.30817393388927,
+   "volt_high_v": 3.30114963,
+   "volt_low_v": -0.00192963651,
+   "i_avg_a": 3.974586172197481e-05,
+   "cycles_sustained": 117.0
+  },
+  "fail_flags": [],
+  "nominal_point": false,
+  "stop_s": null,
+  "wall_s": 179.9,
+  "err": ""
+ },
+ {
+  "netlist": "sch",
+  "corner": "fs",
+  "vdd": 3.3,
+  "temp": 27,
+  "metrics": {
+   "startup_time_s": 1.204091630011757e-06,
+   "freq_hz": 1038087.9147832855,
+   "duty_cycle_pct": 46.52849230791666,
+   "volt_high_v": 3.30111262,
+   "volt_low_v": -0.00186360086,
+   "i_avg_a": 4.1366839027077616e-05,
+   "cycles_sustained": 117.0
+  },
+  "fail_flags": [],
+  "nominal_point": false,
+  "stop_s": null,
+  "wall_s": 140.2,
+  "err": ""
+ },
+ {
+  "netlist": "sch",
+  "corner": "fs",
+  "vdd": 3.3,
+  "temp": 50,
+  "metrics": {
+   "startup_time_s": 1.1533947968815508e-06,
+   "freq_hz": 1137150.925767774,
+   "duty_cycle_pct": 46.839355078182486,
+   "volt_high_v": 3.30105712,
+   "volt_low_v": -0.00178418257,
+   "i_avg_a": 4.3876827554122856e-05,
+   "cycles_sustained": 117.0
+  },
+  "fail_flags": [],
+  "nominal_point": false,
+  "stop_s": null,
+  "wall_s": 162.3,
+  "err": ""
+ },
+ {
+  "netlist": "sch",
+  "corner": "fs",
+  "vdd": 3.3,
+  "temp": 75,
+  "metrics": {
+   "startup_time_s": 1.1126412002963805e-06,
+   "freq_hz": 1246505.828761506,
+   "duty_cycle_pct": 47.272910646598696,
+   "volt_high_v": 3.30098713,
+   "volt_low_v": -0.00170713203,
+   "i_avg_a": 4.6979194884651445e-05,
+   "cycles_sustained": 117.0
+  },
+  "fail_flags": [],
+  "nominal_point": false,
+  "stop_s": null,
+  "wall_s": 148.9,
+  "err": ""
+ },
+ {
+  "netlist": "sch",
+  "corner": "fs",
+  "vdd": 3.3,
+  "temp": 100,
+  "metrics": {
+   "startup_time_s": 1.0837520304216386e-06,
+   "freq_hz": 1355944.1187856204,
+   "duty_cycle_pct": 47.862156579484086,
+   "volt_high_v": 3.30089952,
+   "volt_low_v": -0.0016378854,
+   "i_avg_a": 5.04108192232414e-05,
+   "cycles_sustained": 117.0
+  },
+  "fail_flags": [],
+  "nominal_point": false,
+  "stop_s": null,
+  "wall_s": 188.5,
+  "err": ""
+ },
+ {
+  "netlist": "sch",
+  "corner": "fs",
+  "vdd": 3.3,
+  "temp": 125,
+  "metrics": {
+   "startup_time_s": 1.0649628663887523e-06,
+   "freq_hz": 1462143.8067095345,
+   "duty_cycle_pct": 48.621970677633314,
+   "volt_high_v": 3.30079004,
+   "volt_low_v": -0.00157091285,
+   "i_avg_a": 5.4091065922816496e-05,
+   "cycles_sustained": 117.0
+  },
+  "fail_flags": [],
+  "nominal_point": false,
+  "stop_s": null,
+  "wall_s": 167.6,
+  "err": ""
  }
 ]

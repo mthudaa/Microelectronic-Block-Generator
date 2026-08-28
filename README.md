@@ -89,7 +89,7 @@ routed, DRC-clean GDS layout.
   silicon performance.
 - **Test Key Circuits:** Comparator, OTA, and Voltage Reference.
 
-> 📂 **See detailed AI design results:** [`AI-Generated-Design-Result/`](AI-Generated-Design-Result/README.md)
+> 📂 **See detailed AI design results:** [`results/`](results/RESULTS_SUMMARY.md)
 > — complete SPICE netlists, GDS layouts, DRC/LVS/PEX reports, and simulation
 > plots for all three designs.
 
@@ -527,6 +527,10 @@ place.
 
 - **Density fill** — the eight global-coverage rules above, closed at die
   integration.
+- **Extended block configurations** — the block table also lists `ACV`, `ACH`,
+  `ACE` and `ACE2` (27–64 pins, up to 2235 × 2235 µm). Allocation of those may
+  be restricted to teams with high schematic/layout review scores. `mbg-d08`
+  targets **BV** and does not depend on an extended allocation.
 - **Shared input pads** — `inp`, `inn`, `ibias` and `clk` each feed several
   blocks, as tabulated above. Intentional for a comparison array, but it does
   not satisfy the dedicated-pad rule stated for the standalone blocks.
@@ -1984,12 +1988,82 @@ in [`lvs_config_mbg_d08.json`](lvs_config_mbg_d08.json).
 
 | | Value |
 | :--- | ---: |
-| **Chip size** | **501.50 × 1090.90 µm** |
-| **Die area** | **547,086 µm² = 0.547 mm²** |
-| **Top-level pins** | **16** |
+| **Chipathon block** | **BV** — 16 pins, 550 × 1110 µm |
+| **Boundary (layer 0/0)** | **501.50 × 1090.90 µm** |
+| Margin inside the BV block | 48.50 µm wide, 19.10 µm tall |
+| **Top-level pins** | **16 of 16 available** — exact fit |
 | **Pad cells** | **14 × `io_secondary_3p3`** |
 | Core blocks | 10 (9 analog candidates + 1 temperature sensor) |
 | Devices / nets | 94 / 60 |
+
+`mbg-d08` is submitted into **block BV**, the 16-pin 550 × 1110 µm
+configuration. Its 16 top-level pins consume the block's pin budget exactly,
+and the geometry clears the BV outline by 48.5 µm horizontally and 19.1 µm
+vertically. The required **boundary on layer 0/0** is drawn at the design
+extent, 501.50 × 1090.90 µm. Layer 0/0 carries no DRC rules in the GF180 deck,
+and every check was re-run against the layout carrying it — 0 violations on
+both engines, LVS matching uniquely on both.
+
+#### Block BV — the allocation this project uses
+
+The Chipathon shuttle offers a menu of fixed block configurations, each with a
+pin budget and a footprint. **`mbg-d08` occupies block BV.**
+
+| | BV |
+| :--- | :--- |
+| Footprint | **550 × 1110 µm** (portrait) |
+| Block area | 610,500 µm² |
+| Pin budget | **16** |
+| Die utilisation | 12.50 % |
+| Placement on die | 350, 1475 |
+
+**How `mbg-d08` sits in it**
+
+| | Design | BV | Headroom |
+| :--- | ---: | ---: | ---: |
+| Width | 501.50 µm | 550 µm | 48.50 µm |
+| Height | 1090.90 µm | 1110 µm | 19.10 µm |
+| Area | 547,086 µm² | 610,500 µm² | 89.6 % occupied |
+| Pins | 16 | 16 | **0 — exact fit** |
+
+The boundary on layer 0/0 is drawn at the design extent (501.50 × 1090.90 µm),
+not at the block outline, so the declared size is the true one.
+
+**Why BV and not another block.** BV is the *smallest* configuration that fits;
+everything below it fails on pin count, footprint, or both:
+
+| Block | Pins | Footprint (µm) | Verdict for `mbg-d08` |
+| :--- | ---: | :--- | :--- |
+| `E` | 6 | 550 × 550 | ✗ 6 pins, and far too small |
+| `D` | 10 | 550 × 550 | ✗ 10 pins < 16, too small |
+| `CH` | 6 | 1110 × 550 | ✗ 6 pins < 16 |
+| `CV` | 6 | 550 × 1110 | ✗ right shape, but only 6 pins |
+| `BH` | 16 | 1110 × 550 | ✗ pin count fits, but landscape — our 1090.9 µm height will not fit in 550 µm |
+| **`BV`** | **16** | **550 × 1110** | ✅ **chosen** — pins exact, portrait aspect matches |
+| `A` | 22 | 1110 × 1110 | ○ fits, but 25 % die utilisation for 16 pins |
+| `ACV` | 27 | 1675 × 1110 | ○ fits; extended configuration |
+| `ACH` | 27 | 1110 × 1675 | ○ fits; extended configuration |
+| `ACE` | 32 | 1675 × 1675 | ○ fits; extended configuration |
+| `ACE2` | 64 | 2235 × 2235 | ○ fits; extended configuration |
+
+`BH` is the instructive near-miss: same 16-pin budget and the same 610,500 µm²
+of area as BV, but rotated. The `mbg-d08` floorplan is a tall column — ten core
+blocks stacked beside a pad row, 501.5 µm wide by 1090.9 µm tall — so only the
+portrait member of that pair can hold it.
+
+`ACV`, `ACH`, `ACE` and `ACE2` are the **extended** configurations, which were
+not part of the original announcement; allocation of them may be restricted to
+teams with high schematic/layout review scores. `mbg-d08` deliberately does not
+depend on one — BV is a standard block, so the submission does not rest on a
+discretionary allocation.
+
+**Consequences of the 16/16 pin budget.** With every BV pin consumed, there is
+no spare pin for expansion. Two present limitations follow directly from it and
+are recorded in [Two gaps against the stated pad rule](#two-gaps-against-the-stated-pad-rule):
+`clk`, `inp`, `inn` and `ibias` are each shared across several blocks rather
+than given per-block pads, and `vss`/`vdd` occupy two of the sixteen. Freeing
+pins for dedicated per-block inputs would mean moving up to `A` (22 pins) or an
+extended block.
 
 Unlike the block-level estimate further down, this is a *real* pad-framed
 layout, not a core area plus an allowance — the 0.547 mm² includes the pads and
@@ -2018,25 +2092,31 @@ the routing between them.
 Order is the `.subckt mbg-d08` port order; `temp_out` is pin 7, before the nine
 block outputs.
 
-| # | Pin | Dir | Function | Pad |
-| ---: | :--- | :--- | :--- | :--- |
-| 1 | `vdd` | PWR | 3.3 V rail, all blocks and all 14 pad cells | *none — see below* |
-| 2 | `vss` | GND | Ground rail, all blocks and all 14 pad cells | *none — see below* |
-| 3 | `clk` | IN | Comparator sampling clock → `clk_core` | `io_secondary_3p3` |
-| 4 | `inp` | IN | Differential input + → `inp_core` | `io_secondary_3p3` |
-| 5 | `inn` | IN | Differential input − → `inn_core` | `io_secondary_3p3` |
-| 6 | `ibias` | IN | Bias current → `ibias_core` | `io_secondary_3p3` |
-| 7 | `temp_out` | OUT | Temperature-sensor relaxation output | `io_secondary_3p3` |
-| 8 | `deepseek_ota` | OUT | OTA output, deepseek | `io_secondary_3p3` |
-| 9 | `gpt_ota` | OUT | OTA output, gpt-5.6-luna | `io_secondary_3p3` |
-| 10 | `oxa_ota` | OUT | OTA output, ox_alpha | `io_secondary_3p3` |
-| 11 | `deepseek_cmp` | OUT | Comparator `OUTP`, deepseek (`OUTN` internal) | `io_secondary_3p3` |
-| 12 | `gpt_cmp` | OUT | Comparator `OUTP`, gpt-5.6-luna (`OUTN` internal) | `io_secondary_3p3` |
-| 13 | `oxa_cmp` | OUT | Comparator `OUTP`, ox_alpha (`OUTN` internal) | `io_secondary_3p3` |
-| 14 | `deepseek_vref` | OUT | 1.2 V reference, deepseek | `io_secondary_3p3` |
-| 15 | `gpt_vref` | OUT | 1.2 V reference, gpt-5.6-luna | `io_secondary_3p3` |
-| 16 | `oxa_vref` | OUT | 1.2 V reference, ox_alpha | `io_secondary_3p3` |
-| | **Total** | | **16 pins** | **14 pads** |
+| # | Pin | `io_type` | `secondary_esd` | Function | Pad cell |
+| ---: | :--- | :--- | :---: | :--- | :--- |
+| 1 | `vss` | `ground` | — | Quiet ground, down-bonded; first pin | *none yet* |
+| 2 | `vdd` | `power` | — | 3.3 V rail, paired with `vss` | *none yet* |
+| 3 | `clk` | `analog` | `true` | Comparator sampling clock → `clk_core` | `io_secondary_3p3` |
+| 4 | `inp` | `analog` | `true` | Differential input + → `inp_core` | `io_secondary_3p3` |
+| 5 | `inn` | `analog` | `true` | Differential input − → `inn_core` | `io_secondary_3p3` |
+| 6 | `ibias` | `analog` | `true` | Bias current → `ibias_core` | `io_secondary_3p3` |
+| 7 | `temp_out` | `analog` | `true` | Temperature-sensor relaxation output | `io_secondary_3p3` |
+| 8 | `deepseek_ota` | `analog` | `true` | OTA output, deepseek | `io_secondary_3p3` |
+| 9 | `gpt_ota` | `analog` | `true` | OTA output, gpt-5.6-luna | `io_secondary_3p3` |
+| 10 | `oxa_ota` | `analog` | `true` | OTA output, ox_alpha | `io_secondary_3p3` |
+| 11 | `deepseek_cmp` | `analog` | `true` | Comparator `OUTP`, deepseek (`OUTN` internal) | `io_secondary_3p3` |
+| 12 | `gpt_cmp` | `analog` | `true` | Comparator `OUTP`, gpt-5.6-luna (`OUTN` internal) | `io_secondary_3p3` |
+| 13 | `oxa_cmp` | `analog` | `true` | Comparator `OUTP`, ox_alpha (`OUTN` internal) | `io_secondary_3p3` |
+| 14 | `deepseek_vref` | `analog` | `true` | 1.2 V reference, deepseek | `io_secondary_3p3` |
+| 15 | `gpt_vref` | `analog` | `true` | 1.2 V reference, gpt-5.6-luna | `io_secondary_3p3` |
+| 16 | `oxa_vref` | `analog` | `true` | 1.2 V reference, ox_alpha | `io_secondary_3p3` |
+| | **Total** | 14 × `analog`, 1 × `power`, 1 × `ground` | | **16 pins** | **14 pads** |
+
+These are the `io_type` / `secondary_esd` values declared in
+[`info.yaml`](info.yaml), following the Chipathon pin schema. All fourteen
+signal pins are `analog` with secondary ESD — each really does sit behind its
+own `io_secondary_3p3` cell in the layout. `vdd`/`vss` are `power`/`ground`,
+which take no `secondary_esd` key (the schema marks it analog-only).
 
 Block interfaces are `VDD VSS INP INN OUT IBIAS` (OTA),
 `VDD VSS INP INN CLK OUTP OUTN` (comparator), `VDD VSS VREF IBIAS` (reference)
@@ -2066,7 +2146,19 @@ edit.
 **2 — There are no power pad cells.** `vdd` and `vss` are top-level labels and
 rails feeding all fourteen `io_secondary_3p3` cells, but the GDS contains no
 `gf180mcu_fd_io__vdd` / `__vss` instance. They must be added at padframe
-integration; the layout as submitted is not bondable on its own.
+integration; the layout as submitted is not bondable on its own. The design
+uses a **single power/ground pair**, so it needs one ground pad — a design
+split across several ground domains would need one pad per domain.
+
+#### Pin ordering in `info.yaml`
+
+`info.yaml` lists **`vss` first**, because the first pin of a quadrant is the
+fixed down-bonded ground and `vss` is this block's quiet ground. That ordering
+is deliberately *not* the `.subckt mbg-d08` port order (which begins
+`VDD VSS CLK …`) — `info.yaml` is a pad-assignment list, not a netlist
+interface. The sixteen names correspond one-to-one with the sixteen text labels
+in the layout, which is what the audit sheet checks; it flags missing layout
+text with an `*`.
 
 <details>
 <summary><b>Superseded: standalone block-level pin list (first review round)</b></summary>

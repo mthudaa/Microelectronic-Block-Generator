@@ -3,7 +3,7 @@
 .lib '/home/huda/.volare/gf180mcuD/libs.tech/ngspice/sm141064.ngspice' res_typical
 .lib '/home/huda/.volare/gf180mcuD/libs.tech/ngspice/sm141064.ngspice' mimcap_typical
 .options reltol=1e-4 vntol=1e-8 abstol=1e-15 chgtol=1e-16 trtol=1
-.temp -40
+.temp 125
 
 * Self-starting relaxation-oscillator temperature sensor, gf180mcuD 3.3V
 * Ports: VDD VSS TEMP_OUT.  Internal PTAT beta-multiplier reference,
@@ -43,7 +43,7 @@ Cprobe TEMP_OUT 0 10f
 Xdut VDD VSS TEMP_OUT temp_sensor
 
 .control
-tran 7.60677e-09 0.000152135 uic
+tran 3.96415e-09 7.9283e-05 uic
 wrdata ts.dat v(TEMP_OUT) i(Vsup) v(Xdut.ncap)
 .endc
 .end

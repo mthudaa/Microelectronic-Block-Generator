@@ -43,7 +43,7 @@ Cprobe TEMP_OUT 0 10f
 Xdut VDD VSS TEMP_OUT temp_sensor
 
 .control
-tran 1e-09 2e-05 uic
+tran 7.60677e-09 0.000152135 uic
 wrdata ts.dat v(TEMP_OUT) i(Vsup) v(Xdut.ncap)
 .endc
 .end
