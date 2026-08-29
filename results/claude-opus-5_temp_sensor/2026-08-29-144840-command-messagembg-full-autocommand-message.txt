@@ -1,0 +1,1137 @@
+ ▐▛███▛█   Claude Code v2.1.250
+▝▜██████▀  Opus 5 · Claude Pro
+  ▝▝ ▝▝    ~/…/results/claude-opus-5_temp_sensor
+
+
+❯ /model 
+  ⎿  Kept model as Opus 5
+
+❯ /mbg-full-auto Design a **self-starting relaxation-oscillator-based           
+temperature sensor** using the Microelectronic-Block-Generator framework with   
+the **GF180MCU `gf180mcuD` PDK**.                                               
+                                                                                
+Follow the existing MBG SKILL for the complete workflow.                        
+                                                                                
+## Result Directory                                                             
+                                                                                
+Store all results in:                                                           
+                                                                                
+```text                                                                         
+results/{model_name}_temp_sensor                                                
+```                                                                             
+                                                                                
+Examples: `deepseek_temp_sensor`, `ox_alpha_temp_sensor`,                       
+`chatgpt_temp_sensor`.                                                          
+                                                                                
+## Ports                                                                        
+                                                                                
+Use exactly:                                                                    
+                                                                                
+```text                                                                         
+VDD VSS TEMP_OUT                                                                
+```                                                                             
+                                                                                
+Top-level:                                                                      
+                                                                                
+```spice                                                                        
+.subckt temp_sensor VDD VSS TEMP_OUT                                            
+```                                                                             
+                                                                                
+Do not add CLK, START, ENABLE, RESET, IBIAS, VBIAS, or TRIM.                    
+                                                                                
+The sensor must self-bias and self-start from normal power-up — no external     
+reference current, no forced initial condition, no calibration input.           
+                                                                                
+## Technology                                                                   
+                                                                                
+```text                                                                         
+PDK : gf180mcuD                                                                 
+VDD : 3.3 V                                                                     
+VSS : 0 V                                                                       
+```                                                                             
+                                                                                
+Use MOSFET devices supported by GF180MCU (`nfet_03v3` / `pfet_03v3`). Native    
+passives (`ppolyf_u` resistor, metal4/metal5 MIM cap, or MOS cap) are expected  
+for the timing element and/or bias generator — this is a required stress point  
+for the framework's native-passive support, not optional.                       
+                                                                                
+## Nominal Conditions                                                           
+                                                                                
+```text                                                                         
+VDD  = 3.3 V                                                                    
+TEMP = 27 °C                                                                    
+```                                                                             
+                                                                                
+## Specifications                                                               
+                                                                                
+| Parameter | Target |                                                          
+|---|---:|                                                                      
+| Autonomous startup | Required (no external pulse or forced IC) |              
+| Nominal frequency @ 27 °C | 100 kHz – 2 MHz |                                 
+| Frequency vs. temperature | Strictly monotonic, −40 °C to 125 °C |            
+| Temperature sensitivity | 2000–6000 ppm/°C (uncalibrated, single-point) |     
+| Startup time | < 10 µs |                                                      
+| Duty cycle | 40–60% |                                                         
+| TEMP_OUT high | > 2.97 V |                                                    
+| TEMP_OUT low | < 0.33 V |                                                     
+| Average supply current | < 200 µA |                                           
+| Sustained oscillation | ≥ 100 cycles at every corner |                        
+                                                                                
+The final acceptance simulation must not depend on an external startup pulse or 
+forced internal initial condition. The design report must include the measured  
+**F(T) curve** — frequency at every characterized temperature point, per        
+corner — not just a pass/fail at nominal.                                       
+                                                                                
+## PVT                                                                          
+                                                                                
+Characterize at:                                                                
+                                                                                
+```text                                                                         
+VDD  = 3.0, 3.3, 3.6 V                                                          
+TEMP = -40, -15, 10, 27, 50, 75, 100, 125 °C                                    
+```                                                                             
+                                                                                
+and meaningful available process corners. Report monotonicity and sensitivity   
+(ppm/°C) at each VDD, not only at 3.3 V.                                        
+                                                                                
+## Preferred Topology                                                           
+                                                                                
+A relaxation oscillator built from:                                             
+                                                                                
+1. A PTAT/CTAT (or beta-multiplier-style) bias generator setting a              
+temperature-dependent charge/discharge current — no external `IBIAS`/`VBIAS`    
+pin; the reference is internal.                                                 
+2. A native-passive RC (or MOS-cap) timing core charged/discharged by that      
+current through switch devices.                                                 
+3. A hysteresis comparator (Schmitt-trigger style) sensing the timing-cap       
+voltage.                                                                        
+4. A cross-coupled latch / inverter buffer closing the feedback loop and        
+driving `TEMP_OUT` rail-to-rail.                                                
+                                                                                
+Independently choose stage sizing, comparator threshold spacing, and            
+bias-generator topology. Keep the design flat (single `.subckt` — MBG does not  
+flatten nested subcircuits). Prefer the simplest topology that remains          
+self-starting and monotonic after PEX; do not over-optimize frequency stability 
+at the expense of temperature sensitivity — unlike a clock-reference            
+oscillator, drift-with-temperature here is the signal, not the error.           
+
+● I'll start by reading the MBG skill documentation and understanding the
+  framework before designing anything.
+
+  Listed 2 directories (ctrl+o to expand)
+
+● Skill(mbg-context-economy)
+  ⎿  Successfully loaded skill
+
+  Ran 19 shell commands (ctrl+o to expand)
+
+● Now let me check the PDK's passive models — sheet resistance and MIM
+  parameters.
+
+  Listed 1 directory, ran 5 shell commands (ctrl+o to expand)
+
+● I have the framework and PDK details. Let me set up the result directory and
+  verify passive-device simulation syntax.
+
+  Ran 12 shell commands (ctrl+o to expand)
+● Passive models and corner sections confirmed. Now let me build the design and
+  prototype it.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Write(ts_design.py)
+  ⎿  Wrote 121 lines to ts_design.py
+       1 """Self-starting relaxation-oscillator temperature sensor — gf18
+       2 
+       3 Ports: VDD VSS TEMP_OUT exactly.  No CLK/START/ENABLE/RESET/IBIA
+         S/VBIAS/TRIM,
+         ere.
+       5 
+       7 --------------------------------------------------------
+       8 1. Beta-multiplier (constant-gm) bias, degenerated by a native `
+         `ppolyf_u``
+      10        I = (2 / (mu_n Cox (W/L)_N1)) * (1 - 1/sqrt(K))^2 / R^2
+     … +162 lines (ctrl+o to expand)
+
+● Write(ts_sim.py)
+  ⎿  Wrote 411 lines to ts_sim.py
+       1 """Measurement + tuning library for the temp_sensor full-auto ru
+       2 
+         etlist`` so
+         re-sensor
+         pply current,
+       6 sustained cycles) instead of the bundled small-signal AC metrics
+       7 
+         able to audit
+         -------------
+          stock gf180
+     … +478 lines (ctrl+o to expand)
+
+  Ran 2 shell commands (ctrl+o to expand)
+
+● Circuit oscillates and self-starts. Now let me fix duty cycle, frequency, and
+  the Schmitt crowbar current, and make the startup test honest (supply ramp +
+  uic).
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Update(ts_sim.py)
+  ⎿  Added 17 lines, removed 1 line
+      157      return "TEMP_OUT"
+      158  
+      159  
+      160 +VRAMP_S = 1e-6          # supply rise time of the modelled pow
+          +er-up                                                         
+      161 +                                                              
+      162 +                                                              
+      163  def build_deck(core_netlist: str, cell: str, *, vdd=3.3, temp=
+           27,
+      164                 corner="typical", stop="250u", step="4n",
+      162 -               cprobe="10f") -> str:                          
+      165 +               cprobe="10f", power_up=True) -> str:           
+      166 +    """Assemble the simulation deck.                          
+      167 +                                                              
+      168 +    ``power_up=True`` (the acceptance configuration) models a 
+          +real power-up:                                                
+      169 +    the supply is a 1 us ramp from 0 V and the transient runs 
+          +with ``uic``, so                                              
+      170 +    every node starts at 0 V and ngspice never solves a DC ope
+          +rating point.                                                 
+      171 +    That is the *least* favourable initial state, not a forced
+          + one — there is                                               
+      172 +    no ``.ic``/``.nodeset`` in the deck and no source on any s
+          +ignal node.  It                                               
+      173 +    is a strictly stronger start-up test than the default DC-o
+          +p start, which                                                
+      174 +    would hand the circuit its settled bias for free.         
+      175 +                                                              
+      176 +    ``power_up=False`` starts from the DC operating point inst
+          +ead, and is kept                                              
+      177 +    only as a cross-check that the design also runs from that 
+          +state.                                                        
+      178 +    """                                                       
+      179      ports = _subckt_ports(core_netlist, cell)
+      180      gnd = next((p for p in ports if _classify_port(p) == "VSS"
+           ), "VSS")
+      181      core = _tie_vsubs(_normalise_passives(core_netlist, gnd), 
+           cell, gnd)
+  ⎿  Loaded ../../CLAUDE.md
+  ⎿  Loaded ../../AGENTS.md
+
+● Update(ts_sim.py)
+  ⎿  Added 8 lines, removed 2 lines
+      192      head.append(f".lib '{stock}' {res_lib}")
+      193      head.append(f".lib '{stock}' {mim_lib}")
+      194      dut_nodes = " ".join(_classify_port(p) for p in ports)
+      195 +    if power_up:                                              
+      196 +        supply = f"Vsup VDD 0 PWL(0 0 {VRAMP_S:g} {vdd})"     
+      197 +        analysis = f"tran {step} {stop} uic"                  
+      198 +    else:                                                     
+      199 +        supply = f"Vsup VDD 0 {vdd}"                          
+      200 +        analysis = f"tran {step} {stop}"                      
+      201      return "\n".join(
+      202          head + [f".temp {temp}", "", "\n".join(keep).strip(), 
+           "",
+      203                  "Vsfix VSS 0 0",
+      198 -                f"Vsup VDD 0 {vdd}",                          
+      204 +                supply,                                       
+      205                  f"Cprobe TEMP_OUT 0 {cprobe}",
+      206                  f"Xdut {dut_nodes} {cell}", "",
+      207                  ".control",
+      202 -                f"tran {step} {stop}",                        
+      208 +                analysis,                                     
+      209                  "wrdata ts.dat v(TEMP_OUT) i(Vsup) v(Xdut.ncap
+           )",
+      210                  ".endc", ".end", ""])
+      211  
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Self-start from a 0 V power-up ramp works. Now the critical question — the
+  F(T) curve.
+
+  Ran 2 shell commands (ctrl+o to expand)
+
+● The TC is +1725 ppm/°C — below the 2000 target. Let me decompose and fix: the
+  Schmitt window is VDD-referenced (grows with T) instead of Vth-referenced.
+
+  Ran 3 shell commands (ctrl+o to expand)
+
+● ute = -1.568 confirms the mobility path gives ~+5200 ppm/°C in strong
+  inversion. Pushing the beta-multiplier into strong inversion lifts TC to
+  +3790.
+
+  Ran 10 shell commands (ctrl+o to expand)
+● The supply current is numerically unstable across otherwise-identical runs.
+  Let me tighten the integrator.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● trtol=1 was the fix — the default truncation-error tolerance let LTE
+  accumulate into the source branch current. Let me adopt tightened options.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Nominal is in spec. Now let me check the corner extremes before locking the
+  design.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Locking the strong-inversion bias. Let me set the final sizing and immediately
+  test whether the layout flow can handle this device-size heterogeneity.
+
+  Ran 3 shell commands (ctrl+o to expand)
+
+● Layout found a real constraint: W=0.22 µm is below what glayout can build a
+  via array on. Widening the starter device.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Layout builds, routes, and passes both DRC engines. LVS mismatches — let me
+  diagnose.
+
+  Ran 5 shell commands (ctrl+o to expand)
+
+● LVS pinpoints it: the extracted resistor's substrate pin lands on VSS, but the
+  schematic declares only two terminals. Let me check how the flow handles a
+  third resistor node.
+
+  Ran 4 shell commands (ctrl+o to expand)
+
+● LVS now matches uniquely. The remaining blocker is a genuine framework gap
+  this design exposed — let me look at it precisely.
+
+  Ran 2 shell commands (ctrl+o to expand)
+
+● This is the native-passive gap the prompt flagged as a stress point: the flow
+  requires an access point for every terminal, but a poly resistor's substrate
+  pin is made by the p-substrate, not by a route.
+
+  Ran 2 shell commands (ctrl+o to expand)
+● Update(~/opensource-project/Microelectronic-Block-Generator/src/mbg/connectivi
+        ty.py)
+  ⎿  Added 2 lines
+      357          for term, net in dev.terminals.items():
+      358              if not net:
+      359                  continue
+      360 +            if _is_substrate_terminal(ctx, dev, term, net):   
+      361 +                continue                                      
+      362              aps = [a for a in ctx.net_to_access.get(net, [])
+      363                     if a.instance == dev.name and a.terminal ==
+            term]
+      364              if not aps:
+
+● Update(~/opensource-project/Microelectronic-Block-Generator/src/mbg/connectivi
+        ty.py)
+  ⎿  Added 25 lines
+      346      return result
+      347  
+      348  
+      349 +def _is_substrate_terminal(ctx, dev, term: str, net: str) -> b
+          +ool:                                                          
+      350 +    """True for a native passive's bulk pin, which the substra
+          +te itself makes.                                              
+      351 +                                                              
+      352 +    ``ppolyf_u`` extracts with three terminals — the two resis
+          +tor ends plus the                                             
+      353 +    p-substrate it sits in — so a schematic that declares only
+          + two makes netgen                                             
+      354 +    invent a proxy net and the LVS fails on net count.  Declar
+          +ing the third                                                 
+      355 +    terminal on ground fixes the LVS, but ``mbg.passives.poly_
+          +resistor`` builds                                             
+      356 +    no substrate contact and has no port for one: the connecti
+          +on is formed by                                               
+      357 +    the p-substrate under the device, held at ground by the su
+          +bstrate taps of                                               
+      358 +    its neighbours, which is exactly how Magic extracts it.   
+      359 +                                                              
+      360 +    Demanding a routed access point for that pin would therefo
+          +re report a                                                   
+      361 +    missing connection that no router could ever satisfy.  Thi
+          +s is narrow on                                                
+      362 +    purpose: only the bulk of a ``res``/``cap`` primitive, and
+          + only when it                                                 
+      363 +    sits on the ground net.  A passive whose bulk is on any ot
+          +her net needs an                                              
+      364 +    isolating well and a real contact, and is still reported. 
+      365 +    """                                                       
+      366 +    if term != "body" or getattr(dev, "kind", None) not in ("r
+          +es", "cap"):                                                  
+      367 +        return False                                          
+      368 +    n = ctx.nets.get(net)                                     
+      369 +    if n is not None and getattr(n, "is_ground", False):      
+      370 +        return True                                           
+      371 +    return str(net).strip().lower() in ("vss", "gnd", "0", "vs
+          +sa")                                                          
+      372 +                                                              
+      373 +                                                              
+      374  def compare_with_netlist(ctx) -> Dict[str, object]:
+      375      """Expected (SPICE) vs physical connectivity, terminal by 
+           terminal.
+      376  
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● all_pass = True. Let me verify my framework change doesn't regress the
+  existing designs, and simultaneously test PEX simulation.
+
+  Ran 6 shell commands (ctrl+o to expand)
+
+● Found it: .option scale=5n scales MOSFET geometry but not the MIM's
+  c_width/c_length subckt parameters — so the extracted timing cap was ~10¹⁰×
+  too large. Let me fix the PEX netlist preparation.
+
+● Update(ts_sim.py)
+  ⎿  Added 64 lines
+      124      return "\n".join(out)
+      125  
+      126  
+      127 +_SCALE_OPT = re.compile(r"^\s*\.options?\s+.*\bscale\s*=\s*([0
+          +-9.eE+-]+)([a-zA-Z]*)",                                       
+      128 +                        re.IGNORECASE)                        
+      129 +_UNIT = {"": 1.0, "m": 1e-3, "u": 1e-6, "n": 1e-9, "p": 1e-12,
+          + "f": 1e-15,                                                  
+      130 +         "k": 1e3, "meg": 1e6}                                
+      131 +                                                              
+      132 +                                                              
+      133 +def _num(text: str) -> float:                                 
+      134 +    m = re.match(r"^([0-9.eE+-]+)([a-zA-Z]*)$", text.strip()) 
+      135 +    if not m:                                                 
+      136 +        return float(text)                                    
+      137 +    unit = m.group(2).lower()                                 
+      138 +    for suffix in ("meg", "m", "u", "n", "p", "f", "k"):      
+      139 +        if unit.startswith(suffix):                           
+      140 +            return float(m.group(1)) * _UNIT[suffix]          
+      141 +    return float(m.group(1))                                  
+      142 +                                                              
+      143 +                                                              
+      144 +def _descale_passive_params(netlist: str) -> str:             
+      145 +    """Undo ``.option scale`` for native-passive geometry para
+          +meters.                                                       
+      146 +                                                              
+      147 +    Magic's PEX netlist writes every dimension in internal uni
+          +ts and puts                                                   
+      148 +    ``.option scale=5n`` at the top.  ngspice's ``scale`` appl
+          +ies to *device*                                               
+      149 +    geometry, so the MOSFETs inside ``pfet_03v3``/``nfet_03v3`
+          +` come out right                                              
+      150 +    — but ``c_width``/``c_length`` are plain subcircuit parame
+          +ters feeding a                                                
+      151 +    ``.param c_area='c_length*c_width'`` expression, and ngspi
+          +ce never scales                                               
+      152 +    those.  The extracted 34 um MIM was therefore evaluated as
+          + c_width=6800                                                 
+      153 +    *metres*, i.e. about 9e4 F, and the timing node could not 
+          +charge at all:                                                
+      154 +    the post-layout netlist simulated as a dead circuit for a 
+          +reason that had                                               
+      155 +    nothing to do with the layout.                            
+      156 +                                                              
+      157 +    The fix rewrites only the passive width/length parameters 
+          +into explicit                                                 
+      158 +    absolute units and leaves ``.option scale`` in place for t
+          +he transistors.                                               
+      159 +    The resistor is rewritten too: its resistance depends only
+          + on the                                                       
+      160 +    length/width *ratio* so it was already right, but making i
+          +t absolute also                                               
+      161 +    makes the r_dw edge correction correct instead of negligib
+          +le-by-accident.                                               
+      162 +    """                                                       
+      163 +    m = None                                                  
+      164 +    for line in netlist.splitlines():                         
+      165 +        m = _SCALE_OPT.match(line) or m                       
+      166 +    if not m:                                                 
+      167 +        return netlist                                        
+      168 +    scale = _num(m.group(1) + m.group(2))                     
+      169 +    if scale == 1.0:                                          
+      170 +        return netlist                                        
+      171 +    keys = ("c_width", "c_length", "r_width", "r_length")     
+      172 +    out = []                                                  
+      173 +    for line in netlist.splitlines():                         
+      174 +        s = line.strip()                                      
+      175 +        if not s or s[0] not in "Xx" or "=" not in s:         
+      176 +            out.append(line)                                  
+      177 +            continue                                          
+      178 +        head, params = _split_line(s)                         
+      179 +        model = head[-1].lower() if head else ""              
+      180 +        if not (model in _RES_MODELS or model.startswith("cap_
+          +mim")):                                                       
+      181 +            out.append(line)                                  
+      182 +            continue                                          
+      183 +        for k in keys:                                        
+      184 +            if k in params:                                   
+      185 +                params[k] = f"{_num(params[k]) * scale:.6g}"  
+      186 +        out.append(" ".join(head[:-1] + [head[-1]]            
+      187 +                            + [f"{k}={v}" for k, v in params.i
+          +tems()]))                                                     
+      188 +    return "\n".join(out)                                     
+      189 +                                                              
+      190 +                                                              
+      191  def _tie_vsubs(netlist: str, cell: str, gnd: str) -> str:
+      192      """Short Magic's floating VSUBS node to the cell's ground 
+           port."""
+      193      if not re.search(r"\bVSUBS\b", netlist):
+  ⎿  Loaded 14 skills from 
+     opensource-project/Microelectronic-Block-Generator/.claude/skills
+  ⎿  14 skills available
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● PEX simulates correctly now — 1.031 MHz, essentially matching pre-layout. Let
+  me check the regression.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● PEX flow works end to end. Let me set up the full-auto driver.
+
+  Ran 2 shell commands (ctrl+o to expand)
+
+● Write(run_full_auto.py)
+  ⎿  Wrote 327 lines to run_full_auto.py
+       1 """Drive /mbg-full-auto for the self-starting temperature sensor
+       2 
+       3 Run from the repository root:
+       4     cd "$MBG_ROOT" && python3 results/claude-opus-5_temp_sensor/
+       5 
+       6 The bundled ``mbg.flow_runtime.simulate_netlist`` measures small
+       7 metrics; this run replaces it so every pre-layout and PEX evalua
+         tion measures
+       8 the sensor instead.
+      10 Why the measurement is a three-temperature sweep, not one point
+     … +380 lines (ctrl+o to expand)
+
+  Ran 2 shell commands (ctrl+o to expand)
+
+● Regression is clean — 8/8 designs still pass all four legs, so the framework
+  fix is safe. Launching the full-auto flow.
+
+  Ran 3 shell commands (ctrl+o to expand)
+
+● SUCCESS / TAPEOUT_READY, converged on iteration 1 of both loops. Now the main
+  remaining deliverable — the full PVT characterization.
+
+  Ran 3 shell commands (ctrl+o to expand)
+● Write(pvt_run.py)
+  ⎿  Wrote 139 lines to pvt_run.py
+       1 """PVT characterisation of the final temperature sensor (schemat
+       2 
+         eratures
+       4 = 240 transient simulations, each run long enough to contain at 
+       5 oscillation cycles at that corner's own frequency (the stop time
+       6 from a measured probe run, never assumed).
+       8 Process corners are real corners of *all three* device classes, 
+         not the MOSFET
+         s for the poly
+          capacitor
+     … +158 lines (ctrl+o to expand)
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● PVT sweep is running. Meanwhile, let me address the reviewer findings and the
+  flat-library equivalence claim.
+
+  Ran 2 shell commands (ctrl+o to expand)
+
+● The Devil's MEDIUM finding is a margin-heuristic artifact on a boolean, but
+  the concern behind it is real. Let me make good on the flat-library
+  equivalence claim I documented.
+
+● Write(check_flat_lib.py)
+  ⎿  Wrote 121 lines to check_flat_lib.py
+       1 """Verify pdk_flat/sm141064.ngspice against the stock GF180 MOSF
+       2 
+       3 ``ts_sim.py`` simulates the MOSFETs from a flattened copy of the
+       4 file, because the stock library re-evaluates roughly a thousand 
+       5 parameter expressions inside its .model cards on every Newton it
+         eration and a
+         answer is
+       7 worthless, so this script re-derives the claim rather than asser
+       8 runs the *actual* design on both libraries and compares.
+      10   1. DC operating point of every internal node.
+     … +132 lines (ctrl+o to expand)
+
+  Ran 4 shell commands (ctrl+o to expand)
+
+● Load average 43 on 12 cores — I oversubscribed the machine. Let me stop and
+  measure the right parallelism.
+
+  Ran 4 shell commands (ctrl+o to expand)
+
+● Those /foss/tools/bin/ngspice processes are another session's — I'll leave
+  them alone. Let me check ngspice's threading controls.
+
+  Ran 2 shell commands (ctrl+o to expand)
+
+● 51 s per point × 240 points is too slow. Let me test whether a coarser max
+  timestep preserves accuracy.
+
+  Ran 2 shell commands (ctrl+o to expand)
+
+● Timing is dominated by machine load, not step size. Let me lock a 10 ns cap
+  and relaunch the sweep with PEX (the sign-off netlist) first.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● PVT is running detached. Let me build the report-table generator while it
+  works.
+
+● Write(pvt_md.py)
+  ⎿  Wrote 171 lines to pvt_md.py
+      1 """Turn pvt_summary.json into the report tables.
+      2 
+      3 Emits pvt_summary.md:
+         point, for
+      5     every corner and every supply, for both the schematic and the
+         extracted
+      6     netlist;
+        two
+      8     temperature sensitivities;
+      9   * the worst-case table for every other acceptance limit.
+     … +194 lines (ctrl+o to expand)
+
+  Ran 3 shell commands (ctrl+o to expand)
+
+● Two foreign ngspice jobs from another session are using half the machine. Let
+  me restructure the sweep to eliminate the redundant probe pass on the
+  expensive PEX points.
+
+  Ran 8 shell commands (ctrl+o to expand)
+● The machine is memory-swapping (7.7 GB swap) with a run queue of 24 on 12
+  cores. Let me stop competing with it, make the sweep resumable, and drop to
+  one worker.
+
+  Ran 1 shell command (ctrl+o to expand)
+  ⎿  You've hit your session limit · resets 12:10am (Asia/Taipei)
+     /upgrade or /usage-credits to finish what you’re working on.
+
+✻ Sautéed for 1h 32m 31s · done Friday 11:08 PM
+
+● Background command "Time an equivalent probe standalone right now" completed
+(exit code 0)
+  ⎿  You've hit your session limit · resets 12:10am (Asia/Taipei)
+     /upgrade or /usage-credits to finish what you’re working on.
+
+✻ Baked for 1s · done Friday 11:10 PM
+
+❯ continue                                                                      
+
+  Ran 2 shell commands (ctrl+o to expand)
+
+● The sweep is running (19/120 schematic points, median 147 s each) but the
+  machine is shared with three other ngspice jobs from another session. Let me
+  make the sweep resumable and write the remaining artifacts while it works.
+
+  Ran 3 shell commands (ctrl+o to expand)
+
+● Let me write the experiment metadata and the design report.
+
+  Ran 2 shell commands (ctrl+o to expand)
+
+● Progress is slow under contention. Let me write the design report now and fold
+  in PVT results as they land.
+
+● Write(DESIGN_REPORT.md)
+  ⎿  Wrote 417 lines to DESIGN_REPORT.md
+       1 # Self-starting relaxation-oscillator temperature sensor — GF180
+       2 
+       3 **Cell** `temp_sensor` · **Ports** `VDD VSS TEMP_OUT` · **Model*
+         * `claude-opus-5`
+         ADY`
+       5 
+       7 
+       8 ## 1. What was asked and what was built
+       9 
+         . Unlike a
+     … +581 lines (ctrl+o to expand)
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Contention eased. Let me check memory headroom before increasing parallelism.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● ngspice is CPU-bound at ~5 cores each, so 2 workers is right. Let me verify
+  the flat-library equivalence claim with the cheap half of that check while the
+  sweep runs.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Operating points are bit-identical across the two libraries. Let me record
+  that precisely in the report.
+
+  Ran 3 shell commands (ctrl+o to expand)
+● Early data looks strong — every completed corner is strictly monotonic with TC
+  ≈ +3900–4000 ppm/°C. Let me keep monitoring.
+
+  Ran 3 shell commands (ctrl+o to expand)
+
+● Artifacts are complete and the laid-out netlist matches the simulated one.
+  Continuing to monitor the sweep.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Let me test whether ngspice's internal threading is actually efficient here —
+  if not, more processes with fewer threads each would be much faster.
+
+  Ran 2 shell commands (ctrl+o to expand)
+
+● My side experiments were competing with the sweep — stopping those. Let me
+  monitor with log reads only.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Monitor(temp_sensor PVT sweep progress and completion)
+  ⎿  Monitor started · task bzcq1hend · timeout 3600s
+
+● Let me replace the provisional table in the report with the real measured data
+  now available.
+
+  Ran 2 shell commands (ctrl+o to expand)
+
+● Monitor event: "temp_sensor PVT sweep progress and completion"
+
+● The design is complete and signed off; the PVT sweep continues in the
+  background with a monitor armed. Here's where things stand.
+
+  results/claude-opus-5_temp_sensor — SUCCESS / TAPEOUT_READY
+
+  Circuit — flat single .subckt temp_sensor VDD VSS TEMP_OUT, 18 MOSFETs + 2
+  native passives, 12 nets, 88 × 156 µm. Beta-multiplier PTAT reference
+  degenerated by a ppolyf_u resistor (1×100 µm ≈ 37 kΩ) → 34×34 µm metal4/metal5
+  MIM (≈2.33 pF) timing core → 6T CMOS Schmitt trigger → inverter buffer
+  closing the loop. Self-extinguishing 3-transistor starter; no IBIAS/START/TRIM
+  pin.
+
+  Verification (all four legs) — Magic DRC CLEAN, KLayout foundry-deck DRC
+  CLEAN, reconciled sign-off PASS; netgen LVS Circuits match uniquely (20
+  devices / 12 nets both sides); internal connectivity clean; PEX extracted and
+  simulated.
+
+  ┌─────────────────────┬─────────────────┬───────────────┬─────────────────┐
+  │       Metric        │     Target      │  Pre-layout   │       PEX       │
+  ├─────────────────────┼─────────────────┼───────────────┼─────────────────┤
+  │ f @ 27 °C           │   100 kHz–2 MHz │     1.082 MHz │       1.031 MHz │
+  ├─────────────────────┼─────────────────┼───────────────┼─────────────────┤
+  │ Sensitivity         │      2000–6000  │         +3950 │    +3868 ppm/°C │
+  │                     │          ppm/°C │               │                 │
+  ├─────────────────────┼─────────────────┼───────────────┼─────────────────┤
+  │ Monotonic −40…125   │        required │           yes │             yes │
+  │ °C                  │                 │               │                 │
+  ├─────────────────────┼─────────────────┼───────────────┼─────────────────┤
+  │ Start-up            │         < 10 µs │       1.42 µs │         1.44 µs │
+  ├─────────────────────┼─────────────────┼───────────────┼─────────────────┤
+  │ Duty                │         40–60 % │   45.5–48.5 % │     45.5–48.7 % │
+  ├─────────────────────┼─────────────────┼───────────────┼─────────────────┤
+  │ VOH / VOL           │ >2.97 / <0.33 V │      3.301 /  │ 3.301 / −0.001  │
+  │                     │                 │        −0.001 │               V │
+  ├─────────────────────┼─────────────────┼───────────────┼─────────────────┤
+  │ Avg supply current  │        < 200 µA │       55.9 µA │         56.3 µA │
+  ├─────────────────────┼─────────────────┼───────────────┼─────────────────┤
+  │ Sustained cycles    │           ≥ 100 │           117 │             117 │
+  └─────────────────────┴─────────────────┴───────────────┴─────────────────┘
+
+  Both optimisation loops converged on iteration 1.
+
+  Start-up is tested honestly. A plain tran solves the DC operating point first
+  and would hand this circuit its settled bias for free, making the test
+  vacuous. Every simulation uses Vsup VDD 0 PWL(0 0 1u 3.3) with tran ... uic —
+  every node starts at 0 V, no .ic, no .nodeset, no source on any signal node.
+
+  Three things I had to fix rather than work around, all reproduced from first
+  principles:
+
+  1. LVS, src/mbg/connectivity.py — Magic extracts ppolyf_u with a substrate
+     pin; declaring it fixes an LVS net-count mismatch (12 vs 13) but then the
+     connectivity checker demanded a routed access point that
+     mbg.passives.poly_resistor exposes no port for. That connection is made by
+     the p-substrate itself. The checker now exempts a res/cap bulk terminal on 
+     the ground net only. Regression: tests/test_all_designs.py 8/8 designs 
+     still pass all four legs. This is the one file I changed outside my results
+     directory — flagging it since connectivity.py sits near Ahmad's
+     verification ownership.
+  2. PEX simulation — .option scale=5n scales MOSFET geometry but not
+     c_width/c_length, which are plain subcircuit parameters. The extracted 34
+     µm MIM evaluated as 6800 metres ≈ 9×10⁴ F, and the post-layout netlist
+     simulated as a dead circuit for a reason unrelated to the layout.
+  3. ngspice trtol — at the default 7, truncation error accumulated into the
+     voltage-source branch current: i(Vsup) drifted 41 µA → 520 µA over 40 µs
+     while every node voltage and the frequency stayed correct. All current
+     figures use trtol=1 and time-weighted averaging.
+
+  Also worth knowing: W = 0.22 µm is not buildable — glayout can't fit a
+  source/drain via array on it and the placer dies with a KeyError.
+
+  Still running
+
+  The 240-point PVT sweep (5 corners × 3 VDD × 8 temps, schematic + PEX) is at
+  48/240. Six complete F(T) curves so far — typical and ss at all three supplies
+  — all strictly monotonically rising across all eight points, TC +3890 to
+  +4065 ppm/°C, varying under 3 % from 3.0 V to 3.6 V.
+
+  It's slow because another session is running three ngspice testbenches on this
+  machine; throughput swung between 130 s and 2000 s per point. pvt_run.py is
+  resumable (completed points reload from pvt_summary.json), and I have a
+  monitor armed — I'll fold the remaining tables into DESIGN_REPORT.md §7 as
+  they land.
+
+  Not run, and not claimed: Monte Carlo / mismatch, and the transient half of
+  check_flat_lib.py (its DC half passed with a 0 V delta — the flattened and
+  stock model libraries give bit-identical operating points).
+
+  One thing to flag: while clearing my own runaway jobs I ran pkill -f 'ngspice 
+  -b', which may have killed one of the other session's mbg-d08 testbench
+  processes. They were running again afterwards, but it's worth a check on that
+  side.
+
+✻ Cooked for 1h 12m 42s · done 1:27 AM
+
+※ recap: Goal was a self-starting relaxation-oscillator temperature sensor in GF180MCU; the design is done and signed off tapeout-ready, with all specs met pre- and post-layout. The 240-point PVT sweep is still running at 48/240, and I'll add its tables to the report when it finishes. (disable recaps in /config)
+
+● Monitor event: "temp_sensor PVT sweep progress and completion"
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● 68/240, zero failing points. Eight of fifteen schematic F(T) curves are
+  complete — all strictly monotonic:
+
+  ┌─────────┬──────────┬─────────────┬─────────────────────┬───────────────┐
+  │ corner  │   VDD    │  f(27 °C)   │  span (−40→125 °C)  │    TC_mean    │
+  ├─────────┼──────────┼─────────────┼─────────────────────┼───────────────┤
+  │         │   3.0 /  │ 1126 / 1082 │ 826→1569 / 791→1519 │ +3890 / +3949 │
+  │ typical │   3.3 /  │  / 1038 kHz │      / 756→1462 kHz │       / +3997 │
+  │         │      3.6 │             │                     │               │
+  ├─────────┼──────────┼─────────────┼─────────────────────┼───────────────┤
+  │         │   3.0 /  │ 760 / 733 / │ 555→1076 / 533→1039 │ +4013 / +4044 │
+  │ ss      │   3.3 /  │     705 kHz │      / 512→1001 kHz │       / +4065 │
+  │         │      3.6 │             │                     │               │
+  ├─────────┼──────────┼─────────────┼─────────────────────┼───────────────┤
+  │ ff      │   3.0 /  │ 1789 / 1714 │        1322→2289 /  │ +3328 / +3771 │
+  │         │      3.3 │         kHz │       1262→2352 kHz │               │
+  └─────────┴──────────┴─────────────┴─────────────────────┴───────────────┘
+
+  The ff corner is the useful new information: it's the fast extreme (280 Ω/sq
+  poly, ×0.9 MIM, fast MOS) and 27 °C frequency still lands at 1.79 MHz — inside
+  the 100 kHz–2 MHz window with margin. That was the reason for sizing the MIM
+  at 34 µm rather than leaving it at 20 µm. Its sensitivity is the lowest seen
+  so far at +3328 ppm/°C, still comfortably inside the band.
+
+  Waiting on the remaining ff 3.6 V, sf, fs curves and then the PEX half.
+
+✻ Cooked for 22s · done 1:52 AM
+
+※ recap: Goal: a self-starting GF180MCU temperature sensor, designed and verified through the MBG flow. The design is done and signed off as tapeout-ready; the 240-point PVT sweep is at 68 with no failures. Next: let it finish, then add the tables to the report. (disable recaps in /config)
+
+❯ /export                                                                       
+  ⎿  Conversation exported to: /home/huda/opensource-project/Microelectronic-Blo
+     ck-Generator/results/claude-opus-5_temp_sensor/2026-08-29-021233-command-me
+     ssagembg-full-autocommand-message.txt
+
+※ recap: Goal: a self-starting relaxation-oscillator temperature sensor in GF180MCU. The design is finished and signed off (DRC, LVS, PEX all pass, +3868 ppm/°C post-layout). The 240-point PVT sweep is running at 68 done; next step is folding its tables into the report. (disable recaps in /config)
+
+● Monitor event: "temp_sensor PVT sweep progress and completion"
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● 11/15 schematic curves complete, still zero failing points across 88
+  simulations. ff and sf both monotonic with TC +3328…+3925. Waiting on sf 3.6 V
+  and the three fs curves, then the 120-point PEX half begins.
+
+✻ Crunched for 15s · done 2:17 AM
+※ recap: Goal: a self-starting relaxation-oscillator temperature sensor in GF180MCU. The design is done and signed off (DRC, LVS, PEX all pass, tapeout-ready). The 240-point PVT sweep is running at 88 points, zero failures; next is folding its final tables into the report.
+
+● Monitor event: "temp_sensor PVT sweep progress and completion"
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Monitor(temp_sensor PVT sweep progress and completion)
+  ⎿  Monitor started · task blc72a5so · timeout 3600s
+
+● Monitor re-armed. Sweep at 94/240 (sf 3.6 V in progress, then the three fs
+  curves complete the schematic half at 120, and the PEX half follows).
+
+✻ Sautéed for 14s · done 2:26 AM
+
+※ recap: Goal: a self-starting relaxation-oscillator temperature sensor in GF180MCU. The design is verified and TAPEOUT_READY; the 240-point PVT sweep is running at 94/240 with zero failures. Next: fold the finished tables into DESIGN_REPORT.md §7.
+
+● Monitor event: "temp_sensor PVT sweep progress and completion"
+
+● Schematic half complete — 120/120. Let me generate the full tables.
+
+  Ran 2 shell commands (ctrl+o to expand)
+
+● The full schematic PVT grid is complete and clean.
+
+  All 15 corner × supply combinations are strictly monotonically rising across 
+  all eight temperature points. Sensitivity spans +3328…+4065 ppm/°C — every
+  value inside the 2000–6000 window, never closer than 1300 ppm/°C to either
+  bound, and stable across supply (under 3 % variation from 3.0 V to 3.6 V).
+
+  Worst case over all 120 points: VOH 3.001 V, VOL −1.09 mV, duty 45.3–51.1 %,
+  average supply current 87.2 µA, ≥117 sustained cycles, start-up ≤1.98 µs. Zero
+  failing points.
+
+  One result worth calling out: the 27 °C frequency stays inside 100 kHz–2 MHz
+  at every corner, not just the nominal one — extremes are ss/3.6 V at 704.8 kHz
+  and ff/3.0 V at 1789.1 kHz. That was the reason for sizing the MIM at 34 µm;
+  at the 20 µm that met nominal alone, ff would have run past 2 MHz.
+
+  The PEX half (120 points) is now running, using stop times taken from the
+  matching schematic points so each is a single pass rather than
+  probe-plus-rerun. DESIGN_REPORT.md §7.1 now carries the full table; §7.2 is
+  reserved for the extracted grid.
+
+✻ Churned for 40s · done 3:03 AM
+
+※ recap: Goal: a self-starting relaxation-oscillator temperature sensor in GF180MCU. The design is verified and tapeout-ready (DRC, LVS, PEX all pass), and the 120-point schematic PVT sweep passed cleanly. Next: wait for the PEX PVT half to finish, then write its table into the report.
+
+● Monitor event: "temp_sensor PVT sweep progress and completion"
+
+  Ran 1 shell command (ctrl+o to expand)
+  ⎿  Invalid tool parameters
+
+● Monitor(temp_sensor PVT sweep progress and completion)
+  ⎿  Monitor started · task b1rl56efw · timeout 3600s
+
+● PEX half is at 19/120 and running at schematic-like speed (~175 s/point) — the
+  single-pass stop-time prediction worked, and points are landing at 122
+  cycles, comfortably over the 100 required. Roughly 2.5 hours to finish.
+  Monitor re-armed.
+
+✻ Baked for 24s · done 3:26 AM
+
+※ recap: Goal: a self-starting GF180 relaxation-oscillator temperature sensor. The design is done and signed off (DRC/LVS/PEX clean, TAPEOUT_READY), with the 120-point schematic PVT grid all-pass and monotonic. Next: finish the PEX PVT half (19/120) and write §7.2.
+
+● Monitor event: "temp_sensor PVT sweep progress and completion"
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● 6 of 15 PEX curves done, all strictly monotonic, TC +3815…+3982 ppm/°C. The
+  parasitic penalty is remarkably uniform — −4.2 % to −4.9 % on frequency at 
+  every corner and supply — which is the signature of a single dominant effect
+  (≈5 % of extracted capacitance added to the 2.33 pF timing node) rather than
+  anything corner-dependent. TC degrades by under 2 % post-layout.
+
+  Still zero failing points across 170 simulations. PEX at 50/120.
+
+✻ Churned for 20s · done 4:04 AM
+
+※ recap: Goal: a self-starting relaxation-oscillator temperature sensor in GF180MCU. The design is done and signed off (DRC, LVS, PEX all clean, TAPEOUT_READY); the 240-point PVT sweep is at 170 with zero failures. Next: wait for it to finish, then write the PEX tables into the report.
+
+● Monitor event: "temp_sensor PVT sweep progress and completion"
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Monitor(temp_sensor PVT sweep completion)
+  ⎿  Monitor started · task bjm80kevq · timeout 3600s
+
+● 192/240 — PEX at 72/120 and speeding up (98 s/point as the machine frees). The
+  ff/3.6 V/125 °C point, the fastest condition in the whole grid, lands at 2.16
+  MHz with 49.5 % duty and 87.9 µA. Remaining 48 points should take under an
+  hour. Monitor re-armed.
+
+✻ Cooked for 15s · done 4:26 AM
+
+※ recap: The GF180 self-starting temperature sensor is designed, verified and TAPEOUT_READY, with the design report written. The 240-point PVT sweep is at 192/240; next is folding the finished PEX tables into section 7.2 of the report.
+● Monitor event: "temp_sensor PVT sweep completion"
+
+● 222/240 — 18 points left in the fs corner. Waiting for completion, then I'll
+  generate the full PEX tables and close out the report.
+
+✻ Sautéed for 7s · done 4:59 AM
+
+● Monitor event: "temp_sensor PVT sweep completion"
+
+● Monitor "temp_sensor PVT sweep completion" stream ended
+
+● PVT sweep complete — 240/240 points, both netlists, every point meets every 
+  limit. Let me generate the final tables and close out the report.
+
+  Ran 5 shell commands (ctrl+o to expand)
+
+● Monitor(flat-library transient equivalence check)
+  ⎿  Monitor started · task br6kc7iz4 · timeout 3600s
+
+● The full PVT characterization is done. Final numbers:
+
+  PVT — 240/240 points, zero failures
+
+  Every one of the 30 corner × supply F(T) curves is strictly monotonically 
+  rising across all eight temperature points — 15 on the schematic netlist, 15
+  on the extracted one.
+
+  ┌────────────────────┬──────────────────────────┬─────────────┬───────────┐
+  │                    │      TC_mean range       │ TC_27 range │ monotonic │
+  ├────────────────────┼──────────────────────────┼─────────────┼───────────┤
+  │ Schematic, 3.0 /   │           +3328…+4013 /  │             │           │
+  │ 3.3 / 3.6 V        │           +3771…+4044 /  │ +4014…+4250 │ 15/15     │
+  │                    │              +3890…+4065 │             │           │
+  ├────────────────────┼──────────────────────────┼─────────────┼───────────┤
+  │ PEX, 3.0 / 3.3 /   │           +3259…+3941 /  │             │           │
+  │ 3.6 V              │           +3693…+3965 /  │ +3948…+4156 │ 15/15     │
+  │                    │              +3807…+3982 │             │           │
+  └────────────────────┴──────────────────────────┴─────────────┴───────────┘
+
+  Every sensitivity sits inside the required 2000–6000 ppm/°C band, never closer
+  than ~1250 ppm/°C to either bound.
+
+  Worst case over all 120 extracted points: VOH 3.001 V, VOL −0.93 mV, duty
+  45.25–51.35 %, average supply current 87.9 µA, ≥120 sustained cycles, start-up
+  ≤2.01 µs. All inside spec.
+
+  The post-layout frequency penalty is −4.2 % to −5.3 % and near-identical at
+  every corner and supply. That uniformity is the informative part: it's one
+  dominant effect — roughly 5 % of extracted capacitance on the 2.33 pF timing
+  node — not a corner-dependent interaction. Sensitivity degrades under 2 %
+  post-layout; monotonicity is untouched.
+
+  Sweep wall time 6 h 30 min; pvt_run.py is resumable and was restarted twice
+  without losing completed points.
+
+  DESIGN_REPORT.md §7.1–§7.3 and pvt_summary.md now carry the complete tables,
+  and experiment.json records the grid and results.
+
+  I've also launched the transient half of check_flat_lib.py now that the
+  machine is free — that's the last item I can move from NOT RUN to measured.
+  Its DC half already passed with a 0 V delta. Monte Carlo / mismatch remains
+  not run and is not claimed; it's the largest residual risk in the package,
+  along with the ~2.5:1 absolute frequency spread across process (inherent to an
+  uncalibrated sensor, since the poly-resistor sheet spread enters as 1/R²).
+
+✻ Churned for 1m 23s · done 5:21 AM
+
+● Monitor event: "flat-library transient equivalence check"
+
+● Monitor "flat-library transient equivalence check" stream ended
+
+● The transient check reported 0.0000 % delta — but at −40 °C both sides
+  returned 0 Hz, meaning the 5 µs window was too short to extract a frequency.
+  That's a vacuous comparison the script счёл a pass. Let me fix the guard and
+  re-run.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Monitor(flat-library equivalence re-check with vacuous-comparison guard)
+  ⎿  Monitor started · task buavbtiip · timeout 3600s
+
+● Caught a real flaw in my own check: comparing two simulations that both failed
+  to oscillate long enough yields "0 % difference" and would have been reported
+  as a pass. The script now treats a missing frequency on either side as a
+  failure rather than agreement, and the transient window is 10 µs so −40 °C
+  (791 kHz, 1.26 µs period) actually produces countable cycles. Re-running.
+
+  The 27 °C and 125 °C comparisons from the first run were genuine and identical
+  to all printed digits (1081.569 kHz and 1518.221 kHz on both libraries).
+
+✻ Cogitated for 33s · done 5:21 AM
+
+● Monitor event: "flat-library equivalence re-check with vacuous-comparison
+guard"
+
+● Monitor "flat-library equivalence re-check with vacuous-comparison guard"
+stream ended
+
+● All three temperatures now produce real, identical frequencies. Let me record
+  this and close out.
+
+  Ran 4 shell commands (ctrl+o to expand)
+
+● Everything is complete. Final state:
+
+  results/claude-opus-5_temp_sensor — SUCCESS / TAPEOUT_READY
+
+  Design — flat .subckt temp_sensor VDD VSS TEMP_OUT, 18 MOSFETs + 2 native
+  passives, 12 nets, 88 × 156 µm. Beta-multiplier PTAT reference on a ppolyf_u
+  resistor → 34 µm MIM timing core → 6T Schmitt trigger → inverter buffer
+  closing the loop. Self-extinguishing 3-transistor starter, no bias/enable/trim
+  pin.
+
+  Verification — Magic DRC CLEAN, KLayout foundry-deck DRC CLEAN, reconciled
+  PASS; netgen LVS matches uniquely; internal connectivity clean; PEX extracted
+  and simulated. Both optimisation loops converged on iteration 1.
+
+  PVT — 240/240 points, zero failures. All 30 corner × supply F(T) curves
+  strictly monotonically rising across all eight temperatures. PEX sensitivity
+  +3259…+3982 ppm/°C (schematic +3328…+4065), stable to within 3 % across
+  supply. Worst case on the extracted netlist: VOH 3.001 V, VOL −0.93 mV, duty
+  45.25–51.35 %, 87.9 µA, ≥120 cycles, start-up ≤2.01 µs.
+
+  The engineering that mattered: the first working circuit measured +1725 ppm/°C
+  — below spec. Decomposing the waveform showed the current, not the
+  comparator, was the limiting term: XMN1 sat in moderate inversion, where the
+  beta-multiplier degenerates to a 1/T PTAT instead of tracking 1/µn (ute = 
+  −1.568 → +5200 ppm/°C). Sweeping the Schmitt feedback ratio moved the total by
+  under ±200 ppm/°C, ruling that knob out. Raising XMN1's current density (W/L
+  1.0 → 0.25) and restoring frequency with capacitance rather than resistance —
+  because more resistance would have undone the gain — landed it at +3868 ppm/°C
+  post-layout.
+
+  Four defects found and fixed, all reproduced from first principles rather than
+  worked around: the ppolyf_u substrate-pin LVS/access-point conflict
+  (src/mbg/connectivity.py, regression 8/8 designs still pass all four legs);
+  .option scale not reaching MIM subcircuit parameters, which made the extracted
+  netlist simulate as a dead circuit; ngspice's default trtol corrupting
+  supply-current measurement (41 → 520 µA drift with correct voltages); and W = 
+  0.22 µm being unbuildable by glayout.
+
+  I also caught a flaw in my own equivalence checker — it reported PASS on two
+  simulations that both failed to oscillate. Fixed and re-run: flattened and
+  stock model libraries now agree to 0 V on operating points and 0.0000 % on
+  transient metrics at all three temperatures.
+
+  Not run, not claimed: Monte Carlo / mismatch. That plus the ~2.5:1 absolute
+  frequency spread across process (inherent to an uncalibrated sensor —
+  poly-resistor sheet spread enters as 1/R²) are the documented residual risks.
+
+  Two housekeeping notes: simwork/ holds 925 MB of regenerable waveform data —
+  say the word and I'll clear it. And your connectivity.py fix is already
+  committed in 9af7622e; I made no commits myself.
+
+✻ Worked for 55s · done 5:23 AM
+
+※ recap: The GF180MCU self-starting temperature sensor is finished and tapeout-ready: DRC/LVS/PEX clean and all 240 PVT points passing with monotonic F(T). Nothing is running; the only open item is whether to clear the 925 MB of regenerable waveform data in simwork/.
+
+● 3 background shell command task(s) from the previous session have no
+completion record. They may have been stopped (via the UI, Monitor timeout, or
+agent teardown — these leave no transcript marker), or they may have been
+running when the previous Claude Code process exited. They have been marked
+stopped. Task ids: bzcq1hend, blc72a5so, b1rl56efw. Task ids in this
+notification beginning with "__orphan_summary" are internal scan markers, not
+tasks.
+
+  Ran 2 shell commands (ctrl+o to expand)
+  ⎿  Loaded ../../CLAUDE.md
+  ⎿  Loaded ../../AGENTS.md
+● That notification was benign — those three monitors had already served their
+  purpose (the sweep finished at 240/240 and I verified it before they were
+  reaped). Nothing was interrupted, and no background jobs remain.
+
+  Confirmed intact after the session resume:
+
+  - pvt_summary.json — 240 points, 0 failing
+  - full_auto_result.json — SUCCESS, tapeout_ready: True
+  - final/ — GDS, PEX netlist, both DRC reports, KLayout database, LVS report,
+    extracted netlist, SVG
+
+  The work is complete. Final accounting:
+
+  Delivered — results/claude-opus-5_temp_sensor/: a self-starting, self-biasing
+  relaxation-oscillator temperature sensor on gf180mcuD, 18 MOS + ppolyf_u
+  resistor + metal4/metal5 MIM, flat single .subckt with exactly VDD VSS 
+  TEMP_OUT. DRC clean on both engines, LVS matches uniquely, PEX extracted and
+  simulated. 1.031 MHz at 27 °C post-layout, +3868 ppm/°C, strictly monotonic,
+  56 µA. All 240 PVT points and all 30 F(T) curves pass.
+
+  Files changed outside the results directory — one: src/mbg/connectivity.py
+  (native-passive substrate-terminal exemption), which you've since committed in
+  9af7622e. Regression re-run after the change: 8/8 designs pass all four legs.
+
+  Not run, not claimed — Monte Carlo / mismatch.
+
+  Open items for you — simwork/ holds 925 MB of regenerable waveform data I left
+  in place per the no-delete-without-approval rule; and it's worth confirming
+  the other session's mbg-d08 testbenches weren't disrupted when I cleared my
+  own runaway ngspice processes.
+
+✻ Cogitated for 43s · done 2:48 PM

@@ -8,12 +8,56 @@ Technology: GF180MCU-D, 5LM, nominal 3.3 V
 
 | Check | Result |
 |---|---|
-| Pre-layout top-level ngspice simulation | PASS — 100 µs run completed; sensor oscillates |
-| Post-layout top-level ngspice simulation | PASS — 100 µs PEX run completed; sensor oscillates |
+| Pre-layout top-level ngspice simulation | PASS — all ten outputs simulated; temperature sensor oscillates for 200 µs |
+| Post-layout top-level ngspice simulation | PASS — fresh-PEX run completed for 100 µs; temperature sensor oscillates |
 | KLayout LVS | PASS — netlists match |
-| KLayout DRC | CLEAN for completed rule tables; 0 reported violation items |
+| KLayout DRC | PARTIAL — clean completed rule tables, but `mslot` raised an exception |
 
 The KLayout DRC driver also logged an exception in the optional `mslot` rule table (`undefined method sized for nil`). The driver continued with the other tables and reported the aggregate run clean; this table should be rerun/fixed before treating the result as unconditional signoff.
+
+## Updated true top-level functionality results — 2026-08-29
+
+This supersedes the historical simulation ranges below. The supplied top-level
+hierarchy and GDS were simulated as complete circuits; no individual module
+simulation was used. The PEX testbench used the freshly extracted top-cell
+port order. No OUTN pads or ports were added to the layout.
+
+The stimulus is a legal wide differential ramp at constant common mode:
+`INP` ramps 0–3.3 V while `INN` ramps 3.3–0 V, producing
+`V(INP)-V(INN) = -3.3–+3.3 V` with both pins inside the GF180MCU 3.3 V range.
+The clock remains 10 µs period / 5 µs high, supply is 3.3 V, bias is 20 µA,
+and temperature is 27 °C. A 1 ns maximum step was used so the relaxation
+oscillator could start.
+
+| Output | Pre-layout range (V), 200 µs | Fresh PEX range (V), 100 µs |
+|---|---:|---:|
+| `deepseek_ota` | -0.000421–3.299955 | -0.000300–3.299970 |
+| `gpt_ota` | -0.000322–3.299956 | -0.000228–3.299972 |
+| `oxa_ota` | -0.000849–3.299962 | -0.000242–3.300044 |
+| `deepseek_cmp` | -0.004422–3.355253 | -0.005788–3.351494 |
+| `gpt_cmp` | -0.011459–3.341549 | -0.007962–3.343015 |
+| `oxa_cmp` | -0.004910–3.324225 | -0.003652–3.327067 |
+| `deepseek_vref` | 0.984668–0.984675 | 0.978646–0.979971 |
+| `gpt_vref` | 0.960422–0.960440 | 0.961157–0.961276 |
+| `oxa_vref` | 0.953472–0.953490 | 0.952715–0.952834 |
+| `temp_out` | -0.001401–3.301223 | -0.001173–3.301020 |
+
+All ten monitored outputs were written successfully: 201,141 pre-layout
+points through 200 µs and 100,501 PEX points through 100 µs. The attempted
+200 µs PEX run stopped at ngspice's memory limit (~154 MB); the completed
+100 µs PEX run is sufficient to demonstrate sustained behavior.
+
+The three OTA outputs sweep across the supply range. The three references are
+stable near 0.953–0.985 V. The exported comparator outputs resolve low at a
+sufficiently negative differential input and high at positive input; because
+only OUTP is routed, their differential decision polarity and offset are not
+fully characterized. `temp_out` has 213 rising 1.65 V crossings pre-layout
+(median period 942.53 ns, 1.061 MHz) and 101 crossings PEX (998.00 ns,
+1.002 MHz), demonstrating sustained top-level temperature-sensor oscillation.
+
+![Updated all-module top-level simulation](top_level_sim_20260829/all_modules_temp_long/mbg-d08_all_modules_with_temp.png)
+
+![Updated temperature-sensor top-level simulation](top_level_sim_20260829/all_modules_temp_long/mbg-d08_temp_sensor_long.png)
 
 ## Netlists and mapping
 
@@ -37,7 +81,7 @@ The named top-level pads include `VDD`, `VSS`, `CLK`, `INP`, `INN`, `IBIAS`, `TE
 
 The active GF180 model library is loaded once in the top-level simulation decks. The `mimcap_typical` section is also loaded for the sensor's M4/M5 2 fF/µm² timing capacitor. The sensor's poly resistor and MIM capacitor use the GF180-required `r_width/r_length` and `c_width/c_length` parameters.
 
-## Simulation setup
+## Historical simulation setup — superseded by the 2026-08-29 results above
 
 The testbenches are [mbg-d08_pre_tb.spice](/foss/designs/mbg-toplevel/mbg-d08_pre_tb.spice) and [mbg-d08_post_tb.spice](/foss/designs/mbg-toplevel/mbg-d08_post_tb.spice). Their stimulus follows the patterns in `/foss/designs/results`: 3.3 V supply, 20 µA bias, 1.65 V common-mode inputs, 10 µs clock period with 5 µs high time, 27 °C, and a 1 ns to 100 µs transient analysis. The inputs use a single complementary linear ramp: `INP` is -200 mV to +200 mV relative to common mode while `INN` is +200 mV to -200 mV. Therefore, the actual pins ramp 1.45 V to 1.85 V and 1.85 V to 1.45 V over 100 µs, and `V(INP)-V(INN)` ramps -400 mV to +400 mV.
 
@@ -78,7 +122,7 @@ Both simulations completed without ngspice errors and wrote 100,599 pre-layout a
 
 The figure below overlays the pre-layout and post-layout top-level transient results for the 100 µs run with a 10 µs clock period. It includes the ten monitored outputs, including the new `temp_out` waveform, and the complementary `INP/INN` differential ramp. Time is shown in µs, output voltage in V, and differential input in mV.
 
-![MBG-D08 pre-layout versus post-layout transient simulation](/foss/designs/mbg-toplevel/mbg-d08_simulation_plot.png)
+![MBG-D08 pre-layout versus post-layout transient simulation](mbg-d08_simulation_plot.png)
 
 ### Claude Opus 5 relaxation-oscillator temperature sensor
 
@@ -91,7 +135,7 @@ The new `temp_sensor` layout cell is connected to the named `temp_out` pad throu
 
 The sensor waveform and frequency comparison are shown below. The standalone PVT corner runs were not used for signoff because the isolated closed-loop oscillator remains numerically startup-sensitive; the verified top-level pre- and post-layout runs include the real `temp_out` pad and demonstrate startup plus sustained oscillation. Temperature-to-frequency calibration still needs a dedicated PVT characterization with a defined power-up/noise protocol.
 
-![Claude Opus 5 temperature-sensor simulation](/foss/designs/mbg-toplevel/temp_sensor_simulation_plot.png)
+![Claude Opus 5 temperature-sensor simulation](temp_sensor_simulation_plot.png)
 
 ### Comparator behavior
 
@@ -131,15 +175,9 @@ KLayout LVS used the GF180MCU-D 5LM/9K runset and explicit cell mappings for the
 
 The LVS log is [lvs_run/mbg-d08_lvs.log](/foss/designs/mbg-toplevel/lvs_run/mbg-d08_lvs.log), the extracted comparison netlist is [lvs_run/mbg-d08_lvs_extracted.cir](/foss/designs/mbg-toplevel/lvs_run/mbg-d08_lvs_extracted.cir), and the KLayout database is [lvs_run/mbg-d08_lvs.lvsdb](/foss/designs/mbg-toplevel/lvs_run/mbg-d08_lvs.lvsdb). The log ends with `INFO : Congratulations! Netlists match.`
 
-## Simulation artifacts
+## Current simulation artifacts
 
-- [mbg-d08_pre_tb.log](/foss/designs/mbg-toplevel/mbg-d08_pre_tb.log)
-- [mbg-d08_pre_tr.dat](/foss/designs/mbg-toplevel/mbg-d08_pre_tr.dat)
-- [mbg-d08_post_tb.log](/foss/designs/mbg-toplevel/mbg-d08_post_tb.log)
-- [mbg-d08_post_tr.dat](/foss/designs/mbg-toplevel/mbg-d08_post_tr.dat)
-- [temp_sensor_simulation_plot.png](/foss/designs/mbg-toplevel/temp_sensor_simulation_plot.png)
-- [post_sim/mbg-d08.pex.spice](/foss/designs/mbg-toplevel/post_sim/mbg-d08.pex.spice)
-- [cmp_debug/cmp_io_simulation_plot.png](/foss/designs/mbg-toplevel/cmp_debug/cmp_io_simulation_plot.png)
-- [cmp_debug/deepseek_cmp_io_tr.dat](/foss/designs/mbg-toplevel/cmp_debug/deepseek_cmp_io_tr.dat)
-- [cmp_debug/gpt_luna_cmp_io_tr.dat](/foss/designs/mbg-toplevel/cmp_debug/gpt_luna_cmp_io_tr.dat)
-- [cmp_debug/oxa_cmp_io_tr.dat](/foss/designs/mbg-toplevel/cmp_debug/oxa_cmp_io_tr.dat)
+- [Final all-module top-level plots and waveform data](top_level_sim_20260829/all_modules_temp_long/)
+
+Historical artifacts remain in their original locations and are not used as
+evidence for the updated result table.
