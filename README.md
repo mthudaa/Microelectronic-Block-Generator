@@ -432,10 +432,11 @@ block outputs, not at the end:
 4  inp        8  deepseek_ota  12  gpt_cmp   16  oxa_vref
 ```
 
-The die measures **501.50 × 1090.90 µm (0.547 mm²)** with fourteen
-`io_secondary_3p3` pad cells. Two departures from the pad rule set in the first
-review round — four shared input pads, and no power pad cells — are tabulated
-in [Chip Size & Pin List](#-chip-size--pin-list-per-judge-request--issue-20).
+The design occupies **501.50 × 1090.90 µm (0.547 mm²)** inside a **550 × 1110
+µm** block-BV boundary on layer 0/0, with fourteen `io_secondary_3p3` pad
+cells. Two departures from the pad rule set in the first review round — four
+shared input pads, and no power pad cells — are tabulated in [Chip Size & Pin
+List](#-chip-size--pin-list-per-judge-request--issue-20).
 
 #### One name, both views
 
@@ -1989,8 +1990,9 @@ in [`lvs_config_mbg_d08.json`](lvs_config_mbg_d08.json).
 | | Value |
 | :--- | ---: |
 | **Chipathon block** | **BV** — 16 pins, 550 × 1110 µm |
-| **Boundary (layer 0/0)** | **501.50 × 1090.90 µm** |
-| Margin inside the BV block | 48.50 µm wide, 19.10 µm tall |
+| **Boundary (layer 0/0)** | **550 × 1110 µm** — the BV footprint |
+| **Design extent** | **501.50 × 1090.90 µm** |
+| Margin inside the boundary | 48.50 µm wide, 19.10 µm tall |
 | **Top-level pins** | **16 of 16 available** — exact fit |
 | **Pad cells** | **14 × `io_secondary_3p3`** |
 | Core blocks | 10 (9 analog candidates + 1 temperature sensor) |
@@ -1999,8 +2001,9 @@ in [`lvs_config_mbg_d08.json`](lvs_config_mbg_d08.json).
 `mbg-d08` is submitted into **block BV**, the 16-pin 550 × 1110 µm
 configuration. Its 16 top-level pins consume the block's pin budget exactly,
 and the geometry clears the BV outline by 48.5 µm horizontally and 19.1 µm
-vertically. The required **boundary on layer 0/0** is drawn at the design
-extent, 501.50 × 1090.90 µm. Layer 0/0 carries no DRC rules in the GF180 deck,
+vertically. The required **boundary on layer 0/0** is drawn at the full BV
+footprint, 550 × 1110 µm, so the outline declares the allocated block rather
+than the geometry inside it. Layer 0/0 carries no DRC rules in the GF180 deck,
 and every check was re-run against the layout carrying it — 0 violations on
 both engines, LVS matching uniquely on both.
 
@@ -2026,8 +2029,8 @@ pin budget and a footprint. **`mbg-d08` occupies block BV.**
 | Area | 547,086 µm² | 610,500 µm² | 89.6 % occupied |
 | Pins | 16 | 16 | **0 — exact fit** |
 
-The boundary on layer 0/0 is drawn at the design extent (501.50 × 1090.90 µm),
-not at the block outline, so the declared size is the true one.
+The boundary on layer 0/0 is drawn at the **BV block outline**
+(550 × 1110 µm); the geometry inside it occupies 501.50 × 1090.90 µm.
 
 **Why BV and not another block.** BV is the *smallest* configuration that fits;
 everything below it fails on pin count, footprint, or both:

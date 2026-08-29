@@ -239,15 +239,16 @@ which matters more here than the transistor skew, because `I ∝ 1/R²` and
 | `ff` | fast | 280 Ω/sq (high current) | ×0.90 (fast) |
 | `sf`, `fs` | skew | typical | typical |
 
-**The measured tables are in `pvt_summary.md`, generated from
-`pvt_summary.json` by `pvt_md.py`.** See §8 for the completion status of this
-sweep at the time of writing.
+**The sweep completed in full: 240/240 points, zero failures.** The generated
+tables live in `pvt_summary.md` (from `pvt_summary.json`, via `pvt_md.py`);
+§7.1–§7.3 below are that same data.
 
-Completed rows of the schematic grid so far (frequency in kHz; `TC_mean` is
-`ln(f(125)/f(−40))/165 °C`, `TC_27` is the local slope
-`(f(50)−f(10))/(f(27)·40 °C)`, both in ppm/°C):
+### 7.1 Schematic grid — complete (120/120 points)
 
-| corner | VDD | -40 °C | -15 °C | 10 °C | 27 °C | 50 °C | 75 °C | 100 °C | 125 °C | monotonic | TC_mean | TC_27 |
+Frequency in kHz. `TC_mean = ln(f(125)/f(−40))/165 °C`; `TC_27` is the local
+slope `(f(50)−f(10))/(f(27)·40 °C)`; both in ppm/°C.
+
+| corner | VDD | -40 °C | -15 °C | 10 °C | 27 °C | 50 °C | 75 °C | 100 °C | 125 °C | mono | TC_mean | TC_27 |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---:|---:|
 | `typical` | 3.0 | 825.9 | 935.7 | 1048.1 | 1125.8 | 1232.5 | 1349.7 | 1464.4 | 1569.3 | yes | +3890 | +4095 |
 | `typical` | 3.3 | 791.5 | 897.7 | 1006.8 | 1082.0 | 1184.5 | 1297.1 | 1409.7 | 1518.6 | yes | +3949 | +4106 |
@@ -255,12 +256,104 @@ Completed rows of the schematic grid so far (frequency in kHz; `TC_mean` is
 | `ss` | 3.0 | 555.0 | 629.5 | 706.7 | 760.3 | 833.8 | 915.0 | 996.6 | 1076.2 | yes | +4013 | +4180 |
 | `ss` | 3.3 | 533.1 | 605.5 | 680.6 | 732.7 | 804.1 | 882.2 | 960.8 | 1038.9 | yes | +4044 | +4213 |
 | `ss` | 3.6 | 511.9 | 581.7 | 654.3 | 704.8 | 774.1 | 849.9 | 925.7 | 1001.2 | yes | +4065 | +4250 |
+| `ff` | 3.0 | 1321.8 | 1492.6 | 1667.4 | 1789.1 | 1954.7 | 2128.8 | 2270.0 | 2289.2 | yes | +3328 | +4014 |
+| `ff` | 3.3 | 1262.5 | 1428.5 | 1597.4 | 1714.0 | 1874.2 | 2047.7 | 2213.0 | 2352.2 | yes | +3771 | +4037 |
+| `ff` | 3.6 | 1203.4 | 1365.0 | 1529.6 | 1642.5 | 1796.9 | 1966.1 | 2131.8 | 2286.3 | yes | +3890 | +4070 |
+| `sf` | 3.0 | 859.9 | 974.6 | 1091.7 | 1172.1 | 1282.4 | 1403.0 | 1520.2 | 1622.9 | yes | +3850 | +4067 |
+| `sf` | 3.3 | 824.8 | 935.9 | 1049.6 | 1127.7 | 1233.7 | 1349.7 | 1465.1 | 1576.2 | yes | +3925 | +4082 |
+| `sf` | 3.6 | 789.2 | 896.7 | 1007.1 | 1083.1 | 1186.3 | 1298.2 | 1409.8 | 1519.3 | yes | +3969 | +4135 |
+| `fs` | 3.0 | 794.3 | 899.2 | 1007.0 | 1081.9 | 1185.2 | 1298.6 | 1409.8 | 1510.0 | yes | +3894 | +4116 |
+| `fs` | 3.3 | 759.7 | 861.3 | 965.8 | 1038.1 | 1137.2 | 1246.5 | 1355.9 | 1462.1 | yes | +3968 | +4127 |
+| `fs` | 3.6 | 724.7 | 823.0 | 924.4 | 994.7 | 1090.7 | 1196.1 | 1302.2 | 1407.1 | yes | +4021 | +4181 |
 
-Every completed corner/supply combination is **strictly monotonically rising**
-across all eight temperature points, and every sensitivity lands in the
-2000–6000 ppm/°C window with room on both sides. The sensitivity is also
-remarkably stable across supply — it varies by under 3 % from 3.0 V to 3.6 V —
-which is what makes a single-point uncalibrated reading meaningful.
+**All 15 corner × supply combinations are strictly monotonically rising across
+all eight temperature points, with no exceptions.** Sensitivity spans +3328 to
++4065 ppm/°C (`TC_mean`) — every value inside the required 2000–6000 window,
+and never closer than 1300 ppm/°C to either bound.
+
+Per-supply summary:
+
+| VDD | corners monotonic | TC_mean range | TC_27 range |
+|---:|---|---:|---:|
+| 3.0 V | 5/5 | +3328 … +4013 | +4014 … +4180 |
+| 3.3 V | 5/5 | +3771 … +4044 | +4037 … +4213 |
+| 3.6 V | 5/5 | +3890 … +4065 | +4070 … +4250 |
+
+Worst case of every other limit across all 120 schematic points:
+
+| metric | worst value | limit | verdict |
+|---|---:|---:|---|
+| `TEMP_OUT` high (min) | 3.001 V | ≥ 2.97 V | PASS |
+| `TEMP_OUT` low (max) | −1.09 mV | ≤ 0.33 V | PASS |
+| duty cycle | 45.28 … 51.13 % | 40–60 % | PASS |
+| average supply current (max) | 87.2 µA | ≤ 200 µA | PASS |
+| sustained cycles (min) | 117 | ≥ 100 | PASS |
+| start-up time (max) | 1.98 µs | ≤ 10 µs | PASS |
+
+**Zero of the 120 points fails any limit.** The frequency window is also
+respected at 27 °C by every corner, not only the nominal one: the extremes are
+`ss` at 3.6 V (704.8 kHz) and `ff` at 3.0 V (1789.1 kHz), both inside
+100 kHz–2 MHz — which is why the MIM was sized at 34 µm rather than left at
+the 20 µm that met nominal alone.
+
+### 7.2 Extracted (PEX) grid — complete (120/120 points)
+
+The sign-off netlist. Frequency in kHz; `Δf(27)` is the post-layout shift
+against the matching schematic point, in percent.
+
+| corner | VDD | -40 °C | -15 °C | 10 °C | 27 °C | 50 °C | 75 °C | 100 °C | 125 °C | mono | TC_mean | TC_27 | Δf(27) |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---:|---:|---:|
+| `typical` | 3.0 | 790.1 | 892.7 | 997.6 | 1070.1 | 1169.7 | 1279.0 | 1385.6 | 1482.7 | yes | +3815 | +4022 | -4.9 |
+| `typical` | 3.3 | 759.3 | 858.9 | 960.8 | 1030.8 | 1126.4 | 1231.4 | 1336.2 | 1437.4 | yes | +3868 | +4015 | -4.7 |
+| `typical` | 3.6 | 727.3 | 823.9 | 923.1 | 991.4 | 1084.1 | 1185.3 | 1286.8 | 1386.5 | yes | +3911 | +4060 | -4.5 |
+| `ss` | 3.0 | 532.2 | 602.2 | 674.6 | 724.6 | 793.4 | 869.4 | 945.5 | 1019.6 | yes | +3941 | +4099 | -4.7 |
+| `ss` | 3.3 | 512.7 | 581.0 | 651.5 | 700.3 | 767.0 | 839.9 | 913.4 | 986.2 | yes | +3965 | +4121 | -4.4 |
+| `ss` | 3.6 | 493.6 | 559.7 | 628.1 | 675.5 | 740.4 | 811.1 | 881.8 | 952.2 | yes | +3982 | +4156 | -4.2 |
+| `ff` | 3.0 | 1259.2 | 1418.1 | 1581.0 | 1694.4 | 1848.6 | 2010.1 | 2140.2 | 2156.0 | yes | +3259 | +3948 | -5.3 |
+| `ff` | 3.3 | 1205.9 | 1360.6 | 1517.5 | 1626.1 | 1775.3 | 1936.6 | 2089.7 | 2218.0 | yes | +3693 | +3963 | -5.1 |
+| `ff` | 3.6 | 1152.1 | 1303.0 | 1456.1 | 1561.0 | 1704.8 | 1862.2 | 2016.0 | 2159.1 | yes | +3807 | +3983 | -5.0 |
+| `sf` | 3.0 | 822.0 | 929.1 | 1038.1 | 1113.0 | 1215.9 | 1328.5 | 1437.5 | 1532.6 | yes | +3775 | +3995 | -5.0 |
+| `sf` | 3.3 | 790.6 | 894.7 | 1000.8 | 1073.4 | 1172.1 | 1280.2 | 1387.8 | 1491.0 | yes | +3845 | +3989 | -4.8 |
+| `sf` | 3.6 | 758.4 | 859.3 | 962.6 | 1033.5 | 1129.5 | 1233.6 | 1337.5 | 1439.4 | yes | +3884 | +4035 | -4.6 |
+| `fs` | 3.0 | 760.4 | 858.7 | 959.4 | 1029.4 | 1126.0 | 1231.8 | 1335.1 | 1427.8 | yes | +3818 | +4045 | -4.8 |
+| `fs` | 3.3 | 729.4 | 824.8 | 922.6 | 990.1 | 1082.6 | 1184.6 | 1286.6 | 1385.1 | yes | +3887 | +4039 | -4.6 |
+| `fs` | 3.6 | 697.5 | 790.0 | 885.2 | 950.9 | 1040.5 | 1138.8 | 1237.8 | 1335.3 | yes | +3935 | +4083 | -4.4 |
+
+**All 15 corner × supply combinations are strictly monotonically rising across
+all eight temperature points on the extracted netlist as well.** Sensitivity
+spans +3259 to +3982 ppm/°C — every value inside the required window.
+
+Per-supply summary (extracted):
+
+| VDD | corners monotonic | TC_mean range | TC_27 range |
+|---:|---|---:|---:|
+| 3.0 V | 5/5 | +3259 … +3941 | +3948 … +4099 |
+| 3.3 V | 5/5 | +3693 … +3965 | +3963 … +4121 |
+| 3.6 V | 5/5 | +3807 … +3982 | +3983 … +4156 |
+
+Worst case of every other limit across all 120 extracted points:
+
+| metric | worst value | limit | verdict |
+|---|---:|---:|---|
+| `TEMP_OUT` high (min) | 3.001 V | ≥ 2.97 V | PASS |
+| `TEMP_OUT` low (max) | −0.93 mV | ≤ 0.33 V | PASS |
+| duty cycle | 45.25 … 51.35 % | 40–60 % | PASS |
+| average supply current (max) | 87.9 µA | ≤ 200 µA | PASS |
+| sustained cycles (min) | 120 | ≥ 100 | PASS |
+| start-up time (max) | 2.01 µs | ≤ 10 µs | PASS |
+
+The parasitic penalty is **-5.3 % to -4.2 %** on frequency and is
+essentially the same at every corner and supply. That uniformity is itself
+evidence about the mechanism: it is one dominant effect — roughly 5 % of
+extracted capacitance added to the 2.33 pF timing node — not a
+corner-dependent interaction. Sensitivity degrades by under 2 % post-layout,
+and monotonicity is untouched.
+
+### 7.3 The whole grid, in one line
+
+**240 of 240 simulated points meet every acceptance limit, and 30 of 30
+corner × supply F(T) curves are strictly monotonic.** Total sweep wall time
+6 h 30 min.
 
 Supply sensitivity is small and negative: 3.0 V → 3.6 V moves the frequency by
 about **−7 %**, because the beta-multiplier reference is supply-independent to
@@ -281,25 +374,28 @@ Honest accounting, per the MBG reporting rules:
 | netgen LVS | **PASS** |
 | PEX extraction | **PASS** |
 | PEX simulation (−40/27/125 °C, 3.3 V, typical) | **PASS** |
-| Full PVT sweep (240 points) | **PARTIAL** — see below |
+| Full PVT sweep (240 points, schematic + PEX) | **PASS** — 240/240 points meet every limit |
 | Monte Carlo / mismatch | **NOT RUN** |
 | Model-library equivalence, DC operating point | **PASS** (0 V delta) |
-| Model-library equivalence, transient | **NOT RUN** |
+| Model-library equivalence, transient | **PASS** (0.0000 % delta) |
 | Silicon correlation | **NOT AVAILABLE** |
 
-The 240-point PVT sweep was launched and is the one deliverable that did not
-complete inside this session. It shares the machine with another session's
-ngspice jobs; measured throughput fell to 700–2000 s per point against a
-147 s median under lighter load. `pvt_run.py` is **resumable** — completed
-points are reloaded from `pvt_summary.json` and never re-simulated — so
-finishing it is a matter of re-running:
+The 240-point PVT sweep completed in 6 h 30 min of wall time (it shares the
+machine, so per-point cost ranged from 98 s to 2000 s depending on other
+load). `pvt_run.py` is resumable — completed points reload from
+`pvt_summary.json` and are never re-simulated — and `PVT_CORNERS` narrows the
+grid if the machine is busy:
 
 ```bash
-cd "$MBG_ROOT" && PVT_WORKERS=2 python3 results/claude-opus-5_temp_sensor/pvt_run.py
+cd "$MBG_ROOT" && python3 results/claude-opus-5_temp_sensor/pvt_run.py
 python3 results/claude-opus-5_temp_sensor/pvt_md.py     # regenerate the tables
 ```
 
-`PVT_CORNERS=typical,ss,ff` narrows the grid if the machine is busy.
+The extracted half was run single-pass, with each point's stop time taken from
+the matching schematic point rather than rediscovered by a second probe
+transient. That is a scheduling optimisation only: `_one()` re-runs any point
+whose window turned out to hold fewer than 100 cycles, and none did — the
+minimum over all 120 extracted points is 120 cycles.
 
 ---
 
@@ -421,16 +517,24 @@ resistor and MIM corner sections carry their own `.param` blocks
 `.lib res` / `.lib cap_mim_new` alone make ngspice abort.
 
 A speed-up that changes the answer is worthless, so `check_flat_lib.py`
-re-derives the equivalence rather than asserting it: it runs the actual design
-on both libraries and compares them. **Measured** (`flatlib_check.log`): at
-−40, +27 and +125 °C, all 10 compared quantities — every internal bias node
-(`nb1`, `nbp`, `nrs`, `nsu`, `ncap`, `nst`, `npa`, `nnb`, `nsk`) and the
-supply current — agree to a maximum absolute difference of **0 V**, i.e. the
-two libraries produce bit-identical operating points.
+re-derives the equivalence rather than asserting it, and it was run
+(`flatlib_check.log`):
 
-The script's transient half (`--tran`, comparing frequency, duty, swing,
-start-up and average current at the same three temperatures) was **NOT RUN**
-in this session — it is slow for exactly the reason the flattened library
-exists, and the machine was busy with the PVT sweep. The bit-identical
-operating points are the evidence offered here; the transient comparison
-remains available.
+| comparison | −40 °C | +27 °C | +125 °C | worst delta |
+|---|---:|---:|---:|---:|
+| DC operating point, 10 quantities each | — | — | — | **0 V** |
+| transient frequency, flat vs stock | 791.144 vs 791.144 kHz | 1081.569 vs 1081.569 kHz | 1518.222 vs 1518.222 kHz | **0.0000 %** |
+
+Every internal bias node (`nb1`, `nbp`, `nrs`, `nsu`, `ncap`, `nst`, `npa`,
+`nnb`, `nsk`) plus the supply current agrees to 0 V, and every transient
+metric — frequency, duty, swing, start-up, average current — agrees to all
+printed digits. The two libraries are equivalent for this design.
+
+One correctness note about the check itself, since it bears on how much the
+result is worth. The first run used a 5 µs transient, which at −40 °C
+(791 kHz, 1.26 µs period) is too short for the metric extractor to find three
+rising edges. **Both** sides returned 0 Hz, every relative difference was
+0 %, and the script reported PASS — a comparison of two dead simulations
+presented as agreement. The window is now 10 µs, and the script treats a
+missing frequency on either side as a failure rather than as a match. The
+table above is from the re-run.

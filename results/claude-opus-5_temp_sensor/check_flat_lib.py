@@ -10,7 +10,7 @@ runs the *actual* design on both libraries and compares.
   1. DC operating point of every internal node, at -40 / 27 / 125 C.  This is
      the cheap half and it is the strongest single check: it compares every
      bias node the design depends on.  Always run.
-  2. A 5 us transient at each of those temperatures, comparing frequency,
+  2. A 10 us transient at each of those temperatures, comparing frequency,
      duty cycle, swing, start-up time and average supply current.  Run with
      ``--tran``; it is slow precisely because the stock library is slow, which
      is the reason the flattened copy exists.
@@ -90,9 +90,21 @@ def main():
             for tag, lib in (("flat", flat), ("stock", stock)):
                 ts_sim.FLAT_LIB = lib
                 row[tag] = ts_sim.simulate_ts_netlist(
-                    net, CELL, temp=temp, stop=5e-6,
+                    net, CELL, temp=temp, stop=10e-6,
                     workdir=os.path.join(wd, tag))
             keys = [k for k in row["flat"] if k in row["stock"]]
+            # A comparison of two dead simulations is not evidence.  If the
+            # window was too short to extract a frequency, both sides report
+            # 0 Hz and every relative difference is 0 % -- which would sail
+            # through as a pass while proving nothing.
+            if not (row["flat"].get("freq_hz") and row["stock"].get("freq_hz")):
+                failures.append(
+                    f"tran {temp}C: no frequency extracted "
+                    f"(flat={row['flat'].get('freq_hz')}, "
+                    f"stock={row['stock'].get('freq_hz')}) -- window too "
+                    f"short, comparison is vacuous")
+                print(f"  tran{temp:>4}C: VACUOUS - no frequency extracted")
+                continue
             worst_k, worst_v = "", 0.0
             for k in keys:
                 x, y = row["flat"][k], row["stock"][k]

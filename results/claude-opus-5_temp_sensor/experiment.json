@@ -49,9 +49,10 @@
   "post_simulation_status": "PASS",
   "internal_connectivity": "CLEAN (opens=0 shorts=0 drc=0 missing_access=0)",
   "monte_carlo_status": "NOT RUN",
-  "pvt_status": "see pvt_summary.json / pvt_summary.md",
+  "pvt_status": "PASS - 240/240 points (5 corners x 3 VDD x 8 temps, schematic + PEX) meet every limit; 30/30 F(T) curves strictly monotonic",
   "runtime_s": {
-    "full_auto_flow": 137.409
+    "full_auto_flow": 137.409,
+    "pvt_sweep": 23383
   },
   "final_status": "PASS",
   "tapeout_ready": true,
@@ -75,5 +76,66 @@
       "regression": "tests/test_all_designs.py 8/8 designs pass all four legs after the change"
     }
   ],
-  "recorded": "2026-08-29T00:15:50"
+  "recorded": "2026-08-29T00:15:50",
+  "pvt_grid": {
+    "corners": [
+      "typical",
+      "ss",
+      "ff",
+      "sf",
+      "fs"
+    ],
+    "vdd": [
+      3.0,
+      3.3,
+      3.6
+    ],
+    "temps": [
+      -40,
+      -15,
+      10,
+      27,
+      50,
+      75,
+      100,
+      125
+    ],
+    "netlists": [
+      "sch",
+      "pex"
+    ],
+    "points": 240,
+    "failing_points": 0,
+    "wall_s": 23383
+  },
+  "pvt_results": {
+    "tc_mean_ppm_per_c_range_pex": [
+      3259,
+      3982
+    ],
+    "tc_mean_ppm_per_c_range_sch": [
+      3328,
+      4065
+    ],
+    "monotonic_curves": "30/30",
+    "pex_worst": {
+      "voh_min_v": 3.001,
+      "vol_max_v": -0.0009271,
+      "duty_pct": [
+        45.25,
+        51.35
+      ],
+      "i_avg_max_a": 8.785e-05,
+      "cycles_min": 120,
+      "startup_max_s": 2.009e-06
+    },
+    "pex_vs_sch_freq_delta_pct": [
+      -5.29,
+      -4.16
+    ]
+  },
+  "model_library_equivalence": {
+    "dc_operating_point": "PASS - 0 V max delta, 10 quantities, -40/27/125 C",
+    "transient": "PASS - 0.0000% max delta on frequency/duty/swing/startup/current at -40/27/125 C"
+  }
 }
