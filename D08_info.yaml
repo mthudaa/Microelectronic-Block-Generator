@@ -1,0 +1,88 @@
+# ----- ------ ----- ----- ------ ----- ----- ------ -----
+# Chipathon 2026: Project configuration
+# LICENSE: Apache License Version 2.0
+# http://www.apache.org/licenses/
+# ----- ------ ----- ----- ------ ----- ----- ------ -----
+
+# data will be pulled from main branch of the repo.
+# please be sure that the main branch contains the data you want to submit.
+# This file will be updated with more information later
+
+# ======================================================
+# Project metadata (used for documentation / review)
+# ======================================================
+project:
+  title: "MBG-D08: AI-generated analog block array"
+  team: "D08 Microelectronic Block Generator"
+  discord: ""
+  description: "Integrated top-level GDS combining nine AI/LLM-generated analog blocks (3x 5T-OTA, 3x StrongArm comparator, 3x 1.2V reference) plus a relaxation-oscillator temperature sensor, behind 14 secondary-ESD analog pads (gLayout track, GF180MCU-D)"
+  lvs_config: "lvs_config_mbg_d08.json"
+
+# ======================================================
+# Pin connections to the external pads.
+#
+# Order below is the port order of `.subckt mbg-d08` in
+# mbg-toplevel/mbg-d08_pre_sim.spice (temp_out is pin 7).
+#
+# All 14 signal pins are analog and each sits behind its own
+# io_secondary_3p3 secondary-ESD cell in the layout.
+# vdd/vss are power/ground: secondary_esd is analog-only.
+# ======================================================
+pins:
+  # --- supply rails -----------------------------------------------------
+  # Ground is listed FIRST: the first pin of a quadrant is the fixed
+  # down-bonded ground, and vss is this block's quiet ground.
+  # vdd is paired with it (one power pin, one ground pin).
+  # NOTE: the GDS contains no gf180mcu_fd_io__vdd / __vss cell yet; both
+  # rails are carried into all 14 pad cells and need power pads at
+  # padframe integration.
+  - name: vss                 # quiet ground, down-bonded; first pin
+    io_type: ground
+  - name: vdd                 # 3.3 V rail, paired with vss
+    io_type: power
+
+  # --- analog inputs ----------------------------------------------------
+  - name: clk                 # comparator sampling clock -> clk_core
+    io_type: analog           # shared by the 3 StrongArm comparators
+    secondary_esd: true
+  - name: inp                 # differential input + -> inp_core
+    io_type: analog           # shared by 3 OTAs + 3 comparators
+    secondary_esd: true
+  - name: inn                 # differential input - -> inn_core
+    io_type: analog           # shared by 3 OTAs + 3 comparators
+    secondary_esd: true
+  - name: ibias               # bias current -> ibias_core
+    io_type: analog           # shared by 3 OTAs + 3 VREFs
+    secondary_esd: true
+
+  # --- analog outputs ---------------------------------------------------
+  - name: deepseek_ota        # 5T-OTA OUT, deepseek
+    io_type: analog
+    secondary_esd: true
+  - name: gpt_ota             # 5T-OTA OUT, gpt-5.6-luna
+    io_type: analog
+    secondary_esd: true
+  - name: oxa_ota             # 5T-OTA OUT, ox_alpha
+    io_type: analog
+    secondary_esd: true
+  - name: deepseek_cmp        # comparator OUTP, deepseek (OUTN internal)
+    io_type: analog
+    secondary_esd: true
+  - name: gpt_cmp             # comparator OUTP, gpt-5.6-luna (OUTN internal)
+    io_type: analog
+    secondary_esd: true
+  - name: oxa_cmp             # comparator OUTP, ox_alpha (OUTN internal)
+    io_type: analog
+    secondary_esd: true
+  - name: deepseek_vref       # 1.2 V reference VREF, deepseek
+    io_type: analog
+    secondary_esd: true
+  - name: gpt_vref            # 1.2 V reference VREF, gpt-5.6-luna
+    io_type: analog
+    secondary_esd: true
+  - name: oxa_vref            # 1.2 V reference VREF, ox_alpha
+    io_type: analog
+    secondary_esd: true
+  - name: temp_out            # RO temperature sensor output (claude-opus-5)
+    io_type: analog
+    secondary_esd: true
