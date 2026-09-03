@@ -16,73 +16,109 @@ project:
   team: "D08 Microelectronic Block Generator"
   discord: ""
   description: "Integrated top-level GDS combining nine AI/LLM-generated analog blocks (3x 5T-OTA, 3x StrongArm comparator, 3x 1.2V reference) plus a relaxation-oscillator temperature sensor, behind 14 secondary-ESD analog pads (gLayout track, GF180MCU-D)"
-  lvs_config: "lvs_config_mbg_d08.json"
+  lvs_config: "lvs_config.json"
 
 # ======================================================
 # Pin connections to the external pads.
 #
-# Order below is the port order of `.subckt mbg-d08` in
-# mbg-toplevel/mbg-d08_pre_sim.spice (temp_out is pin 7).
+# Verified against mbg-toplevel/layout/mbg-d08.gds (sha256 c24b19ff...,
+# 2026-09-04): order matches the pin geometry 16/16, with vss at W22 and
+# vdd at N01 (NW corner). The block is placed at origin - DIEAREA and the
+# layer-0/0 boundary are both (0,0)-(550,1110) um - and all 16 pin
+# rectangles touch the die edge, so every DEF landing strip is covered.
 #
-# All 14 signal pins are analog and each sits behind its own
-# io_secondary_3p3 secondary-ESD cell in the layout.
-# vdd/vss are power/ground: secondary_esd is analog-only.
+# Sign-off on that GDS: Magic DRC 0 violations; KLayout DRC 0 violations
+# over 728 rules / 168 decks, 0 exceptions; netgen LVS circuits match
+# uniquely, 94/94 devices, 60/60 nets, no property errors. Metal2 corner
+# obstruction clear (0 overlap exact and +5 um, nearest Metal2 39.340 um).
+#
+# OPEN with the organizer (@d-m-bailey):
+#   1. D08_BV.def still carries the OLD pin assignment and must be
+#      regenerated from this list. A proposed replacement generated from
+#      the layout is in mbg-toplevel/def/D08_BV_proposed.def.
+#   2. W22/N01 hold gf180mcu_fd_io__asig_5p0 signal cells today, while
+#      gf180mcu_fd_io__dvss/__dvdd sit at W12/W13. The pad cell types must
+#      be swapped for power at the NW corner, and the "first quadrant pin
+#      is a fixed down-bonded ground" rule re-checked - W12 now carries
+#      temp_out.
+#   3. The GDS top cell is now at origin; the frame recorded in
+#      D08_selected_variants.json was [2009000, 1449000, 2559000, 2559000].
+#
+# Slot order is W12..W22 up the west edge, then N01..N05 left-to-right
+# along the north edge. Coordinates are the label positions, measured from
+# the layout. ORDER IS PHYSICAL - do not re-group these by function.
+#
+# All 14 signal pins are analog, each behind its own io_secondary_3p3
+# secondary-ESD cell. vdd/vss are power/ground: secondary_esd is analog-only.
 # ======================================================
 pins:
-  # --- supply rails -----------------------------------------------------
-  # Ground is listed FIRST: the first pin of a quadrant is the fixed
-  # down-bonded ground, and vss is this block's quiet ground.
-  # vdd is paired with it (one power pin, one ground pin).
-  # NOTE: the GDS contains no gf180mcu_fd_io__vdd / __vss cell yet; both
-  # rails are carried into all 14 pad cells and need power pads at
-  # padframe integration.
-  - name: vss                 # quiet ground, down-bonded; first pin
+  #    *** PIN MAP (target, NW-corner power) ***
+  #                                     clk
+  #                                 inn |
+  #                             inp |   |
+  #                       ibias  |   |  |
+  #                 vdd     |    |   |  |
+  #                       ||  || ||  || ||
+  #                       ||  || ||  || ||
+  #                       ||  || ||  || ||
+  #           vss   ====== ---------------
+  #  deepseek_ota   ====== |             |
+  #       gpt_ota   ====== |             |
+  #       oxa_ota   ====== |             |
+  #  deepseek_cmp   ====== |             |
+  #       gpt_cmp   ====== |     BV      |
+  #       oxa_cmp   ====== |             |
+  # deepseek_vref   ====== |             |
+  #      gpt_vref   ====== |             |
+  #      oxa_vref   ====== |             |
+  #      temp_out   ====== |_____________|
+  #
+  # --- west edge, bottom -> top (slots W12..W22) -------------------------
+  - name: temp_out            # W12  (  2.50,   42.50)  RO temp sensor (claude-opus-5)
+    io_type: analog
+    secondary_esd: true
+  - name: oxa_vref            # W13  (  2.50,  142.50)  1.2 V reference, ox_alpha
+    io_type: analog
+    secondary_esd: true
+  - name: gpt_vref            # W14  (  2.50,  242.50)  1.2 V reference, gpt-5.6-luna
+    io_type: analog
+    secondary_esd: true
+  - name: deepseek_vref       # W15  (  2.50,  342.50)  1.2 V reference, deepseek
+    io_type: analog
+    secondary_esd: true
+  - name: oxa_cmp             # W16  (  2.50,  442.50)  comparator OUTP, ox_alpha (OUTN internal)
+    io_type: analog
+    secondary_esd: true
+  - name: gpt_cmp             # W17  (  2.50,  542.50)  comparator OUTP, gpt-5.6-luna (OUTN internal)
+    io_type: analog
+    secondary_esd: true
+  - name: deepseek_cmp        # W18  (  2.50,  642.50)  comparator OUTP, deepseek (OUTN internal)
+    io_type: analog
+    secondary_esd: true
+  - name: oxa_ota             # W19  (  2.50,  742.50)  5T-OTA OUT, ox_alpha
+    io_type: analog
+    secondary_esd: true
+  - name: gpt_ota             # W20  (  2.50,  842.50)  5T-OTA OUT, gpt-5.6-luna
+    io_type: analog
+    secondary_esd: true
+  - name: deepseek_ota        # W21  (  2.50,  942.50)  5T-OTA OUT, deepseek
+    io_type: analog
+    secondary_esd: true
+  - name: vss                 # W22  (  6.50, 1042.50)  quiet ground (NW corner)
     io_type: ground
-  - name: vdd                 # 3.3 V rail, paired with vss
+
+  # --- north edge, left -> right (slots N01..N05) ------------------------
+  - name: vdd                 # N01  ( 63.39, 1100.59)  3.3 V rail (NW corner)
     io_type: power
-
-  # --- analog inputs ----------------------------------------------------
-  - name: clk                 # comparator sampling clock -> clk_core
-    io_type: analog           # shared by the 3 StrongArm comparators
-    secondary_esd: true
-  - name: inp                 # differential input + -> inp_core
-    io_type: analog           # shared by 3 OTAs + 3 comparators
-    secondary_esd: true
-  - name: inn                 # differential input - -> inn_core
-    io_type: analog           # shared by 3 OTAs + 3 comparators
-    secondary_esd: true
-  - name: ibias               # bias current -> ibias_core
-    io_type: analog           # shared by 3 OTAs + 3 VREFs
-    secondary_esd: true
-
-  # --- analog outputs ---------------------------------------------------
-  - name: deepseek_ota        # 5T-OTA OUT, deepseek
+  - name: ibias               # N02  (164.50, 1106.09)  bias current -> ibias_core (3 OTAs + 3 VREFs)
     io_type: analog
     secondary_esd: true
-  - name: gpt_ota             # 5T-OTA OUT, gpt-5.6-luna
+  - name: inp                 # N03  (264.50, 1106.09)  differential input + -> inp_core
     io_type: analog
     secondary_esd: true
-  - name: oxa_ota             # 5T-OTA OUT, ox_alpha
+  - name: inn                 # N04  (364.50, 1106.09)  differential input - -> inn_core
     io_type: analog
     secondary_esd: true
-  - name: deepseek_cmp        # comparator OUTP, deepseek (OUTN internal)
-    io_type: analog
-    secondary_esd: true
-  - name: gpt_cmp             # comparator OUTP, gpt-5.6-luna (OUTN internal)
-    io_type: analog
-    secondary_esd: true
-  - name: oxa_cmp             # comparator OUTP, ox_alpha (OUTN internal)
-    io_type: analog
-    secondary_esd: true
-  - name: deepseek_vref       # 1.2 V reference VREF, deepseek
-    io_type: analog
-    secondary_esd: true
-  - name: gpt_vref            # 1.2 V reference VREF, gpt-5.6-luna
-    io_type: analog
-    secondary_esd: true
-  - name: oxa_vref            # 1.2 V reference VREF, ox_alpha
-    io_type: analog
-    secondary_esd: true
-  - name: temp_out            # RO temperature sensor output (claude-opus-5)
+  - name: clk                 # N05  (464.50, 1106.59)  comparator sampling clock -> clk_core
     io_type: analog
     secondary_esd: true

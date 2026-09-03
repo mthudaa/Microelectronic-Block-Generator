@@ -1,0 +1,74 @@
+VERSION 5.8 ;
+DIVIDERCHAR "/" ;
+BUSBITCHARS "[]" ;
+DESIGN D08_BV ;
+UNITS DISTANCE MICRONS 200 ;
+DIEAREA ( 0 0 ) ( 110000 222000 ) ;
+PINS 16 ;
+- temp_out + NET temp_out + DIRECTION INOUT + USE SIGNAL
+  + LAYER Metal2 ( 0 4068 ) ( 800 12932 )
+  + LAYER Metal2 ( 800 4490 ) ( 1440 12500 )
+  + FIXED ( 0 0 ) N ;
+- oxa_vref + NET oxa_vref + DIRECTION INOUT + USE SIGNAL
+  + LAYER Metal2 ( 0 24068 ) ( 800 32932 )
+  + LAYER Metal2 ( 800 24490 ) ( 1440 32500 )
+  + FIXED ( 0 0 ) N ;
+- gpt_vref + NET gpt_vref + DIRECTION INOUT + USE SIGNAL
+  + LAYER Metal2 ( 0 44068 ) ( 800 52932 )
+  + LAYER Metal2 ( 800 44490 ) ( 1440 52500 )
+  + FIXED ( 0 0 ) N ;
+- deepseek_vref + NET deepseek_vref + DIRECTION INOUT + USE SIGNAL
+  + LAYER Metal2 ( 0 64068 ) ( 800 72932 )
+  + LAYER Metal2 ( 800 64490 ) ( 1440 72500 )
+  + FIXED ( 0 0 ) N ;
+- oxa_cmp + NET oxa_cmp + DIRECTION INOUT + USE SIGNAL
+  + LAYER Metal2 ( 0 84068 ) ( 800 92932 )
+  + LAYER Metal2 ( 800 84490 ) ( 1440 92500 )
+  + FIXED ( 0 0 ) N ;
+- gpt_cmp + NET gpt_cmp + DIRECTION INOUT + USE SIGNAL
+  + LAYER Metal2 ( 0 104068 ) ( 800 112932 )
+  + LAYER Metal2 ( 800 104490 ) ( 1440 112500 )
+  + FIXED ( 0 0 ) N ;
+- deepseek_cmp + NET deepseek_cmp + DIRECTION INOUT + USE SIGNAL
+  + LAYER Metal2 ( 0 124068 ) ( 800 132932 )
+  + LAYER Metal2 ( 800 124490 ) ( 1440 132500 )
+  + FIXED ( 0 0 ) N ;
+- oxa_ota + NET oxa_ota + DIRECTION INOUT + USE SIGNAL
+  + LAYER Metal2 ( 0 144068 ) ( 800 152932 )
+  + LAYER Metal2 ( 800 144490 ) ( 1440 152500 )
+  + FIXED ( 0 0 ) N ;
+- gpt_ota + NET gpt_ota + DIRECTION INOUT + USE SIGNAL
+  + LAYER Metal2 ( 0 164068 ) ( 800 172932 )
+  + LAYER Metal2 ( 800 164490 ) ( 1440 172500 )
+  + FIXED ( 0 0 ) N ;
+- deepseek_ota + NET deepseek_ota + DIRECTION INOUT + USE SIGNAL
+  + LAYER Metal2 ( 0 184068 ) ( 800 192932 )
+  + LAYER Metal2 ( 800 184490 ) ( 1440 192500 )
+  + FIXED ( 0 0 ) N ;
+- vss + NET vss + DIRECTION INOUT + USE GROUND
+  + LAYER Metal2 ( 0 201272 ) ( 4000 215728 )
+  + FIXED ( 0 0 ) N ;
+- vdd + NET vdd + DIRECTION INOUT + USE POWER
+  + LAYER Metal2 ( 6272 218000 ) ( 20728 222000 )
+  + FIXED ( 0 0 ) N ;
+- ibias + NET ibias + DIRECTION INOUT + USE SIGNAL
+  + LAYER Metal2 ( 29068 221200 ) ( 37932 222000 )
+  + LAYER Metal2 ( 29490 220560 ) ( 37500 221200 )
+  + FIXED ( 0 0 ) N ;
+- inp + NET inp + DIRECTION INOUT + USE SIGNAL
+  + LAYER Metal2 ( 49068 221200 ) ( 57932 222000 )
+  + LAYER Metal2 ( 49490 220560 ) ( 57500 221200 )
+  + FIXED ( 0 0 ) N ;
+- inn + NET inn + DIRECTION INOUT + USE SIGNAL
+  + LAYER Metal2 ( 69068 221200 ) ( 77932 222000 )
+  + LAYER Metal2 ( 69490 220560 ) ( 77500 221200 )
+  + FIXED ( 0 0 ) N ;
+- clk + NET clk + DIRECTION INOUT + USE SIGNAL
+  + LAYER Metal2 ( 89068 221200 ) ( 97932 222000 )
+  + LAYER Metal2 ( 89490 220560 ) ( 97500 221200 )
+  + FIXED ( 0 0 ) N ;
+END PINS
+BLOCKAGES 1 ;
+- LAYER Metal2 + RECT ( 105800 221600 ) ( 110000 222000 ) ;
+END BLOCKAGES
+END DESIGN
