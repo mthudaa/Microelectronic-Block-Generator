@@ -43,10 +43,10 @@
 + deepseek_vref gpt_vref oxa_vref
 
 * Four input pads.  ASIG3V3 is the core-side node.
-XIO_CLK  VDD CLK  clk_core  VSS io_secondary_3p3
-XIO_INP  VDD INP  inp_core  VSS io_secondary_3p3
-XIO_INN  VDD INN  inn_core  VSS io_secondary_3p3
-XIO_IBIAS VDD IBIAS ibias_core VSS io_secondary_3p3
+XIO_CLK  VDD CLK_core  clk  VSS io_secondary_3p3
+XIO_INP  VDD INP_core  inp  VSS io_secondary_3p3
+XIO_INN  VDD INN_core  inn  VSS io_secondary_3p3
+XIO_IBIAS VDD IBIAS_core ibias VSS io_secondary_3p3
 
 * The three GDS OTA cells.
 XOTA_DS  VDD VSS inp_core inn_core deepseek_ota_core ibias_core deepseek_ota
@@ -67,14 +67,14 @@ XVREF_OXA VDD VSS oxa_vref_core ibias_core ox_alpha_vref_1v2
 XTEMP_CLAUDE VDD VSS temp_out_core claude-opus-5_temp_sensor
 
 * Nine named analog output pads plus the named temp_out pad.
-XIO_DS_OTA  VDD deepseek_ota  deepseek_ota_core  VSS io_secondary_3p3
-XIO_GPT_OTA VDD gpt_ota       gpt_ota_core       VSS io_secondary_3p3
-XIO_OXA_OTA VDD oxa_ota       oxa_ota_core       VSS io_secondary_3p3
-XIO_DS_CMP  VDD deepseek_cmp  deepseek_cmp_core   VSS io_secondary_3p3
-XIO_GPT_CMP VDD gpt_cmp       gpt_cmp_core       VSS io_secondary_3p3
-XIO_OXA_CMP VDD oxa_cmp       oxa_cmp_core       VSS io_secondary_3p3
-XIO_DS_VREF VDD deepseek_vref deepseek_vref_core  VSS io_secondary_3p3
-XIO_GPT_VREF VDD gpt_vref     gpt_vref_core      VSS io_secondary_3p3
-XIO_OXA_VREF VDD oxa_vref     oxa_vref_core      VSS io_secondary_3p3
-XIO_TEMP     VDD temp_out     temp_out_core      VSS io_secondary_3p3
+XIO_DS_OTA  VDD deepseek_ota_core  deepseek_ota  VSS io_secondary_3p3
+XIO_GPT_OTA VDD gpt_ota_core       gpt_ota       VSS io_secondary_3p3
+XIO_OXA_OTA VDD oxa_ota_core       oxa_ota       VSS io_secondary_3p3
+XIO_DS_CMP  VDD deepseek_cmp_core  deepseek_cmp   VSS io_secondary_3p3
+XIO_GPT_CMP VDD gpt_cmp_core       gpt_cmp       VSS io_secondary_3p3
+XIO_OXA_CMP VDD oxa_cmp_core       oxa_cmp       VSS io_secondary_3p3
+XIO_DS_VREF VDD deepseek_vref_core deepseek_vref  VSS io_secondary_3p3
+XIO_GPT_VREF VDD gpt_vref_core     gpt_vref      VSS io_secondary_3p3
+XIO_OXA_VREF VDD oxa_vref_core     oxa_vref      VSS io_secondary_3p3
+XIO_TEMP     VDD temp_out_core     temp_out      VSS io_secondary_3p3
 .ends mbg-d08

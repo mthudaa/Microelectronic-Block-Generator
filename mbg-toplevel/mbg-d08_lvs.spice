@@ -137,11 +137,11 @@ D1 TO_GATE VDD diode_pd2nw_03v3 area=100p pj=40u m=4
 + deepseek_cmp gpt_cmp oxa_cmp
 + deepseek_vref gpt_vref oxa_vref
 
-XIO_CLK vdd clk clk_core vss io_secondary_3p3
-XIO_INP vdd inp inp_core vss io_secondary_3p3
-XIO_INN vdd inn inn_core vss io_secondary_3p3
-XIO_IBIAS vdd ibias ibias_core vss io_secondary_3p3
-XIO_TEMP vdd temp_out temp_out_core vss io_secondary_3p3
+XIO_CLK vdd clk_core clk vss io_secondary_3p3
+XIO_INP vdd inp_core inp vss io_secondary_3p3
+XIO_INN vdd inn_core inn vss io_secondary_3p3
+XIO_IBIAS vdd ibias_core ibias vss io_secondary_3p3
+XIO_TEMP vdd temp_out_core temp_out vss io_secondary_3p3
 
 XOTA_DS vdd vss inp_core inn_core deepseek_ota_core ibias_core deepseek_ota
 XOTA_GPT vdd vss inp_core inn_core gpt_ota_core ibias_core gpt_luna_ota
@@ -154,13 +154,13 @@ XVREF_GPT vdd vss gpt_vref_core ibias_core gpt_luna_vref_1v2
 XVREF_OXA vdd vss oxa_vref_core ibias_core ox_alpha_vref_1v2
 XTEMP_CLAUDE vdd vss temp_out_core claude_opus_5_temp_sensor
 
-XIO_DS_OTA vdd deepseek_ota deepseek_ota_core vss io_secondary_3p3
-XIO_GPT_OTA vdd gpt_ota gpt_ota_core vss io_secondary_3p3
-XIO_OXA_OTA vdd oxa_ota oxa_ota_core vss io_secondary_3p3
-XIO_DS_CMP vdd deepseek_cmp deepseek_cmp_core vss io_secondary_3p3
-XIO_GPT_CMP vdd gpt_cmp gpt_cmp_core vss io_secondary_3p3
-XIO_OXA_CMP vdd oxa_cmp oxa_cmp_core vss io_secondary_3p3
-XIO_DS_VREF vdd deepseek_vref deepseek_vref_core vss io_secondary_3p3
-XIO_GPT_VREF vdd gpt_vref gpt_vref_core vss io_secondary_3p3
-XIO_OXA_VREF vdd oxa_vref oxa_vref_core vss io_secondary_3p3
+XIO_DS_OTA vdd deepseek_ota_core deepseek_ota vss io_secondary_3p3
+XIO_GPT_OTA vdd gpt_ota_core gpt_ota vss io_secondary_3p3
+XIO_OXA_OTA vdd oxa_ota_core oxa_ota vss io_secondary_3p3
+XIO_DS_CMP vdd deepseek_cmp_core deepseek_cmp vss io_secondary_3p3
+XIO_GPT_CMP vdd gpt_cmp_core gpt_cmp vss io_secondary_3p3
+XIO_OXA_CMP vdd oxa_cmp_core oxa_cmp vss io_secondary_3p3
+XIO_DS_VREF vdd deepseek_vref_core deepseek_vref vss io_secondary_3p3
+XIO_GPT_VREF vdd gpt_vref_core gpt_vref vss io_secondary_3p3
+XIO_OXA_VREF vdd oxa_vref_core oxa_vref vss io_secondary_3p3
 .ends mbg_d08
