@@ -21,7 +21,7 @@
     ""
   ],
   "LVS_SPICE_FILES": [
-    "$UPRJ_ROOT/mbg-toplevel/mbg-d08_pre_sim.spice"
+    "$UPRJ_ROOT/mbg-toplevel/mbg-d08.spice"
   ],
   "LVS_VERILOG_FILES": [
     ""
