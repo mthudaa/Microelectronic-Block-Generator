@@ -1,0 +1,51 @@
+{
+ "schema": "mbg.result/1",
+ "tool": "layout.generate",
+ "ok": true,
+ "status": "PASS",
+ "summary": "vref_bgr_1v2: 81.3 x 80.5 um; all four legs pass (DRC magic=DRC: CLEAN, sign-off=PASS, LVS=match, PEX=ok, internal=clean)",
+ "metrics": {
+  "pdk": "gf180mcuD",
+  "cell": "vref_bgr_1v2",
+  "size_um": [
+   81.28,
+   80.48
+  ],
+  "area_um2": 6541.41,
+  "devices": 19,
+  "routed_nets": 14,
+  "total_nets": 14,
+  "wire_length_um": 1089.36,
+  "vias": 99,
+  "internal_clean": true,
+  "drc_magic": "DRC: CLEAN",
+  "drc_signoff": "PASS",
+  "drc_engines": [
+   "magic",
+   "klayout"
+  ],
+  "lvs_match": true,
+  "pex": true,
+  "all_pass": true
+ },
+ "artifacts": {
+  "gds": "outputs/vref-bgr-1v2/layout-2/vref_bgr_1v2.gds",
+  "layout_txt": "outputs/vref-bgr-1v2/layout-2/layout.txt",
+  "layout_json": "outputs/vref-bgr-1v2/layout-2/layout.json",
+  "svg": "outputs/vref-bgr-1v2/layout-2/vref_bgr_1v2.svg",
+  "schematic": "outputs/vref-bgr-1v2/layout-2/vref_bgr_1v2.spice",
+  "magic_drc": "outputs/vref-bgr-1v2/layout-2/vref_bgr_1v2.magic.drc.rpt",
+  "drc_summary": "outputs/vref-bgr-1v2/layout-2/verification/drc_summary.json",
+  "lvs_report": "outputs/vref-bgr-1v2/layout-2/vref_bgr_1v2.lvs.out",
+  "extracted": "outputs/vref-bgr-1v2/layout-2/vref_bgr_1v2_extracted.spice",
+  "pex": "outputs/vref-bgr-1v2/layout-2/vref_bgr_1v2.pex.spice",
+  "log": "outputs/vref-bgr-1v2/layout-2/log.txt"
+ },
+ "issues": [],
+ "next": [
+  "mbg measure vref outputs/vref-bgr-1v2/layout-2/vref_bgr_1v2.pex.spice --post-layout",
+  "mbg layout view outputs/vref-bgr-1v2/layout-2"
+ ],
+ "run_dir": "outputs/vref-bgr-1v2/layout-2",
+ "elapsed_s": 19.995
+}

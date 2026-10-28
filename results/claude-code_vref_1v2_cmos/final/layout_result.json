@@ -1,0 +1,51 @@
+{
+ "schema": "mbg.result/1",
+ "tool": "layout.generate",
+ "ok": true,
+ "status": "PASS",
+ "summary": "vref_cmos_1v2: 44.6 x 22.2 um; all four legs pass (DRC magic=DRC: CLEAN, sign-off=PASS, LVS=match, PEX=ok, internal=clean)",
+ "metrics": {
+  "pdk": "gf180mcuD",
+  "cell": "vref_cmos_1v2",
+  "size_um": [
+   44.58,
+   22.18
+  ],
+  "area_um2": 988.78,
+  "devices": 5,
+  "routed_nets": 5,
+  "total_nets": 5,
+  "wire_length_um": 259.38,
+  "vias": 23,
+  "internal_clean": true,
+  "drc_magic": "DRC: CLEAN",
+  "drc_signoff": "PASS",
+  "drc_engines": [
+   "magic",
+   "klayout"
+  ],
+  "lvs_match": true,
+  "pex": true,
+  "all_pass": true
+ },
+ "artifacts": {
+  "gds": "outputs/vref-cmos-1v2/layout/vref_cmos_1v2.gds",
+  "layout_txt": "outputs/vref-cmos-1v2/layout/layout.txt",
+  "layout_json": "outputs/vref-cmos-1v2/layout/layout.json",
+  "svg": "outputs/vref-cmos-1v2/layout/vref_cmos_1v2.svg",
+  "schematic": "outputs/vref-cmos-1v2/layout/vref_cmos_1v2.spice",
+  "magic_drc": "outputs/vref-cmos-1v2/layout/vref_cmos_1v2.magic.drc.rpt",
+  "drc_summary": "outputs/vref-cmos-1v2/layout/verification/drc_summary.json",
+  "lvs_report": "outputs/vref-cmos-1v2/layout/vref_cmos_1v2.lvs.out",
+  "extracted": "outputs/vref-cmos-1v2/layout/vref_cmos_1v2_extracted.spice",
+  "pex": "outputs/vref-cmos-1v2/layout/vref_cmos_1v2.pex.spice",
+  "log": "outputs/vref-cmos-1v2/layout/log.txt"
+ },
+ "issues": [],
+ "next": [
+  "mbg measure vref outputs/vref-cmos-1v2/layout/vref_cmos_1v2.pex.spice --post-layout",
+  "mbg layout view outputs/vref-cmos-1v2/layout"
+ ],
+ "run_dir": "outputs/vref-cmos-1v2/layout",
+ "elapsed_s": 15.689
+}

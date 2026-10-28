@@ -1,6 +1,10 @@
 ---
 name: mbg-context-economy
 description: How to work in this repository without burning the context window - resolve the repo from $MBG_ROOT instead of searching $HOME, read a file once at the right granularity, never poll git state, and climb the verification ladder cheapest-first instead of re-running the whole flow. Use at the start of any multi-step task in this repo, and whenever a session starts feeling slow or repetitive. Do not use it to decide what a design should be - it governs how you gather information, not what you conclude.
+license: Apache-2.0
+metadata:
+  owner: jabir
+  project: microelectronic-block-generator
 ---
 <!-- GENERATED FILE — do not edit by hand. Source: .ai/skills/mbg-context-economy/SKILL.md. Regenerate with: python3 scripts/sync_agent_tools.py -->
 

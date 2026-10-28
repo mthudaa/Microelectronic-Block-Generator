@@ -1,10 +1,28 @@
 ---
 name: mbg-spice-sim
 description: Runs ngspice simulations for analog blocks in this repository and turns the raw output into readable data, using mbg.simulation (run_spice, raw_to_csv, parse_dat). Use when the user asks to simulate a netlist, measure gain, bandwidth, delay or offset, sweep corners, or compare pre-layout against post-layout behaviour. Do not use it to generate layout (use mbg-spice-to-gds) or to run DRC, LVS or PEX (use mbg-ic-verify).
+license: Apache-2.0
+metadata:
+  owner: huda
+  project: microelectronic-block-generator
 ---
 <!-- GENERATED FILE — do not edit by hand. Source: .ai/skills/mbg-spice-sim/SKILL.md. Regenerate with: python3 scripts/sync_agent_tools.py -->
 
 # MBG SPICE Simulation
+
+## From any agent: `mbg sim run` and `mbg measure`
+
+```bash
+scripts/mbg sim run amp.spice --analysis op --supplies '{"VDD":3.3,"VSS":0}' --sources '{"INP":1.65,"INN":1.65}' --probes OUT
+scripts/mbg sim run ref.spice --analysis dc --sweep '{"source":"temp","start":-40,"stop":125,"step":5}' --probes VREF
+scripts/mbg measure ota amp.spice --out OUT --inp INP --inn INN       # gain, UGF, PM, current
+scripts/mbg measure vref ref.spice --spec vref_md --corners all       # reference recipe
+```
+
+The testbench (model sections per device kind, `.temp`, supplies, current
+sources, corners) is generated from the PDK profile; results come back as
+one JSON envelope with the CSV path under `artifacts`. Add `--post-layout`
+for a PEX netlist. The Python API below is what these commands use.
 
 
 ## Preferred API: mbg.analysis.Testbench

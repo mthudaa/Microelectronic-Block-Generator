@@ -1,0 +1,22 @@
+#!/bin/sh
+# scripts/mbg — run the MBG agent CLI from a clone, from any directory.
+#
+# Every harness (Claude Code, Codex, OpenCode, Pi, Gemini CLI, Cursor, a
+# DeepSeek agent, a plain shell) calls this one launcher, so no config file
+# needs an absolute path. It finds the repository from its own location and
+# picks the interpreter: $MBG_PYTHON, then $MBG_VENV, then <repo>/.venv,
+# then python3. `scripts/mbg mcp` serves the same tools over MCP (stdio).
+here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P) || exit 2
+root=$(dirname -- "$here")
+if [ -n "${MBG_PYTHON:-}" ]; then
+    py=$MBG_PYTHON
+elif [ -n "${MBG_VENV:-}" ] && [ -x "$MBG_VENV/bin/python" ]; then
+    py=$MBG_VENV/bin/python
+elif [ -x "$root/.venv/bin/python" ]; then
+    py=$root/.venv/bin/python
+else
+    py=python3
+fi
+PYTHONPATH="$root/src${PYTHONPATH:+:$PYTHONPATH}"
+export PYTHONPATH
+exec "$py" -m mbg "$@"

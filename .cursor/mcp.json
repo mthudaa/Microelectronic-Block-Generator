@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "mbg": {
+      "command": "${workspaceFolder}/scripts/mbg",
+      "args": [
+        "mcp"
+      ]
+    }
+  }
+}

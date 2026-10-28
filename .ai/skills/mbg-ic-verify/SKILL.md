@@ -9,6 +9,19 @@ platforms: [opencode, claude, codex]
 
 # MBG IC Layout Verification (DRC / LVS / PEX)
 
+## From any agent: one command per check
+
+```bash
+scripts/mbg verify drc cell.gds                       # Magic + the PDK's KLayout deck
+scripts/mbg verify lvs cell.gds --netlist cell.spice  # netgen
+scripts/mbg verify pex cell.gds                       # Magic extraction -> cell.pex.spice
+```
+
+Each prints one JSON envelope (`status`, `metrics`, report paths under
+`artifacts`); add `--pdk sky130A` for sky130 (Magic-only DRC, reported in
+`metrics.drc_engines`). The Python functions below are what these commands
+call.
+
 ## DRC is dual-engine — Magic *and* KLayout
 
 ```python

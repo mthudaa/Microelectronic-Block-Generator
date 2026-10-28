@@ -216,9 +216,19 @@ class PDKRules:
     def gds_layer(self, name: str) -> int:
         return self.layer(name).gds_layer
 
-    def name_of_gds(self, gds_layer: int) -> Optional[str]:
+    def name_of_gds(self, gds_layer: int, datatype: Optional[int] = None) -> Optional[str]:
+        """The routing-metal name of a GDS layer, or None.
+
+        With a ``datatype`` the match is exact. In sky130 metal, via cut and
+        pin share a layer number (met1 68/20, via 68/44, pin 68/16), so
+        matching on the number alone counted every via cut as met1 metal —
+        a false SHORT in the internal checker. gf180 metals are all
+        datatype 0, so its behaviour is unchanged.
+        """
         for n, li in self._layer_cache.items():
-            if li.gds_layer == gds_layer:
+            if li.gds_layer != gds_layer:
+                continue
+            if datatype is None or tuple(li.layer_tuple)[1] == datatype:
                 return n
         return None
 

@@ -1,0 +1,261 @@
+{
+ "schema": "mbg.result/1",
+ "tool": "measure.vref",
+ "ok": true,
+ "status": "PASS",
+ "summary": "VREF=1.2148 V, TC=34.5 ppm/C, line=20.66 mV/V, IVDD=24.7 uA, PSRR=-34.0 dB over 5 corner(s); spec met",
+ "metrics": {
+  "vref_v": 1.21479,
+  "tc_ppm_c": 34.4742,
+  "line_reg_mv_v": 20.6633,
+  "dvref_line_mv": 12.398,
+  "ivdd_ua": 24.6556,
+  "ibias_sens_mv": 0.01,
+  "startup_us": 8.4127,
+  "psrr_db": -33.9956,
+  "vref_pvt_min_v": 1.17571,
+  "vref_pvt_max_v": 1.22244,
+  "vref_t_min_v": 1.21055,
+  "vref_t_max_v": 1.21507,
+  "startup_ok": true,
+  "conditions": {
+   "pdk": "gf180mcuD",
+   "cell": "vref_bgr_1v2",
+   "ports": {
+    "vdd": "VDD",
+    "vss": "VSS",
+    "vref": "VREF",
+    "ibias": "IBIAS"
+   },
+   "vdd": 3.3,
+   "vdd_window": [
+    3.0,
+    3.6
+   ],
+   "temp_range": [
+    -40.0,
+    125.0,
+    5.0
+   ],
+   "ibias_a": 2e-05,
+   "ibias_dir": "source",
+   "cl": "1p"
+  }
+ },
+ "artifacts": {
+  "metrics_json": "outputs/vref-bgr-1v2/pre_simulation-5/vref_metrics.json",
+  "temp_sweep": "outputs/vref-bgr-1v2/pre_simulation-5/temp_sweep.csv",
+  "line_sweep": "outputs/vref-bgr-1v2/pre_simulation-5/line_sweep.csv",
+  "log": "outputs/vref-bgr-1v2/pre_simulation-5/log.txt"
+ },
+ "issues": [],
+ "next": [
+  "mbg spec check --metrics outputs/vref-bgr-1v2/pre_simulation-5/vref_metrics.json --spec vref_md",
+  "mbg layout generate outputs/vref-bgr-1v2/generated_netlist.spice"
+ ],
+ "data": {
+  "per_corner": {
+   "typical": {
+    "vref_v": 1.21479,
+    "ivdd_ua": 19.7077,
+    "tc_ppm_c": 22.5493,
+    "vref_t_min_v": 1.21055,
+    "vref_t_max_v": 1.21507,
+    "dvref_line_mv": 10.8935,
+    "line_reg_mv_v": 18.1558,
+    "vref_pvt_min_v": 1.1994,
+    "vref_pvt_max_v": 1.22041,
+    "ibias_sens_mv": 0.0,
+    "psrr_db": -34.9472,
+    "psrr_1k_db": -34.9472,
+    "startup_us": 8.28898,
+    "startup_final_v": 1.21479,
+    "startup_ok": true
+   },
+   "ff": {
+    "vref_v": 1.21577,
+    "ivdd_ua": 24.6556,
+    "tc_ppm_c": 33.553,
+    "vref_t_min_v": 1.20908,
+    "vref_t_max_v": 1.21581,
+    "dvref_line_mv": 12.3758,
+    "line_reg_mv_v": 20.6264,
+    "vref_pvt_min_v": 1.19022,
+    "vref_pvt_max_v": 1.22238,
+    "ibias_sens_mv": 0.01,
+    "psrr_db": -33.9956,
+    "psrr_1k_db": -33.9957,
+    "startup_us": 8.4127,
+    "startup_final_v": 1.21577,
+    "startup_ok": true
+   },
+   "ss": {
+    "vref_v": 1.21678,
+    "ivdd_ua": 16.3728,
+    "tc_ppm_c": 34.4742,
+    "vref_t_min_v": 1.21096,
+    "vref_t_max_v": 1.21788,
+    "dvref_line_mv": 10.1175,
+    "line_reg_mv_v": 16.8625,
+    "vref_pvt_min_v": 1.20513,
+    "vref_pvt_max_v": 1.22208,
+    "ibias_sens_mv": 0.0,
+    "psrr_db": -35.5164,
+    "psrr_1k_db": -35.5164,
+    "startup_us": 8.27744,
+    "startup_final_v": 1.21678,
+    "startup_ok": true
+   },
+   "fs": {
+    "vref_v": 1.21413,
+    "ivdd_ua": 19.6699,
+    "tc_ppm_c": 24.0107,
+    "vref_t_min_v": 1.20959,
+    "vref_t_max_v": 1.2144,
+    "dvref_line_mv": 10.4522,
+    "line_reg_mv_v": 17.4204,
+    "vref_pvt_min_v": 1.17571,
+    "vref_pvt_max_v": 1.21941,
+    "ibias_sens_mv": 0.0,
+    "psrr_db": -35.2269,
+    "psrr_1k_db": -35.2269,
+    "startup_us": 8.40655,
+    "startup_final_v": 1.21413,
+    "startup_ok": true
+   },
+   "sf": {
+    "vref_v": 1.21566,
+    "ivdd_ua": 19.7456,
+    "tc_ppm_c": 24.0258,
+    "vref_t_min_v": 1.21105,
+    "vref_t_max_v": 1.21587,
+    "dvref_line_mv": 12.398,
+    "line_reg_mv_v": 20.6633,
+    "vref_pvt_min_v": 1.20286,
+    "vref_pvt_max_v": 1.22244,
+    "ibias_sens_mv": 0.0,
+    "psrr_db": -34.1183,
+    "psrr_1k_db": -34.1183,
+    "startup_us": 8.28408,
+    "startup_final_v": 1.21566,
+    "startup_ok": true
+   }
+  },
+  "spec": {
+   "pre_layout": {
+    "source": "pre_layout",
+    "pass": true,
+    "score": 0.0,
+    "metrics": {
+     "vref_v": {
+      "value": 1.21479,
+      "target": 1.2,
+      "op": "==",
+      "unit": " V",
+      "status": "PASS",
+      "margin": null,
+      "margin_pct": null
+     },
+     "tc_ppm_c": {
+      "value": 34.4742,
+      "target": 300.0,
+      "op": "<=",
+      "unit": " ppm/C",
+      "status": "PASS",
+      "margin": 265.526,
+      "margin_pct": 88.509
+     },
+     "line_reg_mv_v": {
+      "value": 20.6633,
+      "target": 100.0,
+      "op": "<=",
+      "unit": " mV/V",
+      "status": "PASS",
+      "margin": 79.3367,
+      "margin_pct": 79.337
+     },
+     "dvref_line_mv": {
+      "value": 12.398,
+      "target": 60.0,
+      "op": "<=",
+      "unit": " mV",
+      "status": "PASS",
+      "margin": 47.602,
+      "margin_pct": 79.337
+     },
+     "ivdd_ua": {
+      "value": 24.6556,
+      "target": 300.0,
+      "op": "<=",
+      "unit": " uA",
+      "status": "PASS",
+      "margin": 275.344,
+      "margin_pct": 91.781
+     }
+    }
+   },
+   "stretch": {
+    "source": "stretch",
+    "pass": false,
+    "score": 3.28278,
+    "metrics": {
+     "vref_v": {
+      "value": 1.21479,
+      "target": 1.2,
+      "op": "==",
+      "unit": " V",
+      "status": "PASS",
+      "margin": null,
+      "margin_pct": null
+     },
+     "tc_ppm_c": {
+      "value": 34.4742,
+      "target": 50.0,
+      "op": "<=",
+      "unit": " ppm/C",
+      "status": "PASS",
+      "margin": 15.5258,
+      "margin_pct": 31.052
+     },
+     "line_reg_mv_v": {
+      "value": 20.6633,
+      "target": 5.0,
+      "op": "<=",
+      "unit": " mV/V",
+      "status": "FAIL",
+      "margin": -15.6633,
+      "margin_pct": -313.267
+     },
+     "psrr_db": {
+      "value": -33.9956,
+      "target": -40.0,
+      "op": "<=",
+      "unit": " dB",
+      "status": "FAIL",
+      "margin": -6.00435,
+      "margin_pct": -15.011
+     },
+     "startup_us": {
+      "value": 8.4127,
+      "target": 100.0,
+      "op": "<=",
+      "unit": " us",
+      "status": "PASS",
+      "margin": 91.5873,
+      "margin_pct": 91.587
+     },
+     "ivdd_ua": {
+      "value": 24.6556,
+      "target": 300.0,
+      "op": "<=",
+      "unit": " uA",
+      "status": "PASS",
+      "margin": 275.344,
+      "margin_pct": 91.781
+     }
+    }
+   }
+  }
+ },
+ "run_dir": "outputs/vref-bgr-1v2/pre_simulation-5"
+}

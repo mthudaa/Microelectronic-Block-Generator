@@ -9,6 +9,20 @@ platforms: [opencode, claude, codex]
 
 # MBG SPICE Simulation
 
+## From any agent: `mbg sim run` and `mbg measure`
+
+```bash
+scripts/mbg sim run amp.spice --analysis op --supplies '{"VDD":3.3,"VSS":0}' --sources '{"INP":1.65,"INN":1.65}' --probes OUT
+scripts/mbg sim run ref.spice --analysis dc --sweep '{"source":"temp","start":-40,"stop":125,"step":5}' --probes VREF
+scripts/mbg measure ota amp.spice --out OUT --inp INP --inn INN       # gain, UGF, PM, current
+scripts/mbg measure vref ref.spice --spec vref_md --corners all       # reference recipe
+```
+
+The testbench (model sections per device kind, `.temp`, supplies, current
+sources, corners) is generated from the PDK profile; results come back as
+one JSON envelope with the CSV path under `artifacts`. Add `--post-layout`
+for a PEX netlist. The Python API below is what these commands use.
+
 
 ## Preferred API: mbg.analysis.Testbench
 

@@ -28,7 +28,7 @@ from typing import Dict, List, Optional, Tuple
 import gdsfactory as gf
 from gdsfactory import Component
 from glayout import nmos, pmos, resistor, mimcap, mimcap_array
-from mbg.passives import poly_resistor, mim_cap, RES_MIN_WIDTH, CAP_MIN_SIZE
+from mbg.passives import HRES_MIN_WIDTH, poly_resistor, mim_cap, RES_MIN_WIDTH, CAP_MIN_SIZE
 
 from mbg.design_context import (
     BoundingBox, Device, Obstacle, PinAccessPoint, Placement, Zone,
@@ -96,6 +96,19 @@ class PlacementConfig:
         self.with_dummy: bool = kw.get("with_dummy", False)
         self.with_tie: bool = kw.get("with_tie", True)
 
+        # Placement hints — how an agent moves devices without a mouse. All
+        # optional; with none given the floorplan is exactly the automatic one.
+        #   rows   {dev: row}            row 0 is the top row
+        #   order  {row: [dev, ...]}     left-to-right order; that row is not
+        #                                reshuffled by the HPWL refinement
+        #   groups [{kind, devices}]     keep these together as a matched set
+        #   array  [{devices, cols, gap}] grid in row-major order (e.g. a 3x3
+        #                                common-centroid PNP block)
+        #   fixed  {dev: {x, y}}         lower-left corner of the device slot
+        self.hints: dict = dict(kw.get("hints") or {})
+        #: PDK profile; set from the DesignContext by place()
+        self.profile = kw.get("profile")
+
         self.verbosity: int = kw.get("verbosity", 1)
 
     def log(self, level, msg):
@@ -120,7 +133,11 @@ def build_device(pdk, dev: Device, cfg: PlacementConfig):
     w = dev.finger_width if dev.finger_width else (dev.width or 3.0)
     l = dev.length or 0.5
     dnw = _wants_dnwell(dev, cfg)
-    key = (dev.kind, round(w, 6), round(l, 6), dev.fingers, dev.multipliers,
+    # The model and PDK are part of the identity: a ppolyf_u and a
+    # ppolyf_u_1k of the same size are different drawings, and a process
+    # switch must never reuse the other PDK's cell.
+    key = (getattr(pdk, "name", str(id(pdk))), (dev.model or "").lower(), dev.kind,
+           round(w, 6), round(l, 6), dev.fingers, dev.multipliers,
            dnw, cfg.with_dummy, cfg.with_tie)
     if key in _DEV_CACHE:
         return _DEV_CACHE[key]
@@ -156,11 +173,12 @@ def build_device(pdk, dev: Device, cfg: PlacementConfig):
                     f"only {sorted(_NATIVE_RESISTOR_MODELS)} have a native "
                     f"generator. Building it from another primitive would put a "
                     f"different device in the layout and fail LVS.")
-            if w < RES_MIN_WIDTH:
+            min_w = HRES_MIN_WIDTH if model == "ppolyf_u_1k" else RES_MIN_WIDTH
+            if w < min_w:
                 raise UnsupportedDeviceError(
-                    f"{dev.name}: W={w} um is below the PRES.1 minimum "
-                    f"{RES_MIN_WIDTH} um for a poly resistor.")
-            c = poly_resistor(width=w, length=l)
+                    f"{dev.name}: W={w} um is below the minimum {min_w} um "
+                    f"for a {model} resistor.")
+            c = poly_resistor(width=w, length=l, model=model)
         else:
             # with_tie=True is required, not optional: without the well tie the
             # generated resistor violates DF.7 (N-well overlap of P-Diffusion)
@@ -179,6 +197,16 @@ def build_device(pdk, dev: Device, cfg: PlacementConfig):
                 f"{dev.name}: MIM top plate {size} um is below the MIMTM.8a "
                 f"minimum {CAP_MIN_SIZE} um. gf180 has no smaller MIM.")
         c = mim_cap(size=size)
+    elif dev.kind == "bjt":
+        # Vertical BJTs are fixed foundry cells; see mbg.fixed_cells.
+        profile = cfg.profile
+        spec = profile.device(dev.model) if profile is not None else None
+        if spec is None or not spec.layout:
+            raise UnsupportedDeviceError(
+                f"{dev.name}: no layout for BJT model '{dev.model}' in "
+                f"{getattr(profile, 'name', 'this PDK')}")
+        from mbg.fixed_cells import build_fixed_device
+        c = build_fixed_device(profile, spec.model)
     else:
         raise ValueError(f"no generator for device kind {dev.kind!r} ({dev.name})")
 
@@ -216,7 +244,7 @@ _PASSIVE_RESISTOR_MODELS = {
 # Of those, the ones mbg.passives can actually build and that Magic extracts
 # with the correct r_width/r_length. The rest have no generator; building them
 # from a different primitive would silently put the wrong device in the layout.
-_NATIVE_RESISTOR_MODELS = {"ppolyf_u"}
+_NATIVE_RESISTOR_MODELS = {"ppolyf_u", "ppolyf_u_1k"}
 
 
 class UnsupportedDeviceError(NotImplementedError):
@@ -256,13 +284,19 @@ def terminal_port_names(dev: Device) -> Dict[str, List[str]]:
         for term, tmpl in native.items():
             out[term] = ([tmpl.format(d=d) for d in _DIRECTIONS]
                          + [fallback[term].format(d=d) for d in _DIRECTIONS])
+    else:
+        # fixed foundry cells (mbg.fixed_cells) name ports <terminal>_<dir>
+        for term in dev.terminals:
+            out[term] = [f"{term}_{d}" for d in _DIRECTIONS]
     return out
 
 
 def _layer_name(rules, layer_spec) -> Optional[str]:
     try:
-        lyr = layer_spec[0] if isinstance(layer_spec, (tuple, list)) else layer_spec
-        return rules.name_of_gds(int(lyr))
+        if isinstance(layer_spec, (tuple, list)):
+            dt = int(layer_spec[1]) if len(layer_spec) > 1 else None
+            return rules.name_of_gds(int(layer_spec[0]), dt)
+        return rules.name_of_gds(int(layer_spec))
     except Exception:
         return None
 
@@ -340,7 +374,18 @@ def harvest_obstacles(ctx, dev_name: str, ref, cfg: PlacementConfig) -> int:
         for pts in plist:
             xs = [float(p[0]) for p in pts]
             ys = [float(p[1]) for p in pts]
-            boxes.append(BoundingBox(min(xs), min(ys), max(xs), max(ys)))
+            bb = BoundingBox(min(xs), min(ys), max(xs), max(ys))
+            # A ring or L-shape modelled by its bounding box claims everything
+            # it encloses — a tie ring would then "contain" the drain metal
+            # inside it and read as a short. Such polygons (sky130 gLayout tie
+            # rings, foundry BJT cells) are split into rectangles; plain
+            # rectangles, all gf180 gLayout geometry, take the old path.
+            if len(pts) > 4 and _poly_area(xs, ys) < 0.9 * bb.area:
+                from mbg.fixed_cells import rect_decompose
+                for (rx0, ry0, rx1, ry1) in rect_decompose(list(zip(xs, ys))):
+                    boxes.append(BoundingBox(rx0, ry0, rx1, ry1))
+            else:
+                boxes.append(bb)
         if not boxes:
             continue
 
@@ -385,6 +430,12 @@ def harvest_obstacles(ctx, dev_name: str, ref, cfg: PlacementConfig) -> int:
     return n
 
 
+def _poly_area(xs, ys) -> float:
+    n = len(xs)
+    return abs(sum(xs[i] * ys[(i + 1) % n] - xs[(i + 1) % n] * ys[i]
+                   for i in range(n))) / 2.0
+
+
 # ── floorplan ──────────────────────────────────────────────────────────
 
 def _needs_nwell_gap(ctx, a: str, b: str, cfg) -> bool:
@@ -398,7 +449,13 @@ def _needs_nwell_gap(ctx, a: str, b: str, cfg) -> bool:
     are always two islands and the gap always applies.
     """
     da, db = ctx.devices.get(a), ctx.devices.get(b)
-    return bool(da and db and da.kind == "pmos" and db.kind == "pmos")
+    return bool(da and db and _has_nwell(da) and _has_nwell(db))
+
+
+def _has_nwell(dev: Device) -> bool:
+    """PFETs and vertical PNPs (whose base is an n-well) each bring a well."""
+    return dev.kind == "pmos" or (dev.kind == "bjt"
+                                  and (dev.model or "").lower().startswith("pnp"))
 
 
 def _gap_between(ctx, a: str, b: str, cfg, base: float) -> float:
@@ -416,6 +473,8 @@ def _row_of(dev: Device) -> int:
     if dev.kind == "nmos":
         src = (dev.terminals.get("source") or "").lower()
         return 2 if src in ("vss", "gnd", "vgnd", "0") else 1
+    if dev.kind == "bjt":
+        return 4
     return 3
 
 
@@ -521,6 +580,9 @@ def plan_floorplan(ctx, sizes: Dict[str, Tuple[float, float]],
             y += row_heights[r] + cfg.channel_y
         return placements
 
+    if cfg.hints:
+        return _plan_with_hints(ctx, sizes, cfg)
+
     # connectivity-aware ordering: greedy swaps inside each row (§19)
     best = layout(rows)
     best_cost = _hpwl_of_order(ctx, {d: (p.x + sizes[d][0] / 2.0,
@@ -550,6 +612,198 @@ def plan_floorplan(ctx, sizes: Dict[str, Tuple[float, float]],
     return best
 
 
+# ── placement hints (the agent's hands) ────────────────────────────────
+
+def _hint_devices(h: dict) -> List[str]:
+    names = list((h.get("rows") or {}).keys()) + list((h.get("fixed") or {}).keys())
+    for seq in (h.get("order") or {}).values():
+        names += list(seq)
+    for g in (h.get("groups") or []) + (h.get("array") or []):
+        names += list(g.get("devices", []))
+    return names
+
+
+def _apply_hint_groups(ctx, cfg) -> None:
+    """``groups`` hints become matching groups, ahead of the detected ones.
+
+    A device named in a hinted group is taken out of any detected group, so
+    the agent's grouping wins instead of fighting the detector.
+    """
+    from mbg.design_context import MatchingGroup
+    unknown = sorted({d for d in _hint_devices(cfg.hints) if d not in ctx.devices})
+    if unknown:
+        raise ValueError(f"placement hints name unknown device(s) {unknown}; "
+                         f"devices are {sorted(ctx.devices)}")
+    hinted = {}
+    taken = set()
+    for i, g in enumerate(cfg.hints.get("groups") or []):
+        devs = [d for d in g.get("devices", []) if d not in taken]
+        if len(devs) >= 2:
+            name = g.get("name") or f"hint_{i + 1}"
+            hinted[name] = MatchingGroup(name, g.get("kind", "generic"), devs,
+                                         bool(g.get("symmetric", True)))
+            taken.update(devs)
+    rest = {}
+    for name, g in ctx.matching_groups.items():
+        devs = [d for d in g.devices if d not in taken]
+        if len(devs) >= 2:
+            g.devices = devs
+            rest[name] = g
+    ctx.matching_groups = {**hinted, **rest}
+
+
+def _plan_with_hints(ctx, sizes: Dict[str, Tuple[float, float]],
+                     cfg: PlacementConfig) -> Dict[str, Placement]:
+    """The floorplan with the agent's rows / order / arrays / fixed slots.
+
+    Same row model as :func:`plan_floorplan` (row 0 on top, clusters left to
+    right, n-well gaps between wells), with three differences: a hinted row
+    keeps the given order and is not reshuffled; an ``array`` is one block
+    laid out as a grid; ``fixed`` devices are moved to the given slot last,
+    and any overlap that causes is reported, never silently resolved.
+    """
+    import math
+    h = cfg.hints
+    arrays = [dict(a) for a in (h.get("array") or [])]
+    in_array = {d: i for i, a in enumerate(arrays) for d in a.get("devices", [])}
+    clusters = []
+    for cl in _cluster_devices(ctx):
+        rest = [d for d in cl if d not in in_array and d in sizes]
+        if rest:
+            clusters.append(rest)
+    for i, a in enumerate(arrays):
+        clusters.append([d for d in a["devices"] if d in sizes])
+    array_idx = {tuple(a["devices"]): a for a in arrays}
+
+    row_hint = {d: int(r) for d, r in (h.get("rows") or {}).items()}
+    order = {int(r): list(seq) for r, seq in (h.get("order") or {}).items()}
+
+    def cluster_row(cl):
+        for d in cl:
+            if d in row_hint:
+                return row_hint[d]
+        for r, seq in order.items():
+            if any(d in seq for d in cl):
+                return r
+        return _cluster_row(ctx, cl)
+
+    rows: Dict[int, List[List[str]]] = {}
+    for cl in clusters:
+        rows.setdefault(cluster_row(cl), []).append(cl)
+    for r, cls in rows.items():
+        if r in order:
+            seq = order[r]
+            cls.sort(key=lambda cl: min([seq.index(d) for d in cl if d in seq] or [len(seq)]))
+
+    def members(cl):
+        if tuple(cl) in array_idx:
+            return list(cl)
+        for seq in order.values():
+            if all(d in seq for d in cl):
+                return sorted(cl, key=seq.index)
+        return _symmetric_order(ctx, cl)
+
+    def array_geom(cl):
+        a = array_idx[tuple(cl)]
+        cols = max(1, int(a.get("cols", len(cl))))
+        nrow = int(math.ceil(len(cl) / cols))
+        colw = max(sizes[d][0] for d in cl)
+        rowh = max(sizes[d][1] for d in cl)
+        gap = float(a.get("gap", cfg.intra_cluster_gap))
+        if any(_has_nwell(ctx.devices[d]) for d in cl):
+            gap = max(gap, cfg.nwell_spacing)
+        return cols, nrow, colw, rowh, gap
+
+    def dims(cl):
+        if tuple(cl) in array_idx:
+            cols, nrow, colw, rowh, gap = array_geom(cl)
+            return cols * colw + (cols - 1) * gap, nrow * rowh + (nrow - 1) * gap
+        ms = members(cl)
+        w = sum(sizes[d][0] for d in ms) + sum(
+            _gap_between(ctx, ms[i], ms[i + 1], cfg, cfg.intra_cluster_gap)
+            for i in range(len(ms) - 1))
+        return w, max(sizes[d][1] for d in ms)
+
+    def layout(rows_map) -> Dict[str, Placement]:
+        placements: Dict[str, Placement] = {}
+        heights = {r: max(dims(cl)[1] for cl in cls) for r, cls in rows_map.items()}
+        widths = {}
+        for r, cls in rows_map.items():
+            total = sum(dims(cl)[0] for cl in cls)
+            for i in range(len(cls) - 1):
+                total += _gap_between(ctx, members(cls[i])[-1], members(cls[i + 1])[0],
+                                      cfg, cfg.channel_x)
+            widths[r] = total
+        y = 0.0
+        for r in sorted(rows_map, reverse=True):
+            x = -widths[r] / 2.0
+            for k, cl in enumerate(rows_map[r]):
+                if tuple(cl) in array_idx:
+                    cols, nrow, colw, rowh, gap = array_geom(cl)
+                    for i, d in enumerate(cl):
+                        ci, ri = i % cols, i // cols
+                        placements[d] = Placement(
+                            instance=d, x=x + ci * (colw + gap),
+                            y=y + (nrow - 1 - ri) * (rowh + gap), orientation="R0", row=r)
+                    x += dims(cl)[0]
+                else:
+                    ms = members(cl)
+                    for i, d in enumerate(ms):
+                        placements[d] = Placement(instance=d, x=x, y=y,
+                                                  orientation="R0", row=r)
+                        x += sizes[d][0]
+                        if i + 1 < len(ms):
+                            x += _gap_between(ctx, d, ms[i + 1], cfg, cfg.intra_cluster_gap)
+                if k + 1 < len(rows_map[r]):
+                    x += _gap_between(ctx, members(cl)[-1], members(rows_map[r][k + 1])[0],
+                                      cfg, cfg.channel_x)
+            y += heights[r] + cfg.channel_y
+        return placements
+
+    def cost(pl):
+        return _hpwl_of_order(ctx, {d: (p.x + sizes[d][0] / 2.0, p.y + sizes[d][1] / 2.0)
+                                    for d, p in pl.items()})
+
+    best = layout(rows)
+    best_cost = cost(best)
+    improved, passes = True, 0
+    while improved and passes < cfg.refine_passes:
+        improved, passes = False, passes + 1
+        for r, cls in rows.items():
+            if r in order:
+                continue                         # the agent fixed this row's order
+            for i in range(len(cls)):
+                for j in range(i + 1, len(cls)):
+                    cls[i], cls[j] = cls[j], cls[i]
+                    cand = layout(rows)
+                    c = cost(cand)
+                    if c < best_cost - 1e-9:
+                        best, best_cost, improved = cand, c, True
+                    else:
+                        cls[i], cls[j] = cls[j], cls[i]
+
+    for d, pos in (h.get("fixed") or {}).items():
+        if d in best:
+            best[d] = Placement(instance=d, x=float(pos["x"]), y=float(pos["y"]),
+                                orientation="R0", row=best[d].row)
+    overlaps = []
+    names = list(best)
+    for i in range(len(names)):
+        a = best[names[i]]
+        wa, ha = sizes[names[i]]
+        for j in range(i + 1, len(names)):
+            b = best[names[j]]
+            wb, hb = sizes[names[j]]
+            if a.x < b.x + wb and b.x < a.x + wa and a.y < b.y + hb and b.y < a.y + ha:
+                overlaps.append([names[i], names[j]])
+    if overlaps:
+        cfg.log(1, f"  [PLACEMENT] WARNING hinted placement overlaps: {overlaps}")
+    ctx.metrics["hint_overlaps"] = overlaps
+    ctx.metrics["placement_hints"] = sorted(k for k, v in h.items() if v)
+    ctx.metrics["placement_weighted_hpwl"] = round(cost(best), 3)
+    return best
+
+
 # ── the placer ─────────────────────────────────────────────────────────
 
 def place(ctx, pdk, cfg: Optional[PlacementConfig] = None) -> Component:
@@ -559,6 +813,10 @@ def place(ctx, pdk, cfg: Optional[PlacementConfig] = None) -> Component:
         from mbg.pdk_rules import get_rules
         ctx.rules = get_rules(pdk)
     ctx.pdk = pdk
+    if cfg.profile is None:
+        cfg.profile = getattr(ctx, "profile", None)
+    if cfg.hints:
+        _apply_hint_groups(ctx, cfg)
 
     # Matched devices must share isolation. A differential pair with a deep
     # n-well on one side and not the other is not a matched pair at all — the
@@ -586,8 +844,10 @@ def place(ctx, pdk, cfg: Optional[PlacementConfig] = None) -> Component:
             # caller rather than a log line.
             raise
         except Exception as e:
-            cfg.log(1, f"  [PLACEMENT] cannot build {name} ({dev.model}): {e}")
-            continue
+            # Same reason as above: a device that is silently skipped here is
+            # a layout that can never pass LVS, discovered three stages later.
+            raise ValueError(f"cannot build {name} ({dev.model}): "
+                             f"{type(e).__name__}: {e}") from e
         comps[name] = c
         bb = c.bbox
         w_dev = float(bb[1][0] - bb[0][0])

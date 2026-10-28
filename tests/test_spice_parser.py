@@ -224,6 +224,7 @@ class TestF_ReferenceNetlistsUnchanged(unittest.TestCase):
         "cmp_2stage_clk": (12, 11), "inverter": (2, 4), "ota_5t": (5, 8),
         "ota_bb": (5, 9), "rc_filter": (2, 3), "ring_osc_3": (6, 5),
         "strongarm": (11, 10), "vref_1v2": (7, 6),
+        "vref_cmos_1v2": (5, 5), "vref_bgr_1v2": (19, 14),
     }
 
     def test_device_and_net_counts(self):

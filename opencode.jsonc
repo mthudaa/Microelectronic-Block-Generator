@@ -1,6 +1,17 @@
 {
 "$schema": "https://opencode.ai/config.json",
 
+// MBG tools over MCP (same registry as `scripts/mbg`). Keep in step with
+// .ai/manifest.json#mcp, which generates the other harnesses' configs.
+"mcp": {
+  "mbg": {
+    "type": "local",
+    "command": ["scripts/mbg", "mcp"],
+    "enabled": true,
+    "timeout": 60000
+  }
+},
+
 "permission": {
 "read": {
 "*": "allow",
@@ -45,6 +56,10 @@
   "docker ps *": "allow",
   "docker logs *": "ask",
   "docker exec *": "ask",
+
+  "scripts/mbg": "allow",
+  "scripts/mbg *": "allow",
+  "./scripts/mbg *": "allow",
 
   "git add *": "ask",
   "git commit *": "ask",

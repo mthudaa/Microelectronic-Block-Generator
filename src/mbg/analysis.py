@@ -220,7 +220,12 @@ class Testbench:
                  pdk_root: Optional[str] = None,
                  corner: str = "typical",
                  workdir: str = "sim",
-                 timeout: int = 600):
+                 timeout: int = 600,
+                 pdk: Optional[str] = None,
+                 temp: Optional[float] = None,
+                 isources: Optional[Dict[str, object]] = None,
+                 extra_lines: Sequence[str] = (),
+                 model_libs: Optional[Sequence[Tuple[str, str]]] = None):
         self.netlist = netlist
         self.cell = cell
         self.supplies = dict(supplies or {})
@@ -237,11 +242,45 @@ class Testbench:
         self.seed: Optional[int] = None
         self.ports = list(ports) if ports else self._ports_from_netlist(netlist, cell)
 
-        root = pdk_root or os.environ.get("PDKPATH") or os.path.join(
-            os.environ.get("PDK_ROOT", os.path.expanduser("~/.volare")),
-            os.environ.get("PDK", "gf180mcuD"))
-        self.pdk_models = os.path.join(root, "libs.tech", "ngspice", "sm141064.ngspice")
-        self.pdk_design = os.path.join(root, "libs.tech", "ngspice", "design.ngspice")
+        # Optional extensions, all off by default so an existing call builds
+        # exactly the deck it always did:
+        #   temp        -> `.temp T`
+        #   isources    -> {node: value} injects `value` amps INTO the node from
+        #                  ground; {node: (from_node, value)} from another node
+        #   extra_lines -> appended verbatim after the stimulus
+        #   model_libs  -> [(path, section), ...] replaces the automatic choice
+        self.temp = temp
+        self.isources = dict(isources or {})
+        self.extra_lines = list(extra_lines)
+        self.model_libs = list(model_libs) if model_libs else None
+
+        from mbg import pdk_profile
+        self.profile = self._profile_for(pdk, netlist)
+        self.corner = self.profile.canonical_corner(corner)
+        env_root = os.environ.get("PDKPATH")
+        if pdk_root:
+            root = pdk_root
+        elif env_root and os.path.basename(os.path.normpath(env_root)) == self.profile.name:
+            root = env_root
+        elif pdk is None and env_root and os.environ.get("PDK", self.profile.name) == self.profile.name:
+            root = env_root
+        else:
+            root = str(self.profile.path())
+        self.pdk_root = root
+        self.pdk_models = os.path.join(root, self.profile.model_file_rel)
+        design_rel = self.profile.design_file_rel
+        self.pdk_design = os.path.join(root, design_rel) if design_rel else ""
+
+    @staticmethod
+    def _profile_for(pdk, netlist):
+        """The PDK profile: explicit, else from the netlist's models, else env."""
+        from mbg import pdk_profile
+        if pdk:
+            return pdk_profile.resolve(pdk)
+        try:
+            return pdk_profile.for_netlist(netlist)
+        except Exception:
+            return pdk_profile.resolve()
 
     # -- deck construction --
     @staticmethod
@@ -269,7 +308,60 @@ class Testbench:
                 lines.append(f"Vsrc{i} {node} 0 {val}")
         for node, spec in self.loads.items():
             lines.append(f"C_load_{node} {node} 0 {spec}")
+        for i, (node, val) in enumerate(self.isources.items()):
+            src, value = (val if isinstance(val, (tuple, list)) else ("0", val))
+            # ngspice: current flows from n+ through the source to n-, so
+            # `I src node` pushes `value` amps into `node`.
+            lines.append(f"Iisrc{i} {src} {node} {value}")
+        lines.extend(self.extra_lines)
         return lines
+
+    # -- model libraries --
+    def device_kinds(self) -> List[str]:
+        """Device kinds in the circuit, from the profile's device catalogue."""
+        kinds = []
+        for line in self._core().splitlines():
+            parts = line.split()
+            if not parts or parts[0].startswith((".", "*", "+")):
+                continue
+            for tok in parts[1:]:
+                if "=" in tok:
+                    break
+                kind = self.profile.kind_of(tok)
+                if kind and kind not in kinds:
+                    kinds.append(kind)
+        return kinds
+
+    def lib_lines(self) -> List[str]:
+        """`.lib` lines for this circuit: one section per device kind present.
+
+        A MOS-only circuit gets exactly the single `.lib <models> <corner>`
+        line this class always wrote. A bandgap with PNPs and poly resistors
+        on gf180 additionally gets `bjt_<corner>` and `res_<corner>` — the
+        sections that define those devices, which the MOS corners do not.
+        """
+        if self.model_libs:
+            return [f".lib '{path}' {sec}" for path, sec in self.model_libs]
+        sections = self.profile.lib_sections(self.device_kinds(), self.corner)
+        available = self._available_sections()
+        if available:
+            missing = [sec for sec in sections if sec not in available]
+            if missing:
+                raise ValueError(
+                    f"model library {self.pdk_models} has no section(s) "
+                    f"{missing} for corner {self.corner!r}; available: "
+                    f"{sorted(available)}")
+        return [f".lib '{self.pdk_models}' {sec}" for sec in sections]
+
+    _SECTION_CACHE: Dict[str, List[str]] = {}
+
+    def _available_sections(self) -> List[str]:
+        if not os.path.isfile(self.pdk_models):
+            return []
+        if self.pdk_models not in Testbench._SECTION_CACHE:
+            from mbg.pdk_profile import scan_lib_sections
+            Testbench._SECTION_CACHE[self.pdk_models] = scan_lib_sections(self.pdk_models)
+        return Testbench._SECTION_CACHE[self.pdk_models]
 
     def build_deck(self, analysis_lines: Sequence[str], control: Sequence[str]) -> str:
         """Assemble a complete, runnable ngspice deck."""
@@ -277,12 +369,14 @@ class Testbench:
             raise FileNotFoundError(
                 f"PDK models not found at {self.pdk_models} — set PDK_ROOT/PDKPATH")
         head = []
-        if os.path.isfile(self.pdk_design):
+        if self.pdk_design and os.path.isfile(self.pdk_design):
             # must come before the model library or the models fail to evaluate
             head.append(f".include '{self.pdk_design}'")
-        head.append(f".lib '{self.pdk_models}' {self.corner}")
+        head.extend(self.lib_lines())
         if self.mismatch:
             head.append(".param sw_stat_mismatch=1")
+        if self.temp is not None:
+            head.append(f".temp {self.temp}")
 
         inst = f"Xdut {' '.join(self.ports)} {self.cell}"
         body = head + ["", self._core(), ""] + self._stimulus() + [inst, ""]
@@ -296,7 +390,14 @@ class Testbench:
              probes: Sequence[str], workdir: Optional[str] = None,
              datfile: Optional[str] = None,
              complex_data: bool = False) -> SimResult:
-        r = run_spice(deck, workdir=workdir or self.workdir, timeout=self.timeout, fmt="dat")
+        wd = workdir or self.workdir
+        if self.profile.spiceinit:
+            # ngspice reads .spiceinit from its working directory; sky130
+            # needs `set ngbehavior=hsa` or its model library fails to parse.
+            os.makedirs(wd, exist_ok=True)
+            with open(os.path.join(wd, ".spiceinit"), "w") as f:
+                f.write("\n".join(self.profile.spiceinit) + "\n")
+        r = run_spice(deck, workdir=wd, timeout=self.timeout, fmt="dat")
         res = SimResult(analysis=analysis, x_name=x_name, returncode=r["returncode"],
                         stdout=r.get("stdout", ""), stderr=r.get("stderr", ""),
                         workdir=r.get("workdir", ""), deck=deck)
@@ -319,21 +420,50 @@ class Testbench:
     def op(self) -> SimResult:
         """Operating point: one value per probe."""
         probes = self.probes or self.ports
-        ctrl = ["op"] + [f"print v({p})" for p in probes]
+        ctrl = ["op"] + [f"print {_vec(p)}" for p in probes]
         return self._run("op", self.build_deck([], ctrl), "", probes)
 
     def dc(self, source_node: str, start: float, stop: float, step: float) -> SimResult:
-        """Sweep a source and record the probes."""
-        idx = list(self.sources).index(source_node) if source_node in self.sources else None
-        vname = f"Vsrc{idx}" if idx is not None else source_node
+        """Sweep a source and record the probes.
+
+        ``source_node`` is a node driven by ``sources`` or ``supplies`` (a
+        supply sweep gives line regulation), a source name, or ``"temp"``
+        for a temperature sweep in degrees C.
+        """
+        vname = self._source_name(source_node)
         # Default to every port, not just the swept source: recording only
         # the stimulus tells you what you already know and leaves the
         # response — the reason for the sweep — out of the result.
         probes = self.probes or self.ports or [source_node]
         ctrl = [f"dc {vname} {start} {stop} {step}",
-                f"wrdata dc.dat {' '.join('v(%s)' % p for p in probes)}"]
-        return self._run("dc", self.build_deck([], ctrl), "v_sweep", probes,
+                f"wrdata dc.dat {' '.join(_vec(p) for p in probes)}"]
+        x_name = "temp" if vname == "temp" else "v_sweep"
+        return self._run("dc", self.build_deck([], ctrl), x_name, probes,
                          datfile="dc.dat")
+
+    def _source_name(self, node: str) -> str:
+        """The ngspice source driving ``node`` (or ``temp``)."""
+        if node.lower() == "temp":
+            return "temp"
+        if node in self.sources:
+            return f"Vsrc{list(self.sources).index(node)}"
+        if node in self.supplies:
+            return f"Vsupply{list(self.supplies).index(node)}"
+        return node
+
+    def run(self, control: Sequence[str], *, analysis: str = "custom",
+            x_name: str = "", probes: Sequence[str] = (),
+            datfile: Optional[str] = None, complex_data: bool = False,
+            workdir: Optional[str] = None) -> SimResult:
+        """Run arbitrary ngspice control lines against this testbench.
+
+        The public form of what the measurement recipes need: the deck is
+        built exactly as for the canned analyses (models, stimulus, DUT), and
+        ``print``/``wrdata`` output is parsed into the result.
+        """
+        return self._run(analysis, self.build_deck([], control), x_name,
+                         list(probes), workdir=workdir, datfile=datfile,
+                         complex_data=complex_data)
 
     def ac(self, fstart: float, fstop: float, points: int = 20,
            variation: str = "dec", ac_node: Optional[str] = None) -> SimResult:
@@ -343,19 +473,21 @@ class Testbench:
             raise ValueError("ac() needs a source node to excite")
         probes = self.probes or self.ports or [node]
         deck = self.build_deck([], [f"ac {variation} {points} {fstart} {fstop}",
-                                    f"wrdata ac.dat {' '.join('v(%s)' % p for p in probes)}"])
+                                    f"wrdata ac.dat {' '.join(_vec(p) for p in probes)}"])
         # Give the chosen source an AC magnitude of 1. The old pattern only
         # matched a single-token value, so a source written "DC 1.2" kept an
         # AC magnitude of zero and the sweep came back all zeros — a silent
         # wrong answer. Match the line, not the value, and refuse to run if
         # the source is not there at all.
-        idx = list(self.sources).index(node)
-        deck, n = re.subn(rf"^(Vsrc{idx}\s+{re.escape(node)}\s+0\s+.*)$",
+        # The excited node may be a supply as well as a source: AC on VDD,
+        # read at the output, is the PSRR transfer function.
+        vname = self._source_name(node)
+        deck, n = re.subn(rf"^({re.escape(vname)}\s+{re.escape(node)}\s+0\s+.*)$",
                           r"\1 AC 1", deck, flags=re.MULTILINE)
         if n != 1:
             raise RuntimeError(
                 f"ac(): could not attach an AC magnitude to source "
-                f"'Vsrc{idx}' on node '{node}'. Without it every result is "
+                f"'{vname}' on node '{node}'. Without it every result is "
                 f"zero, so this fails instead of returning one.")
         return self._run("ac", deck, "frequency", probes, datfile="ac.dat",
                          complex_data=True)
@@ -364,7 +496,7 @@ class Testbench:
         """Transient analysis."""
         probes = self.probes or self.ports
         ctrl = [f"tran {step} {stop} {start}",
-                f"wrdata tran.dat {' '.join('v(%s)' % p for p in probes)}"]
+                f"wrdata tran.dat {' '.join(_vec(p) for p in probes)}"]
         return self._run("tran", self.build_deck([], ctrl), "time", probes,
                          datfile="tran.dat")
 
@@ -396,6 +528,11 @@ class Testbench:
 
 
 # ── parsing ────────────────────────────────────────────────────────────
+
+def _vec(probe: str) -> str:
+    """A node name as an ngspice vector; expressions like i(Vsupply0) pass through."""
+    return probe if "(" in probe else f"v({probe})"
+
 
 def _parse_print(res: SimResult, probes: Sequence[str]) -> None:
     """Pull `name = value` lines out of ngspice's stdout."""

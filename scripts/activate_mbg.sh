@@ -48,7 +48,7 @@ if [ -x "${_mbg_venv}/bin/activate" ] || [ -f "${_mbg_venv}/bin/activate" ]; the
     . "${_mbg_venv}/bin/activate"
 else
     printf 'mbg: no virtual environment at %s\n' "${_mbg_venv}" >&2
-    printf 'mbg: run ./scripts/setup_env.sh first\n' >&2
+    printf 'mbg: run ./install.sh --stage python first\n' >&2
 fi
 
 # --- PDK ---------------------------------------------------------------
@@ -82,6 +82,6 @@ printf 'mbg: PDK %s at %s\n' "${PDK}" "${PDKPATH}"
 if [ -n "${MBG_MAGIC_ROOT:-}" ] || [ -n "${MBG_NETGEN_ROOT:-}" ]; then
     printf 'mbg: local EDA tools from %s\n' "${MBG_TOOLS_ROOT}"
 fi
-printf 'mbg: run ./scripts/setup_env.sh --check to verify\n'
+printf 'mbg: run ./install.sh --check to verify\n'
 
 unset _mbg_src _mbg_dir _mbg_venv

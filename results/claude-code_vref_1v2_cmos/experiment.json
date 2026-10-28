@@ -1,0 +1,40 @@
+{
+  "experiment_id": "vref-cmos-1v2",
+  "model": "NOT AVAILABLE",
+  "pdk": "gf180mcuD",
+  "prompt_level": "detailed",
+  "api_calls": 0,
+  "refinement_iterations": 0,
+  "max_refinement_iterations": 2,
+  "netlist_valid": true,
+  "pre_simulation_status": "PASS",
+  "gds_generated": true,
+  "drc_status": "PASS",
+  "lvs_status": "PASS",
+  "pex_status": "PASS",
+  "post_simulation_status": "PASS",
+  "final_status": "PARTIAL",
+  "created_at": "2026-10-28T12:44:54+00:00",
+  "updated_at": "2026-10-28T12:57:46+00:00",
+  "artifacts": {
+    "prompt": "prompt.txt",
+    "netlist": "generated_netlist.spice",
+    "gds": "final/vref_cmos_1v2.gds",
+    "pre_simulation": "pre_simulation/vref_metrics.json",
+    "drc": "final/verification/drc_summary.json",
+    "lvs": "final/vref_cmos_1v2.lvs.out",
+    "pex": "final/vref_cmos_1v2.pex.spice",
+    "post_simulation": "post_simulation/vref_metrics.json"
+  },
+  "metadata": {
+    "description": "MOS-only 1.2 V reference: NMOS diode at its zero-TC point, fed from IBIAS through mirrors",
+    "created_by": "mbg design init",
+    "final_status_note": "every stage PASS; final PASS also needs >= 1 recorded API call (api_calls), which an agent-driven run does not log",
+    "agent": "Claude Code (interactive agent session, driving `scripts/mbg` only)",
+    "model_note": "model identifier not recorded in the repository by session policy; fill in from the session record",
+    "design_iterations": 10,
+    "design_iterations_note": "netlist candidates evaluated with `mbg measure vref` before the final one; bounded at 16",
+    "api_calls_note": "0: no LLM API was called by MBG; the agent itself authored the netlist",
+    "workspace": "outputs/vref-cmos-1v2"
+  }
+}

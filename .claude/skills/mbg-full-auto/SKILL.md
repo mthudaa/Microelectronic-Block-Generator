@@ -6,6 +6,13 @@ description: Fully automated analog design from one request — the /mbg-full-au
 
 # `/mbg-full-auto` — Fully Automated Design
 
+Every stage below has a `scripts/mbg` command (skill `mbg-agent-interface`):
+`design init` → `netlist check` → `measure vref|ota` (pre-layout) →
+`layout generate` → `measure … --post-layout` → `design status`, or
+`flow run --recipe vref|ota --spec <spec>` for the whole chain. Prefer them
+to hand-written Python: they keep `experiment.json` and the artifact layout
+current and return statuses the sign-off gate can quote.
+
 Canonical definitions: `.ai/knowledge/FULL_AUTOMATE.md` and
 `.ai/knowledge/DESIGN_FLOW.md`. Read them before deviating.
 

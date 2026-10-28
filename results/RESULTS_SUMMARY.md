@@ -5,7 +5,7 @@ Generator, as recorded in this directory. One row per design, generated from
 the artifacts on disk (`full_auto_result.json`, `final/drc_summary.json`,
 `final/*.lvs.out`, `final/*.gds`) rather than transcribed by hand.
 
-- Designs: **13**
+- Designs: **15**
 - PDK: **GF180MCU-D** (`gf180mcuD`), 3.3 V single supply
 - Flow: `/mbg-full-auto` — specification → pre-layout optimisation → layout →
   DRC → LVS → PEX extraction → PEX-aware re-optimisation → sign-off
@@ -27,7 +27,16 @@ the artifacts on disk (`full_auto_result.json`, `final/drc_summary.json`,
 | `ox_alpha_ota` | OX-Alpha | 5T-OTA | 6 | 8 | 50.8 × 55.04 | 2,796 | ✅ | ✅ | ✅ | ✅ |
 | `ox_alpha_strongarm_comparator` | OX-Alpha | StrongArm comparator | 11 | 10 | 42.88 × 49.94 | 2,141 | ✅ | ✅ | ✅ | ✅ |
 | `ox_alpha_vref_1v2` | OX-Alpha | 1.2 V voltage reference | 4 | 5 | 32.74 × 35.66 | 1,168 | ✅ | ✅ | ✅ | ✅ |
-| **Total** | | **13 designs** | | | | **34,898** | **13/13** | **13/13** | **13/13** | **13/13** |
+| `claude-code_vref_1v2_cmos` | Claude Code ¹ | 1.2 V voltage reference (MOS-only) | 5 | 5 | 44.58 × 22.18 | 989 | ✅ | ✅ | ✅ | PARTIAL ² |
+| `claude-code_vref_1v2_bgr` | Claude Code ¹ | 1.2 V bandgap reference (PNP + poly R) | 19 | 14 | 81.28 × 80.48 | 6,541 | ✅ | ✅ | ✅ | PARTIAL ² |
+| **Total** | | **15 designs** | | | | **42,428** | **15/15** | **15/15** | **15/15** | **13/15** |
+
+¹ Designed by an AI agent through the `scripts/mbg` CLI only (no driver
+scripts); model identifier not recorded in the repository.
+² DRC (Magic + KLayout), LVS, PEX and the post-layout VREF.md specification
+all pass, but these two runs used `mbg measure vref` + `mbg layout generate`,
+not `/mbg-full-auto`: Monte Carlo / mismatch and the Devil/Angel reviews in the
+sign-off list below were **not run**, so they are not marked tapeout-ready.
 
 All thirteen designs reach `tapeout_ready: true` in their own run record:
 Magic DRC clean, KLayout sign-off clean, netgen LVS matching, a parasitic
@@ -106,6 +115,32 @@ DeepSeek's reference is the clear winner on quality: **60 ppm/°C** against
 better temperature coefficient in the smallest area of the three. It pays for
 it in supply current (61 µA against 20–40 µA). Note that none of the three
 lands exactly on 1.2 V: 1.225 V, 1.167 V and 1.154 V respectively.
+
+### Two more, from the `mbg` agent CLI: MOS-only vs bandgap
+
+Post-layout (PEX), worst case over the five corners unless noted, measured by
+`mbg measure vref` (same recipe for both). See each `REPORT.md`.
+
+| Design | Devices | Area (µm²) | V_ref typ (V) | Tempco worst / typ (ppm/°C) | Line reg (mV/V) | PSRR (dB) | I_dd (µA) | V_ref over corners (V) |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | :--- |
+| `claude-code_vref_1v2_cmos` | 5 MOS | 989 | 1.1828 | 98.9 / 36.3 | 4.54 | −47.0 | 40.6 | 1.044 – 1.326 |
+| `claude-code_vref_1v2_bgr` | 10 MOS, 4 PNP, 5 R | 6,541 | 1.2148 | 34.5 / 22.5 | 20.7 | −34.0 | 24.7 | 1.214 – 1.217 |
+
+Both pass the VREF.md gate after PEX. The bandgap is the better *reference* —
+a 2.7 mV process spread against 281 mV, and the lower tempco — at 6.6× the area
+and with weaker line regulation and PSRR (its OTA's finite gain, multiplied by
+1 + R2/R1). The MOS-only design is a threshold reference: excellent line
+regulation and PSRR, tiny, but it tracks the NMOS corner and the bias current.
+The bandgap deliberately ignores VREF.md's MOS-only clause; it is the
+comparison point.
+
+> **Post-layout simulation of passives.** These runs found that Magic's PEX
+> netlists (`.option scale=5n`) handed `ppolyf_u*` and MIM subcircuits their
+> `r_/c_` width and length in scaled units, which ngspice does not rescale for
+> subcircuit parameters. `checks.run_pex` now converts them. Post-layout
+> numbers recorded before the fix for designs with poly resistors or MIM
+> capacitors — here `claude-opus-5_temp_sensor` — used mis-scaled passives and
+> should be re-simulated before they are quoted.
 
 ## Ring oscillator — three candidates
 

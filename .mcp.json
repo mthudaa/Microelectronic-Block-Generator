@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "mbg": {
+      "type": "stdio",
+      "command": "scripts/mbg",
+      "args": [
+        "mcp"
+      ],
+      "env": {}
+    }
+  }
+}

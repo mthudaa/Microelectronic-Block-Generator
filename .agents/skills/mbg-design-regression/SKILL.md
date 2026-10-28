@@ -1,6 +1,10 @@
 ---
 name: mbg-design-regression
 description: Reads AI-Generated-Design-Result as both working design output and regression evidence, understands the "<design>_designcontext_v2/" convention for new pipeline runs kept beside preserved baselines, and inventories the artifacts (.gds, .lvs.out, .magic.drc.rpt, .spice, REPORT.md) each design directory holds. Use before comparing a new run against a prior one, or before writing anything into AI-Generated-Design-Result. Do not use it to generate a new layout or run verification — this skill is read-only and never overwrites a previous result.
+license: Apache-2.0
+metadata:
+  owner: huda
+  project: microelectronic-block-generator
 ---
 <!-- GENERATED FILE — do not edit by hand. Source: .ai/skills/mbg-design-regression/SKILL.md. Regenerate with: python3 scripts/sync_agent_tools.py -->
 

@@ -71,7 +71,7 @@ class TestA_PDKMissing(unittest.TestCase):
                 with self.assertRaises(config.ToolError) as cm:
                     config.ensure_pdk_env(strict=True)
                 msg = str(cm.exception)
-                self.assertIn("setup_env.sh --pdk", msg)
+                self.assertIn("install.sh --stage pdk", msg)
                 self.assertIn("gf180mcuD", msg)
                 self.assertNotIn("NoneType", msg)
             finally:
@@ -100,7 +100,7 @@ class TestB_IncompatibleMagic(unittest.TestCase):
                 info = config.resolve_magic()
                 self.assertFalse(info.ok)
                 self.assertIn("0.0.0", info.reason)
-                self.assertIn("setup_env.sh", info.reason)
+                self.assertIn("install.sh --stage eda", info.reason)
                 with self.assertRaises(config.ToolError):
                     config.magic_bin()
             finally:

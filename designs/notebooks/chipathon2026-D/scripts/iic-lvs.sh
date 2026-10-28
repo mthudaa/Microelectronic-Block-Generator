@@ -371,7 +371,7 @@ fi
 
 echo "[INFO] Extracting netlist from layout <$CELL_LAY>..."
 OLDDIR=$PWD && cd "$RESDIR" || exit $ERR_NO_RESULT
-magic -dnull -noconsole \
+"${MBG_MAGIC:-magic}" -dnull -noconsole \
 	-rcfile "$PDKPATH/libs.tech/magic/$PDK.magicrc" \
 	 "$EXT_SCRIPT" \
 	 > /dev/null 2> /dev/null
@@ -387,14 +387,14 @@ fi
 
 echo "[INFO] Run netgen..."
 if [ "$VERILOG_MODE" -eq 0 ]; then
-	netgen -batch lvs "$NETLIST_LAY $TOPCELL" "$NETLIST_SCH $TOPCELL" \
+	"${MBG_NETGEN:-netgen}" -batch lvs "$NETLIST_LAY $TOPCELL" "$NETLIST_SCH $TOPCELL" \
 		"$PDK_ROOT/$PDK/libs.tech/netgen/${PDK}_setup.tcl" \
 		"$LVS_REPORT" > "$LVS_LOG"
 else
 	# this is not needed if subcircuit descend off is applied during the extract
 	# UPDATE: still needed, the subcircuit descend off seems to not work
 	export MAGIC_EXT_USE_GDS=1
-	netgen -batch lvs "$NETLIST_LAY $TOPCELL" "$CELL_V $TOPCELL" \
+	"${MBG_NETGEN:-netgen}" -batch lvs "$NETLIST_LAY $TOPCELL" "$CELL_V $TOPCELL" \
                 "$PDK_ROOT/$PDK/libs.tech/netgen/${PDK}_setup.tcl" \
                 "$LVS_REPORT" > "$LVS_LOG"
 fi

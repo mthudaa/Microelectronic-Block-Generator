@@ -1,0 +1,61 @@
+{
+  "schema": "mbg.pdk/1",
+  "name": "sky130A",
+  "family": "sky130",
+  "aliases": ["sky130", "sky130a"],
+  "default": false,
+  "description": "SkyWater 130 nm, variant A. Supported for MOS-only layout (smoke-verified); passives and BJTs are simulation-only.",
+  "supply": {"nominal_v": 1.8, "min_v": 1.62, "max_v": 1.98, "devices_v": "1.8 V core devices (sky130_fd_pr__nfet_01v8 / pfet_01v8)"},
+  "std_cell_library": "sky130_fd_sc_hd",
+  "glayout_pdk": "sky130",
+  "units": "W/L are unitless microns (the model library sets .option scale=1e-6): write W=1 L=0.15, not W=1u",
+  "conventions": {
+    "instance_prefix": {"nmos": "XM", "pmos": "XM", "res": "XR", "cap": "XC", "bjt": "XQ"},
+    "fingers_over_multiplier": "prefer nf=N over m=N for matching and compactness",
+    "body": {"pmos": "highest supply (VPWR/VDD)", "nmos": "ground (VGND/VSS)"},
+    "ground_names": ["VSS", "GND", "VGND", "VNB", "0"],
+    "supply_names": ["VDD", "VPWR", "VPB", "VCC"]
+  },
+  "devices": {
+    "sky130_fd_pr__nfet_01v8": {"kind": "nmos", "terminals": ["d", "g", "s", "b"], "layout": true, "sim": "mos",
+                                "w_min_um": 0.42, "w_max_um": 10.0, "l_min_um": 0.15, "l_max_um": 10.0,
+                                "body_net": "ground"},
+    "sky130_fd_pr__pfet_01v8": {"kind": "pmos", "terminals": ["d", "g", "s", "b"], "layout": true, "sim": "mos",
+                                "w_min_um": 0.42, "w_max_um": 10.0, "l_min_um": 0.15, "l_max_um": 10.0,
+                                "body_net": "supply"},
+    "sky130_fd_pr__nfet_01v8_lvt": {"kind": "nmos", "terminals": ["d", "g", "s", "b"], "layout": false, "sim": "mos",
+                                    "note": "simulation only in MBG"},
+    "sky130_fd_pr__pfet_01v8_lvt": {"kind": "pmos", "terminals": ["d", "g", "s", "b"], "layout": false, "sim": "mos",
+                                    "note": "simulation only in MBG"},
+    "sky130_fd_pr__res_xhigh_po_0p35": {"kind": "res", "terminals": ["p", "n", "body"], "layout": false, "sim": "res",
+                                        "note": "simulation only in MBG"},
+    "sky130_fd_pr__cap_mim_m3_1": {"kind": "cap", "terminals": ["p", "n"], "layout": false, "sim": "cap",
+                                   "note": "simulation only in MBG"},
+    "sky130_fd_pr__pnp_05v5_W3p40L3p40": {"kind": "bjt", "terminals": ["c", "b", "e"], "layout": false, "sim": "bjt",
+                                          "substrate_terminals": ["c"], "note": "simulation only in MBG"}
+  },
+  "ngspice": {
+    "model_file": "libs.tech/ngspice/sky130.lib.spice",
+    "design_file": null,
+    "corners": ["tt", "ff", "ss", "sf", "fs"],
+    "default_corner": "tt",
+    "corner_aliases": {"typical": "tt"},
+    "sections": {
+      "mos": {"pattern": "{corner}", "corners": ["tt", "ff", "ss", "sf", "fs", "mc"]},
+      "bjt": {"pattern": "{corner}", "corners": ["tt", "ff", "ss", "sf", "fs"]},
+      "res": {"pattern": "{corner}", "corners": ["tt", "ff", "ss", "sf", "fs"]},
+      "cap": {"pattern": "{corner}", "corners": ["tt", "ff", "ss", "sf", "fs"]}
+    },
+    "fallback_corner": "tt",
+    "spiceinit": ["set ngbehavior=hsa", "set ng_nomodcheck"]
+  },
+  "verification": {
+    "drc_engines": ["magic"],
+    "drc_primary": "magic",
+    "klayout_deck": null,
+    "klayout_variant": null,
+    "lvs_permute_models": ["sky130_fd_pr__nfet_01v8", "sky130_fd_pr__pfet_01v8"]
+  },
+  "tested_ceiling": {"mos": 5, "nets": 6, "max_net_degree": 9,
+                     "evidence": "tests/netlists/sky130/ (smoke: inverter, ota_5t)"}
+}

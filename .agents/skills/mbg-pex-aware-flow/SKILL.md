@@ -1,10 +1,19 @@
 ---
 name: mbg-pex-aware-flow
 description: Drives the MBG two-loop design methodology — pre-layout optimization, then PEX-aware post-layout optimization. Use whenever a design has performance targets (gain, bandwidth, phase margin, offset, delay, power) and must be taken from specification to a sign-off candidate. Use it to decide what to do when post-layout simulation misses spec. Do not use it for layout-only tasks with no performance target (use mbg-spice-to-gds), or for pure verification of an existing GDS (use mbg-ic-verify).
+license: Apache-2.0
+metadata:
+  owner: huda
+  project: microelectronic-block-generator
 ---
 <!-- GENERATED FILE — do not edit by hand. Source: .ai/skills/mbg-pex-aware-flow/SKILL.md. Regenerate with: python3 scripts/sync_agent_tools.py -->
 
 # PEX-Aware Design Flow
+
+Tools for both loops: `scripts/mbg measure vref|ota <netlist>` for
+pre-layout, the same command on `<cell>.pex.spice` with `--post-layout` for
+post-layout, `scripts/mbg flow run` for one pass of both; skill
+`mbg-agent-interface`.
 
 Canonical definition: `.ai/knowledge/DESIGN_FLOW.md`. Read it before deviating
 from anything here.
@@ -19,6 +28,17 @@ produces the sign-off candidate.
 iteration; it does not end the run.
 
 Pre-layout PASS ≠ finished design.
+
+## DRC is dual-engine
+
+Step 6 below is **two** checks on the same GDS: **KLayout DRC** (GF180
+foundry deck — the sign-off authority) and **Magic DRC** (independent
+complementary check), reconciled into one verdict.
+
+`PASS` requires both clean and agreeing. Magic failing while KLayout is clean
+is `DRC_DISAGREEMENT` — investigate; it is not a pass. A KLayout or rule-deck
+that is missing is `CONFIGURATION_FAILURE`. LVS and PEX are `SKIP`ped unless
+the reconciled DRC verdict passes.
 
 ## Procedure
 

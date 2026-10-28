@@ -1,0 +1,28 @@
+* 1.2 V bandgap: vertical PNPs, ppolyf_u_1k, PMOS-input OTA.
+*
+* Designed through the mbg agent CLI; see results/claude-code_vref_1v2_bgr.
+* The first fixture with BJTs and high-resistance poly, and the first above
+* the old ceiling (12 MOS / 11 nets / degree 16).
+* complexity: 10 MOS + 4 PNP + 5 R = 19 devices, 14 nets, max net degree 21
+.lib "{PDK_LIB}" typical
+.subckt vref_bgr_1v2 VDD VSS VREF IBIAS
+XM1 VA PG VDD VDD pfet_03v3 L=8u W=2u nf=1
+XM2 VB PG VDD VDD pfet_03v3 L=8u W=2u nf=1
+XM3 VREF PG VDD VDD pfet_03v3 L=8u W=2u nf=1
+XQ1 VSS VSS VA pnp_05p00x05p00
+XQ2a VSS VSS VX pnp_10p00x10p00
+XQ2b VSS VSS VX pnp_10p00x10p00
+XQ3 VSS VSS VC pnp_05p00x05p00
+XR1 VB VX VSS ppolyf_u_1k r_width=1u r_length=10u
+XR2a VREF n1 VSS ppolyf_u_1k r_width=1u r_length=25u
+XR2b n1 n2 VSS ppolyf_u_1k r_width=1u r_length=25u
+XR2c n2 n3 VSS ppolyf_u_1k r_width=1u r_length=25u
+XR2d n3 VC VSS ppolyf_u_1k r_width=1u r_length=25u
+XM4 NT PG VDD VDD pfet_03v3 L=8u W=2u nf=1
+XM5 NM VB NT VDD pfet_03v3 L=4u W=8u nf=2
+XM6 PG VA NT VDD pfet_03v3 L=4u W=8u nf=2
+XM7 NM NM VSS VSS nfet_03v3 L=8u W=2u nf=1
+XM8 PG NM VSS VSS nfet_03v3 L=8u W=2u nf=1
+XM9 IBIAS VREF VSS VSS nfet_03v3 L=1u W=8u nf=1
+XM10 PG IBIAS VSS VSS nfet_03v3 L=2u W=1u nf=1
+.ends

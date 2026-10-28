@@ -1,0 +1,49 @@
++------------------------------------------------+  y=80.5
+||------||------| |------||------||------|------||
+|| XM5  || XM6  | | XM1  || XM2  || XM3  | XM4  ||
+||------||------| |------||------||------|------||
+|                                                |
+|                            |--|                |
+|                            |  |                |
+|           |------||------| |XM||---|           |
+|           | XM7  || XM8  | |  ||XM1|           |
+|           |------||------| |--||---|           |
+|                                                |
+|                 || ||    || ||                 |
+|                 || ||    || ||                 |
+|                 || ||    || ||                 |
+|                 || ||    || ||                 |
+|                 || || || || ||                 |
+|                 || || || || ||                 |
+|                 || || || || ||                 |
+|                 || || || || ||                 |
+|                 || || || || ||                 |
+|                                                |
+|               |-------||-------|               |
+|        |----| | XQ2a  || XQ2b  | |----|        |
+|        |XQ1 | |       ||       | |XQ3 |        |
+|        |----| |-------||-------| |----|        |
++------------------------------------------------+  y=0.0
+x=-40.6                                   x=40.6
+
+vref_bgr_1v2: 81.28 x 80.48 um, 19 devices
+device    kind   row        x        y       w       h  nets
+XM5       pmos     0   -40.64    71.39   12.42    9.09  drain=NM gate=VB source=NT body=VDD
+XM6       pmos     0   -26.72    71.39   12.42    9.09  drain=PG gate=VA source=NT body=VDD
+XM1       pmos     0   -11.30    71.39   11.86    7.09  drain=VA gate=PG source=VDD body=VDD
+XM2       pmos     0     2.06    71.39   11.86    7.09  drain=VB gate=PG source=VDD body=VDD
+XM3       pmos     0    15.42    71.39   11.86    7.09  drain=VREF gate=PG source=VDD body=VDD
+XM4       pmos     0    28.78    71.39   11.86    7.09  drain=NT gate=PG source=VDD body=VDD
+XM7       nmos     2   -20.72    52.30   11.86    7.09  drain=NM gate=NM source=VSS body=VSS
+XM8       nmos     2    -7.86    52.30   11.86    7.09  drain=PG gate=NM source=VSS body=VSS
+XM9       nmos     2     7.00    52.30    4.86   13.09  drain=IBIAS gate=VREF source=VSS body=VSS
+XM10      nmos     2    14.86    52.30    5.86    6.10  drain=PG gate=IBIAS source=VSS body=VSS
+XR2a      res      3   -10.50    19.28    1.80   27.02  p=VREF n=n1 body=VSS
+XR2b      res      3    -5.70    19.28    1.80   27.02  p=n1 n=n2 body=VSS
+XR1       res      3    -0.90    19.28    1.80   12.02  p=VB n=VX body=VSS
+XR2c      res      3     3.90    19.28    1.80   27.02  p=n2 n=n3 body=VSS
+XR2d      res      3     8.70    19.28    1.80   27.02  p=n3 n=VC body=VSS
+XQ1       bjt      4   -26.06     0.00    8.28    8.28  c=VSS b=VSS e=VA
+XQ2a      bjt      4   -14.78    -0.00   13.28   13.28  c=VSS b=VSS e=VX
+XQ2b      bjt      4     1.50    -0.00   13.28   13.28  c=VSS b=VSS e=VX
+XQ3       bjt      4    17.78     0.00    8.28    8.28  c=VSS b=VSS e=VC

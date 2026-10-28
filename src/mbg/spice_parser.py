@@ -5,7 +5,6 @@
 """
 import re
 from collections import defaultdict
-from gdsfactory import port
 
 def _first(params, *keys, default="-"):
     """First key in `params` that carries a real value, not the "-" placeholder."""
@@ -184,6 +183,16 @@ def parse_netlist_with_pdk(file_content, manual_pdk="Tidak Terdeteksi", mode="an
                 "n": raw_nodes[1] if len(raw_nodes) > 1 else "-",
                 "body": raw_nodes[2] if len(raw_nodes) > 2 else "-"
             }
+
+        # BIPOLAR (Q c b e [s] model) — kept whole; the old fallback below
+        # read only two nodes and took the emitter for the model name.
+        elif device_type == 'Q':
+            nodes_and_name = [p for p in parts[1:] if '=' not in p]
+            model_name = nodes_and_name[-1] if nodes_and_name else "-"
+            raw_nodes = nodes_and_name[:-1]
+            nodes_dict = {t: n for t, n in zip(("c", "b", "e", "s"), raw_nodes)}
+            remaining = ""
+            param_dict = {}
 
         # SUBCIRCUIT (X)
         elif device_type == 'X': 
@@ -465,6 +474,10 @@ def _assign_initial_placement(final_output):
 
 
 def matrix_port_init(config):
+    # gdsfactory is imported here, not at module level, so the parser itself
+    # (and every agent tool built on it) loads without the layout stack.
+    from gdsfactory import port
+
     port_matrix = {}
     arah_mata_angin = ["N", "S", "E", "W"]
     
@@ -500,9 +513,20 @@ _POWER_NAMES = {"vdd", "vpwr", "vcc", "vddio", "vdda", "avdd"}
 _GROUND_NAMES = {"vss", "gnd", "vgnd", "vssio", "vssa", "agnd", "0"}
 
 
-def _device_kind(model, name=""):
+def _device_kind(model, name="", profile=None):
+    """nmos | pmos | res | cap | bjt | other.
+
+    The PDK profile's device catalogue is authoritative when one is given;
+    the name heuristics below remain for netlists outside any catalogue.
+    """
+    if profile is not None:
+        kind = profile.kind_of(model)
+        if kind:
+            return kind
     m = (model or "").lower()
     n = (name or "").upper()
+    if m.startswith(("pnp", "npn")) or n.startswith(("XQ", "Q")):
+        return "bjt"
     if "pfet" in m or "pmos" in m:
         return "pmos"
     if "nfet" in m or "nmos" in m:
@@ -576,7 +600,7 @@ def _validate_device(dev, comp):
                 f"parameters, or an unexpanded .param.")
 
 
-def build_design_context(config, pdk=None, name=None):
+def build_design_context(config, pdk=None, name=None, profile=None):
     """Turn a parsed netlist ``config`` into a DesignContext (§11).
 
     Extracts, in addition to the plain device/net lists:
@@ -597,6 +621,13 @@ def build_design_context(config, pdk=None, name=None):
                    if c.get("type") == "subcircuit"), None)
     ctx = DesignContext(name=name or (subckt or {}).get("subcir", "top"))
     ctx.pdk = pdk
+    if profile is None:
+        try:
+            from mbg import pdk_profile
+            profile = pdk_profile.resolve(config.get("metadata", {}).get("pdk"))
+        except Exception:
+            profile = None
+    ctx.profile = profile
     if pdk is not None:
         from mbg.pdk_rules import get_rules
         ctx.rules = get_rules(pdk)
@@ -608,7 +639,14 @@ def build_design_context(config, pdk=None, name=None):
         if comp.get("type") != "device":
             continue
         p = comp.get("parameters", {}) or {}
-        kind = _device_kind(comp.get("model"), comp.get("name"))
+        kind = _device_kind(comp.get("model"), comp.get("name"), profile)
+        nodes = comp.get("nodes") or {}
+        spec = profile.device(comp.get("model")) if profile is not None else None
+        if spec is not None and kind == "bjt" and all(k.startswith("pin") for k in nodes):
+            # An X-instance reports pin1..pinN; name them by the model's
+            # terminal order (gf180 pnp: c b e) so ports and LVS line up.
+            ordered = [nodes[f"pin{i + 1}"] for i in range(len(nodes))]
+            nodes = dict(zip(spec.terminals, ordered))
         nf = int(_num(p.get("nf"), 1) or 1)
         m = int(_num(p.get("m"), 1) or 1)
         w_total = _num(p.get("w") or p.get("r_width") or p.get("c_width"))
@@ -617,7 +655,7 @@ def build_design_context(config, pdk=None, name=None):
             name=comp["name"],
             model=comp.get("model", ""),
             kind=kind,
-            terminals={t: n for t, n in (comp.get("nodes") or {}).items() if n != "-"},
+            terminals={t: n for t, n in nodes.items() if n != "-"},
             width=w_total,
             length=l_val,
             fingers=max(1, nf),

@@ -334,6 +334,14 @@ def check_adapter_generation(root: Path, manifest: dict, skills: dict, workflows
             if not expect.is_file():
                 missing.append(f"workflow '{name}' declares platform '{p}' but {expect.relative_to(root)} is missing")
 
+    # The generic Agent Skills tree carries every canonical skill.
+    ag = plat.get("agents")
+    if ag:
+        for name in skills:
+            expect = root / ag["skills_dir"] / name / ag.get("skill_file", "SKILL.md")
+            if not expect.is_file():
+                missing.append(f"skill '{name}' has no generic adapter {expect.relative_to(root)}")
+
     if missing:
         for m in missing:
             res.fail("F3", m)
@@ -381,6 +389,7 @@ def check_broken_references(root: Path, manifest: dict, skills: dict, res: Resul
         root / ".opencode" / "skills", root / ".opencode" / "commands",
         root / ".claude" / "skills", root / ".claude" / "commands",
         root / "plugins" / "mbg-analog" / "skills",
+        root / ".agents" / "skills",
     ]
     md_files = [root / "CLAUDE.md", root / "plugins" / "mbg-analog" / ".codex-plugin" / "GENERATED.md"]
     for d in md_glob_roots:
@@ -472,11 +481,12 @@ def check_broken_references(root: Path, manifest: dict, skills: dict, res: Resul
         # that used to live under scripts/ were merged into one install.sh at
         # the root, so restricting this to scripts/ would reject the very
         # command the manifest is supposed to advertise.
-        m = re.search(r"((?:scripts/)?[A-Za-z0-9_./-]+\.(?:py|sh))", cmd)
+        # scripts/mbg is the extensionless agent launcher.
+        m = re.search(r"((?:scripts/)?[A-Za-z0-9_./-]+\.(?:py|sh)|scripts/mbg\b)", cmd)
         if not m:
             problems.append(
                 f".ai/manifest.json: capability '{cap_id}' command '{cmd}' "
-                "does not name a scripts/*.py, scripts/*.sh or ./install.sh file")
+                "does not name scripts/mbg, a scripts/*.py, scripts/*.sh or ./install.sh file")
             continue
         script_rel = m.group(1)
         if not (root / script_rel).is_file():
@@ -739,6 +749,12 @@ def _parse_core_symbols(root: Path) -> tuple[dict, set]:
         }
         module_symbols[module_name] = names
         all_symbols |= names
+    # Sub-packages (mbg.agent): `mbg.<pkg>.<module>` names a module file.
+    for pkg in sorted(p for p in core_dir.iterdir() if (p / "__init__.py").is_file()):
+        module_symbols.setdefault(pkg.name, set()).update(
+            f.stem for f in pkg.glob("*.py") if f.stem != "__init__")
+        module_symbols[pkg.name].update(d.name for d in pkg.iterdir()
+                                        if (d / "__init__.py").is_file())
     return module_symbols, all_symbols
 
 

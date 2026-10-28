@@ -1,0 +1,261 @@
+{
+ "schema": "mbg.result/1",
+ "tool": "measure.vref",
+ "ok": true,
+ "status": "PASS",
+ "summary": "VREF=1.1828 V, TC=98.9 ppm/C, line=4.54 mV/V, IVDD=40.6 uA, PSRR=-47.0 dB over 5 corner(s); spec met",
+ "metrics": {
+  "vref_v": 1.18278,
+  "tc_ppm_c": 98.893,
+  "line_reg_mv_v": 4.5408,
+  "dvref_line_mv": 2.72448,
+  "ivdd_ua": 40.5945,
+  "ibias_sens_mv": 315.38,
+  "startup_us": 9.6675,
+  "psrr_db": -46.96,
+  "vref_pvt_min_v": 1.03827,
+  "vref_pvt_max_v": 1.33881,
+  "vref_t_min_v": 1.17872,
+  "vref_t_max_v": 1.1858,
+  "startup_ok": true,
+  "conditions": {
+   "pdk": "gf180mcuD",
+   "cell": "vref_cmos_1v2",
+   "ports": {
+    "vdd": "VDD",
+    "vss": "VSS",
+    "vref": "VREF",
+    "ibias": "IBIAS"
+   },
+   "vdd": 3.3,
+   "vdd_window": [
+    3.0,
+    3.6
+   ],
+   "temp_range": [
+    -40.0,
+    125.0,
+    5.0
+   ],
+   "ibias_a": 2e-05,
+   "ibias_dir": "source",
+   "cl": "1p"
+  }
+ },
+ "artifacts": {
+  "metrics_json": "outputs/vref-cmos-1v2/post_simulation-3/vref_metrics.json",
+  "temp_sweep": "outputs/vref-cmos-1v2/post_simulation-3/temp_sweep.csv",
+  "line_sweep": "outputs/vref-cmos-1v2/post_simulation-3/line_sweep.csv",
+  "log": "outputs/vref-cmos-1v2/post_simulation-3/log.txt"
+ },
+ "issues": [],
+ "next": [
+  "mbg spec check --metrics outputs/vref-cmos-1v2/post_simulation-3/vref_metrics.json --spec vref_md",
+  "mbg layout generate outputs/vref-cmos-1v2/pex/vref_cmos_1v2.pex.spice"
+ ],
+ "data": {
+  "per_corner": {
+   "typical": {
+    "vref_v": 1.18278,
+    "ivdd_ua": 40.434,
+    "tc_ppm_c": 36.2737,
+    "vref_t_min_v": 1.17872,
+    "vref_t_max_v": 1.1858,
+    "dvref_line_mv": 2.48825,
+    "line_reg_mv_v": 4.14708,
+    "vref_pvt_min_v": 1.17751,
+    "vref_pvt_max_v": 1.18708,
+    "ibias_sens_mv": 292.66,
+    "psrr_db": -47.8175,
+    "psrr_1k_db": -47.8175,
+    "startup_us": 9.58109,
+    "startup_final_v": 1.18278,
+    "startup_ok": true
+   },
+   "ff": {
+    "vref_v": 1.04447,
+    "ivdd_ua": 40.5945,
+    "tc_ppm_c": 36.3572,
+    "vref_t_min_v": 1.0395,
+    "vref_t_max_v": 1.04577,
+    "dvref_line_mv": 2.39514,
+    "line_reg_mv_v": 3.9919,
+    "vref_pvt_min_v": 1.03827,
+    "vref_pvt_max_v": 1.04702,
+    "ibias_sens_mv": 273.259,
+    "psrr_db": -48.2851,
+    "psrr_1k_db": -48.2851,
+    "startup_us": 9.6675,
+    "startup_final_v": 1.04447,
+    "startup_ok": true
+   },
+   "ss": {
+    "vref_v": 1.32561,
+    "ivdd_ua": 40.2837,
+    "tc_ppm_c": 98.893,
+    "vref_t_min_v": 1.31577,
+    "vref_t_max_v": 1.3374,
+    "dvref_line_mv": 2.72448,
+    "line_reg_mv_v": 4.5408,
+    "vref_pvt_min_v": 1.31443,
+    "vref_pvt_max_v": 1.33881,
+    "ibias_sens_mv": 315.38,
+    "psrr_db": -46.96,
+    "psrr_1k_db": -46.96,
+    "startup_us": 9.60947,
+    "startup_final_v": 1.32561,
+    "startup_ok": true
+   },
+   "fs": {
+    "vref_v": 1.08525,
+    "ivdd_ua": 40.4402,
+    "tc_ppm_c": 10.2838,
+    "vref_t_min_v": 1.08341,
+    "vref_t_max_v": 1.08525,
+    "dvref_line_mv": 2.38426,
+    "line_reg_mv_v": 3.97377,
+    "vref_pvt_min_v": 1.08208,
+    "vref_pvt_max_v": 1.08641,
+    "ibias_sens_mv": 280.814,
+    "psrr_db": -48.1331,
+    "psrr_1k_db": -48.1331,
+    "startup_us": 9.64625,
+    "startup_final_v": 1.08525,
+    "startup_ok": true
+   },
+   "sf": {
+    "vref_v": 1.28252,
+    "ivdd_ua": 40.4301,
+    "tc_ppm_c": 73.9457,
+    "vref_t_min_v": 1.27507,
+    "vref_t_max_v": 1.29072,
+    "dvref_line_mv": 2.65011,
+    "line_reg_mv_v": 4.41685,
+    "vref_pvt_min_v": 1.27381,
+    "vref_pvt_max_v": 1.2921,
+    "ibias_sens_mv": 306.071,
+    "psrr_db": -47.3507,
+    "psrr_1k_db": -47.3507,
+    "startup_us": 9.59715,
+    "startup_final_v": 1.28252,
+    "startup_ok": true
+   }
+  },
+  "spec": {
+   "post_layout": {
+    "source": "post_layout",
+    "pass": true,
+    "score": 0.0,
+    "metrics": {
+     "vref_v": {
+      "value": 1.18278,
+      "target": 1.2,
+      "op": "==",
+      "unit": " V",
+      "status": "PASS",
+      "margin": null,
+      "margin_pct": null
+     },
+     "tc_ppm_c": {
+      "value": 98.893,
+      "target": 300.0,
+      "op": "<=",
+      "unit": " ppm/C",
+      "status": "PASS",
+      "margin": 201.107,
+      "margin_pct": 67.036
+     },
+     "line_reg_mv_v": {
+      "value": 4.5408,
+      "target": 100.0,
+      "op": "<=",
+      "unit": " mV/V",
+      "status": "PASS",
+      "margin": 95.4592,
+      "margin_pct": 95.459
+     },
+     "dvref_line_mv": {
+      "value": 2.72448,
+      "target": 60.0,
+      "op": "<=",
+      "unit": " mV",
+      "status": "PASS",
+      "margin": 57.2755,
+      "margin_pct": 95.459
+     },
+     "ivdd_ua": {
+      "value": 40.5945,
+      "target": 300.0,
+      "op": "<=",
+      "unit": " uA",
+      "status": "PASS",
+      "margin": 259.406,
+      "margin_pct": 86.469
+     }
+    }
+   },
+   "stretch": {
+    "source": "stretch",
+    "pass": false,
+    "score": 0.977859,
+    "metrics": {
+     "vref_v": {
+      "value": 1.18278,
+      "target": 1.2,
+      "op": "==",
+      "unit": " V",
+      "status": "PASS",
+      "margin": null,
+      "margin_pct": null
+     },
+     "tc_ppm_c": {
+      "value": 98.893,
+      "target": 50.0,
+      "op": "<=",
+      "unit": " ppm/C",
+      "status": "FAIL",
+      "margin": -48.893,
+      "margin_pct": -97.786
+     },
+     "line_reg_mv_v": {
+      "value": 4.5408,
+      "target": 5.0,
+      "op": "<=",
+      "unit": " mV/V",
+      "status": "PASS",
+      "margin": 0.4592,
+      "margin_pct": 9.184
+     },
+     "psrr_db": {
+      "value": -46.96,
+      "target": -40.0,
+      "op": "<=",
+      "unit": " dB",
+      "status": "PASS",
+      "margin": 6.96004,
+      "margin_pct": 17.4
+     },
+     "startup_us": {
+      "value": 9.6675,
+      "target": 100.0,
+      "op": "<=",
+      "unit": " us",
+      "status": "PASS",
+      "margin": 90.3325,
+      "margin_pct": 90.333
+     },
+     "ivdd_ua": {
+      "value": 40.5945,
+      "target": 300.0,
+      "op": "<=",
+      "unit": " uA",
+      "status": "PASS",
+      "margin": 259.406,
+      "margin_pct": 86.469
+     }
+    }
+   }
+  }
+ },
+ "run_dir": "outputs/vref-cmos-1v2/post_simulation-3"
+}

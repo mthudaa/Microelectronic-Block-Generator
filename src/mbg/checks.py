@@ -172,10 +172,17 @@ def _find_eda_scripts():
     if override and os.path.isfile(os.path.join(override, "iic-drc.sh")):
         return os.path.abspath(override)
     here = os.path.dirname(os.path.abspath(__file__))
+    # The repository root is where pyproject.toml sits next to src/ — the same
+    # rule config.repo_root() uses. Looking for .git instead failed in any
+    # copy without git metadata (a release tarball, `git archive`, a CI
+    # artifact) and sent every DRC/PEX call to a script path that does not
+    # exist.
     root = here
-    for _ in range(6):                      # walk up looking for the repo root
+    for _ in range(6):
         root = os.path.dirname(root)
-        if os.path.isdir(os.path.join(root, ".git")):
+        if (os.path.isfile(os.path.join(root, "pyproject.toml"))
+                and os.path.isdir(os.path.join(root, "src"))) \
+                or os.path.isdir(os.path.join(root, ".git")):
             break
     for cand in (
         os.path.join(root, "designs", "notebooks", "chipathon2026-D", "scripts"),
@@ -403,6 +410,60 @@ def fix_port_order(extracted_path, correct_order, out_path=None):
     with open(out, "w") as f:
         f.writelines(lines)
     return out
+
+
+# ── PEX: subcircuit passive geometry ──────────────────────────────────
+
+_SCALE_RE = re.compile(r"^\s*\.option[s]?\s+.*\bscale\s*=\s*([0-9.eE+-]+[a-zA-Z]*)",
+                       re.IGNORECASE | re.MULTILINE)
+_PASSIVE_GEOM_RE = re.compile(r"\b(r_width|r_length|c_width|c_length)=([0-9.eE+-]+)(?=\s|$)",
+                              re.IGNORECASE)
+_SPICE_VALUE_RE = re.compile(r"([0-9.]+(?:[eE][+-]?[0-9]+)?)(meg|[fpnumkg])?", re.IGNORECASE)
+_SI_SUFFIX = {"f": 1e-15, "p": 1e-12, "n": 1e-9, "u": 1e-6, "m": 1e-3,
+              "k": 1e3, "meg": 1e6, "g": 1e9}
+
+
+def _spice_value(text):
+    """``5n`` -> 5e-09, ``1e-9`` -> 1e-09 (SPICE suffix rules)."""
+    m = _SPICE_VALUE_RE.fullmatch(text.strip())
+    if not m:
+        raise ValueError(f"not a SPICE number: {text!r}")
+    return float(m.group(1)) * _SI_SUFFIX.get((m.group(2) or "").lower(), 1.0)
+
+
+def rescale_subckt_passives(text):
+    """Put Magic's scaled passive geometry back into real units.
+
+    Magic writes ``.option scale=5n`` and gives every device its geometry in
+    those units. ngspice applies ``scale`` to MOSFET instance geometry, but
+    NOT to parameters handed to a subcircuit — and gf180's ``ppolyf_u*`` and
+    MIM models are subcircuits taking ``r_width``/``r_length`` (or
+    ``c_width``/``c_length``). A resistor extracted as ``r_width=200
+    r_length=5000`` was therefore simulated as 200 m by 5000 m: the sheet
+    ratio survives, but the width correction (``r_dw``), and with it R,
+    are wrong, and the post-layout result is not the layout. Here those
+    values are multiplied by the scale and written in um. Unitless values
+    only; a value that already carries a unit is left alone.
+
+    Returns ``(text, number_of_lines_changed)``.
+    """
+    m = _SCALE_RE.search(text)
+    if not m:
+        return text, 0
+    try:
+        scale = _spice_value(m.group(1))
+    except ValueError:
+        return text, 0
+    out, n = [], 0
+    for line in text.splitlines(keepends=True):
+        if line[:1] in ("X", "x") and _PASSIVE_GEOM_RE.search(line):
+            new = _PASSIVE_GEOM_RE.sub(
+                lambda g: f"{g.group(1)}={float(g.group(2)) * scale / 1e-6:.6g}u", line)
+            if new != line:
+                n += 1
+                line = new
+        out.append(line)
+    return "".join(out), n
 
 
 # ── MOSFET Drain-Source permute ───────────────────────────────────────
@@ -1256,8 +1317,17 @@ def run_pex(gds_path, cell_name=None, mode=2, subcircuit=True,
     if workdir: cmd += ["-w", resdir]
     cmd.append(gds_for_pex)
 
+    env = os.environ.copy()
     try:
-        r = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
+        # Same as run_drc: pin the verified Magic. Without it the script looks
+        # only on PATH, which an MBG-built Magic is deliberately not on.
+        env["MBG_MAGIC"] = _config.magic_bin()
+    except ToolError as e:
+        return {"pex_path": None, "mode": str(mode), "log": str(e),
+                "summary": f"PEX: ERROR ({e})"}
+    try:
+        r = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout,
+                           env=env)
     except subprocess.TimeoutExpired:
         return {"pex_path": None, "mode": str(mode), "log": "PEX timed out",
                 "summary": "PEX: TIMEOUT"}
@@ -1267,6 +1337,21 @@ def run_pex(gds_path, cell_name=None, mode=2, subcircuit=True,
     pex_path = os.path.join(resdir, f"{base}.pex.spice")
     if not os.path.isfile(pex_path):
         pex_path = None
+
+    # ── Post-process: subcircuit passives under `.option scale` ──
+    rescaled = 0
+    if pex_path:
+        try:
+            with open(pex_path) as f:
+                original = f.read()
+            fixed, rescaled = rescale_subckt_passives(original)
+            if rescaled:
+                with open(pex_path, "w") as f:
+                    f.write(fixed)
+                log += (f"\n[PEX] {rescaled} subcircuit passive(s): r_/c_ width and "
+                        f"length converted from .option scale units to um")
+        except Exception as e:                              # noqa: BLE001
+            log += f"\n[PEX] passive rescaling skipped: {e}"
 
     # ── Post-process: permute D/S if requested ──
     if pex_path and permute_sd:

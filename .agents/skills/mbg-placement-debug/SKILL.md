@@ -1,6 +1,10 @@
 ---
 name: mbg-placement-debug
 description: Inspects analog device placement — matching groups, symmetry constraints, device bounding boxes and overlap, pin access points, reserved zones, routing channels, congestion, and the placement-routability feedback loop. Use when a layout's device placement looks wrong, a net cannot find a routable path, or you need to explain why the placer chose a given floorplan. Do not use it to change the router or to generate a new layout end to end.
+license: Apache-2.0
+metadata:
+  owner: huda
+  project: microelectronic-block-generator
 ---
 <!-- GENERATED FILE — do not edit by hand. Source: .ai/skills/mbg-placement-debug/SKILL.md. Regenerate with: python3 scripts/sync_agent_tools.py -->
 

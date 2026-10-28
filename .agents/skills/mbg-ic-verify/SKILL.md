@@ -1,10 +1,59 @@
 ---
 name: mbg-ic-verify
 description: Runs DRC, LVS, and PEX physical verification for GDSII layouts using Magic and netgen, with automatic port-order fixing for LVS. Use when the user asks to "run DRC", "check LVS", "extract parasitics", "verify layout", "run pex", or otherwise wants post-layout verification of an existing GDS under GF180MCU. Do not use it to generate layout (use mbg-spice-to-gds) or to run SPICE simulation.
+license: Apache-2.0
+metadata:
+  owner: ahmad
+  project: microelectronic-block-generator
 ---
 <!-- GENERATED FILE — do not edit by hand. Source: .ai/skills/mbg-ic-verify/SKILL.md. Regenerate with: python3 scripts/sync_agent_tools.py -->
 
 # MBG IC Layout Verification (DRC / LVS / PEX)
+
+## From any agent: one command per check
+
+```bash
+scripts/mbg verify drc cell.gds                       # Magic + the PDK's KLayout deck
+scripts/mbg verify lvs cell.gds --netlist cell.spice  # netgen
+scripts/mbg verify pex cell.gds                       # Magic extraction -> cell.pex.spice
+```
+
+Each prints one JSON envelope (`status`, `metrics`, report paths under
+`artifacts`); add `--pdk sky130A` for sky130 (Magic-only DRC, reported in
+`metrics.drc_engines`). The Python functions below are what these commands
+call.
+
+## DRC is dual-engine — Magic *and* KLayout
+
+```python
+from mbg.drc import run_dual_drc
+s = run_dual_drc(gds_path, cell_name, workdir)
+s.verdict     # PASS | FAIL | DRC_DISAGREEMENT | ERROR | CONFIGURATION_FAILURE
+print(s.report())
+```
+
+**KLayout is the sign-off authority** — it runs the GF180 foundry deck from
+`$PDKPATH/libs.tech/klayout/tech/drc/gf180mcu.drc`. **Magic is the
+independent complementary check.** Both must be clean and must agree.
+
+Never report DRC from Magic alone. Never treat a KLayout run that produced no
+database as clean — the deck exits 0 by design, so the `.lyrdb` is the only
+verdict. A `DRC_DISAGREEMENT` is a result to investigate, not a pass.
+
+Cell-level runs exclude die-level density/fill rules (`decks=all,-density`);
+an assembled die uses `decks=all`.
+
+## Before you read anything: context economy
+
+This repository is big enough that *how* you gather information decides
+whether you finish. A measured session here spent **87% of a 1 MB
+conversation on tool output** — one file re-read 22 times, `git status`
+polled 27+ times, and 33 KB spent searching `$HOME` for a repo whose path
+was already in `$MBG_ROOT`. Read `mbg-context-economy` first. The short
+version: resolve the repo from `$MBG_ROOT`, index a file before opening it,
+never re-read what is already in context, do not poll git state, and climb
+the verification ladder cheapest-first. Reading less is the goal; **checking
+less is not**.
 
 ## Purpose
 

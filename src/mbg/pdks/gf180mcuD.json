@@ -1,0 +1,72 @@
+{
+  "schema": "mbg.pdk/1",
+  "name": "gf180mcuD",
+  "family": "gf180",
+  "aliases": ["gf180", "gf180mcu", "gf180mcud"],
+  "default": true,
+  "description": "GlobalFoundries 180 nm MCU, variant D (5 metal layers, 11 kA top metal). Project default.",
+  "supply": {"nominal_v": 3.3, "min_v": 3.0, "max_v": 3.6, "devices_v": "3.3 V devices only (nfet_03v3 / pfet_03v3)"},
+  "std_cell_library": "gf180mcu_fd_sc_mcu7t5v0",
+  "glayout_pdk": "gf180",
+  "units": "W/L written with an explicit unit suffix, e.g. W=2u L=0.5u",
+  "conventions": {
+    "instance_prefix": {"nmos": "XM", "pmos": "XM", "res": "XR", "cap": "XC", "bjt": "XQ"},
+    "fingers_over_multiplier": "prefer nf=N over m=N for matching and compactness",
+    "body": {"pmos": "highest supply (VDD)", "nmos": "ground (VSS)"},
+    "ground_names": ["VSS", "GND", "AVSS", "VGND", "0"],
+    "supply_names": ["VDD", "AVDD", "VCC", "VPWR"]
+  },
+  "devices": {
+    "nfet_03v3": {"kind": "nmos", "terminals": ["d", "g", "s", "b"], "layout": true, "sim": "mos",
+                  "w_min_um": 0.22, "w_max_um": 10.0, "l_min_um": 0.28, "l_max_um": 10.0,
+                  "body_net": "ground"},
+    "pfet_03v3": {"kind": "pmos", "terminals": ["d", "g", "s", "b"], "layout": true, "sim": "mos",
+                  "w_min_um": 0.22, "w_max_um": 10.0, "l_min_um": 0.28, "l_max_um": 10.0,
+                  "body_net": "supply"},
+    "nfet_06v0": {"kind": "nmos", "terminals": ["d", "g", "s", "b"], "layout": false, "sim": "mos",
+                  "note": "6 V device; the project is 3.3 V only"},
+    "pfet_06v0": {"kind": "pmos", "terminals": ["d", "g", "s", "b"], "layout": false, "sim": "mos",
+                  "note": "6 V device; the project is 3.3 V only"},
+    "ppolyf_u": {"kind": "res", "terminals": ["p", "n", "body"], "layout": true, "sim": "res",
+                 "w_min_um": 0.8, "sheet_ohm_sq": 7.0, "params": ["r_width", "r_length"],
+                 "substrate_terminals": ["body"],
+                 "note": "unsalicided P+ poly, low value (~7 ohm/sq)"},
+    "ppolyf_u_1k": {"kind": "res", "terminals": ["p", "n", "body"], "layout": true, "sim": "res",
+                    "w_min_um": 1.0, "sheet_ohm_sq": 1000.0, "params": ["r_width", "r_length"],
+                    "substrate_terminals": ["body"],
+                    "note": "high-resistance poly (~1 kohm/sq); use series unit resistors for matching"},
+    "cap_mim_2f0_m4m5_noshield": {"kind": "cap", "terminals": ["p", "n"], "layout": true, "sim": "cap",
+                                   "w_min_um": 5.0, "params": ["c_width", "c_length"],
+                                   "note": "2 fF/um^2 MIM between metal4 and metal5"},
+    "pnp_10p00x10p00": {"kind": "bjt", "terminals": ["c", "b", "e"], "layout": true, "sim": "bjt",
+                        "fixed_cell": "pnp_10p00x10p00_0", "substrate_terminals": ["c"],
+                        "note": "vertical PNP, 10x10 um emitter; collector is the p-substrate (tie to ground)"},
+    "pnp_05p00x05p00": {"kind": "bjt", "terminals": ["c", "b", "e"], "layout": true, "sim": "bjt",
+                        "fixed_cell": "pnp_05p00x05p00_0", "substrate_terminals": ["c"],
+                        "note": "vertical PNP, 5x5 um emitter; collector is the p-substrate (tie to ground)"}
+  },
+  "ngspice": {
+    "model_file": "libs.tech/ngspice/sm141064.ngspice",
+    "design_file": "libs.tech/ngspice/design.ngspice",
+    "corners": ["typical", "ff", "ss", "fs", "sf"],
+    "default_corner": "typical",
+    "corner_aliases": {"tt": "typical"},
+    "sections": {
+      "mos": {"pattern": "{corner}", "corners": ["typical", "ff", "ss", "fs", "sf", "statistical"]},
+      "bjt": {"pattern": "bjt_{corner}", "corners": ["typical", "ff", "ss"]},
+      "res": {"pattern": "res_{corner}", "corners": ["typical", "ff", "ss"]},
+      "cap": {"pattern": "mimcap_{corner}", "corners": ["typical", "ff", "ss"]}
+    },
+    "fallback_corner": "typical",
+    "spiceinit": []
+  },
+  "verification": {
+    "drc_engines": ["magic", "klayout"],
+    "drc_primary": "klayout",
+    "klayout_deck": "libs.tech/klayout/tech/drc/gf180mcu.drc",
+    "klayout_variant": "D",
+    "lvs_permute_models": ["pfet_03v3", "nfet_03v3"]
+  },
+  "tested_ceiling": {"mos": 12, "nets": 11, "max_net_degree": 16,
+                     "evidence": "tests/test_complexity_ladder.py, tests/netlists/"}
+}

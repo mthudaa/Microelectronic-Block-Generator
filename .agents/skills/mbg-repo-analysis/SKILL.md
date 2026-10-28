@@ -1,10 +1,26 @@
 ---
 name: mbg-repo-analysis
 description: Maps the Microelectronic Block Generator repository, traces the active execution path from a design script to the layout pipeline, separates active implementations from legacy code kept only for backward compatibility, and analyzes SPICE netlists (devices, nets, terminals, connectivity). Use before modifying or debugging any core module, or when asked what a design script actually calls. Do not use it to generate layout, run verification, or modify implementation — this skill is read-only.
+license: Apache-2.0
+metadata:
+  owner: huda
+  project: microelectronic-block-generator
 ---
 <!-- GENERATED FILE — do not edit by hand. Source: .ai/skills/mbg-repo-analysis/SKILL.md. Regenerate with: python3 scripts/sync_agent_tools.py -->
 
 # MBG Repository Analysis
+
+## Before you read anything: context economy
+
+This repository is big enough that *how* you gather information decides
+whether you finish. A measured session here spent **87% of a 1 MB
+conversation on tool output** — one file re-read 22 times, `git status`
+polled 27+ times, and 33 KB spent searching `$HOME` for a repo whose path
+was already in `$MBG_ROOT`. Read `mbg-context-economy` first. The short
+version: resolve the repo from `$MBG_ROOT`, index a file before opening it,
+never re-read what is already in context, do not poll git state, and climb
+the verification ladder cheapest-first. Reading less is the goal; **checking
+less is not**.
 
 ## Purpose
 

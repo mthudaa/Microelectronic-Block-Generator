@@ -1,10 +1,40 @@
 ---
 name: mbg-spice-to-gds
 description: Converts a SPICE subcircuit netlist into a DRC-clean GDSII layout using gLayout, via the single entry point spice_to_gds_with_checks(netlist). Use when the user asks to generate GDS from SPICE, convert a netlist to layout, "layout my circuit", or "spice to gds" for the GF180MCU 3.3V PDK. Do not use for manual step-by-step placement/routing, simulation-only tasks, or verification-only tasks on an already-built GDS (use mbg-ic-verify for that).
+license: Apache-2.0
+metadata:
+  owner: huda
+  project: microelectronic-block-generator
 ---
 <!-- GENERATED FILE — do not edit by hand. Source: .ai/skills/mbg-spice-to-gds/SKILL.md. Regenerate with: python3 scripts/sync_agent_tools.py -->
 
 # MBG SPICE to GDS Layout Generator
+
+## From any agent: one command
+
+```bash
+scripts/mbg netlist check my.spice           # models, units, limits, layout support — first
+scripts/mbg layout generate my.spice         # or: --design <workspace> [--hints hints.json] [--pdk sky130A]
+scripts/mbg layout view <run_dir>            # ASCII floorplan + device/net tables
+```
+
+`layout generate` calls `spice_to_gds_with_checks` and returns one JSON
+envelope: `status` PASS only when all four legs pass, the GDS/LVS/DRC/PEX
+paths under `artifacts`, failures as `issues` with hints. Use the Python API
+below when you are changing the pipeline itself, not to run it. See skill
+`mbg-agent-interface`.
+
+## Before you read anything: context economy
+
+This repository is big enough that *how* you gather information decides
+whether you finish. A measured session here spent **87% of a 1 MB
+conversation on tool output** — one file re-read 22 times, `git status`
+polled 27+ times, and 33 KB spent searching `$HOME` for a repo whose path
+was already in `$MBG_ROOT`. Read `mbg-context-economy` first. The short
+version: resolve the repo from `$MBG_ROOT`, index a file before opening it,
+never re-read what is already in context, do not poll git state, and climb
+the verification ladder cheapest-first. Reading less is the goal; **checking
+less is not**.
 
 ## Pipeline Entry Point
 
@@ -218,14 +248,31 @@ project's single supported pipeline entry point.
 | `drc` | DRC result dict from `run_drc` |
 | `lvs` | LVS result dict from `run_lvs` |
 | `pex` | PEX result dict from `run_pex` |
-| `all_pass` | `True` only if DRC clean AND LVS match AND PEX produced output |
+| `drc_signoff` | Dual-engine verdict from `run_dual_drc` — Magic AND KLayout |
+| `verification` | Internal connectivity: `opens`, `shorts`, `missing_access`, `clean` |
+| `metrics` | `routing_summary()`: routed/total nets, wire length, vias, congestion |
+| `context` | The `DesignContext` the layout was built from |
+| `all_pass` | All four legs: Magic DRC clean AND `drc_signoff["verdict"] == "PASS"` AND LVS match AND internal connectivity clean |
 
-For a from-scratch inspection of the same flow through the newer
-`DesignContext`-based path (`spice_to_gds_ctx` /
-`spice_to_gds_with_checks_ctx` in `core/pipeline.py`), see
-`mbg-repo-analysis` — that path returns `component`, `context`,
-`verification`, and `metrics` instead of a checks dict, and is not what
-`spice_to_gds_with_checks` calls internally today.
+`all_pass` is the whole gate, not a DRC summary. Two things it deliberately
+includes:
+
+* **The KLayout sign-off verdict, not Magic alone.** KLayout runs the GF180
+  foundry deck and is the sign-off authority (see `mbg-ic-verify`); Magic is
+  the independent complementary check. `all_pass` once read `drc["clean"]`
+  only, so a design KLayout had FAILED — or never checked, because it was
+  not configured — could still report `all_pass=True`. `NOT_CONFIGURED`
+  counts as a failure on purpose: an engine that did not run has not agreed
+  to anything.
+* **Internal connectivity**, including `missing_access` — a SPICE terminal
+  the layout never gave an access point to. It produces no geometry, so
+  `opens` cannot see it; without this leg an unconnected device terminal
+  could reach external LVS as the first thing that noticed.
+
+Since v0.2 this entry point drives the `DesignContext` path
+(`spice_to_gds_with_checks_ctx` in `src/mbg/pipeline.py`). The original
+shape-router path is reached only with `legacy=True` or via
+`spice_to_gds_with_checks_legacy()`.
 
 ## Failure Modes
 
@@ -233,8 +280,11 @@ For a from-scratch inspection of the same flow through the newer
   starts; do not silently set a personal fallback path.
 - Netlist has no `.subckt` or zero parsed components — the pipeline raises
   `ValueError` before layout starts.
-- `drc["clean"]` is `False`, `lvs["match"]` is `False`, or `pex["pex_path"]`
-  is `None` — report each stage's own `summary` field verbatim; do not
-  claim `all_pass` when the dict says otherwise.
+- `drc["clean"]` is `False`, `drc_signoff["verdict"]` is not `PASS`,
+  `lvs["match"]` is `False`, `verification["clean"]` is `False`, or
+  `pex["pex_path"]` is `None` — report each stage's own `summary`/`reason`
+  field verbatim; do not claim `all_pass` when the dict says otherwise, and
+  do not report a Magic-clean result as "DRC clean" without the sign-off
+  verdict beside it.
 - Floating/unrouted internal nets — inspect with `mbg-routing-debug`
   (`mbg.connectivity.verify`) rather than guessing from the SVG preview.

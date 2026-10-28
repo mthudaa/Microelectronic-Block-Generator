@@ -9,6 +9,20 @@ platforms: [opencode, claude, codex]
 
 # MBG SPICE to GDS Layout Generator
 
+## From any agent: one command
+
+```bash
+scripts/mbg netlist check my.spice           # models, units, limits, layout support — first
+scripts/mbg layout generate my.spice         # or: --design <workspace> [--hints hints.json] [--pdk sky130A]
+scripts/mbg layout view <run_dir>            # ASCII floorplan + device/net tables
+```
+
+`layout generate` calls `spice_to_gds_with_checks` and returns one JSON
+envelope: `status` PASS only when all four legs pass, the GDS/LVS/DRC/PEX
+paths under `artifacts`, failures as `issues` with hints. Use the Python API
+below when you are changing the pipeline itself, not to run it. See skill
+`mbg-agent-interface`.
+
 ## Before you read anything: context economy
 
 This repository is big enough that *how* you gather information decides

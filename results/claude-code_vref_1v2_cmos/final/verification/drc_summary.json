@@ -1,0 +1,38 @@
+{
+  "verdict": "PASS",
+  "reason": "all configured DRC engines report clean",
+  "primary": "klayout",
+  "gds_sha256": "38cc936cedfa9337",
+  "results": [
+    {
+      "engine": "magic",
+      "status": "CLEAN",
+      "violations": 0,
+      "rules": {},
+      "report_path": "<repo>/outputs/vref-cmos-1v2/layout/verification/vref_cmos_1v2.magic.drc.rpt",
+      "log_path": "<repo>/outputs/vref-cmos-1v2/layout/verification/logs/magic_drc.log",
+      "tool": "$MBG_TOOLS_ROOT/magic-8.3.681/bin/magic",
+      "tool_version": "8.3.681",
+      "deck": "$PDK_ROOT/gf180mcuD/libs.tech/magic/gf180mcuD.tech",
+      "gds": "<repo>/outputs/vref-cmos-1v2/layout/vref_cmos_1v2.gds",
+      "gds_sha256": "38cc936cedfa9337",
+      "elapsed": 0.746,
+      "message": ""
+    },
+    {
+      "engine": "klayout",
+      "status": "CLEAN",
+      "violations": 0,
+      "rules": {},
+      "report_path": "<repo>/outputs/vref-cmos-1v2/layout/verification/vref_cmos_1v2.klayout.lyrdb",
+      "log_path": "<repo>/outputs/vref-cmos-1v2/layout/verification/logs/klayout_drc.log",
+      "tool": "$MBG_TOOLS_ROOT/klayout-0.30.10/bin/klayout",
+      "tool_version": "0.30.10",
+      "deck": "$PDK_ROOT/gf180mcuD/libs.tech/klayout/tech/drc/gf180mcu.drc",
+      "gds": "<repo>/outputs/vref-cmos-1v2/layout/vref_cmos_1v2.gds",
+      "gds_sha256": "38cc936cedfa9337",
+      "elapsed": 2.661,
+      "message": ""
+    }
+  ]
+}

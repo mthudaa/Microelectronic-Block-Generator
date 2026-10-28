@@ -30,6 +30,7 @@ PPLUS = (31, 0)      # layer PPLUS  calma 31 0
 CONT = (33, 0)       # layer CONT   calma 33 0
 MET1 = (34, 0)       # layer MET1   calma 34 0
 SBLK = (49, 0)       # layer SBLK   calma 49 0   (salicide block)
+HRES = (62, 0)       # layer HRES   calma 62 0   (high-resistance implant)
 RESDEF = (110, 5)    # layer RESDEF calma 110 5  (RES_MK marker)
 VIA3 = (40, 0)       # layer VIA3   calma 40 0
 VIA4 = (41, 0)       # layer VIA4   calma 41 0
@@ -59,8 +60,25 @@ _PPLUS_SUR = 0.30        # PPLUS surround of rpp (tech comment, line ~749)
 _SAB_OVER = 0.28
 
 
-def poly_resistor(width: float = 1.0, length: float = 4.0) -> gf.Component:
-    """An unsalicided P+ poly resistor that extracts as ``ppolyf_u``.
+# ── high-resistance poly (ppolyf_u_1k) ──────────────────────────────────
+# Magic: hires = POLY & SBLK & HRES & RESDEF & !DUALGATE (rpp requires NOT
+# HRES, so the two never alias). KLayout deck, rule_decks/hres.rb:
+HRES_MIN_WIDTH = 1.00    # HRES.2
+_HRES_SUR = 0.40         # HRES.4: HRES encloses the poly by 0.4 um
+_HRES_SAB_EXT = 0.10     # SBLK extends 0.1 um past the resistor (Magic cifoutput)
+_HRES_PP_SAB = 0.10      # HRES.10: PPLUS overlaps SAB by exactly 0.1 um
+_HRES_CONT_GAP = 0.32    # contact >= 0.22 um from SAB (HRES.8) = 0.1 + 0.22
+_HRES_CONT_WINDOW = 0.54 # Magic res_cont_space_max: contact within 0.54 um
+_HRES_PP_CONT = 0.20     # HRES.7: PPLUS encloses the contact by 0.2 um
+
+
+def poly_resistor(width: float = 1.0, length: float = 4.0,
+                  model: str = "ppolyf_u") -> gf.Component:
+    """An unsalicided P+ poly resistor that extracts as ``model``.
+
+    ``model`` is ``ppolyf_u`` (~7 ohm/sq) or ``ppolyf_u_1k`` (~1 kohm/sq, the
+    one a bandgap wants: R2 of ~100 kohm is 100 squares instead of 14 000).
+    The two are drawn differently — see :func:`_hres_resistor`.
 
     ``width`` and ``length`` are the resistive segment (what Magic reports as
     ``r_width`` / ``r_length``), not the cell outline.
@@ -72,6 +90,10 @@ def poly_resistor(width: float = 1.0, length: float = 4.0) -> gf.Component:
     looks like it should help and never does. The contact is therefore pinned
     to exactly that window rather than derived from a head length.
     """
+    if model == "ppolyf_u_1k":
+        return _hres_resistor(width, length)
+    if model != "ppolyf_u":
+        raise ValueError(f"no native drawing for resistor model {model!r}")
     if width < RES_MIN_WIDTH:
         raise ValueError(
             f"poly resistor width {width} um < PRES.1 minimum {RES_MIN_WIDTH} um")
@@ -105,6 +127,53 @@ def poly_resistor(width: float = 1.0, length: float = 4.0) -> gf.Component:
         _add_ports(c, term, (0.0, (ylo + yhi) / 2.0), 2 * m1_half, MET1)
 
     c.name = f"mbg_ppolyf_u_w{width:g}_l{length:g}".replace(".", "p")
+    return c
+
+
+def _hres_resistor(width: float, length: float) -> gf.Component:
+    """``ppolyf_u_1k``: P+ only on the heads, HRES over everything.
+
+    Unlike ``ppolyf_u``, the high-resistance device must NOT have P+ over its
+    body: the foundry deck requires the P+ head implants to overlap the
+    salicide block by exactly 0.1 um (HRES.10), and the resistor length is
+    defined by the space between the two P+ heads (HRES.12a), which is where
+    RES_MK must end. The contact window moves out by the 0.1 um SAB extension.
+    """
+    if width < HRES_MIN_WIDTH:
+        raise ValueError(
+            f"ppolyf_u_1k width {width} um < HRES.2 minimum {HRES_MIN_WIDTH} um")
+    if length <= 0:
+        raise ValueError(f"poly resistor length must be positive, got {length}")
+    c = gf.Component()
+    half_l = length / 2.0
+    cont_lo = half_l + _HRES_CONT_GAP
+    cont_hi = half_l + _HRES_CONT_WINDOW          # == cont_lo + _CONT_SIZE
+    head_end = cont_hi + _POLY_ENC
+
+    def _rect(layer, hx, ylo, yhi):
+        c.add_polygon([(-hx, ylo), (hx, ylo), (hx, yhi), (-hx, yhi)], layer=layer)
+
+    _rect(POLY, width / 2.0, -head_end, head_end)
+    _rect(SBLK, width / 2.0 + _SAB_OVER, -half_l - _HRES_SAB_EXT,
+          half_l + _HRES_SAB_EXT)
+    _rect(RESDEF, width / 2.0 + _SAB_OVER, -half_l, half_l)
+    _rect(HRES, width / 2.0 + _HRES_SUR, -head_end - _HRES_SUR,
+          head_end + _HRES_SUR)
+    pp_hx = max(width / 2.0 + _PPLUS_SUR, _CONT_SIZE / 2.0 + _HRES_PP_CONT)
+    pp_out = max(head_end + _PPLUS_SUR, cont_hi + _HRES_PP_CONT)
+    for sgn in (1, -1):
+        lo, hi = sorted((sgn * (half_l + _HRES_SAB_EXT - _HRES_PP_SAB), sgn * pp_out))
+        _rect(PPLUS, pp_hx, lo, hi)
+
+    cs = _CONT_SIZE
+    m1_half = cs / 2.0 + _M1_ENC
+    for sgn, term in ((1, "p"), (-1, "n")):
+        ylo, yhi = sorted((sgn * cont_lo, sgn * cont_hi))
+        _rect(CONT, cs / 2.0, ylo, yhi)
+        _rect(MET1, m1_half, ylo - _M1_ENC, yhi + _M1_ENC)
+        _add_ports(c, term, (0.0, (ylo + yhi) / 2.0), 2 * m1_half, MET1)
+
+    c.name = f"mbg_ppolyf_u_1k_w{width:g}_l{length:g}".replace(".", "p")
     return c
 
 

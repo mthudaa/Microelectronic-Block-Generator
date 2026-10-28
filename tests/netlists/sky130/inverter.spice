@@ -1,0 +1,7 @@
+* Inverter, sky130A (smoke test for the second PDK).
+* sky130 sizes are unitless microns: W=1 means 1 um.
+* complexity: 2 MOS, 4 nets
+.subckt inverter_sky130 VDD VSS IN OUT
+XM1p OUT IN VDD VDD sky130_fd_pr__pfet_01v8 L=0.5 W=2 nf=1
+XM1n OUT IN VSS VSS sky130_fd_pr__nfet_01v8 L=0.5 W=1 nf=1
+.ends

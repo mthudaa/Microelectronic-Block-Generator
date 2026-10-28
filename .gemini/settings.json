@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "mbg": {
+      "command": "scripts/mbg",
+      "args": [
+        "mcp"
+      ],
+      "timeout": 1800000
+    }
+  },
+  "context": {
+    "fileName": [
+      "AGENTS.md"
+    ]
+  }
+}

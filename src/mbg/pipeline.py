@@ -366,15 +366,20 @@ def spice_to_gds_with_checks_legacy(netlist_input, gds_path=None,
 def spice_to_gds_ctx(netlist_input, mode="analog", add_labels=True,
                      power_rails=True, rail_layer="met5",
                      placement_config=None, router_config=None,
-                     verify=True, verbosity=1):
+                     verify=True, verbosity=1, pdk=None):
     """Full context-driven layout flow.
+
+    ``pdk`` names the variant (``gf180mcuD``, ``sky130A``) or family; by
+    default it is inferred from the netlist's device models. A request that
+    contradicts the models (sky130 rules for ``nfet_03v3``) is an error.
 
     Returns:
         dict with keys ``component``, ``context``, ``verification``,
         ``metrics``.  Nothing is reported as passing that was not measured.
     """
-    from glayout import gf180 as _gf180, sky130 as _sky130
+    import glayout as _glayout
     from glayout.util.snap_to_grid import component_snap_to_grid
+    from mbg import pdk_profile
     from mbg.spice_parser import build_design_context
     from mbg.placement_engine import PlacementConfig, place_with_routability
     from mbg.router import GridRouter, RouterConfig, realize
@@ -387,17 +392,12 @@ def spice_to_gds_ctx(netlist_input, mode="analog", add_labels=True,
     if not config.get("components"):
         raise ValueError("Parsed netlist has 0 components — check SPICE syntax")
 
-    pdk_name = config["metadata"]["pdk"]
-    if pdk_name == "gf180":
-        pdk = _gf180
-    elif pdk_name == "sky130":
-        pdk = _sky130
-    else:
-        raise ValueError(f"Unknown PDK: {pdk_name}")
+    profile = pdk_profile.for_netlist(netlist_input, pdk)
+    pdk = getattr(_glayout, profile.glayout_pdk)
     pdk.activate()
     set_pdk(pdk)
 
-    ctx = build_design_context(config, pdk)
+    ctx = build_design_context(config, pdk, profile=profile)
     print(f"[PIPELINE] {ctx.name}: {len(ctx.devices)} devices, "
           f"{len(ctx.nets)} nets, {len(ctx.matching_groups)} matched groups")
     for g in ctx.matching_groups.values():
@@ -549,22 +549,43 @@ def spice_to_gds_with_checks_ctx(netlist_input, gds_path=None, mode="analog",
                                  add_labels=True, verbosity=1,
                                  placement_config=None, router_config=None,
                                  power_rails=True, rail_layer="met5",
-                                 write_views=True):
+                                 write_views=True, pdk=None, outdir=None):
     """Context-driven flow followed by the real Magic/netgen signoff.
 
     DRC and LVS results are reported exactly as the tools returned them.
+    ``pdk`` selects the variant (default: inferred from the models); the
+    sign-off tools run with PDK/PDKPATH pointed at it. ``outdir`` defaults
+    to ``./<cell>/``.
     """
+    import re
+    from mbg import pdk_profile
+    profile = pdk_profile.for_netlist(netlist_input, pdk)
+    with profile.env():
+        r = _with_checks_ctx(netlist_input, profile, gds_path=gds_path, mode=mode,
+                             add_labels=add_labels, verbosity=verbosity,
+                             placement_config=placement_config,
+                             router_config=router_config,
+                             power_rails=power_rails, rail_layer=rail_layer,
+                             write_views=write_views, outdir=outdir)
+    return r
+
+
+def _with_checks_ctx(netlist_input, profile, *, gds_path, mode, add_labels,
+                     verbosity, placement_config, router_config, power_rails,
+                     rail_layer, write_views, outdir):
     import re
     cell = re.search(r'\.subckt\s+(\S+)', netlist_input)
     cell_name = cell.group(1) if cell else "top"
-    outdir = os.path.join(os.getcwd(), cell_name)
+    outdir = outdir or os.path.join(os.getcwd(), cell_name)
     os.makedirs(outdir, exist_ok=True)
     gds_path = gds_path or os.path.join(outdir, f"{cell_name}.gds")
 
     r = spice_to_gds_ctx(netlist_input, mode=mode, add_labels=add_labels,
                          placement_config=placement_config,
                          router_config=router_config, verbosity=verbosity,
-                         power_rails=power_rails, rail_layer=rail_layer)
+                         power_rails=power_rails, rail_layer=rail_layer,
+                         pdk=profile.name)
+    r["pdk"] = profile.name
     write_gds_foundry(r["component"], gds_path)
     r["gds_path"] = gds_path
     r["outdir"] = outdir
@@ -598,6 +619,8 @@ def spice_to_gds_with_checks_ctx(netlist_input, gds_path=None, mode="analog",
     try:
         from mbg.drc import run_dual_drc
         _s = run_dual_drc(gds_path, cell_name=cell_name, workdir=outdir,
+                          engines=profile.drc_engines,
+                          primary=profile.drc_primary,
                           verbosity=verbosity)
         r["drc_signoff"] = _s.as_dict()
         r["drc_report"] = _s.report()
@@ -648,7 +671,7 @@ def spice_to_gds_with_checks(netlist_input, gds_path=None, mode="analog",
                              add_labels=True, legacy=False, verbosity=0,
                              placement_config=None, router_config=None,
                              power_rails=True, rail_layer="met5",
-                             write_views=True):
+                             write_views=True, pdk=None, outdir=None):
     """SPICE -> GDS with DRC, LVS and PEX. The primary entry point.
 
     Since v0.2 this drives the DesignContext flow (analog-aware placement plus
@@ -663,6 +686,8 @@ def spice_to_gds_with_checks(netlist_input, gds_path=None, mode="analog",
         this path     4/4 pass   (DRC clean, LVS match, 0 opens, 0 shorts)
 
     Pass ``legacy=True`` to run the original implementation unchanged.
+    ``pdk`` picks the process variant (``gf180mcuD`` default, ``sky130A``);
+    by default it is inferred from the device models in the netlist.
 
     Returns the same keys as before — ``outdir``, ``gds_path``, ``svg_path``,
     ``cell_name``, ``drc``, ``lvs``, ``pex``, ``all_pass`` — plus ``context``,
@@ -675,7 +700,7 @@ def spice_to_gds_with_checks(netlist_input, gds_path=None, mode="analog",
         netlist_input, gds_path=gds_path, mode=mode, add_labels=add_labels,
         verbosity=verbosity, placement_config=placement_config,
         router_config=router_config, power_rails=power_rails,
-        rail_layer=rail_layer, write_views=write_views)
+        rail_layer=rail_layer, write_views=write_views, pdk=pdk, outdir=outdir)
 
 
 _PASSIVE_PARAM_NAMES = {

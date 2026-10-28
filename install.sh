@@ -319,9 +319,13 @@ build_tool() {   # name repo version [jobs]
              PDK_ROOT="${PDK_ROOT_EFF}" PDK="${PDK_NAME}" \
              PDKPATH="${PDK_ROOT_EFF}/${PDK_NAME}" \
              "${VENV}/bin/python" -c "
-import sys
+import os, sys
 from mbg import config
-info = getattr(config, 'resolve_' + '${name}')()
+resolve = getattr(config, 'resolve_' + '${name}')
+tech = os.path.join(os.environ['PDKPATH'], 'libs.tech', 'magic', os.environ['PDK'] + '.tech')
+# Magic's full probe loads the PDK techfile; before the pdk stage has run,
+# check the binary alone instead of reporting a good build as broken.
+info = resolve(probe=False) if '${name}' == 'magic' and not os.path.isfile(tech) else resolve()
 sys.exit(0 if info.ok else 1)
 " 2>/dev/null
         then
@@ -738,8 +742,9 @@ exec "\${MBG_VENV:-$VENV}/bin/python" "\$@"
 EOF
 cat > "$MBG_HOME/bin/mbg" <<'EOF'
 #!/usr/bin/env bash
-# Minimal MBG launcher. Subcommands are delegated to the repo scripts that
-# implement them; `mbg check` is the environment preflight.
+# MBG launcher. `mbg check` is the environment preflight; every other
+# subcommand (doctor, tools, netlist, sim, measure, layout, verify, flow,
+# job, mcp, ...) is the agent tool surface in the repository, scripts/mbg.
 set -euo pipefail
 PY="${MBG_VENV:?MBG_VENV not set — source ~/.mbg/activate.sh}/bin/python"
 ROOT="${MBG_ROOT:?MBG_ROOT not set}"
@@ -757,11 +762,12 @@ mbg — Microelectronic Block Generator
   mbg python ...  run a script with MBG's interpreter
   mbg shell       interactive Python with MBG importable
 
-Design flows are driven from the agent slash commands (/mbg-full-auto) or
-from Python; see the README.
+Design tools (one JSON result per call; `mbg tools` lists them all):
+  mbg doctor | pdk | design | netlist | sim | measure | layout | verify | flow | job
+  mbg mcp         the same tools as an MCP server (stdio)
 USAGE
         ;;
-    *) echo "mbg: unknown subcommand '$1' (try: mbg --help)" >&2; exit 2 ;;
+    *) MBG_PYTHON="$PY" exec "$ROOT/scripts/mbg" "$@" ;;
 esac
 EOF
 chmod +x "$MBG_HOME/bin/mbg" "$MBG_HOME/bin/mbg-python"

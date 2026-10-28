@@ -1,5 +1,5 @@
 {
-  "$comment": "SOURCE OF TRUTH. Canonical agent-integration manifest for the Microelectronic Block Generator. Edited by hand; consumed by scripts/sync_agent_tools.py to generate the OpenCode, Claude Code and Codex adapters. JSON is used because it is the only zero-dependency format available on every interpreter in this repository (the root .venv lacks PyYAML, the chipathon .venv lacks tomllib).",
+  "$comment": "SOURCE OF TRUTH. Canonical agent-integration manifest for the Microelectronic Block Generator. Edited by hand; consumed by scripts/sync_agent_tools.py to generate the OpenCode, Claude Code and Codex adapters, the generic .agents/skills tree, the MCP client configs and the AGENTS.md index. JSON is used because it is the only zero-dependency format available on every interpreter in this repository (the root .venv lacks PyYAML, the chipathon .venv lacks tomllib).",
   "schema_version": 1,
   "project": {
     "name": "Microelectronic Block Generator",
@@ -25,7 +25,8 @@
         "commands",
         "agents",
         "code_tools",
-        "repo_permissions"
+        "repo_permissions",
+        "mcp"
       ],
       "generated": [
         "skills",
@@ -78,6 +79,15 @@
         "skills",
         "plugin_manifest",
         "marketplace"
+      ]
+    },
+    "agents": {
+      "$comment": "Agent Skills standard tree read by Codex, OpenCode, Pi, DeepSeek-based agents (Deep Code) and other harnesses that follow AGENTS.md. Every canonical skill is generated here.",
+      "skills_dir": ".agents/skills",
+      "skill_file": "SKILL.md",
+      "instructions_file": "AGENTS.md",
+      "generated": [
+        "skills"
       ]
     }
   },
@@ -383,10 +393,70 @@
         "claude": true,
         "codex": true
       }
+    },
+    "agent_cli": {
+      "summary": "Drive every stage (check, simulate, measure, layout, verify, flow) from one command line that prints one JSON result envelope per call.",
+      "class": "GENERATING",
+      "skill": "mbg-agent-interface",
+      "command": "scripts/mbg tools",
+      "entry_point": "mbg.agent.cli.main",
+      "platforms": {
+        "opencode": true,
+        "claude": true,
+        "codex": true
+      }
+    },
+    "mcp_server": {
+      "summary": "Serve the same tools over the Model Context Protocol (stdio) for any MCP-capable harness.",
+      "class": "GENERATING",
+      "skill": "mbg-agent-interface",
+      "command": "scripts/mbg mcp",
+      "entry_point": "mbg.agent.mcp.serve",
+      "platforms": {
+        "opencode": true,
+        "claude": true,
+        "codex": true
+      }
+    },
+    "check_netlist": {
+      "summary": "Static netlist checks against the PDK catalogue before simulation or layout: models, units, size limits, body ties, layout support, complexity ceiling.",
+      "class": "READ-ONLY",
+      "skill": "mbg-agent-interface",
+      "command": "scripts/mbg netlist check",
+      "entry_point": "mbg.netlist_check.check_netlist",
+      "platforms": {
+        "opencode": true,
+        "claude": true,
+        "codex": true
+      }
+    },
+    "measure_reference": {
+      "summary": "Characterise a voltage reference across temperature, supply, corners and bias current and evaluate it against a specification.",
+      "class": "GENERATING",
+      "skill": "mbg-voltage-reference",
+      "command": "scripts/mbg measure vref",
+      "entry_point": "mbg.measure.measure_vref",
+      "platforms": {
+        "opencode": true,
+        "claude": true,
+        "codex": true
+      }
+    },
+    "pdk_profiles": {
+      "summary": "Declarative PDK profiles (gf180mcuD default, sky130A): device catalogue, model sections, sign-off decks.",
+      "class": "READ-ONLY",
+      "skill": "mbg-agent-interface",
+      "command": "scripts/mbg pdk info",
+      "entry_point": "mbg.pdk_profile.load",
+      "platforms": {
+        "opencode": true,
+        "claude": true,
+        "codex": true
+      }
     }
   },
   "workflows": {
-    "mbg-full-automate": {
+    "mbg-full-auto": {
       "summary": "Full automatic analog IC design flow, specification to tapeout-ready layout.",
       "agent": "build",
       "platforms": {
@@ -499,6 +569,21 @@
     "generated_designs": {
       "root": "AI-Generated-Design-Result",
       "dirs_only": true
+    }
+  },
+  "mcp": {
+    "$comment": "One stdio MCP server for every harness: `scripts/mbg mcp` (zero dependencies; each call runs the mbg CLI). Project-scoped client configs are generated from this block. OpenCode's entry lives in the hand-maintained opencode.jsonc.",
+    "server_name": "mbg",
+    "command": "scripts/mbg",
+    "args": [
+      "mcp"
+    ],
+    "tool_timeout_sec": 1800,
+    "configs": {
+      "claude": ".mcp.json",
+      "codex": ".codex/config.toml",
+      "cursor": ".cursor/mcp.json",
+      "gemini": ".gemini/settings.json"
     }
   }
 }

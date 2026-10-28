@@ -1,0 +1,12 @@
+* 1.2 V MOS-only reference (NMOS diode at its zero-TC current).
+*
+* Designed through the mbg agent CLI; see results/claude-code_vref_1v2_cmos.
+* complexity: 5 MOS, 5 nets, max net degree 6
+.lib "{PDK_LIB}" typical
+.subckt vref_cmos_1v2 VDD VSS VREF IBIAS
+XM0 IBIAS IBIAS VSS VSS nfet_03v3 L=2u W=4u nf=2
+XM1 pm IBIAS VSS VSS nfet_03v3 L=2u W=4u nf=2
+XM2 pm pm VDD VDD pfet_03v3 L=4u W=16u nf=4
+XM3 VREF pm VDD VDD pfet_03v3 L=4u W=16u nf=4
+XM4 VREF VREF VSS VSS nfet_03v3 L=0.4u W=0.5u nf=1
+.ends

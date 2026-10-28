@@ -43,11 +43,15 @@ notebooks = ["nbformat>=5.9", "nbclient>=0.9", "ipykernel>=6", "matplotlib>=3.7"
 all = ["mbg[dev,notebooks]"]
 
 [project.scripts]
+mbg = "mbg.agent.cli:main"
 mbg-sync = "mbg.cli:sync_entry"
 mbg-validate = "mbg.cli:validate_entry"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+mbg = ["pdks/*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

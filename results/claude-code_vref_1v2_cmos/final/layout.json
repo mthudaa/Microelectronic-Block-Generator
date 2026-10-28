@@ -1,0 +1,164 @@
+{
+ "cell": "vref_cmos_1v2",
+ "bbox": [
+  -22.29,
+  0.0,
+  22.29,
+  22.18
+ ],
+ "size_um": [
+  44.58,
+  22.18
+ ],
+ "devices": {
+  "XM0": {
+   "model": "nfet_03v3",
+   "kind": "nmos",
+   "terminals": {
+    "drain": "IBIAS",
+    "gate": "IBIAS",
+    "source": "VSS",
+    "body": "VSS"
+   },
+   "x": -12.55,
+   "y": 0.0,
+   "w": 8.42,
+   "h": 7.09,
+   "row": 2,
+   "orientation": "R0",
+   "access_points": 16
+  },
+  "XM1": {
+   "model": "nfet_03v3",
+   "kind": "nmos",
+   "terminals": {
+    "drain": "pm",
+    "gate": "IBIAS",
+    "source": "VSS",
+    "body": "VSS"
+   },
+   "x": -3.13,
+   "y": 0.0,
+   "w": 8.42,
+   "h": 7.09,
+   "row": 2,
+   "orientation": "R0",
+   "access_points": 16
+  },
+  "XM2": {
+   "model": "pfet_03v3",
+   "kind": "pmos",
+   "terminals": {
+    "drain": "pm",
+    "gate": "pm",
+    "source": "VDD",
+    "body": "VDD"
+   },
+   "x": -22.29,
+   "y": 13.09,
+   "w": 21.54,
+   "h": 9.09,
+   "row": 0,
+   "orientation": "R0",
+   "access_points": 16
+  },
+  "XM3": {
+   "model": "pfet_03v3",
+   "kind": "pmos",
+   "terminals": {
+    "drain": "VREF",
+    "gate": "pm",
+    "source": "VDD",
+    "body": "VDD"
+   },
+   "x": 0.75,
+   "y": 13.09,
+   "w": 21.54,
+   "h": 9.09,
+   "row": 0,
+   "orientation": "R0",
+   "access_points": 16
+  },
+  "XM4": {
+   "model": "nfet_03v3",
+   "kind": "nmos",
+   "terminals": {
+    "drain": "VREF",
+    "gate": "VREF",
+    "source": "VSS",
+    "body": "VSS"
+   },
+   "x": 8.29,
+   "y": -0.0,
+   "w": 4.26,
+   "h": 5.6,
+   "row": 2,
+   "orientation": "R0",
+   "access_points": 16
+  }
+ },
+ "rows": {
+  "0": [
+   "XM2",
+   "XM3"
+  ],
+  "2": [
+   "XM0",
+   "XM1",
+   "XM4"
+  ]
+ },
+ "nets": {
+  "IBIAS": {
+   "degree": 3,
+   "routed": true,
+   "power": false,
+   "ground": false
+  },
+  "VSS": {
+   "degree": 11,
+   "routed": true,
+   "power": false,
+   "ground": true
+  },
+  "pm": {
+   "degree": 4,
+   "routed": true,
+   "power": false,
+   "ground": false
+  },
+  "VDD": {
+   "degree": 9,
+   "routed": true,
+   "power": true,
+   "ground": false
+  },
+  "VREF": {
+   "degree": 3,
+   "routed": true,
+   "power": false,
+   "ground": false
+  }
+ },
+ "failures": [],
+ "matching_groups": [
+  {
+   "name": "mirror_1",
+   "kind": "current_mirror",
+   "devices": [
+    "XM0",
+    "XM1"
+   ]
+  },
+  {
+   "name": "mirror_2",
+   "kind": "current_mirror",
+   "devices": [
+    "XM2",
+    "XM3"
+   ]
+  }
+ ],
+ "hint_overlaps": [],
+ "pdk": "gf180mcuD"
+}

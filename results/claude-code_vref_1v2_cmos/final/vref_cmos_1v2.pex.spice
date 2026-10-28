@@ -1,0 +1,29 @@
+* PEX produced on Wed Oct 28 12:57:43 UTC 2026 using <repo>/designs/notebooks/chipathon2026-D/scripts/iic-pex.sh with m=2 and s=1
+* NGSPICE file created from vref_cmos_1v2.ext - technology: gf180mcuD
+
+.option scale=5n
+
+.subckt vref_cmos_1v2 IBIAS VREF VSS VDD
+X0 a_n4072_2838# IBIAS VSS VSS nfet_03v3 ad=22.4n pd=0.512m as=48n ps=1.04m w=400 l=400
+X1 IBIAS IBIAS VSS VSS nfet_03v3 ad=22.4n pd=0.512m as=48n ps=1.04m w=400 l=400
+X2 a_n4072_2838# a_n4072_2838# VDD VDD pfet_03v3 ad=44.8n pd=0.912m as=96n ps=1.84m w=800 l=800
+X3 VREF a_n4072_2838# VDD VDD pfet_03v3 ad=44.8n pd=0.912m as=44.8n ps=0.912m w=800 l=800
+X4 a_n4072_2838# a_n4072_2838# VDD VDD pfet_03v3 ad=44.8n pd=0.912m as=44.8n ps=0.912m w=800 l=800
+X5 VDD a_n4072_2838# VREF VDD pfet_03v3 ad=96n pd=1.84m as=44.8n ps=0.912m w=800 l=800
+X6 VREF VREF VSS VSS nfet_03v3 ad=12n pd=0.44m as=12n ps=0.44m w=100 l=80
+X7 VDD a_n4072_2838# a_n4072_2838# VDD pfet_03v3 ad=44.8n pd=0.912m as=44.8n ps=0.912m w=800 l=800
+X8 VDD a_n4072_2838# VREF VDD pfet_03v3 ad=44.8n pd=0.912m as=44.8n ps=0.912m w=800 l=800
+X9 VREF a_n4072_2838# VDD VDD pfet_03v3 ad=44.8n pd=0.912m as=96n ps=1.84m w=800 l=800
+X10 VSS IBIAS a_n4072_2838# VSS nfet_03v3 ad=48n pd=1.04m as=22.4n ps=0.512m w=400 l=400
+X11 VSS IBIAS IBIAS VSS nfet_03v3 ad=48n pd=1.04m as=22.4n ps=0.512m w=400 l=400
+X12 VDD a_n4072_2838# a_n4072_2838# VDD pfet_03v3 ad=96n pd=1.84m as=44.8n ps=0.912m w=800 l=800
+C0 a_n4072_2838# IBIAS 0.28168f
+C1 a_n4072_2838# VREF 1.43149f
+C2 VDD a_n4072_2838# 19.0918f
+C3 IBIAS VREF 0.03f
+C4 VDD VREF 2.9516f
+C5 IBIAS VSS 6.43348f
+C6 VREF VSS 3.34428f
+C7 VDD VSS 56.9536f
+C8 a_n4072_2838# VSS 2.90655f ; **FLOATING
+.ends

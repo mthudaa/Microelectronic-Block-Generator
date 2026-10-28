@@ -22,13 +22,20 @@ MAGICRC = os.path.join(PDKPATH, "libs.tech", "magic", "gf180mcuD.magicrc")
 HAVE_PDK = bool(PDKPATH) and os.path.exists(MAGICRC)
 
 
+def _magic_bin():
+    """The Magic MBG resolved (MBG_MAGIC, its tools root, then PATH)."""
+    from mbg import config
+    info = config.resolve_magic(probe=False)
+    return info.path if info.ok and info.path else "magic"
+
+
 def _magic(cell, gds_path, workdir, script):
     tcl = os.path.join(workdir, "run.tcl")
     with open(tcl, "w") as f:
         f.write(f'gds read {gds_path}\nload {cell} -dereference\n'
                 f'select top cell\n{script}\nquit -noprompt\n')
     return subprocess.run(
-        ["magic", "-dnull", "-noconsole", "-rcfile", MAGICRC, tcl],
+        [_magic_bin(), "-dnull", "-noconsole", "-rcfile", MAGICRC, tcl],
         cwd=workdir, capture_output=True, text=True, timeout=300,
         stdin=subprocess.DEVNULL).stdout
 

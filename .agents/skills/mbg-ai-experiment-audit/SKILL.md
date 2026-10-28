@@ -1,6 +1,10 @@
 ---
 name: mbg-ai-experiment-audit
 description: Audits an MBG AI-assisted analog-design experiment record for reproducibility, prompt independence, bounded LLM refinement, artifact completeness, AI metrics, and evidence-based results. Use this skill when reviewing experiment.json, generated SPICE, GDS, simulation outputs, or DRC/LVS/PEX reports for an AI experiment. Do not use it to modify analog-design, simulation, routing, or verification implementations.
+license: Apache-2.0
+metadata:
+  owner: jabir
+  project: microelectronic-block-generator
 ---
 <!-- GENERATED FILE — do not edit by hand. Source: .ai/skills/mbg-ai-experiment-audit/SKILL.md. Regenerate with: python3 scripts/sync_agent_tools.py -->
 

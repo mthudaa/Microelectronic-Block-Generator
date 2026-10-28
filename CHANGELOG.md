@@ -5,6 +5,51 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- **Tool surface for any AI agent** (`src/mbg/agent/`): one registry of 19
+  tools served as the `scripts/mbg` command line (also `python -m mbg` and the
+  `mbg` console script) and as a dependency-free stdio MCP server
+  (`scripts/mbg mcp`). Every call prints one `mbg.result/1` JSON envelope
+  (status PASS/FAIL/PARTIAL/NOT RUN/NOT AVAILABLE, metrics, artifacts,
+  issues with hints, suggested next calls); logs go to the run directory;
+  long runs become background jobs. Design workspaces under `outputs/<name>/`
+  keep `experiment.json` current.
+- **Declarative PDK profiles** (`src/mbg/pdks/*.json`, `mbg.pdk_profile`):
+  gf180mcuD (default) and sky130A (smoke-verified, MOS-only layout,
+  Magic-only DRC). `import mbg` no longer loads gLayout until it is needed.
+- **Simulation**: model sections per device kind, temperature and supply
+  sweeps, current sources; `mbg.measure` recipes for voltage references and
+  amplifiers (`mbg measure vref|ota`).
+- **Devices**: gf180 vertical PNPs from the PDK's fixed cells, `ppolyf_u_1k`
+  high-resistance poly, native `Q` lines, `bjt` device kind.
+- **Placement hints** (rows, order, matching groups, arrays, fixed
+  positions) and a text layout view (`mbg layout view`).
+- **Static netlist checks** against the PDK catalogue (`mbg netlist check`).
+- **Agent-harness integration**: generated `.agents/skills/` (Agent Skills
+  standard), MCP configs for Claude Code, Codex, Cursor and Gemini CLI, an
+  OpenCode `mcp` entry, a generated tool/skill index in `AGENTS.md`,
+  `docs/TOOLS.md` and `docs/ai_interface.md`; skills `mbg-agent-interface`
+  and `mbg-voltage-reference`.
+- **Two 1.2 V references** designed through the CLI on gf180mcuD (bandgap
+  and MOS-only), evidence in `results/claude-code_vref_1v2_{bgr,cmos}/`, and
+  both added to the regression set.
+
+### Fixed
+- PEX netlists simulated poly resistors and MIM capacitors with Magic's
+  scaled geometry read as metres (`.option scale` does not reach subcircuit
+  parameters); `checks.run_pex` now writes them in µm.
+- sky130 layer lookups matched on GDS layer number alone; access points sat
+  outside narrow pins.
+- `place()` dropped a device whose build failed instead of reporting it.
+- Error messages named the removed `scripts/setup_env.sh`; the installer's
+  Magic probe failed a good build when the PDK was not yet installed.
+- The LLM netlist prompt contradicted the PDK (1.8 V, `M` prefix); it is now
+  generated from the profile.
+- OpenCode tools parsed polluted stdout; they now wrap `scripts/mbg`.
+- `sync_agent_tools.py --check` (validator F5) failed on gitignored files.
+
 ## [v1.0.0] - 2025-07-25
 
 ### Added

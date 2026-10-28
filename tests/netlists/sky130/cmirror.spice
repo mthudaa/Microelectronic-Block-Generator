@@ -1,0 +1,6 @@
+* NMOS current mirror, sky130A (smoke test for the second PDK).
+* complexity: 2 MOS, 4 nets
+.subckt cmirror_sky130 VSS IREF IOUT
+XM1 IREF IREF VSS VSS sky130_fd_pr__nfet_01v8 L=1 W=2 nf=2
+XM2 IOUT IREF VSS VSS sky130_fd_pr__nfet_01v8 L=1 W=2 nf=2
+.ends

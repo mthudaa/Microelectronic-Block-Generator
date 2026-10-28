@@ -1,0 +1,14 @@
+* MOS-only 1.2 V reference (gf180mcuD, 3.3 V), ports VDD VSS VREF IBIAS.
+* IBIAS (20 uA pushed into the pin) -> XM0/XM1 NMOS mirror -> XM2/XM3 PMOS
+* mirror (L=4u for line regulation) -> XM4, a diode-connected nfet biased
+* at its zero-temperature-coefficient (ZTC) current, where the mobility and
+* threshold drifts cancel. L=0.4u puts the ZTC gate voltage near its
+* maximum for nfet_03v3 (~1.17 V); W=0.5u biases XM4 a little above ZTC to
+* centre VREF at 1.18 V. Designed through `mbg measure vref` (10 candidates).
+.subckt vref_cmos_1v2 VDD VSS VREF IBIAS
+XM0 IBIAS IBIAS VSS VSS nfet_03v3 L=2u W=4u nf=2
+XM1 pm IBIAS VSS VSS nfet_03v3 L=2u W=4u nf=2
+XM2 pm pm VDD VDD pfet_03v3 L=4u W=16u nf=4
+XM3 VREF pm VDD VDD pfet_03v3 L=4u W=16u nf=4
+XM4 VREF VREF VSS VSS nfet_03v3 L=0.4u W=0.5u nf=1
+.ends

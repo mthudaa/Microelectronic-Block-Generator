@@ -42,29 +42,51 @@ def _load_api_key():
     return None
 
 
+def netlist_rules(pdk=None) -> str:
+    """System prompt for netlist generation, written from the PDK profile.
+
+    The rules used to be a hand-written string that contradicted the PDK
+    (1.8 V supply, ``M`` prefix, 50 µm widths); they now come from the same
+    profile `mbg netlist check` validates against.
+    """
+    from mbg import pdk_profile
+    prof = pdk_profile.resolve(pdk)
+    nmos = prof.models("nmos", layout_only=True)[0]
+    pmos = prof.models("pmos", layout_only=True)[0]
+    spec = prof.device(nmos)
+    units = prof.data.get("units", "")
+    suffix = "u" if "suffix" in units else ""
+    model_file = prof.data["ngspice"]["model_file"].rsplit("/", 1)[-1]
+    corner = prof.default_corner
+    vdd = prof.supply_v
+    return f"""You are an analog IC design expert. Generate ONLY a SPICE subcircuit netlist.
+Respond with NOTHING except the netlist -- no explanations, no markdown, no comments.
+
+STRICT RULES ({prof.name}):
+1. First line MUST be: .lib "/path/to/{prof.name}/libs.tech/ngspice/{model_file}" {corner}
+2. Second line MUST be: .subckt <name> <ports...>
+3. Last line MUST be: .ends
+4. ONLY use these models: {nmos} (NMOS) and {pmos} (PMOS).
+5. Format EXACTLY: XM<name> <drain> <gate> <source> <body> <model> W=<w>{suffix} L=<l>{suffix} nf=<n>
+   ({units})
+6. SUPPLY: VDD={vdd:g}V. Connect PMOS body to VDD, NMOS body to VSS.
+7. NO empty lines between devices. NO markdown fences. NO other text.
+8. Choose net names that reflect circuit function (e.g., n1, n2 for internal, vin/vout for I/O).
+9. Width per finger (W/nf) between {spec.w_min_um:g} and {spec.w_max_um:g} {'um' if suffix else '(microns)'};
+   L between {spec.l_min_um:g} and {spec.l_max_um:g}. Use nf=N fingers for wide devices, never m=N."""
+
+
 def generate_netlist_from_prompt(user_prompt, model="deepseek-v4-flash",
                                  api_key=None,
                                  api_url="https://api.deepseek.com/v1/chat/completions",
-                                 llm_feedback=None):
+                                 llm_feedback=None, pdk=None):
     api_key = api_key or _load_api_key()
     if not api_key:
         raise RuntimeError(
             "DEEPSEEK_API_KEY not set. "
             "Export it or create .env file with DEEPSEEK_API_KEY=sk-..."
         )
-    context = """You are an analog IC design expert. Generate ONLY a SPICE subcircuit netlist.
-Respond with NOTHING except the netlist -- no explanations, no markdown, no comments.
-
-STRICT RULES:
-1. First line MUST be: .lib "/path/to/gf180mcu/libs.tech/ngspice/sm141064.ngspice" typical
-2. Second line MUST be: .subckt <name> <ports...>
-3. Last line MUST be: .ends
-4. ONLY use these models: nfet_03v3 (NMOS) and pfet_03v3 (PMOS).
-5. Format EXACTLY: M<name> <drain> <gate> <source> <body> <model> W=<w>u L=<l>u
-6. SUPPLY: Use VDD=1.8V. Connect PMOS body to vdd, NMOS body to vss.
-7. NO empty lines between devices. NO markdown fences. NO other text.
-8. Choose net names that reflect circuit function (e.g., n1, n2 for internal, vin/vout for I/O).
-9. Keep W between 1u and 50u. Keep L=1u for analog. Use ng=1 (no multi-finger)."""
+    context = netlist_rules(pdk)
 
     messages = [
         {"role": "system", "content": context},

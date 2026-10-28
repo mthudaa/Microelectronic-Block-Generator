@@ -27,7 +27,7 @@ Resolution order for every tool (first hit wins):
 5. otherwise a :class:`ToolError` naming what to run
 
 Nothing here writes to the filesystem or installs anything; that is
-``scripts/setup_env.sh``.
+``./install.sh``.
 """
 
 from __future__ import annotations
@@ -199,7 +199,7 @@ def ensure_pdk_env(strict: bool = False) -> PDKConfig:
                 + "".join(f"  not found: {m}\n" for m in missing)
                 + f"\n  PDK_ROOT = {cfg.root}\n  PDK      = {cfg.pdk}\n"
                 + "\nInstall it with:\n"
-                + "  ./scripts/setup_env.sh --pdk\n"
+                + "  ./install.sh --stage pdk\n"
                 + "\nor point PDK_ROOT at an existing installation.")
     return cfg
 
@@ -370,7 +370,7 @@ def resolve_magic(cfg: Optional[PDKConfig] = None,
         info.ok, info.source = True, source
         return info
 
-    info.reason = _tool_error_text("Magic", tried, "--eda")
+    info.reason = _tool_error_text("Magic", tried, "--stage eda")
     return info
 
 
@@ -437,7 +437,7 @@ def resolve_netgen(probe: bool = True) -> ToolInfo:
         info.ok, info.source = True, source
         return info
 
-    info.reason = _tool_error_text("netgen", tried, "--eda")
+    info.reason = _tool_error_text("netgen", tried, "--stage eda")
     return info
 
 
@@ -528,7 +528,7 @@ def _tool_error_text(label: str, tried: Sequence[str], flag: str) -> str:
             f"Checked, in order:\n{body}\n\n"
             + (f"{why}\n\n" if why else "")
             + f"Install a known-good build under $MBG_TOOLS_ROOT with:\n"
-              f"  ./scripts/setup_env.sh {flag}\n\n"
+              f"  ./install.sh {flag}\n\n"
               f"or point MBG_{label.upper()}_ROOT at an existing prefix.")
 
 

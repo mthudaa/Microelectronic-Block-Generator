@@ -1,0 +1,83 @@
+{
+ "gate": [
+  {
+   "name": "vref_v",
+   "op": "==",
+   "target": 1.2,
+   "unit": "V",
+   "tol": 0.05
+  },
+  {
+   "name": "tc_ppm_c",
+   "op": "<=",
+   "target": 300.0,
+   "unit": "ppm/C",
+   "tol": null
+  },
+  {
+   "name": "line_reg_mv_v",
+   "op": "<=",
+   "target": 100.0,
+   "unit": "mV/V",
+   "tol": null
+  },
+  {
+   "name": "dvref_line_mv",
+   "op": "<=",
+   "target": 60.0,
+   "unit": "mV",
+   "tol": null
+  },
+  {
+   "name": "ivdd_ua",
+   "op": "<=",
+   "target": 300.0,
+   "unit": "uA",
+   "tol": null
+  }
+ ],
+ "stretch": [
+  {
+   "name": "vref_v",
+   "op": "==",
+   "target": 1.2,
+   "unit": "V",
+   "tol": 0.024
+  },
+  {
+   "name": "tc_ppm_c",
+   "op": "<=",
+   "target": 50.0,
+   "unit": "ppm/C",
+   "tol": null
+  },
+  {
+   "name": "line_reg_mv_v",
+   "op": "<=",
+   "target": 5.0,
+   "unit": "mV/V",
+   "tol": null
+  },
+  {
+   "name": "psrr_db",
+   "op": "<=",
+   "target": -40.0,
+   "unit": "dB",
+   "tol": null
+  },
+  {
+   "name": "startup_us",
+   "op": "<=",
+   "target": 100.0,
+   "unit": "us",
+   "tol": null
+  },
+  {
+   "name": "ivdd_ua",
+   "op": "<=",
+   "target": 300.0,
+   "unit": "uA",
+   "tol": null
+  }
+ ]
+}

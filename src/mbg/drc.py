@@ -339,7 +339,7 @@ class KLayoutDRC(DRCEngine):
                     "the GF180 KLayout DRC deck was not found under "
                     "$PDKPATH/libs.tech/klayout/tech/drc/gf180mcu.drc. "
                     "Set MBG_KLAYOUT_DECK, or reinstall the PDK with "
-                    "./scripts/setup_env.sh --pdk.")
+                    "./install.sh --stage pdk.")
         return (True, "")
 
     def __init__(self, decks: Optional[str] = None):

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Preflight report for the MBG local environment.
 
-Run through ``./scripts/setup_env.sh --check``. Kept in Python rather than
+Run through ``./install.sh --check``. Kept in Python rather than
 shell so that it asks the *same* resolver the pipeline uses — a check that
 re-implements tool lookup in shell can pass while the real run picks a
 different binary.
@@ -106,7 +106,7 @@ def main() -> int:
             print("\nPDK files not found:")
             for m in cfg.missing():
                 print(f"  {m}")
-            print("\nInstall with:  ./scripts/setup_env.sh --pdk")
+            print("\nInstall with:  ./install.sh --stage pdk")
         return 1
 
     print(f"{G}Environment OK — the GF180 regression can run.{N}")

@@ -257,9 +257,10 @@ class ExperimentManifest:
         if not self.model.strip():
             raise ValueError("Model identifier cannot be empty")
 
-        if self.pdk != "gf180mcuD":
+        supported = _supported_pdks()
+        if self.pdk not in supported:
             raise ValueError(
-                f"Unsupported PDK '{self.pdk}'; expected 'gf180mcuD'"
+                f"Unsupported PDK '{self.pdk}'; expected one of {supported}"
             )
 
         if self.api_calls < 0:
@@ -571,6 +572,13 @@ class ExperimentManifest:
             )
 
         return cls.from_dict(data)
+
+
+def _supported_pdks() -> list[str]:
+    """PDK variants with a profile in src/mbg/pdks/ (gf180mcuD is the default)."""
+    profiles = Path(__file__).resolve().parent / "pdks"
+    names = sorted(p.stem for p in profiles.glob("*.json"))
+    return names or ["gf180mcuD"]
 
 
 def utc_now_iso() -> str:

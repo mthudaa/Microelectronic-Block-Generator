@@ -142,7 +142,9 @@ fi
 # -----------------------------------
 
 if [ $RUN_MAGIC -eq 1 ]; then
-	if [ ! -x "$(command -v magic)" ]; then
+	# MBG_MAGIC (set by mbg.checks) names the verified binary; PATH is only
+	# the fallback, so check the one that will actually run.
+	if [ ! -x "$(command -v "${MBG_MAGIC:-magic}")" ]; then
     	echo "[ERROR] Magic executable could not be found!"
     	exit $ERR_CMD_NOT_FOUND
 	fi

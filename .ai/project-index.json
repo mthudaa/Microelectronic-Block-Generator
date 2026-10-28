@@ -10,15 +10,19 @@
   "targets": {
     "framework_utils": [
       {
-        "lines": 157,
+        "lines": 244,
         "path": "src/mbg/__init__.py"
       },
       {
-        "lines": 467,
+        "lines": 7,
+        "path": "src/mbg/__main__.py"
+      },
+      {
+        "lines": 604,
         "path": "src/mbg/analysis.py"
       },
       {
-        "lines": 1285,
+        "lines": 1370,
         "path": "src/mbg/checks.py"
       },
       {
@@ -30,11 +34,11 @@
         "path": "src/mbg/config.py"
       },
       {
-        "lines": 371,
+        "lines": 416,
         "path": "src/mbg/connectivity.py"
       },
       {
-        "lines": 577,
+        "lines": 578,
         "path": "src/mbg/design_context.py"
       },
       {
@@ -42,8 +46,12 @@
         "path": "src/mbg/drc.py"
       },
       {
-        "lines": 801,
+        "lines": 809,
         "path": "src/mbg/experiment_manifest.py"
+      },
+      {
+        "lines": 254,
+        "path": "src/mbg/fixed_cells.py"
       },
       {
         "lines": 703,
@@ -62,15 +70,27 @@
         "path": "src/mbg/integrate.py"
       },
       {
-        "lines": 370,
+        "lines": 132,
+        "path": "src/mbg/layout_view.py"
+      },
+      {
+        "lines": 392,
         "path": "src/mbg/llm.py"
+      },
+      {
+        "lines": 380,
+        "path": "src/mbg/measure.py"
+      },
+      {
+        "lines": 256,
+        "path": "src/mbg/netlist_check.py"
       },
       {
         "lines": 312,
         "path": "src/mbg/outputs.py"
       },
       {
-        "lines": 227,
+        "lines": 296,
         "path": "src/mbg/passives.py"
       },
       {
@@ -78,11 +98,15 @@
         "path": "src/mbg/pdk_devices.py"
       },
       {
-        "lines": 392,
+        "lines": 415,
+        "path": "src/mbg/pdk_profile.py"
+      },
+      {
+        "lines": 402,
         "path": "src/mbg/pdk_rules.py"
       },
       {
-        "lines": 711,
+        "lines": 736,
         "path": "src/mbg/pipeline.py"
       },
       {
@@ -90,7 +114,7 @@
         "path": "src/mbg/placement.py"
       },
       {
-        "lines": 787,
+        "lines": 1047,
         "path": "src/mbg/placement_engine.py"
       },
       {
@@ -122,7 +146,7 @@
         "path": "src/mbg/specs.py"
       },
       {
-        "lines": 802,
+        "lines": 840,
         "path": "src/mbg/spice_parser.py"
       },
       {
@@ -130,45 +154,14 @@
         "path": "src/mbg/utils.py"
       }
     ],
-    "generated_designs": [
-      {
-        "path": "AI-Generated-Design-Result/comparator_core"
-      },
-      {
-        "path": "AI-Generated-Design-Result/comparator_core_designcontext_v2"
-      },
-      {
-        "path": "AI-Generated-Design-Result/comparator_core_glm_5-2"
-      },
-      {
-        "path": "AI-Generated-Design-Result/mbg_vref_1v2"
-      },
-      {
-        "path": "AI-Generated-Design-Result/mbg_vref_1v2_glm_5-2"
-      },
-      {
-        "path": "AI-Generated-Design-Result/ota_5t"
-      },
-      {
-        "path": "AI-Generated-Design-Result/ota_5t_designcontext_v2"
-      },
-      {
-        "path": "AI-Generated-Design-Result/ota_5t_glm_5-2"
-      },
-      {
-        "path": "AI-Generated-Design-Result/two_stage_comparator_designcontext_v2"
-      },
-      {
-        "path": "AI-Generated-Design-Result/vref_1v2_designcontext_v2"
-      }
-    ],
+    "generated_designs": [],
     "pdk_modules": [
       {
         "lines": 168,
         "path": "src/mbg/pdk_devices.py"
       },
       {
-        "lines": 392,
+        "lines": 402,
         "path": "src/mbg/pdk_rules.py"
       }
     ],
@@ -178,7 +171,7 @@
         "path": "src/mbg/placement.py"
       },
       {
-        "lines": 787,
+        "lines": 1047,
         "path": "src/mbg/placement_engine.py"
       },
       {
@@ -188,7 +181,7 @@
     ],
     "routing_modules": [
       {
-        "lines": 371,
+        "lines": 416,
         "path": "src/mbg/connectivity.py"
       },
       {
@@ -206,17 +199,21 @@
         "path": "src/mbg/simulation.py"
       },
       {
-        "lines": 802,
+        "lines": 840,
         "path": "src/mbg/spice_parser.py"
       }
     ],
     "tests": [
       {
+        "lines": 170,
+        "path": "tests/test_agent_cli.py"
+      },
+      {
         "lines": 270,
         "path": "tests/test_agent_integrations.py"
       },
       {
-        "lines": 232,
+        "lines": 235,
         "path": "tests/test_all_designs.py"
       },
       {
@@ -240,6 +237,10 @@
         "path": "tests/test_experiment_manifest.py"
       },
       {
+        "lines": 57,
+        "path": "tests/test_fixed_cells.py"
+      },
+      {
         "lines": 382,
         "path": "tests/test_flow.py"
       },
@@ -260,6 +261,14 @@
         "path": "tests/test_integration.py"
       },
       {
+        "lines": 118,
+        "path": "tests/test_mcp_server.py"
+      },
+      {
+        "lines": 76,
+        "path": "tests/test_netlist_check.py"
+      },
+      {
         "lines": 105,
         "path": "tests/test_notebooks.py"
       },
@@ -272,8 +281,16 @@
         "path": "tests/test_outputs.py"
       },
       {
-        "lines": 128,
+        "lines": 135,
         "path": "tests/test_passives.py"
+      },
+      {
+        "lines": 124,
+        "path": "tests/test_pdk_profiles.py"
+      },
+      {
+        "lines": 46,
+        "path": "tests/test_pex_passive_scaling.py"
       },
       {
         "lines": 135,
@@ -292,17 +309,21 @@
         "path": "tests/test_search.py"
       },
       {
-        "lines": 243,
+        "lines": 244,
         "path": "tests/test_spice_parser.py"
+      },
+      {
+        "lines": 105,
+        "path": "tests/test_testbench_deck.py"
       }
     ],
     "verification_modules": [
       {
-        "lines": 1285,
+        "lines": 1370,
         "path": "src/mbg/checks.py"
       },
       {
-        "lines": 371,
+        "lines": 416,
         "path": "src/mbg/connectivity.py"
       }
     ]

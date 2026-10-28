@@ -1,6 +1,10 @@
 ---
 name: mbg-extension-authoring
 description: Creates or reviews canonical agent skills and workflows under .ai/, plus OpenCode-only custom tools under .opencode/tools, for the Microelectronic Block Generator repository. Use this for authoring or reviewing SKILL.md files, .ai/workflows entries, or .opencode/tools/*.ts files. Do not use it for analog design, simulation, routing, DRC, LVS, or PEX implementation.
+license: Apache-2.0
+metadata:
+  owner: jabir
+  project: microelectronic-block-generator
 ---
 <!-- GENERATED FILE — do not edit by hand. Source: .ai/skills/mbg-extension-authoring/SKILL.md. Regenerate with: python3 scripts/sync_agent_tools.py -->
 
@@ -41,7 +45,7 @@ Before creating an extension, determine:
 1. Extension type (skill, workflow, or OpenCode tool).
 2. Extension name (must use the `mbg-` prefix).
 3. Primary responsibility — one clear job.
-4. Intended platforms (`opencode`, `Codex`, `codex` — a skill or workflow
+4. Intended platforms (`opencode`, `claude`, `codex` — a skill or workflow
    almost always targets all three; a code tool targets `opencode` only,
    since it is the only platform among the three that supports code
    tools).
@@ -52,9 +56,9 @@ Before creating an extension, determine:
 ## Preconditions
 
 - **`.ai/` is the source of truth.** Do not create or edit files directly
-  under `.opencode/skills/*`, `.Codex/skills/*`,
+  under `.opencode/skills/*`, `.claude/skills/*`,
   `plugins/mbg-analog/skills/*`, `.opencode/commands/*`, or
-  `.Codex/commands/*` — those directories are generated output. A sync
+  `.claude/commands/*` — those directories are generated output. A sync
   script (`scripts/sync_agent_tools.py`) reads `.ai/skills/`,
   `.ai/workflows/`, and `.ai/manifest.json` and regenerates the per-platform
   adapters. Any hand-edit made directly to a generated adapter file is
@@ -85,7 +89,7 @@ Examples: `mbg-extension-authoring`, `mbg-repo-analysis`,
 2. Use flat frontmatter only — the sync script's parser is hand-rolled and
    does not support nested YAML maps, block lists, or multi-line folded
    scalars. Write list fields inline: `capabilities: [cap_a, cap_b]`,
-   `platforms: [opencode, Codex, codex]`.
+   `platforms: [opencode, claude, codex]`.
 
    ```yaml
    ---
@@ -94,7 +98,7 @@ Examples: `mbg-extension-authoring`, `mbg-repo-analysis`,
    class: READ-ONLY | GENERATING | MUTATING | DESTRUCTIVE
    owner: huda | ahmad | jabir
    capabilities: [cap_id]
-   platforms: [opencode, Codex, codex]
+   platforms: [opencode, claude, codex]
    ---
    ```
 3. Follow the project's section layout in
@@ -102,14 +106,14 @@ Examples: `mbg-extension-authoring`, `mbg-repo-analysis`,
    `## When Not to Use`, `## Required Inputs`, `## Preconditions`,
    `## Workflow`, `## Outputs`, `## Failure Modes`.
 4. Keep the body platform-neutral — do not write "OpenCode" or
-   "Codex" into the instructions unless the skill is genuinely about
+   "Claude Code" into the instructions unless the skill is genuinely about
    authoring for that one platform (as this skill is, for the code-tool
    section above). The same body ships to all three adapters.
 5. Do not invent tools, APIs, modules, or verification results that do not
    exist in the codebase — verify every referenced function or module by
    reading the actual source first.
 6. Run `python3 scripts/sync_agent_tools.py` to regenerate the OpenCode,
-   Codex, and Codex adapters from the new `.ai/skills/` entry, and to add
+   Claude, and Codex adapters from the new `.ai/skills/` entry, and to add
    it to `.ai/manifest.json` if the manifest itself needs a new capability
    entry (the manifest is owned by the lead and hand-edited separately —
    coordinate rather than editing it unreviewed).
@@ -123,7 +127,7 @@ Examples: `mbg-extension-authoring`, `mbg-repo-analysis`,
    name: mbg-example-workflow
    description: One sentence.
    agent: build | plan
-   platforms: [opencode, Codex]
+   platforms: [opencode, claude]
    ---
    ```
 2. Use `plan` for read-only analysis/review workflows, `build` when the
@@ -178,7 +182,7 @@ Known limitations:
 ## Failure Modes
 
 - **Editing a generated adapter directly** — e.g. hand-editing
-  `.opencode/skills/<name>/SKILL.md` or `.Codex/skills/<name>/SKILL.md`.
+  `.opencode/skills/<name>/SKILL.md` or `.claude/skills/<name>/SKILL.md`.
   Stop and redirect the edit to the corresponding `.ai/` file instead; the
   generated copy will be overwritten on the next sync.
 - **Nested or block YAML in frontmatter** — the sync script's parser is

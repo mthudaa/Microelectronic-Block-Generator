@@ -1,6 +1,10 @@
 ---
 name: mbg-reviewers
 description: The Devil and Angel critic sub-agents and how their reviews are synthesized into a decision. Use when acting as a reviewer for a design stage, when interpreting review findings, or when deciding whether a design may proceed or be signed off. Do not use it to modify a design directly — reviewers advise, the Designer changes, the tools decide.
+license: Apache-2.0
+metadata:
+  owner: huda
+  project: microelectronic-block-generator
 ---
 <!-- GENERATED FILE — do not edit by hand. Source: .ai/skills/mbg-reviewers/SKILL.md. Regenerate with: python3 scripts/sync_agent_tools.py -->
 
@@ -56,6 +60,19 @@ changes (shorten/widen the critical net, promote to higher metal, shield,
 common-centroid) before resizing devices.
 
 Do not re-propose advice the ledger shows was already tried and did not help.
+
+## Reviewing dual DRC
+
+**Devil** must challenge: a `DRC_DISAGREEMENT` treated as a pass; a missing
+or errored KLayout result; a KLayout run reporting zero violations with no
+database (the deck exits 0 by design, so that is a tool failure); Magic and
+KLayout run on different GDS revisions; stale DRC from a previous iteration.
+
+**Angel** should turn a KLayout violation into a targeted fix using the rule
+id, layer and bounding box in the `.lyrdb` — e.g. a spacing rule on a routed
+net points at routing, a density rule at fill scope rather than the cell.
+
+Neither reviewer may overrule the reconciled DRC verdict.
 
 ## Synthesis
 

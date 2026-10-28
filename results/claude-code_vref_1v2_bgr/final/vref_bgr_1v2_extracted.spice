@@ -1,0 +1,30 @@
+* NGSPICE file created from vref_bgr_1v2.ext - technology: gf180mcuD
+
+.subckt vref_bgr_1v2 IBIAS VREF VSS VDD
+X0 a_n6942_14706# a_n6942_14706# VSS VSS nfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=8u
+X1 VSS VSS a_n4958_14498# pnp_05p00x05p00
+**devattr s=1000000,4000
+X2 a_n7862_14706# a_n4158_14706# VDD VDD pfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=8u
+X3 a_n2020_3936# a_n1060_3936# VSS ppolyf_u_1k r_width=1u r_length=25u
+X4 a_n7742_14498# a_n2628_328# VSS ppolyf_u_1k r_width=1u r_length=10u
+X5 VSS VSS a_n2628_328# pnp_10p00x10p00
+**devattr s=4000000,8000
+X6 VSS VSS a_1820_3936# pnp_05p00x05p00
+**devattr s=1000000,4000
+X7 a_n4158_14706# IBIAS VSS VSS nfet_03v3 ad=0.6p pd=3.2u as=0.6p ps=3.2u w=1u l=2u
+X8 VREF a_n2020_3936# VSS ppolyf_u_1k r_width=1u r_length=25u
+X9 a_860_3936# a_1820_3936# VSS ppolyf_u_1k r_width=1u r_length=25u
+X10 a_n7862_14706# a_n4958_14498# a_n4158_14706# VDD pfet_03v3 ad=2.4p pd=9.2u as=1.12p ps=4.56u w=4u l=4u
+X11 a_n4158_14706# a_n6942_14706# VSS VSS nfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=8u
+X12 IBIAS VREF VSS VSS nfet_03v3 ad=4.8p pd=17.2u as=4.8p ps=17.2u w=8u l=1u
+X13 VSS VSS a_n2628_328# pnp_10p00x10p00
+**devattr s=4000000,8000
+X14 a_n4958_14498# a_n4158_14706# VDD VDD pfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=8u
+X15 a_n1060_3936# a_860_3936# VSS ppolyf_u_1k r_width=1u r_length=25u
+X16 a_n7742_14498# a_n4158_14706# VDD VDD pfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=8u
+X17 VREF a_n4158_14706# VDD VDD pfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=8u
+X18 a_n4158_14706# a_n4958_14498# a_n7862_14706# VDD pfet_03v3 ad=1.12p pd=4.56u as=2.4p ps=9.2u w=4u l=4u
+X19 a_n6942_14706# a_n7742_14498# a_n7862_14706# VDD pfet_03v3 ad=1.12p pd=4.56u as=2.4p ps=9.2u w=4u l=4u
+X20 a_n7862_14706# a_n7742_14498# a_n6942_14706# VDD pfet_03v3 ad=2.4p pd=9.2u as=1.12p ps=4.56u w=4u l=4u
+.ends
+

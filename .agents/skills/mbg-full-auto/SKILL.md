@@ -1,13 +1,36 @@
 ---
 name: mbg-full-auto
 description: Fully automated analog design from one request — the /mbg-full-auto command. Parses the specification, runs pre-layout optimization, layout, DRC, LVS, PEX extraction, PEX simulation and PEX-aware fine-tuning, with Devil and Angel reviewers at every stage, then a tapeout-ready sign-off gate and an automatic design report. Use when the user gives a design request and wants it carried through autonomously. Do not use for a single isolated stage (use the stage skills), or for layout with no performance target (use mbg-spice-to-gds).
+license: Apache-2.0
+metadata:
+  owner: huda
+  project: microelectronic-block-generator
 ---
 <!-- GENERATED FILE — do not edit by hand. Source: .ai/skills/mbg-full-auto/SKILL.md. Regenerate with: python3 scripts/sync_agent_tools.py -->
 
 # `/mbg-full-auto` — Fully Automated Design
 
+Every stage below has a `scripts/mbg` command (skill `mbg-agent-interface`):
+`design init` → `netlist check` → `measure vref|ota` (pre-layout) →
+`layout generate` → `measure … --post-layout` → `design status`, or
+`flow run --recipe vref|ota --spec <spec>` for the whole chain. Prefer them
+to hand-written Python: they keep `experiment.json` and the artifact layout
+current and return statuses the sign-off gate can quote.
+
 Canonical definitions: `.ai/knowledge/FULL_AUTOMATE.md` and
 `.ai/knowledge/DESIGN_FLOW.md`. Read them before deviating.
+
+## Before you read anything: context economy
+
+This repository is big enough that *how* you gather information decides
+whether you finish. A measured session here spent **87% of a 1 MB
+conversation on tool output** — one file re-read 22 times, `git status`
+polled 27+ times, and 33 KB spent searching `$HOME` for a repo whose path
+was already in `$MBG_ROOT`. Read `mbg-context-economy` first. The short
+version: resolve the repo from `$MBG_ROOT`, index a file before opening it,
+never re-read what is already in context, do not poll git state, and climb
+the verification ladder cheapest-first. Reading less is the goal; **checking
+less is not**.
 
 ## Command
 
@@ -83,6 +106,58 @@ that worked, and bracket it — the design space is not monotonic, and pushing
 one metric can break another. Never extrapolate past a measurement.
 
 `FullAutoConfig.for_effort("normal" | "high" | "exhaustive")` sets the budget.
+
+## DRC is dual-engine, automatically
+
+Layout is checked by **both** engines on the same GDS: KLayout (GF180 foundry
+deck — the sign-off authority) and Magic (independent complementary check).
+You do not request KLayout separately; `spice_to_gds_with_checks` runs both
+and records the reconciled verdict.
+
+`PASS` needs both clean and agreeing. `DRC_DISAGREEMENT` (Magic fails,
+KLayout clean) blocks sign-off and must be investigated. A missing KLayout or
+missing rule deck is `CONFIGURATION_FAILURE` — full sign-off is not possible
+without it.
+
+## Complex circuits use the same flow, not a reduced one
+
+There is no separate "simple" path to fall back to. `spice_to_gds_with_checks`
+drives the DesignContext flow for every design: constraint-aware placement
+with a placement–routing feedback loop, a congestion-aware multi-layer grid
+router with rip-up and negotiation, internal connectivity verification, then
+dual-engine DRC and LVS. A larger circuit gets more iterations of that, not a
+different algorithm.
+
+What to actually do when a design is large:
+
+* **Read the structural metrics before theorising.**
+  `tests/test_complexity_ladder.py` prints device count, net count, max net
+  degree, matched groups and how many distinct (W, L) pairs the design uses.
+  Device count is a poor predictor: the 11-MOS StrongArm comparator and the
+  12-MOS clocked comparator have the SAME maximum net degree, and only the
+  latter exposed a boundary. Device-size heterogeneity — seven distinct
+  (W, L) pairs against one — is what made its floorplan hard.
+* **Let the loops run.** `place_with_routability` re-places when routing
+  reports unroutable nets, and the router negotiates over
+  `ripup_iterations` sweeps. Both are bounded. Raising a timeout is not a
+  fix; if the router is not making progress across sweeps, the diagnosis is
+  in `ctx.failures` (`cause`, `blocking_instances`, `suggested_action`), not
+  in the clock.
+* **Read a partial route as partial.** A net may have real geometry and
+  still be incomplete: check `RoutedNet.complete` and `RoutePlan.partial`,
+  not merely whether segments exist.
+* **Internal connectivity gates the expensive tools.** `opens`, `shorts`
+  AND `missing_access` must all be zero before Magic, KLayout and netgen are
+  worth running. If the internal check already knows the layout is wrong,
+  report that — do not spend a DRC/LVS cycle rediscovering it.
+* **Preserve the evidence on failure.** Normalised topology, placement
+  coordinates, routing failures, internal connectivity report, both DRC
+  reports, the extracted netlist and the LVS mismatch. A complex design that
+  failed must be diagnosable without re-running it.
+
+Escalation order when a complex design will not route, all bounded:
+reroute → alternate layers → placement legalisation → re-placement → broader
+search. Report which rung it reached.
 
 ## The sign-off gate
 

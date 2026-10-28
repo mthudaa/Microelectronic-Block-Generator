@@ -1,0 +1,475 @@
+{
+ "cell": "vref_bgr_1v2",
+ "bbox": [
+  -40.64,
+  0.0,
+  40.64,
+  80.48
+ ],
+ "size_um": [
+  81.28,
+  80.48
+ ],
+ "devices": {
+  "XM1": {
+   "model": "pfet_03v3",
+   "kind": "pmos",
+   "terminals": {
+    "drain": "VA",
+    "gate": "PG",
+    "source": "VDD",
+    "body": "VDD"
+   },
+   "x": -11.3,
+   "y": 71.39,
+   "w": 11.86,
+   "h": 7.09,
+   "row": 0,
+   "orientation": "R0",
+   "access_points": 16
+  },
+  "XM2": {
+   "model": "pfet_03v3",
+   "kind": "pmos",
+   "terminals": {
+    "drain": "VB",
+    "gate": "PG",
+    "source": "VDD",
+    "body": "VDD"
+   },
+   "x": 2.06,
+   "y": 71.39,
+   "w": 11.86,
+   "h": 7.09,
+   "row": 0,
+   "orientation": "R0",
+   "access_points": 16
+  },
+  "XM3": {
+   "model": "pfet_03v3",
+   "kind": "pmos",
+   "terminals": {
+    "drain": "VREF",
+    "gate": "PG",
+    "source": "VDD",
+    "body": "VDD"
+   },
+   "x": 15.42,
+   "y": 71.39,
+   "w": 11.86,
+   "h": 7.09,
+   "row": 0,
+   "orientation": "R0",
+   "access_points": 16
+  },
+  "XQ1": {
+   "model": "pnp_05p00x05p00",
+   "kind": "bjt",
+   "terminals": {
+    "c": "VSS",
+    "b": "VSS",
+    "e": "VA"
+   },
+   "x": -26.06,
+   "y": 0.0,
+   "w": 8.28,
+   "h": 8.28,
+   "row": 4,
+   "orientation": "R0",
+   "access_points": 12
+  },
+  "XQ2a": {
+   "model": "pnp_10p00x10p00",
+   "kind": "bjt",
+   "terminals": {
+    "c": "VSS",
+    "b": "VSS",
+    "e": "VX"
+   },
+   "x": -14.78,
+   "y": -0.0,
+   "w": 13.28,
+   "h": 13.28,
+   "row": 4,
+   "orientation": "R0",
+   "access_points": 12
+  },
+  "XQ2b": {
+   "model": "pnp_10p00x10p00",
+   "kind": "bjt",
+   "terminals": {
+    "c": "VSS",
+    "b": "VSS",
+    "e": "VX"
+   },
+   "x": 1.5,
+   "y": -0.0,
+   "w": 13.28,
+   "h": 13.28,
+   "row": 4,
+   "orientation": "R0",
+   "access_points": 12
+  },
+  "XQ3": {
+   "model": "pnp_05p00x05p00",
+   "kind": "bjt",
+   "terminals": {
+    "c": "VSS",
+    "b": "VSS",
+    "e": "VC"
+   },
+   "x": 17.78,
+   "y": 0.0,
+   "w": 8.28,
+   "h": 8.28,
+   "row": 4,
+   "orientation": "R0",
+   "access_points": 12
+  },
+  "XR1": {
+   "model": "ppolyf_u_1k",
+   "kind": "res",
+   "terminals": {
+    "p": "VB",
+    "n": "VX",
+    "body": "VSS"
+   },
+   "x": -0.9,
+   "y": 19.28,
+   "w": 1.8,
+   "h": 12.02,
+   "row": 3,
+   "orientation": "R0",
+   "access_points": 8
+  },
+  "XR2a": {
+   "model": "ppolyf_u_1k",
+   "kind": "res",
+   "terminals": {
+    "p": "VREF",
+    "n": "n1",
+    "body": "VSS"
+   },
+   "x": -10.5,
+   "y": 19.28,
+   "w": 1.8,
+   "h": 27.02,
+   "row": 3,
+   "orientation": "R0",
+   "access_points": 8
+  },
+  "XR2b": {
+   "model": "ppolyf_u_1k",
+   "kind": "res",
+   "terminals": {
+    "p": "n1",
+    "n": "n2",
+    "body": "VSS"
+   },
+   "x": -5.7,
+   "y": 19.28,
+   "w": 1.8,
+   "h": 27.02,
+   "row": 3,
+   "orientation": "R0",
+   "access_points": 8
+  },
+  "XR2c": {
+   "model": "ppolyf_u_1k",
+   "kind": "res",
+   "terminals": {
+    "p": "n2",
+    "n": "n3",
+    "body": "VSS"
+   },
+   "x": 3.9,
+   "y": 19.28,
+   "w": 1.8,
+   "h": 27.02,
+   "row": 3,
+   "orientation": "R0",
+   "access_points": 8
+  },
+  "XR2d": {
+   "model": "ppolyf_u_1k",
+   "kind": "res",
+   "terminals": {
+    "p": "n3",
+    "n": "VC",
+    "body": "VSS"
+   },
+   "x": 8.7,
+   "y": 19.28,
+   "w": 1.8,
+   "h": 27.02,
+   "row": 3,
+   "orientation": "R0",
+   "access_points": 8
+  },
+  "XM4": {
+   "model": "pfet_03v3",
+   "kind": "pmos",
+   "terminals": {
+    "drain": "NT",
+    "gate": "PG",
+    "source": "VDD",
+    "body": "VDD"
+   },
+   "x": 28.78,
+   "y": 71.39,
+   "w": 11.86,
+   "h": 7.09,
+   "row": 0,
+   "orientation": "R0",
+   "access_points": 16
+  },
+  "XM5": {
+   "model": "pfet_03v3",
+   "kind": "pmos",
+   "terminals": {
+    "drain": "NM",
+    "gate": "VB",
+    "source": "NT",
+    "body": "VDD"
+   },
+   "x": -40.64,
+   "y": 71.39,
+   "w": 12.42,
+   "h": 9.09,
+   "row": 0,
+   "orientation": "R0",
+   "access_points": 16
+  },
+  "XM6": {
+   "model": "pfet_03v3",
+   "kind": "pmos",
+   "terminals": {
+    "drain": "PG",
+    "gate": "VA",
+    "source": "NT",
+    "body": "VDD"
+   },
+   "x": -26.72,
+   "y": 71.39,
+   "w": 12.42,
+   "h": 9.09,
+   "row": 0,
+   "orientation": "R0",
+   "access_points": 16
+  },
+  "XM7": {
+   "model": "nfet_03v3",
+   "kind": "nmos",
+   "terminals": {
+    "drain": "NM",
+    "gate": "NM",
+    "source": "VSS",
+    "body": "VSS"
+   },
+   "x": -20.72,
+   "y": 52.3,
+   "w": 11.86,
+   "h": 7.09,
+   "row": 2,
+   "orientation": "R0",
+   "access_points": 16
+  },
+  "XM8": {
+   "model": "nfet_03v3",
+   "kind": "nmos",
+   "terminals": {
+    "drain": "PG",
+    "gate": "NM",
+    "source": "VSS",
+    "body": "VSS"
+   },
+   "x": -7.86,
+   "y": 52.3,
+   "w": 11.86,
+   "h": 7.09,
+   "row": 2,
+   "orientation": "R0",
+   "access_points": 16
+  },
+  "XM9": {
+   "model": "nfet_03v3",
+   "kind": "nmos",
+   "terminals": {
+    "drain": "IBIAS",
+    "gate": "VREF",
+    "source": "VSS",
+    "body": "VSS"
+   },
+   "x": 7.0,
+   "y": 52.3,
+   "w": 4.86,
+   "h": 13.09,
+   "row": 2,
+   "orientation": "R0",
+   "access_points": 16
+  },
+  "XM10": {
+   "model": "nfet_03v3",
+   "kind": "nmos",
+   "terminals": {
+    "drain": "PG",
+    "gate": "IBIAS",
+    "source": "VSS",
+    "body": "VSS"
+   },
+   "x": 14.86,
+   "y": 52.3,
+   "w": 5.86,
+   "h": 6.1,
+   "row": 2,
+   "orientation": "R0",
+   "access_points": 16
+  }
+ },
+ "rows": {
+  "0": [
+   "XM5",
+   "XM6",
+   "XM1",
+   "XM2",
+   "XM3",
+   "XM4"
+  ],
+  "4": [
+   "XQ1",
+   "XQ2a",
+   "XQ2b",
+   "XQ3"
+  ],
+  "2": [
+   "XM7",
+   "XM8",
+   "XM9",
+   "XM10"
+  ],
+  "3": [
+   "XR2a",
+   "XR2b",
+   "XR1",
+   "XR2c",
+   "XR2d"
+  ]
+ },
+ "nets": {
+  "VA": {
+   "degree": 3,
+   "routed": true,
+   "power": false,
+   "ground": false
+  },
+  "PG": {
+   "degree": 7,
+   "routed": true,
+   "power": false,
+   "ground": false
+  },
+  "VDD": {
+   "degree": 18,
+   "routed": true,
+   "power": true,
+   "ground": false
+  },
+  "VB": {
+   "degree": 3,
+   "routed": true,
+   "power": false,
+   "ground": false
+  },
+  "VREF": {
+   "degree": 3,
+   "routed": true,
+   "power": false,
+   "ground": false
+  },
+  "VSS": {
+   "degree": 29,
+   "routed": true,
+   "power": false,
+   "ground": true
+  },
+  "VX": {
+   "degree": 3,
+   "routed": true,
+   "power": false,
+   "ground": false
+  },
+  "VC": {
+   "degree": 2,
+   "routed": true,
+   "power": false,
+   "ground": false
+  },
+  "n1": {
+   "degree": 2,
+   "routed": true,
+   "power": false,
+   "ground": false
+  },
+  "n2": {
+   "degree": 2,
+   "routed": true,
+   "power": false,
+   "ground": false
+  },
+  "n3": {
+   "degree": 2,
+   "routed": true,
+   "power": false,
+   "ground": false
+  },
+  "NT": {
+   "degree": 3,
+   "routed": true,
+   "power": false,
+   "ground": false
+  },
+  "NM": {
+   "degree": 4,
+   "routed": true,
+   "power": false,
+   "ground": false
+  },
+  "IBIAS": {
+   "degree": 2,
+   "routed": true,
+   "power": false,
+   "ground": false
+  }
+ },
+ "failures": [],
+ "matching_groups": [
+  {
+   "name": "diffpair_1",
+   "kind": "diff_pair",
+   "devices": [
+    "XM5",
+    "XM6"
+   ]
+  },
+  {
+   "name": "mirror_1",
+   "kind": "current_mirror",
+   "devices": [
+    "XM7",
+    "XM8"
+   ]
+  },
+  {
+   "name": "matched_1",
+   "kind": "generic",
+   "devices": [
+    "XM1",
+    "XM2",
+    "XM3",
+    "XM4"
+   ]
+  }
+ ],
+ "hint_overlaps": [],
+ "pdk": "gf180mcuD"
+}

@@ -73,7 +73,7 @@ class Device:
     """One SPICE instance, kept alive for the whole flow."""
     name: str
     model: str
-    kind: str                       # "nmos" | "pmos" | "res" | "cap" | "other"
+    kind: str                       # "nmos" | "pmos" | "res" | "cap" | "bjt" | "other"
     terminals: Dict[str, str] = field(default_factory=dict)   # terminal -> net
     width: Optional[float] = None       # total device width from SPICE (um)
     length: Optional[float] = None
@@ -435,6 +435,7 @@ class DesignContext:
     # technology -------------------------------------------------------
     pdk: Any = None
     rules: Any = None                   # PDKRules
+    profile: Any = None                 # mbg.pdk_profile.PDKProfile
     metrics: Dict[str, Any] = field(default_factory=dict)
 
     # ── controlled updates (§10) ────────────────────────────────────

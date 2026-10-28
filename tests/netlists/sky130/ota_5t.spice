@@ -1,0 +1,9 @@
+* 5T-OTA, sky130A (smoke test for the second PDK).
+* complexity: 5 MOS, 6 nets
+.subckt ota_5t_sky130 VDD VSS INN INP OUT BIAS
+XM1 OUT1 INN TAIL VSS sky130_fd_pr__nfet_01v8 L=1 W=2 nf=1
+XM2 OUT INP TAIL VSS sky130_fd_pr__nfet_01v8 L=1 W=2 nf=1
+XM3 OUT1 OUT1 VDD VDD sky130_fd_pr__pfet_01v8 L=1 W=4 nf=1
+XM4 OUT OUT1 VDD VDD sky130_fd_pr__pfet_01v8 L=1 W=4 nf=1
+XM5 TAIL BIAS VSS VSS sky130_fd_pr__nfet_01v8 L=1 W=2 nf=1
+.ends

@@ -392,6 +392,113 @@ def render_codex_skill(skill: dict) -> str:
     return f"{header}\n{md_banner(skill['source'])}\n\n{body}\n"
 
 
+def render_agents_skill(skill: dict) -> str:
+    """Agent Skills standard (agentskills.io): read from .agents/skills/ by
+    Codex, OpenCode, Pi, DeepSeek-based agents (Deep Code) and others."""
+    header = "\n".join([
+        "---",
+        f"name: {skill['name']}",
+        f"description: {skill['description']}",
+        "license: Apache-2.0",
+        "metadata:",
+        f"  owner: {skill['owner']}",
+        "  project: microelectronic-block-generator",
+        "---",
+    ])
+    body = skill["body"].strip("\n")
+    return f"{header}\n{md_banner(skill['source'])}\n\n{body}\n"
+
+
+def render_mcp_configs(manifest: dict) -> dict:
+    """Project-scoped MCP client configs, one per harness, from manifest.mcp.
+
+    All of them start the same server, `scripts/mbg mcp`, by a path relative
+    to the repository (or the harness's workspace variable), never an
+    absolute one. No `$generated` key is added: some clients validate the
+    file strictly; `sync --check` (validator F5) catches drift instead.
+    """
+    mcp = manifest.get("mcp")
+    if not mcp:
+        return {}
+    name, cmd, args = mcp["server_name"], mcp["command"], list(mcp["args"])
+    timeout = int(mcp.get("tool_timeout_sec", 1800))
+    out = {}
+    for target, path in mcp.get("configs", {}).items():
+        if target == "claude":
+            doc = {"mcpServers": {name: {"type": "stdio", "command": cmd, "args": args,
+                                         "env": {}}}}
+            out[path] = json.dumps(doc, indent=2) + "\n"
+        elif target == "cursor":
+            doc = {"mcpServers": {name: {"command": "${workspaceFolder}/" + cmd,
+                                         "args": args}}}
+            out[path] = json.dumps(doc, indent=2) + "\n"
+        elif target == "gemini":
+            doc = {"mcpServers": {name: {"command": cmd, "args": args,
+                                         "timeout": timeout * 1000}},
+                   "context": {"fileName": ["AGENTS.md"]}}
+            out[path] = json.dumps(doc, indent=2) + "\n"
+        elif target == "codex":
+            arg_list = ", ".join(json.dumps(a) for a in args)
+            out[path] = "\n".join([
+                "# GENERATED FILE — do not edit. Source: .ai/manifest.json#mcp.",
+                f"# Regenerate with: {REGEN_COMMAND}",
+                "# Codex reads a project .codex/config.toml only for trusted projects.",
+                "",
+                f"[mcp_servers.{name}]",
+                f"command = {json.dumps(cmd)}",
+                f"args = [{arg_list}]",
+                "startup_timeout_sec = 30",
+                f"tool_timeout_sec = {timeout}",
+                "",
+            ])
+        else:
+            raise SyncError(f".ai/manifest.json: mcp.configs has unknown target {target!r}")
+    return out
+
+
+AGENTS_BLOCK_BEGIN = "<!-- BEGIN GENERATED: agent index (scripts/sync_agent_tools.py) -->"
+AGENTS_BLOCK_END = "<!-- END GENERATED: agent index -->"
+
+
+def render_agents_index(manifest: dict, skills: dict, workflows: dict, tools: list) -> str:
+    lines = [AGENTS_BLOCK_BEGIN,
+             "<!-- Edit .ai/ or src/mbg/agent/registry.py, then run "
+             f"`{REGEN_COMMAND}`. -->", "",
+             "### Tools (`scripts/mbg <group> <action>`; same tools over MCP: `scripts/mbg mcp`)",
+             "", "| command | what it does |", "| :--- | :--- |"]
+    for t in tools:
+        lines.append(f"| `{t['cli']}` | {t['summary'].split('. ')[0].rstrip('.')} |")
+    lines += ["", "Full input schemas: `scripts/mbg tools <id>` or `docs/TOOLS.md`.", "",
+              "### Skills (`.ai/skills/`, generated into `.agents/skills/`, "
+              "`.claude/skills/`, `.opencode/skills/` and the Codex plugin)", ""]
+    for n in sorted(skills):
+        lines.append(f"- `{n}` — {short_description(skills[n]['description'], 140)}")
+    lines += ["", AGENTS_BLOCK_END]
+    return "\n".join(lines)
+
+
+def sync_block(path: Path, block: str, stats, check: bool, verbose: bool) -> None:
+    """Replace the generated block inside a hand-written file."""
+    if not path.is_file():
+        raise SyncError(f"{path} not found")
+    text = path.read_text(encoding="utf-8")
+    if AGENTS_BLOCK_BEGIN not in text or AGENTS_BLOCK_END not in text:
+        raise SyncError(f"{path}: missing the generated-block markers "
+                        f"{AGENTS_BLOCK_BEGIN!r} / {AGENTS_BLOCK_END!r}")
+    head, rest = text.split(AGENTS_BLOCK_BEGIN, 1)
+    _old, tail = rest.split(AGENTS_BLOCK_END, 1)
+    sync_file(path, head + block + tail, stats, check, verbose)
+
+
+def load_tool_registry(root: Path):
+    """The agent tool registry, imported without the layout stack."""
+    src = str(root / "src")
+    if src not in sys.path:
+        sys.path.insert(0, src)
+    from mbg.agent import registry, docs           # noqa: E402  (pure Python)
+    return [t.as_dict() for t in registry.TOOLS], docs.tools_markdown()
+
+
 def render_opencode_command(wf: dict) -> str:
     header = "\n".join([
         "---",
@@ -455,9 +562,15 @@ def render_claude_md(manifest: dict, skills: dict, workflows: dict) -> str:
         f"{REGEN_COMMAND}          # regenerate adapters + project index",
         f"{REGEN_COMMAND} --check  # CI: fail if adapters are stale",
         "python3 scripts/validate_agent_integrations.py  # validate the result",
-        "./scripts/install_agents.sh                     # setup / refresh Codex",
+        "./install.sh --stage agents                     # setup / refresh Codex",
         "```",
         "",
+        "### Tools",
+        "",
+        "Design stages are tools, not Python snippets: `scripts/mbg tools` lists",
+        "them, every call prints one JSON envelope, and the same tools are",
+        "registered as the project MCP server `mbg` (`.mcp.json`). See",
+        "`docs/TOOLS.md` and the `mbg-agent-interface` skill.",
     ]
     return "\n".join(lines) + "\n"
 
@@ -563,6 +676,15 @@ def _file_entry(root: Path, path: Path) -> dict:
     return entry
 
 
+def _git_ignored(root: Path, rel: str) -> bool:
+    import subprocess
+    try:
+        return subprocess.run(["git", "-C", str(root), "check-ignore", "-q", rel],
+                              capture_output=True).returncode == 0
+    except OSError:
+        return False
+
+
 def build_project_index(root: Path, manifest: dict) -> dict:
     targets_spec = manifest.get("index_targets", {})
     result: dict = {}
@@ -570,7 +692,9 @@ def build_project_index(root: Path, manifest: dict) -> dict:
         spec = targets_spec[tid]
         target_root = root / spec["root"]
         entries: list = []
-        if target_root.is_dir():
+        # A gitignored root (local run output) differs per machine; indexing
+        # it made `sync --check` fail on every clone but the one that ran it.
+        if target_root.is_dir() and not _git_ignored(root, spec["root"]):
             if spec.get("dirs_only"):
                 for child in target_root.iterdir():
                     if child.is_dir() and not child.name.startswith("."):
@@ -794,6 +918,27 @@ def main(argv=None) -> int:
             (root / cx["plugin_manifest"]).parent / "GENERATED.md",
             render_codex_generated_marker(), stats, args.check, args.verbose,
         )
+
+        # 5. Generic Agent Skills target (.agents/skills): every skill
+        ag = plat.get("agents")
+        if ag:
+            ag_names = set(skills)
+            for name in sorted(ag_names):
+                sync_file(
+                    root / ag["skills_dir"] / name / ag["skill_file"],
+                    render_agents_skill(skills[name]), stats, args.check, args.verbose,
+                )
+            prune_stale(root / ag["skills_dir"], ag_names, stats, args.check, args.verbose, True)
+
+        # 6. MCP client configs (Claude Code, Codex, Cursor, Gemini CLI)
+        for rel, content in sorted(render_mcp_configs(manifest).items()):
+            sync_file(root / rel, content, stats, args.check, args.verbose)
+
+        # 7. AGENTS.md tool/skill index and docs/TOOLS.md, from the registry
+        tools, tools_md = load_tool_registry(root)
+        sync_block(root / "AGENTS.md", render_agents_index(manifest, skills, workflows, tools),
+                   stats, args.check, args.verbose)
+        sync_file(root / "docs" / "TOOLS.md", tools_md, stats, args.check, args.verbose)
 
         print(
             f"\ncreated={stats.created} updated={stats.updated} "

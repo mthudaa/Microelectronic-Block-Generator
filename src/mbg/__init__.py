@@ -38,7 +38,7 @@ should use `mbg.placement_engine` and `mbg.router`.
 #     TypeError: expected str, bytes or os.PathLike object, not NoneType
 # raised inside glayout/pdk/sky130_mapped.py — a traceback that names neither
 # the PDK nor the missing variable. Populating the environment here, before
-# the first gLayout import below, is what keeps that from happening.
+# any stage module (and so gLayout) is loaded, is what keeps that from happening.
 from mbg import config as config           # noqa: E402  (must precede glayout)
 from mbg.config import (                   # noqa: E402
     ToolError, ensure_pdk_env, pdk_config, repo_root,
@@ -52,68 +52,155 @@ import numpy as _np                        # noqa: E402
 if not hasattr(_np, "float_"):          # gdsfactory 7 expects the numpy 1 alias
     _np.float_ = _np.float64
 
-# ── the flows ─────────────────────────────────────────────────────────
-from mbg.pipeline import (
-    spice_to_gds_with_checks,       # primary entry point: SPICE -> GDS + DRC/LVS/PEX
-    spice_to_gds_with_checks_ctx,   # same, explicit about using the DesignContext flow
-    spice_to_gds_with_checks_legacy,
-    spice_to_gds,                   # layout only, no signoff
-    spice_to_gds_ctx,
-)
-from mbg.llm import llm_to_gds, generate_netlist_from_prompt
+# ── lazy public API ───────────────────────────────────────────────────
+# Every name below used to be imported eagerly, which made `import mbg` pull
+# in gLayout + gdsfactory even for callers that only wanted `Spec`, the PDK
+# profiles or the agent CLI. They now load on first attribute access
+# (PEP 562), so `from mbg import Spec` works without the layout stack and
+# `from mbg import spice_to_gds_with_checks` behaves exactly as before.
+_LAZY = {
+    # mbg.pipeline
+    "spice_to_gds_with_checks": "pipeline",
+    "spice_to_gds_with_checks_ctx": "pipeline",
+    "spice_to_gds_with_checks_legacy": "pipeline",
+    "spice_to_gds": "pipeline",
+    "spice_to_gds_ctx": "pipeline",
+    # mbg.llm
+    "llm_to_gds": "llm",
+    "generate_netlist_from_prompt": "llm",
+    # mbg.specs
+    "Spec": "specs",
+    "SpecResult": "specs",
+    "SpecReport": "specs",
+    "Degradation": "specs",
+    "evaluate_specs": "specs",
+    "compare_degradation": "specs",
+    "format_spec_table": "specs",
+    # mbg.flow
+    "DesignFlow": "flow",
+    "DesignPoint": "flow",
+    "FlowConfig": "flow",
+    "FlowHooks": "flow",
+    "FlowResult": "flow",
+    "LayoutResult": "flow",
+    "IterationRecord": "flow",
+    "Stage": "flow",
+    "Outcome": "flow",
+    "Failure": "flow",
+    "run_flow": "flow",
+    # mbg.flow_runtime
+    "make_hooks": "flow_runtime",
+    "measure_ac_metrics": "flow_runtime",
+    "scale_device_widths": "flow_runtime",
+    "default_tune_pre": "flow_runtime",
+    "default_tune_post": "flow_runtime",
+    # mbg.spice_parser
+    "parse_netlist_with_pdk": "spice_parser",
+    "build_design_context": "spice_parser",
+    # mbg.design_context
+    "DesignContext": "design_context",
+    "Device": "design_context",
+    "Net": "design_context",
+    "MatchingGroup": "design_context",
+    "SymmetryConstraint": "design_context",
+    "Placement": "design_context",
+    "PinAccessPoint": "design_context",
+    "Zone": "design_context",
+    "Obstacle": "design_context",
+    "Segment": "design_context",
+    "Via": "design_context",
+    "RoutePlan": "design_context",
+    "RoutedNet": "design_context",
+    "RoutingFailure": "design_context",
+    "PlacementFeedback": "design_context",
+    "DRCViolation": "design_context",
+    "LVSViolation": "design_context",
+    "BoundingBox": "design_context",
+    "CongestionMap": "design_context",
+    # mbg.pdk_rules
+    "PDKRules": "pdk_rules",
+    "get_rules": "pdk_rules",
+    # mbg.pdk_devices
+    "DEVICES": "pdk_devices",
+    "SPICE_MODELS": "pdk_devices",
+    "lookup": "pdk_devices",
+    "print_catalog": "pdk_devices",
+    # mbg.placement_engine
+    "PlacementConfig": "placement_engine",
+    "place": "placement_engine",
+    "place_with_routability": "placement_engine",
+    "build_device": "placement_engine",
+    # mbg.router
+    "GridRouter": "router",
+    "RouterConfig": "router",
+    "OccupancyDB": "router",
+    "realize": "router",
+    # mbg.power
+    "add_power_strips": "power",
+    "add_double_guardring": "power",
+    "manual_power": "power",
+    # mbg.checks
+    "run_drc": "checks",
+    "run_lvs": "checks",
+    "run_pex": "checks",
+    "check_tools": "checks",
+    "validate_gds": "checks",
+    "extract_layout_netlist": "checks",
+    "fix_port_order": "checks",
+    # mbg.simulation
+    "run_spice": "simulation",
+    "raw_to_csv": "simulation",
+    "parse_dat": "simulation",
+    "pdk_path": "simulation",
+    # mbg.analysis
+    "Testbench": "analysis",
+    "SimResult": "analysis",
+    "MonteCarloResult": "analysis",
+    "fft": "analysis",
+    # mbg.outputs
+    "write_all": "outputs",
+    "classify_ports": "outputs",
+    "OutputSet": "outputs",
+    "PortSpec": "outputs",
+    # mbg.utils
+    "clean_param": "utils",
+    "display_gds": "utils",
+    "display_component": "utils",
+    "GDS_PATH": "utils",
+    "SVG_PATH": "utils",
+    # mbg.placement
+    "placement": "placement",
+    "manual_placement": "placement",
+    # mbg.routing
+    "auto_router": "routing",
+    "manual_route": "routing",
+    "set_pdk": "routing",
+    "get_pdk": "routing",
+}
 
-# ── the design flow: two optimisation loops ───────────────────────────
-# Pre-layout optimisation finds a nominal circuit; PEX-aware optimisation
-# closes the loop on layout parasitics. PEX is feedback, not a final stamp.
-from mbg.specs import (
-    Spec, SpecResult, SpecReport, Degradation,
-    evaluate_specs, compare_degradation, format_spec_table,
-)
-from mbg.flow import (
-    DesignFlow, DesignPoint, FlowConfig, FlowHooks, FlowResult,
-    LayoutResult, IterationRecord, Stage, Outcome, Failure, run_flow,
-)
-from mbg.flow_runtime import (
-    make_hooks, measure_ac_metrics, scale_device_widths,
-    default_tune_pre, default_tune_post,
-)
 
-# ── design description ────────────────────────────────────────────────
-from mbg.spice_parser import parse_netlist_with_pdk, build_design_context
-from mbg.design_context import (
-    DesignContext, Device, Net, MatchingGroup, SymmetryConstraint,
-    Placement, PinAccessPoint, Zone, Obstacle, Segment, Via, RoutePlan,
-    RoutedNet, RoutingFailure, PlacementFeedback, DRCViolation, LVSViolation,
-    BoundingBox, CongestionMap,
-)
+def __getattr__(name):
+    mod = _LAZY.get(name)
+    if mod is not None:
+        import importlib
+        value = getattr(importlib.import_module(f"mbg.{mod}"), name)
+        globals()[name] = value
+        return value
+    if not name.startswith("__"):
+        import importlib
+        try:
+            module = importlib.import_module(f"mbg.{name}")
+        except ModuleNotFoundError as exc:
+            if exc.name != f"mbg.{name}":
+                raise
+        else:
+            return module
+    raise AttributeError(f"module 'mbg' has no attribute {name!r}")
 
-# ── technology ────────────────────────────────────────────────────────
-from mbg.pdk_rules import PDKRules, get_rules
-from mbg.pdk_devices import DEVICES, SPICE_MODELS, lookup, print_catalog
 
-# ── physical implementation ───────────────────────────────────────────
-from mbg.placement_engine import (
-    PlacementConfig, place, place_with_routability, build_device,
-)
-from mbg.router import GridRouter, RouterConfig, OccupancyDB, realize
-from mbg.power import add_power_strips, add_double_guardring, manual_power
+def __dir__():
+    return sorted(set(globals()) | set(_LAZY))
 
-# ── verification ──────────────────────────────────────────────────────
-from mbg import connectivity
-from mbg.checks import (
-    run_drc, run_lvs, run_pex, check_tools, validate_gds,
-    extract_layout_netlist, fix_port_order,
-)
-from mbg.simulation import run_spice, raw_to_csv, parse_dat, pdk_path
-from mbg.analysis import Testbench, SimResult, MonteCarloResult, fft
-from mbg.outputs import write_all, classify_ports, OutputSet, PortSpec
-
-# ── helpers ───────────────────────────────────────────────────────────
-from mbg.utils import clean_param, display_gds, display_component, GDS_PATH, SVG_PATH
-
-# ── superseded, kept working ──────────────────────────────────────────
-from mbg.placement import placement, manual_placement
-from mbg.routing import auto_router, manual_route, set_pdk, get_pdk
 
 __version__ = "0.2.0"
 

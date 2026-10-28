@@ -45,7 +45,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import fixtures                                             # noqa: E402
 
 ORDER = ["inverter", "ring_osc_3", "ota_5t", "ota_bb", "vref_1v2",
-         "rc_filter", "strongarm", "cmp_2stage_clk"]
+         "vref_cmos_1v2", "rc_filter", "strongarm", "cmp_2stage_clk",
+         "vref_bgr_1v2"]
 
 TITLES = {
     "inverter": "Inverter",
@@ -56,6 +57,8 @@ TITLES = {
     "rc_filter": "RC Filter (native passives)",
     "strongarm": "StrongArm-Comparator",
     "cmp_2stage_clk": "2-Stage Clocked Comparator (12 MOS)",
+    "vref_cmos_1v2": "1.2 V ZTC Reference (MOS-only)",
+    "vref_bgr_1v2": "1.2 V Bandgap (PNP + poly R, 19 dev)",
 }
 
 _missing = set(fixtures.names()) - set(ORDER)

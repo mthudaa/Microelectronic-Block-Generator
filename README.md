@@ -1363,6 +1363,45 @@ The container ships its own Magic and netgen, so `--eda` is unnecessary there.
 
 ---
 
+## 🖐️ Tool Surface for Any AI — `scripts/mbg`
+
+MBG is an EDA you drive by text: every stage of the analog flow is one tool
+call that returns one small JSON document. The tools live in one registry
+(`src/mbg/agent/registry.py`) and are served two ways:
+
+* **Command line** — `scripts/mbg <group> <action>` (or `mbg …` after
+  `./install.sh`, or `python -m mbg …`). Works in any agent harness with a
+  shell.
+* **MCP server** — `scripts/mbg mcp` (stdio, no extra dependencies), with
+  project configs for Claude Code (`.mcp.json`), Codex
+  (`.codex/config.toml`), OpenCode (`opencode.jsonc`), Cursor
+  (`.cursor/mcp.json`) and Gemini CLI (`.gemini/settings.json`).
+
+```bash
+scripts/mbg doctor                                  # tools, versions, PDKs
+scripts/mbg pdk info --pdk gf180mcuD                # legal devices and limits
+scripts/mbg design init ref1 --netlist ref.spice    # workspace outputs/ref1/
+scripts/mbg netlist check --design ref1
+scripts/mbg measure vref --design ref1 --spec vref_md --corners all
+scripts/mbg layout generate --design ref1           # layout + DRC + LVS + PEX
+scripts/mbg layout view --design ref1               # ASCII floorplan
+```
+
+Every call prints `{"schema": "mbg.result/1", "status": …, "summary", "metrics",
+"artifacts", "issues", "next"}` with `status` one of PASS, FAIL, PARTIAL,
+NOT RUN, NOT AVAILABLE; logs go to the run directory. Placement is steered
+with an editable hints file (rows, order, matching groups, arrays, fixed
+positions) instead of drag-and-drop. Long runs become background jobs
+(`scripts/mbg job wait`).
+
+Full reference: [`docs/TOOLS.md`](docs/TOOLS.md) (generated) and
+[`docs/ai_interface.md`](docs/ai_interface.md) (which harness reads what).
+gf180mcuD is the default PDK; sky130A is supported for MOS-only layouts
+(`--pdk sky130A`, smoke-verified). Worked example: two 1.2 V references
+designed end to end through this interface —
+[`results/claude-code_vref_1v2_bgr/REPORT.md`](results/claude-code_vref_1v2_bgr/REPORT.md)
+and [`results/claude-code_vref_1v2_cmos/REPORT.md`](results/claude-code_vref_1v2_cmos/REPORT.md).
+
 ## 🤖 AI Coding Agent Integrations
 
 The project ships a **canonical agent layer** under `.ai/` that is the single
@@ -1621,7 +1660,7 @@ repo-scoped slash-command mechanism at all.
 
 | Workflow | Agent mode | OpenCode | Claude Code | Codex | Canonical source |
 | :--- | :--- | :---: | :---: | :---: | :--- |
-| `/mbg-full-automate` | `build` | ✅ | ✅ | n/a¹ | `.ai/workflows/mbg-full-automate.md` |
+| `/mbg-full-auto` | `build` | ✅ | ✅ | n/a¹ | `.ai/workflows/mbg-full-auto.md` |
 | `/mbg-partial-automate` | `build` | ✅ | ✅ | n/a¹ | `.ai/workflows/mbg-partial-automate.md` |
 | `/mbg-review-ai-experiment` | `plan` | ✅ | ✅ | n/a¹ | `.ai/workflows/mbg-review-ai-experiment.md` |
 | `/mbg-review-extension` | `plan` | ✅ | ✅ | n/a¹ | `.ai/workflows/mbg-review-extension.md` |
@@ -1631,7 +1670,7 @@ repo-scoped slash-command mechanism at all.
 
 ¹ Codex has no repo-scoped commands or subagents (`.ai/manifest.json` →
 `platforms.codex.unsupported`). There is no Codex equivalent of typing
-`/mbg-full-automate` — drive the same work by asking Codex directly in
+`/mbg-full-auto` — drive the same work by asking Codex directly in
 natural language; it still has the skill and reads `AGENTS.md` natively.
 ² `mbg-new-tool` only targets OpenCode — Claude Code has no repo-scoped
 code-tool runtime, so there's nothing for it to generate there.
@@ -1674,7 +1713,7 @@ staleness-only check.
 **Quick start:**
 
 ```text
-/mbg-full-automate
+/mbg-full-auto
 Design a StrongARM latch comparator with <10mV input offset, 1GHz clock,
 GF180MCU 3.3V PDK.
 ```
@@ -1731,7 +1770,7 @@ prompts for permission.
 **Quick start:** same invocation shape as OpenCode —
 
 ```text
-/mbg-full-automate
+/mbg-full-auto
 Design a StrongARM latch comparator with <10mV input offset, 1GHz clock,
 GF180MCU 3.3V PDK.
 ```
@@ -1829,7 +1868,7 @@ DRC-clean GDSII layout for the gf180mcuD PDK: <netlist>
   directory that contains it — the repo root: `codex plugin marketplace add .`
 - *Codex still shows old skills after you edited `.ai/`.* The plugin is cached
   at install time. Run `./install.sh --stage agents` to refresh it.
-- *You typed `/mbg-full-automate` and nothing happened.* Codex has no
+- *You typed `/mbg-full-auto` and nothing happened.* Codex has no
   repo-scoped commands or subagents at all (see the workflow table's
   footnote ¹, and `platforms.codex.unsupported` in `.ai/manifest.json`) —
   there is no slash-command equivalent to fall back to; describe the

@@ -3,6 +3,7 @@
     "defaultMode": "default",
     "allow": [
       "Bash(./install.sh --stage agents:*)",
+      "Bash(./scripts/mbg:*)",
       "Bash(bash install.sh --stage agents:*)",
       "Bash(docker ps:*)",
       "Bash(find:*)",
@@ -16,7 +17,9 @@
       "Bash(pwd)",
       "Bash(python3 scripts/sync_agent_tools.py:*)",
       "Bash(python3 scripts/validate_agent_integrations.py:*)",
-      "Bash(rg:*)"
+      "Bash(rg:*)",
+      "Bash(scripts/mbg:*)",
+      "mcp__mbg"
     ],
     "deny": [
       "Bash(git push:*)",
@@ -31,5 +34,8 @@
       "Bash(docker exec:*)",
       "Bash(docker logs:*)"
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "mbg"
+  ]
 }

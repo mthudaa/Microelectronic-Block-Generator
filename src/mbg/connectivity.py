@@ -13,6 +13,7 @@ This does not replace external DRC/LVS — it is the fast internal check that
 external signoff then confirms.  Every conductor considered here carries an
 explicit net owner; anonymous geometry is reported rather than ignored.
 """
+import math
 from typing import Dict, List, Optional, Set, Tuple
 
 from mbg.design_context import (
@@ -112,7 +113,15 @@ def build_physical_graph(ctx) -> Tuple[_UnionFind, List[_Shape]]:
                 h = rules.min_width(ap.layer) / 2.0
             except Exception:
                 h = 0.14
-            bb = BoundingBox(ap.x - h, ap.y - h, ap.x + h, ap.y + h)
+            # A port sits on the EDGE of its metal and points outward, so the
+            # anchor goes half a width inward, inside the metal it stands for.
+            # Centred on the edge it reached half a width into the gap —
+            # where sky130 drain and source bars face each other 0.14 um
+            # apart, the two anchors touched and read as a short.
+            ang = math.radians(ap.orientation or 0.0)
+            cx = ap.x - h * round(math.cos(ang), 6)
+            cy = ap.y - h * round(math.sin(ang), 6)
+            bb = BoundingBox(cx - h, cy - h, cx + h, cy + h)
             shapes.append(_Shape(uid, net_name, i, i, bb, "access",
                                  f"{ap.instance}.{ap.terminal}"))
             uid += 1
@@ -363,7 +372,16 @@ def _is_substrate_terminal(ctx, dev, term: str, net: str) -> bool:
     sits on the ground net.  A passive whose bulk is on any other net needs an
     isolating well and a real contact, and is still reported.
     """
-    if term != "body" or getattr(dev, "kind", None) not in ("res", "cap"):
+    kind = getattr(dev, "kind", None)
+    if kind == "bjt":
+        # A vertical PNP's collector IS the p-substrate (the profile lists it
+        # in substrate_terminals); like a passive's bulk, the substrate makes
+        # that connection whether or not a wire reaches the collector ring.
+        prof = getattr(ctx, "profile", None)
+        spec = prof.device(dev.model) if prof is not None else None
+        if spec is None or term not in spec.substrate_terminals:
+            return False
+    elif term != "body" or kind not in ("res", "cap"):
         return False
     n = ctx.nets.get(net)
     if n is not None and getattr(n, "is_ground", False):

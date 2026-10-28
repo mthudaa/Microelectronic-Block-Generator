@@ -254,7 +254,9 @@ fi
 # check if commands exist in the path
 # -----------------------------------
 
-if [ ! -x "$(command -v magic)" ]; then
+# MBG_MAGIC (set by mbg.checks) names the verified binary; PATH is the fallback.
+MAGIC_BIN="${MBG_MAGIC:-magic}"
+if [ ! -x "$(command -v "$MAGIC_BIN")" ]; then
    	echo "[ERROR] magic could not be found!"
    	exit $ERR_CMD_NOT_FOUND
 fi
@@ -264,12 +266,12 @@ fi
 echo "[INFO] Running PEX using magic..."
 
 if [ $DEBUG -eq 0 ]; then
-	magic -dnull -noconsole \
+	"$MAGIC_BIN" -dnull -noconsole \
 		-rcfile "$PDKPATH/libs.tech/magic/$PDK.magicrc" \
 		"$EXT_SCRIPT" "$NO_MESSAGE" \
 		> /dev/null 2> /dev/null
 else
-	magic -dnull -noconsole \
+	"$MAGIC_BIN" -dnull -noconsole \
 		-rcfile "$PDKPATH/libs.tech/magic/$PDK.magicrc" \
 		"$EXT_SCRIPT" "$NO_MESSAGE"
 fi

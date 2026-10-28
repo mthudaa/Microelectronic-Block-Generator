@@ -9,6 +9,11 @@ platforms: [opencode, claude, codex]
 
 # PEX-Aware Design Flow
 
+Tools for both loops: `scripts/mbg measure vref|ota <netlist>` for
+pre-layout, the same command on `<cell>.pex.spice` with `--post-layout` for
+post-layout, `scripts/mbg flow run` for one pass of both; skill
+`mbg-agent-interface`.
+
 Canonical definition: `.ai/knowledge/DESIGN_FLOW.md`. Read it before deviating
 from anything here.
 

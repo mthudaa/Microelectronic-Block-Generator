@@ -1,0 +1,9 @@
+# GENERATED FILE — do not edit. Source: .ai/manifest.json#mcp.
+# Regenerate with: python3 scripts/sync_agent_tools.py
+# Codex reads a project .codex/config.toml only for trusted projects.
+
+[mcp_servers.mbg]
+command = "scripts/mbg"
+args = ["mcp"]
+startup_timeout_sec = 30
+tool_timeout_sec = 1800
