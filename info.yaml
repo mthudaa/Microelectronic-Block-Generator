@@ -17,6 +17,11 @@ project:
   discord: ""
   description: "Integrated top-level GDS combining nine AI/LLM-generated analog blocks (3x 5T-OTA, 3x StrongArm comparator, 3x 1.2V reference) plus a relaxation-oscillator temperature sensor, behind 14 secondary-ESD analog pads (gLayout track, GF180MCU-D)"
   lvs_config: "lvs_config.json"
+  gf_def_ready: true            # data ready for def generation with global foundries' pad frame
+  ws_def_ready: false            # data ready for def generation with wafer space pad frame
+  drc_ready: true               # data ready for integration and DRC
+  lvs_ready: true               # data ready for integrated LVS
+  export_control: "Export_Control_GF_Rev8.2_signed.docx"   # Required export control document
 
 # ======================================================
 # Pin connections to the external pads.
