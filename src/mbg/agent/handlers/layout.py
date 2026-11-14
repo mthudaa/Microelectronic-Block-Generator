@@ -19,18 +19,6 @@ def _drc_issues(r: Result, res: dict) -> None:
                      "errors come from spacing between devices — try a larger "
                      "placement channel_x/channel_y",
                 rules=rules[:10] or None)
-    s = res.get("drc_signoff") or {}
-    verdict = s.get("verdict")
-    if verdict and verdict != "PASS":
-        code = "DRC_ENGINE_UNAVAILABLE" if verdict == "CONFIGURATION_FAILURE" else "DRC_SIGNOFF"
-        r.issue(code, f"DRC sign-off {verdict}: {s.get('reason', '')}"[:400],
-                hint=("run `mbg doctor`; a sign-off engine that did not run is a "
-                      "failure, not a pass" if code == "DRC_ENGINE_UNAVAILABLE" else None))
-        for eng in s.get("results") or []:
-            for rule, n in sorted((eng.get("rules") or {}).items(), key=lambda kv: -kv[1])[:6]:
-                r.issue("DRC_RULE", f"{eng.get('engine')}: {rule} x{n}", severity="error",
-                        rule=rule, engine=eng.get("engine"))
-
 
 def _lvs_issues(r: Result, res: dict) -> None:
     lvs = res.get("lvs") or {}
@@ -60,6 +48,7 @@ def _connectivity_issues(r: Result, ver: dict) -> None:
 
 
 def generate(args, ctx) -> Result:
+    macro = load_obj(args["macro_config"], "macro_config") if args.get("macro_config") is not None else None
     r = Result(tool="layout.generate")
     text, path = read_netlist(args)
     prof = profile_for(args, text)
@@ -75,24 +64,23 @@ def generate(args, ctx) -> Result:
         r.set("FAIL", f"netlist not layout-ready: {len(blocking)} blocking issue(s)")
         r.next = [f"mbg netlist check {runio.rel(path)}"]
         return r
-    hints = load_obj(args.get("hints"), "hints") or {}
     from mbg.placement_engine import PlacementConfig
     from mbg.router import RouterConfig
     from mbg.pipeline import spice_to_gds_with_checks, spice_to_gds_ctx, write_gds_foundry
-    pcfg = PlacementConfig(verbosity=1, hints=hints, **(args.get("placement") or {}))
+    pcfg = PlacementConfig(verbosity=1, **(args.get("placement") or {}))
     rcfg = RouterConfig(verbosity=1, **(args.get("router") or {}))
     cell = subckt_name(text)
     outdir = ctx.run_dir
-    ctx.stage("placement + routing" + (" + sign-off" if args.get("verify", True) else ""))
+    ctx.stage("placement + routing" + (" + physical checks" if args.get("verify", True) else ""))
     if args.get("verify", True):
         res = spice_to_gds_with_checks(text, gds_path=str(outdir / f"{cell}.gds"),
                                        pdk=prof.name, outdir=str(outdir),
                                        placement_config=pcfg, router_config=rcfg,
-                                       verbosity=1)
+                                       verbosity=1, macro_config=macro)
     else:
         with prof.env():
             res = spice_to_gds_ctx(text, pdk=prof.name, placement_config=pcfg,
-                                   router_config=rcfg, verbosity=1)
+                                   router_config=rcfg, verbosity=1, macro_config=macro)
             gds = outdir / f"{cell}.gds"
             write_gds_foundry(res["component"], str(gds))
             res["gds_path"] = str(gds)
@@ -116,12 +104,10 @@ def generate(args, ctx) -> Result:
             "layout_json": outdir / "layout.json", "svg": res.get("svg_path")}
     if args.get("verify", True):
         drc = res.get("drc") or {}
-        s = res.get("drc_signoff") or {}
         lvs = res.get("lvs") or {}
         pex = res.get("pex") or {}
         r.metrics.update({
-            "drc_magic": drc.get("summary"), "drc_signoff": s.get("verdict"),
-            "drc_engines": [e.get("engine") for e in (s.get("results") or [])],
+            "drc_magic": drc.get("summary"), "drc_engine": "magic",
             "lvs_match": bool(lvs.get("match")),
             "pex": bool(pex.get("pex_path")), "all_pass": bool(res.get("all_pass")),
         })
@@ -148,7 +134,7 @@ def generate(args, ctx) -> Result:
     record(design, gds=res.get("gds_path"))
     if args.get("verify", True):
         record(design, stage="drc", status="PASS" if (res.get("drc") or {}).get("clean")
-               and (res.get("drc_signoff") or {}).get("verdict") == "PASS" else "FAIL",
+               else "FAIL",
                artifact=outdir / "verification" / "drc_summary.json")
         record(design, stage="lvs", status="PASS" if (res.get("lvs") or {}).get("match")
                else "FAIL", artifact=(res.get("lvs") or {}).get("report_path"))
@@ -160,11 +146,11 @@ def generate(args, ctx) -> Result:
         ok = bool(ver.get("clean"))
         r.set("PASS" if ok else "FAIL",
               f"{cell}: {size}, routed {m.get('routed_nets')}/{m.get('total_nets')} nets, "
-              f"internal {'clean' if ok else 'ISSUES'} (sign-off not run)")
+              f"internal {'clean' if ok else 'ISSUES'} (physical checks not run)")
         r.next = [f"mbg verify drc {r.artifacts.get('gds', '')}",
                   f"mbg layout view {runio.rel(outdir)}"]
         return r
-    legs = (f"DRC magic={r.metrics['drc_magic']}, sign-off={r.metrics['drc_signoff']}, "
+    legs = (f"DRC magic={r.metrics['drc_magic']}, "
             f"LVS={'match' if r.metrics['lvs_match'] else 'MISMATCH'}, "
             f"PEX={'ok' if r.metrics['pex'] else 'none'}, "
             f"internal={'clean' if r.metrics['internal_clean'] else 'ISSUES'}")

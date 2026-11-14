@@ -30,8 +30,8 @@ class ProfileData(unittest.TestCase):
         self.assertEqual(p.supply_v, 3.3)
         self.assertEqual(p.std_cell_library, "gf180mcu_fd_sc_mcu7t5v0")
         self.assertEqual(p.lvs_permute_models, ["pfet_03v3", "nfet_03v3"])
-        self.assertEqual(p.drc_engines, ["magic", "klayout"])
-        self.assertEqual(p.drc_primary, "klayout")
+        self.assertEqual(p.drc_engines, ["magic"])
+        self.assertEqual(p.drc_primary, "magic")
         self.assertEqual(p.klayout_variant, "D")
         self.assertEqual(p.default_corner, "typical")
 

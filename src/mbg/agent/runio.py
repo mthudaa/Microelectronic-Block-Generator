@@ -42,21 +42,9 @@ LOG_FILE = "log.txt"
 # ── locations ─────────────────────────────────────────────────────────
 
 def out_root() -> Path:
-    """Where runs and design workspaces live.
-
-    ``$MBG_OUT`` if set; inside the repository, its gitignored ``outputs/``;
-    anywhere else, ``./mbg-out`` so a user-wide install never writes into
-    someone else's tree unasked.
-    """
-    env = os.environ.get("MBG_OUT")
-    if env:
-        return Path(env).expanduser().resolve()
-    from mbg.config import repo_root
-    repo = repo_root().resolve()
-    cwd = Path.cwd().resolve()
-    if cwd == repo or repo in cwd.parents:
-        return repo / "outputs"
-    return cwd / "mbg-out"
+    """Shared local output root: MBG_OUT or ~/mbg."""
+    from mbg.output_paths import output_root
+    return output_root()
 
 
 def rel(path: Any) -> str:
@@ -96,6 +84,8 @@ def new_run_dir(tool_id: str, design: Optional[str] = None,
     else:
         stamp = _dt.datetime.now().strftime("%Y%m%d-%H%M%S")
         cand = out_root() / "runs" / f"{stamp}-{tool_id.replace('.', '_')}-{secrets.token_hex(2)}"
+    from mbg.output_paths import checked_path
+    cand = checked_path(out_root(), cand)
     cand.mkdir(parents=True, exist_ok=True)
     return cand
 

@@ -96,7 +96,7 @@ _PDK = S("PDK variant or family: gf180mcuD (default), gf180, sky130A, sky130. "
 _NETLIST = S("Path to a SPICE file with exactly one .subckt. Omit when --design "
              "names a workspace that has one.")
 _DESIGN = S("Design workspace name (from `mbg design init`). Artifacts then go "
-            "to outputs/<design>/<stage>/ instead of outputs/runs/.")
+            "to ~/mbg/<design>/<stage>/ instead of ~/mbg/runs/.")
 _WAIT = N("Seconds to wait for a long tool before returning a job id "
           "(default 540 on the CLI, 50 over MCP). The work continues in the "
           "background; collect it with `mbg job wait <id>`.")
@@ -130,7 +130,7 @@ TOOLS: List[Tool] = [
          examples=("mbg pdk info --pdk gf180mcuD --section devices",
                    "mbg pdk info --model pnp_10p00x10p00")),
     Tool("design.init",
-         "Create a design workspace outputs/<name>/ (AGENTS.md artifact layout + "
+         "Create a design workspace ~/mbg/<name>/ (AGENTS.md artifact layout + "
          "experiment.json). Later calls take --design <name>.",
          _obj({"name": S("Workspace name: 3-128 lowercase letters, digits and '-' "
                          "(it is the experiment id)"),
@@ -239,24 +239,22 @@ TOOLS: List[Tool] = [
          "mbg.agent.handlers.spec:check",
          examples=("mbg spec check --metrics m.json --spec spec.json",)),
     Tool("layout.generate",
-         "SPICE -> GDS with the analog placer and DRC-aware router, then Magic + "
-         "KLayout DRC, netgen LVS and PEX. Placement hints steer the placer.",
+         "SPICE -> GDS with placement and grid routing, then Magic "
+         "DRC, netgen LVS and PEX.",
          _obj({"netlist": _NETLIST, "pdk": _PDK, "design": _DESIGN,
-               "hints": FILE_OR_OBJ("Placement hints: {rows: {dev: row}, order: "
-                                    "{row: [devs]}, groups: [{kind, devices}], "
-                                    "fixed: {dev: {x, y}}, array: [{devices, cols}]}"),
                "placement": O("PlacementConfig overrides, e.g. {channel_x: 3}"),
                "router": O("RouterConfig overrides"),
+               "macro_config": FILE_OR_OBJ("Ordinary guard rings and configurable physical pins"),
                "verify": B("Run DRC/LVS/PEX after layout (default true)"),
                "wait_s": _WAIT},
               positional=["netlist"]),
          "mbg.agent.handlers.layout:generate",
          long=True, stage="layout",
          examples=("mbg layout generate ota.spice",
-                   "mbg layout generate --design bgr1 --hints hints.json")),
+                   "mbg layout generate --design my-design")),
     Tool("layout.view",
          "Text view of a generated layout: ASCII floorplan, device boxes, rows, "
-         "per-device nets and routing failures, in the coordinates hints use.",
+         "per-device nets and routing failures, in floorplan coordinates.",
          _obj({"run": S("Run directory of a layout.generate call, or a "
                         "layout.json file"),
                "design": _DESIGN,
@@ -265,7 +263,7 @@ TOOLS: List[Tool] = [
               positional=["run"]),
          "mbg.agent.handlers.layout:view",
          examples=("mbg layout view outputs/runs/<id>",)),
-    Tool("verify.drc", "Magic DRC plus the PDK's KLayout deck on a GDS (dual-engine sign-off).",
+    Tool("verify.drc", "Magic DRC on a GDS with an executed report required for PASS.",
          _obj({"gds": S("GDS file"), "cell": S("Top cell (default: the GDS top cell)"),
                "pdk": _PDK, "design": _DESIGN, "wait_s": _WAIT},
               required=["gds"], positional=["gds"]),
@@ -285,19 +283,18 @@ TOOLS: List[Tool] = [
               required=["gds"], positional=["gds"]),
          "mbg.agent.handlers.verify:pex", long=True, stage="pex",
          mcp="verify:check=pex", examples=("mbg verify pex cell.gds",)),
-    Tool("flow.run",
-         "One call from netlist to sign-off: netlist check, pre-layout "
-         "measurement, layout + DRC/LVS/PEX, post-layout measurement on the "
-         "extracted netlist, spec evaluation pre vs post.",
-         _obj({"netlist": _NETLIST, "pdk": _PDK, "design": _DESIGN,
-               "recipe": S("Measurement recipe", enum=["vref", "ota", "none"]),
-               "recipe_args": O("Arguments for the recipe (as for measure.<recipe>)"),
-               "spec": FILE_OR_OBJ("Specification"),
-               "hints": FILE_OR_OBJ("Placement hints (as for layout.generate)"),
-               "wait_s": _WAIT},
-              positional=["netlist"]),
-         "mbg.agent.handlers.flow:run", long=True, stage="flow",
-         examples=("mbg flow run --design bgr1 --recipe vref --spec vref_md",)),
+    Tool("measure.adc", "Evaluate source-bound ADC transition INL/DNL and missing codes.",
+         _obj({"vin": A("Measured ADC input voltages", items="number"),
+               "codes": A("Measured output codes", items="integer"),
+               "bits": I("Resolution in bits"), "vref": N("Reference voltage")},
+              required=["vin", "codes", "bits", "vref"]),
+         "mbg.agent.handlers.converters:adc"),
+    Tool("measure.dac", "Evaluate measured DAC code voltages, INL/DNL and monotonicity.",
+         _obj({"codes": A("Measured codes", items="integer"),
+               "voltages": A("Measured voltages", items="number"), "vref": N("Reference voltage"),
+               "bits": I("Resolution in bits (default 4)")},
+              required=["codes", "voltages", "vref"]),
+         "mbg.agent.handlers.converters:dac"),
     Tool("job.status", "State of a background job; its result when finished.",
          _obj({"id": S("Job id from a long tool's envelope")},
               required=["id"], positional=["id"]),

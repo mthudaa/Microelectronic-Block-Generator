@@ -49,7 +49,7 @@ What is legal in a PDK: supply, device models with terminal order and size limit
 
 ## `mbg design init`
 
-Create a design workspace outputs/<name>/ (AGENTS.md artifact layout + experiment.json). Later calls take --design <name>.
+Create a design workspace ~/mbg/<name>/ (AGENTS.md artifact layout + experiment.json). Later calls take --design <name>.
 
 | argument | type | description |
 | :--- | :--- | :--- |
@@ -82,7 +82,7 @@ Static checks before simulating or laying out: syntax, models vs the PDK catalog
 | :--- | :--- | :--- |
 | `<netlist>` / `--netlist` | string | Path to a SPICE file with exactly one .subckt. Omit when --design names a workspace that has one. |
 | `--pdk` | string | PDK variant or family: gf180mcuD (default), gf180, sky130A, sky130. Omit to infer it from the netlist's device models. |
-| `--design` | string | Design workspace name (from `mbg design init`). Artifacts then go to outputs/<design>/<stage>/ instead of outputs/runs/. |
+| `--design` | string | Design workspace name (from `mbg design init`). Artifacts then go to ~/mbg/<design>/<stage>/ instead of ~/mbg/runs/. |
 
     mbg netlist check ota.spice
 
@@ -94,7 +94,7 @@ Simulate the subcircuit with ngspice in a generated testbench: op, dc (source, s
 | :--- | :--- | :--- |
 | `<netlist>` / `--netlist` | string | Path to a SPICE file with exactly one .subckt. Omit when --design names a workspace that has one. |
 | `--pdk` | string | PDK variant or family: gf180mcuD (default), gf180, sky130A, sky130. Omit to infer it from the netlist's device models. |
-| `--design` | string | Design workspace name (from `mbg design init`). Artifacts then go to outputs/<design>/<stage>/ instead of outputs/runs/. |
+| `--design` | string | Design workspace name (from `mbg design init`). Artifacts then go to ~/mbg/<design>/<stage>/ instead of ~/mbg/runs/. |
 | `--analysis` | string (op|dc|ac|tran) | Analysis **(required)** |
 | `--corner` | string | Process corner, e.g. typical/ff/ss/fs/sf (gf180) or tt/ff/ss/sf/fs (sky130). 'typical' and 'tt' are accepted for both. |
 | `--temp` | number | Temperature in C (default 27) |
@@ -118,7 +118,7 @@ Characterise a voltage reference: VREF at 27 C, temperature coefficient (box met
 | :--- | :--- | :--- |
 | `<netlist>` / `--netlist` | string | Path to a SPICE file with exactly one .subckt. Omit when --design names a workspace that has one. |
 | `--pdk` | string | PDK variant or family: gf180mcuD (default), gf180, sky130A, sky130. Omit to infer it from the netlist's device models. |
-| `--design` | string | Design workspace name (from `mbg design init`). Artifacts then go to outputs/<design>/<stage>/ instead of outputs/runs/. |
+| `--design` | string | Design workspace name (from `mbg design init`). Artifacts then go to ~/mbg/<design>/<stage>/ instead of ~/mbg/runs/. |
 | `--ports` | object | Port roles {vdd, vss, vref, ibias}; default: the ports named VDD, VSS, VREF, IBIAS |
 | `--vdd` | number | Nominal supply (default: the PDK nominal) |
 | `--vdd-range` | number[] | Line-regulation window [lo, hi] in V |
@@ -142,7 +142,7 @@ Characterise an amplifier: DC gain, -3 dB bandwidth, unity-gain frequency, phase
 | :--- | :--- | :--- |
 | `<netlist>` / `--netlist` | string | Path to a SPICE file with exactly one .subckt. Omit when --design names a workspace that has one. |
 | `--pdk` | string | PDK variant or family: gf180mcuD (default), gf180, sky130A, sky130. Omit to infer it from the netlist's device models. |
-| `--design` | string | Design workspace name (from `mbg design init`). Artifacts then go to outputs/<design>/<stage>/ instead of outputs/runs/. |
+| `--design` | string | Design workspace name (from `mbg design init`). Artifacts then go to ~/mbg/<design>/<stage>/ instead of ~/mbg/runs/. |
 | `--out` | string | Output node **(required)** |
 | `--inp` | string | Non-inverting input node **(required)** |
 | `--inn` | string | Inverting input node (biased at the common mode) |
@@ -155,6 +155,28 @@ Characterise an amplifier: DC gain, -3 dB bandwidth, unity-gain frequency, phase
 | `--post-layout` | boolean | Simulating an extracted (PEX) netlist |
 
     mbg measure ota ota.spice --out OUT --inp INP --inn INN
+
+## `mbg measure adc`
+
+Evaluate source-bound ADC transition INL/DNL and missing codes.
+
+| argument | type | description |
+| :--- | :--- | :--- |
+| `--vin` | number[] | Measured ADC input voltages **(required)** |
+| `--codes` | integer[] | Measured output codes **(required)** |
+| `--bits` | integer | Resolution in bits **(required)** |
+| `--vref` | number | Reference voltage **(required)** |
+
+## `mbg measure dac`
+
+Evaluate measured DAC code voltages, INL/DNL and monotonicity.
+
+| argument | type | description |
+| :--- | :--- | :--- |
+| `--codes` | integer[] | Measured codes **(required)** |
+| `--voltages` | number[] | Measured voltages **(required)** |
+| `--vref` | number | Reference voltage **(required)** |
+| `--bits` | integer | Resolution in bits (default 4) |
 
 ## `mbg spec check`
 
@@ -169,30 +191,30 @@ Evaluate metrics against a specification; PASS only if every required spec is me
 
 ## `mbg layout generate`
 
-SPICE -> GDS with the analog placer and DRC-aware router, then Magic + KLayout DRC, netgen LVS and PEX. Placement hints steer the placer. *(long: runs as a background job)*
+SPICE -> GDS with placement and grid routing, then Magic DRC, netgen LVS and PEX. *(long: runs as a background job)*
 
 | argument | type | description |
 | :--- | :--- | :--- |
 | `<netlist>` / `--netlist` | string | Path to a SPICE file with exactly one .subckt. Omit when --design names a workspace that has one. |
 | `--pdk` | string | PDK variant or family: gf180mcuD (default), gf180, sky130A, sky130. Omit to infer it from the netlist's device models. |
-| `--design` | string | Design workspace name (from `mbg design init`). Artifacts then go to outputs/<design>/<stage>/ instead of outputs/runs/. |
-| `--hints` | object/string | Placement hints: {rows: {dev: row}, order: {row: [devs]}, groups: [{kind, devices}], fixed: {dev: {x, y}}, array: [{devices, cols}]} (inline JSON object, or a path to a .json file) |
+| `--design` | string | Design workspace name (from `mbg design init`). Artifacts then go to ~/mbg/<design>/<stage>/ instead of ~/mbg/runs/. |
 | `--placement` | object | PlacementConfig overrides, e.g. {channel_x: 3} |
 | `--router` | object | RouterConfig overrides |
+| `--macro-config` | object/string | Ordinary guard rings and configurable physical pins (inline JSON object, or a path to a .json file) |
 | `--verify` | boolean | Run DRC/LVS/PEX after layout (default true) |
 | `--wait-s` | number | Seconds to wait for a long tool before returning a job id (default 540 on the CLI, 50 over MCP). The work continues in the background; collect it with `mbg job wait <id>`. |
 
     mbg layout generate ota.spice
-    mbg layout generate --design bgr1 --hints hints.json
+    mbg layout generate --design my-design
 
 ## `mbg layout view`
 
-Text view of a generated layout: ASCII floorplan, device boxes, rows, per-device nets and routing failures, in the coordinates hints use.
+Text view of a generated layout: ASCII floorplan, device boxes, rows, per-device nets and routing failures, in floorplan coordinates.
 
 | argument | type | description |
 | :--- | :--- | :--- |
 | `<run>` / `--run` | string | Run directory of a layout.generate call, or a layout.json file |
-| `--design` | string | Design workspace name (from `mbg design init`). Artifacts then go to outputs/<design>/<stage>/ instead of outputs/runs/. |
+| `--design` | string | Design workspace name (from `mbg design init`). Artifacts then go to ~/mbg/<design>/<stage>/ instead of ~/mbg/runs/. |
 | `--format` | string (ascii|json) | ascii (default) or json |
 | `--width` | integer | ASCII width in characters (default 72) |
 
@@ -200,14 +222,14 @@ Text view of a generated layout: ASCII floorplan, device boxes, rows, per-device
 
 ## `mbg verify drc`
 
-Magic DRC plus the PDK's KLayout deck on a GDS (dual-engine sign-off). *(long: runs as a background job)*
+Magic DRC on a GDS with an executed report required for PASS. *(long: runs as a background job)*
 
 | argument | type | description |
 | :--- | :--- | :--- |
 | `<gds>` / `--gds` | string | GDS file **(required)** |
 | `--cell` | string | Top cell (default: the GDS top cell) |
 | `--pdk` | string | PDK variant or family: gf180mcuD (default), gf180, sky130A, sky130. Omit to infer it from the netlist's device models. |
-| `--design` | string | Design workspace name (from `mbg design init`). Artifacts then go to outputs/<design>/<stage>/ instead of outputs/runs/. |
+| `--design` | string | Design workspace name (from `mbg design init`). Artifacts then go to ~/mbg/<design>/<stage>/ instead of ~/mbg/runs/. |
 | `--wait-s` | number | Seconds to wait for a long tool before returning a job id (default 540 on the CLI, 50 over MCP). The work continues in the background; collect it with `mbg job wait <id>`. |
 
     mbg verify drc cell.gds
@@ -222,7 +244,7 @@ netgen LVS of a GDS against its schematic netlist. *(long: runs as a background 
 | `--netlist` | string | Schematic SPICE **(required)** |
 | `--cell` | string | Top cell |
 | `--pdk` | string | PDK variant or family: gf180mcuD (default), gf180, sky130A, sky130. Omit to infer it from the netlist's device models. |
-| `--design` | string | Design workspace name (from `mbg design init`). Artifacts then go to outputs/<design>/<stage>/ instead of outputs/runs/. |
+| `--design` | string | Design workspace name (from `mbg design init`). Artifacts then go to ~/mbg/<design>/<stage>/ instead of ~/mbg/runs/. |
 | `--wait-s` | number | Seconds to wait for a long tool before returning a job id (default 540 on the CLI, 50 over MCP). The work continues in the background; collect it with `mbg job wait <id>`. |
 
     mbg verify lvs cell.gds --netlist cell.spice
@@ -236,28 +258,11 @@ Magic parasitic extraction to a SPICE netlist for post-layout simulation. *(long
 | `<gds>` / `--gds` | string | GDS file **(required)** |
 | `--cell` | string | Top cell |
 | `--pdk` | string | PDK variant or family: gf180mcuD (default), gf180, sky130A, sky130. Omit to infer it from the netlist's device models. |
-| `--design` | string | Design workspace name (from `mbg design init`). Artifacts then go to outputs/<design>/<stage>/ instead of outputs/runs/. |
+| `--design` | string | Design workspace name (from `mbg design init`). Artifacts then go to ~/mbg/<design>/<stage>/ instead of ~/mbg/runs/. |
 | `--mode` | integer | Magic PEX mode (default 2: R+C) |
 | `--wait-s` | number | Seconds to wait for a long tool before returning a job id (default 540 on the CLI, 50 over MCP). The work continues in the background; collect it with `mbg job wait <id>`. |
 
     mbg verify pex cell.gds
-
-## `mbg flow run`
-
-One call from netlist to sign-off: netlist check, pre-layout measurement, layout + DRC/LVS/PEX, post-layout measurement on the extracted netlist, spec evaluation pre vs post. *(long: runs as a background job)*
-
-| argument | type | description |
-| :--- | :--- | :--- |
-| `<netlist>` / `--netlist` | string | Path to a SPICE file with exactly one .subckt. Omit when --design names a workspace that has one. |
-| `--pdk` | string | PDK variant or family: gf180mcuD (default), gf180, sky130A, sky130. Omit to infer it from the netlist's device models. |
-| `--design` | string | Design workspace name (from `mbg design init`). Artifacts then go to outputs/<design>/<stage>/ instead of outputs/runs/. |
-| `--recipe` | string (vref|ota|none) | Measurement recipe |
-| `--recipe-args` | object | Arguments for the recipe (as for measure.<recipe>) |
-| `--spec` | object/string | Specification (inline JSON object, or a path to a .json file) |
-| `--hints` | object/string | Placement hints (as for layout.generate) (inline JSON object, or a path to a .json file) |
-| `--wait-s` | number | Seconds to wait for a long tool before returning a job id (default 540 on the CLI, 50 over MCP). The work continues in the background; collect it with `mbg job wait <id>`. |
-
-    mbg flow run --design bgr1 --recipe vref --spec vref_md
 
 ## `mbg job status`
 

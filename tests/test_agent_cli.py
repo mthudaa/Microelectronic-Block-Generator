@@ -58,7 +58,7 @@ class CliContract(unittest.TestCase):
     def test_one_tool_schema(self):
         code, env = self.envelope("tools", "layout.generate")
         self.assertEqual(code, 0)
-        self.assertIn("hints", env["data"]["tool"]["input_schema"]["properties"])
+        self.assertIn("macro_config", env["data"]["tool"]["input_schema"]["properties"])
 
     def test_unknown_command_is_a_usage_error(self):
         code, env = self.envelope("frobnicate")
@@ -119,7 +119,7 @@ class CliContract(unittest.TestCase):
         p = subprocess.run([MBG, "layout", "generate", "--help"], capture_output=True,
                            text=True, cwd=ROOT)
         self.assertEqual(p.returncode, 0)
-        self.assertIn("--hints", p.stdout)
+        self.assertIn("--macro-config", p.stdout)
 
 
 class Internals(unittest.TestCase):

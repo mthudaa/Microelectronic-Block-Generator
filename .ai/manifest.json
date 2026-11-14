@@ -1,5 +1,5 @@
 {
-  "$comment": "SOURCE OF TRUTH. Canonical agent-integration manifest for the Microelectronic Block Generator. Edited by hand; consumed by scripts/sync_agent_tools.py to generate the OpenCode, Claude Code and Codex adapters, the generic .agents/skills tree, the MCP client configs and the AGENTS.md index. JSON is used because it is the only zero-dependency format available on every interpreter in this repository (the root .venv lacks PyYAML, the chipathon .venv lacks tomllib).",
+  "$comment": "Canonical public agent metadata. Regenerate adapters from these reviewed sources.",
   "schema_version": 1,
   "project": {
     "name": "Microelectronic Block Generator",
@@ -8,13 +8,12 @@
     "framework": "gLayout + gdsfactory",
     "pdk": "gf180mcuD",
     "core_utilities": "src/mbg",
-    "generated_designs": "AI-Generated-Design-Result",
+    "generated_designs": "outputs",
     "shared_instructions": "AGENTS.md",
     "package": "mbg"
   },
   "platforms": {
     "opencode": {
-      "version_tested": "1.18.18",
       "skills_dir": ".opencode/skills",
       "skill_file": "SKILL.md",
       "commands_dir": ".opencode/commands",
@@ -34,7 +33,6 @@
       ]
     },
     "claude": {
-      "version_tested": "2.1.235",
       "skills_dir": ".claude/skills",
       "skill_file": "SKILL.md",
       "commands_dir": ".claude/commands",
@@ -56,7 +54,6 @@
       ]
     },
     "codex": {
-      "version_tested": "0.148.0",
       "plugin_root": "plugins/mbg-analog",
       "plugin_manifest": "plugins/mbg-analog/.codex-plugin/plugin.json",
       "skills_dir": "plugins/mbg-analog/skills",
@@ -82,7 +79,7 @@
       ]
     },
     "agents": {
-      "$comment": "Agent Skills standard tree read by Codex, OpenCode, Pi, DeepSeek-based agents (Deep Code) and other harnesses that follow AGENTS.md. Every canonical skill is generated here.",
+      "$comment": "Agent Skills standard tree for compatible CLI and MCP clients.",
       "skills_dir": ".agents/skills",
       "skill_file": "SKILL.md",
       "instructions_file": "AGENTS.md",
@@ -92,161 +89,10 @@
     }
   },
   "capabilities": {
-    "analyze_spice": {
-      "summary": "Parse SPICE subcircuits, enumerate devices, nets and terminals, and trace connectivity.",
-      "class": "READ-ONLY",
-      "skill": "mbg-repo-analysis",
-      "entry_point": "mbg.spice_parser.parse_netlist_with_pdk",
-      "platforms": {
-        "opencode": true,
-        "claude": true,
-        "codex": true
-      }
-    },
-    "audit_ai_experiment": {
-      "summary": "Audit an AI experiment record for reproducibility, bounded refinement and evidence.",
-      "class": "READ-ONLY",
-      "skill": "mbg-ai-experiment-audit",
-      "platforms": {
-        "opencode": true,
-        "claude": true,
-        "codex": true
-      }
-    },
-    "author_extension": {
-      "summary": "Create or review agent skills, commands and tools using the project authoring standard.",
+    "agent_cli": {
+      "summary": "Use the public CLI and MCP tools for checked layout work.",
       "class": "GENERATING",
-      "skill": "mbg-extension-authoring",
-      "platforms": {
-        "opencode": true,
-        "claude": true,
-        "codex": true
-      }
-    },
-    "compare_layout_results": {
-      "summary": "Compare a new layout run against a preserved baseline without overwriting it.",
-      "class": "READ-ONLY",
-      "skill": "mbg-design-regression",
-      "platforms": {
-        "opencode": true,
-        "claude": true,
-        "codex": true
-      }
-    },
-    "debug_placement": {
-      "summary": "Inspect placement: matching, symmetry, overlap, pin access, reserved zones, congestion.",
-      "class": "READ-ONLY",
-      "skill": "mbg-placement-debug",
-      "entry_point": "mbg.placement_engine",
-      "platforms": {
-        "opencode": true,
-        "claude": true,
-        "codex": true
-      }
-    },
-    "debug_routing": {
-      "summary": "Trace nets, inspect vias and metal usage, and detect shorts, opens and route conflicts.",
-      "class": "READ-ONLY",
-      "skill": "mbg-routing-debug",
-      "entry_point": "mbg.router",
-      "platforms": {
-        "opencode": true,
-        "claude": true,
-        "codex": true
-      }
-    },
-    "generate_views": {
-      "summary": "Emit LEF, Liberty, Verilog and a views manifest alongside the GDS for every module.",
-      "class": "GENERATING",
-      "skill": "mbg-spice-to-gds",
-      "entry_point": "mbg.outputs.write_all",
-      "platforms": {
-        "opencode": true,
-        "claude": true,
-        "codex": true
-      }
-    },
-    "inspect_generated_designs": {
-      "summary": "Read previous results in AI-Generated-Design-Result as evidence and regression baselines.",
-      "class": "READ-ONLY",
-      "skill": "mbg-design-regression",
-      "platforms": {
-        "opencode": true,
-        "claude": true,
-        "codex": true
-      }
-    },
-    "inspect_repository": {
-      "summary": "Map the repository, trace the active execution path, and separate active from legacy code.",
-      "class": "READ-ONLY",
-      "skill": "mbg-repo-analysis",
-      "platforms": {
-        "opencode": true,
-        "claude": true,
-        "codex": true
-      }
-    },
-    "install_agents": {
-      "summary": "Register the agent integrations for OpenCode, Claude Code and Codex \u2014 repo-scoped, or user-wide so /mbg-* works from any directory.",
-      "class": "MUTATING",
-      "skill": "mbg-setup",
-      "command": "./install.sh --stage agents",
-      "platforms": {
-        "opencode": true,
-        "claude": true,
-        "codex": true
-      }
-    },
-    "integrate_modules": {
-      "summary": "Collect generated modules into a LibreLane macro integration with info.yaml and lvs_config.json.",
-      "class": "GENERATING",
-      "skill": "mbg-spice-to-gds",
-      "command": "python3 scripts/integrate_modules.py --librelane",
-      "entry_point": "mbg.integrate.integrate",
-      "platforms": {
-        "opencode": true,
-        "claude": true,
-        "codex": true
-      }
-    },
-    "run_drc": {
-      "summary": "Run Magic DRC on a GDS and interpret the error tiles.",
-      "class": "GENERATING",
-      "skill": "mbg-ic-verify",
-      "entry_point": "mbg.checks.run_drc",
-      "platforms": {
-        "opencode": true,
-        "claude": true,
-        "codex": true
-      }
-    },
-    "run_lvs": {
-      "summary": "Run netgen LVS against the source netlist and interpret topology, property and pin results.",
-      "class": "GENERATING",
-      "skill": "mbg-ic-verify",
-      "entry_point": "mbg.checks.run_lvs",
-      "platforms": {
-        "opencode": true,
-        "claude": true,
-        "codex": true
-      }
-    },
-    "run_pex": {
-      "summary": "Run parasitic extraction and produce a post-layout netlist.",
-      "class": "GENERATING",
-      "skill": "mbg-ic-verify",
-      "entry_point": "mbg.checks.run_pex",
-      "platforms": {
-        "opencode": true,
-        "claude": true,
-        "codex": true
-      }
-    },
-    "run_simulation": {
-      "summary": "Run ngspice on a netlist and parse the raw output into usable data.",
-      "class": "GENERATING",
-      "skill": "mbg-spice-sim",
-      "entry_point": "mbg.simulation.run_spice",
+      "skill": "mbg-agent-interface",
       "platforms": {
         "opencode": true,
         "claude": true,
@@ -254,21 +100,9 @@
       }
     },
     "setup_environment": {
-      "summary": "Install or repair the whole environment with ./install.sh \u2014 Python, GF180MCU PDK, Magic/netgen/KLayout, and the $MBG_HOME (~/.mbg) shell integration and mbg launchers \u2014 and report the toolchain and PDK.",
+      "summary": "Install and inspect the public Python, PDK and EDA environment.",
       "class": "MUTATING",
       "skill": "mbg-setup",
-      "command": "./install.sh",
-      "platforms": {
-        "opencode": true,
-        "claude": true,
-        "codex": true
-      }
-    },
-    "simulate_analyses": {
-      "summary": "Operating point, DC, AC, transient, Monte Carlo and FFT via mbg.analysis.Testbench.",
-      "class": "GENERATING",
-      "skill": "mbg-spice-sim",
-      "entry_point": "mbg.analysis.Testbench",
       "platforms": {
         "opencode": true,
         "claude": true,
@@ -276,178 +110,69 @@
       }
     },
     "spice_to_gds": {
-      "summary": "Generate a DRC-clean GDSII layout from a SPICE subcircuit via gLayout.",
+      "summary": "Generate a checked layout from an explicit SPICE input.",
       "class": "GENERATING",
       "skill": "mbg-spice-to-gds",
-      "entry_point": "mbg.pipeline.spice_to_gds_with_checks",
       "platforms": {
         "opencode": true,
         "claude": true,
         "codex": true
       }
     },
-    "sync_agent_metadata": {
-      "summary": "Rescan the repository, refresh the project index and regenerate all platform adapters.",
+    "run_drc": {
+      "summary": "Run DRC, LVS and parasitic extraction on a selected layout.",
       "class": "GENERATING",
-      "command": "python3 scripts/sync_agent_tools.py",
+      "skill": "mbg-ic-verify",
       "platforms": {
         "opencode": true,
         "claude": true,
         "codex": true
       }
     },
-    "verify_connectivity": {
-      "summary": "Compare physical connectivity against the SPICE netlist before external signoff.",
+    "run_simulation": {
+      "summary": "Simulate an explicit circuit and report measured results.",
+      "class": "GENERATING",
+      "skill": "mbg-spice-sim",
+      "platforms": {
+        "opencode": true,
+        "claude": true,
+        "codex": true
+      }
+    },
+    "debug_placement": {
+      "summary": "Inspect device locations and layout access without changing connectivity.",
+      "class": "READ-ONLY",
+      "skill": "mbg-placement-debug",
+      "platforms": {
+        "opencode": true,
+        "claude": true,
+        "codex": true
+      }
+    },
+    "debug_routing": {
+      "summary": "Inspect route failures, opens and shorts in a selected run.",
       "class": "READ-ONLY",
       "skill": "mbg-routing-debug",
-      "entry_point": "mbg.connectivity.verify",
       "platforms": {
         "opencode": true,
         "claude": true,
         "codex": true
       }
     },
-    "run_design_flow": {
-      "summary": "Run the two-loop design flow: pre-layout optimisation, then PEX-aware post-layout optimisation against target specifications.",
-      "class": "WRITE",
-      "skill": "mbg-pex-aware-flow",
-      "entry_point": "mbg.flow.DesignFlow.run",
-      "platforms": {
-        "opencode": true,
-        "claude": true,
-        "codex": true
-      }
-    },
-    "evaluate_specifications": {
-      "summary": "Evaluate measured metrics against target specs and quantify pre-layout vs post-layout degradation.",
-      "class": "READ-ONLY",
-      "skill": "mbg-pex-aware-flow",
-      "entry_point": "mbg.specs.evaluate_specs",
-      "platforms": {
-        "opencode": true,
-        "claude": true,
-        "codex": true
-      }
-    },
-    "simulate_extracted_netlist": {
-      "summary": "Simulate the PEX-extracted netlist \u2014 a stage separate from PEX extraction.",
-      "class": "READ-ONLY",
-      "skill": "mbg-pex-aware-flow",
-      "entry_point": "mbg.flow_runtime.make_hooks",
-      "platforms": {
-        "opencode": true,
-        "claude": true,
-        "codex": true
-      }
-    },
-    "run_full_auto": {
-      "summary": "FULL AUTOMATE: one design request driven through specification, both optimisation loops, multi-agent review and the tapeout-ready sign-off gate.",
-      "class": "WRITE",
-      "skill": "mbg-full-auto",
-      "entry_point": "mbg.full_auto.run_full_auto",
-      "platforms": {
-        "opencode": true,
-        "claude": true,
-        "codex": true
-      }
-    },
-    "review_design_stage": {
-      "summary": "Run the independent Devil and Angel reviewers over one design stage and return structured findings.",
-      "class": "READ-ONLY",
-      "skill": "mbg-reviewers",
-      "entry_point": "mbg.reviewers.run_reviews",
-      "platforms": {
-        "opencode": true,
-        "claude": true,
-        "codex": true
-      }
-    },
-    "synthesize_reviews": {
-      "summary": "Combine reviewer output with measured evidence into a decision; evidence and hard gates take precedence.",
-      "class": "READ-ONLY",
-      "skill": "mbg-reviewers",
-      "entry_point": "mbg.reviewers.synthesize",
-      "platforms": {
-        "opencode": true,
-        "claude": true,
-        "codex": true
-      }
-    },
-    "signoff_gate": {
-      "summary": "Evaluate the explicit tapeout-ready gate; unevaluated conditions report NOT RUN and never count as passed.",
-      "class": "READ-ONLY",
-      "skill": "mbg-full-auto",
-      "entry_point": "mbg.full_auto.SignoffGate",
-      "platforms": {
-        "opencode": true,
-        "claude": true,
-        "codex": true
-      }
-    },
-    "work_economically": {
-      "summary": "Work in this repository without exhausting the context window: resolve the repo from $MBG_ROOT, index before reading, never poll git state, and climb the verification ladder cheapest-first.",
-      "class": "READ-ONLY",
-      "skill": "mbg-context-economy",
-      "platforms": {
-        "opencode": true,
-        "claude": true,
-        "codex": true
-      }
-    },
-    "agent_cli": {
-      "summary": "Drive every stage (check, simulate, measure, layout, verify, flow) from one command line that prints one JSON result envelope per call.",
+    "ordinary_macro": {
+      "summary": "Prepare an ordinary guard-ring macro through the checked layout tool.",
       "class": "GENERATING",
-      "skill": "mbg-agent-interface",
-      "command": "scripts/mbg tools",
-      "entry_point": "mbg.agent.cli.main",
+      "skill": "mbg-ordinary-macro",
       "platforms": {
         "opencode": true,
         "claude": true,
         "codex": true
       }
     },
-    "mcp_server": {
-      "summary": "Serve the same tools over the Model Context Protocol (stdio) for any MCP-capable harness.",
-      "class": "GENERATING",
-      "skill": "mbg-agent-interface",
-      "command": "scripts/mbg mcp",
-      "entry_point": "mbg.agent.mcp.serve",
-      "platforms": {
-        "opencode": true,
-        "claude": true,
-        "codex": true
-      }
-    },
-    "check_netlist": {
-      "summary": "Static netlist checks against the PDK catalogue before simulation or layout: models, units, size limits, body ties, layout support, complexity ceiling.",
+    "inspect_repository": {
+      "summary": "Find the public entry points and relevant source modules.",
       "class": "READ-ONLY",
-      "skill": "mbg-agent-interface",
-      "command": "scripts/mbg netlist check",
-      "entry_point": "mbg.netlist_check.check_netlist",
-      "platforms": {
-        "opencode": true,
-        "claude": true,
-        "codex": true
-      }
-    },
-    "measure_reference": {
-      "summary": "Characterise a voltage reference across temperature, supply, corners and bias current and evaluate it against a specification.",
-      "class": "GENERATING",
-      "skill": "mbg-voltage-reference",
-      "command": "scripts/mbg measure vref",
-      "entry_point": "mbg.measure.measure_vref",
-      "platforms": {
-        "opencode": true,
-        "claude": true,
-        "codex": true
-      }
-    },
-    "pdk_profiles": {
-      "summary": "Declarative PDK profiles (gf180mcuD default, sky130A): device catalogue, model sections, sign-off decks.",
-      "class": "READ-ONLY",
-      "skill": "mbg-agent-interface",
-      "command": "scripts/mbg pdk info",
-      "entry_point": "mbg.pdk_profile.load",
+      "skill": "mbg-repo-analysis",
       "platforms": {
         "opencode": true,
         "claude": true,
@@ -456,119 +181,61 @@
     }
   },
   "workflows": {
-    "mbg-full-auto": {
-      "summary": "Full automatic analog IC design flow, specification to tapeout-ready layout.",
-      "agent": "build",
+    "mbg-install": {
+      "summary": "Install the public MBG environment.",
       "platforms": {
         "opencode": true,
-        "claude": true,
-        "codex": false
+        "claude": true
       }
     },
-    "mbg-partial-automate": {
-      "summary": "Semi-automatic analog IC design flow with user confirmation at each stage.",
-      "agent": "build",
+    "mbg-layout": {
+      "summary": "Generate a checked layout from an explicit input.",
       "platforms": {
         "opencode": true,
-        "claude": true,
-        "codex": false
+        "claude": true
       }
     },
-    "mbg-review-ai-experiment": {
-      "summary": "Review an AI experiment record for reproducibility and evidence.",
-      "agent": "plan",
+    "mbg-verify": {
+      "summary": "Verify a selected layout against explicit circuit inputs.",
       "platforms": {
         "opencode": true,
-        "claude": true,
-        "codex": false
-      }
-    },
-    "mbg-review-extension": {
-      "summary": "Review an agent extension against the project authoring and safety rules.",
-      "agent": "plan",
-      "platforms": {
-        "opencode": true,
-        "claude": true,
-        "codex": false
-      }
-    },
-    "mbg-new-skill": {
-      "summary": "Scaffold a new canonical skill under .ai/skills and resync all platforms.",
-      "agent": "build",
-      "platforms": {
-        "opencode": true,
-        "claude": true,
-        "codex": false
-      }
-    },
-    "mbg-new-command": {
-      "summary": "Scaffold a new canonical workflow under .ai/workflows and resync all platforms.",
-      "agent": "build",
-      "platforms": {
-        "opencode": true,
-        "claude": true,
-        "codex": false
-      }
-    },
-    "mbg-new-tool": {
-      "summary": "Create a safe OpenCode custom tool using the project authoring standard.",
-      "agent": "build",
-      "platforms": {
-        "opencode": true,
-        "claude": false,
-        "codex": false
+        "claude": true
       }
     }
   },
   "index_targets": {
-    "framework_utils": {
-      "root": "src/mbg",
-      "glob": "*.py"
-    },
-    "placement_modules": {
+    "public_core": {
       "root": "src/mbg",
       "match": [
-        "placement",
-        "placement_engine",
-        "power"
-      ]
-    },
-    "routing_modules": {
-      "root": "src/mbg",
-      "match": [
-        "routing",
-        "router",
-        "connectivity"
-      ]
-    },
-    "pdk_modules": {
-      "root": "src/mbg",
-      "match": [
-        "pdk_rules",
-        "pdk_devices"
-      ]
-    },
-    "spice_modules": {
-      "root": "src/mbg",
-      "match": [
-        "spice_parser",
-        "simulation"
-      ]
-    },
-    "verification_modules": {
-      "root": "src/mbg",
-      "match": [
+        "analysis",
         "checks",
-        "connectivity"
+        "config",
+        "connectivity",
+        "design_context",
+        "drc",
+        "layout_view",
+        "measure",
+        "netlist_check",
+        "outputs",
+        "passives",
+        "pdk_profile",
+        "pdk_rules",
+        "pipeline",
+        "placement_engine",
+        "power",
+        "router",
+        "simulation",
+        "specs",
+        "spice_parser",
+        "utils",
+        "macro",
+        "macro_guardring",
+        "output_paths"
       ]
     },
-    "tests": {
-      "root": "tests",
-      "glob": "test_*.py"
-    },
-    "generated_designs": {
-      "root": "AI-Generated-Design-Result",
-      "dirs_only": true
+    "pdk_profiles": {
+      "root": "src/mbg/pdks",
+      "glob": "*.json"
     }
   },
   "mcp": {
@@ -585,5 +252,19 @@
       "cursor": ".cursor/mcp.json",
       "gemini": ".gemini/settings.json"
     }
+  },
+  "release": {
+    "tier": "basic-intermediate",
+    "canonical_skills": [
+      "mbg-agent-interface",
+      "mbg-ic-verify",
+      "mbg-ordinary-macro",
+      "mbg-placement-debug",
+      "mbg-repo-analysis",
+      "mbg-routing-debug",
+      "mbg-setup",
+      "mbg-spice-sim",
+      "mbg-spice-to-gds"
+    ]
   }
 }

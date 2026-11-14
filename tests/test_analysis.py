@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Analysis-layer tests: op, DC, AC, transient, FFT, Monte Carlo.
+"""Analysis-layer tests: op, DC, AC, transient, FFT.
 
 Each check asserts something physically meaningful rather than just "it ran" —
 an inverter's trip point sits between the rails, the FFT of a 100 MHz pulse
-peaks at 100 MHz, and a Monte Carlo run actually varies.
+peaks at 100 MHz.
 
 Run:  python tests/test_analysis.py
 """
@@ -93,15 +93,6 @@ class AnalysisTests(unittest.TestCase):
         self.assertAlmostEqual(peak / 1e8, 1.0, delta=0.1,
                                msg=f"FFT peaked at {peak:.4g} Hz, expected ~1e8")
 
-    def test_monte_carlo_actually_varies(self):
-        mc = self._tb(sources={"a": 1.5}).monte_carlo("op", runs=6)
-        self.assertEqual(len(mc.runs), 6)
-        stats = mc.stats("y")
-        self.assertEqual(stats["n"], 6)
-        # The typical corner gates mismatch off; if sigma is zero the corner
-        # or the sw_stat_mismatch switch has regressed.
-        self.assertGreater(stats["sigma"], 1e-6,
-                           "Monte Carlo produced no spread — mismatch is gated off")
 
 
 def main():

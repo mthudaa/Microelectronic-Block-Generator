@@ -45,7 +45,7 @@ class McpProtocol(unittest.TestCase):
         self.assertIn("tools", init["capabilities"])
         names = {t["name"] for t in by_id[2]["result"]["tools"]}
         for n in ("doctor", "pdk", "netlist_check", "sim_run", "measure_vref",
-                  "layout_generate", "layout_view", "verify", "flow_run", "job"):
+                  "layout_generate", "layout_view", "verify", "job"):
             self.assertIn(n, names)
         for t in by_id[2]["result"]["tools"]:
             self.assertEqual(t["inputSchema"]["type"], "object")

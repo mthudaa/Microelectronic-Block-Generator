@@ -1,0 +1,24 @@
+include LICENSE README.md AGENTS.md CLAUDE.md pyproject.toml requirements.txt requirements-lock.txt install.sh
+include scripts/mbg .mcp.json opencode.jsonc
+recursive-include .codex *.toml
+recursive-include .cursor *.json
+recursive-include .gemini *.json
+recursive-include src/mbg *.py *.json *.tcl *.sh
+recursive-include scripts *.py *.sh
+recursive-include .ai *.json *.md
+recursive-include .agents *.json *.md
+recursive-include .claude *.json *.md
+recursive-include .opencode *.json *.md
+recursive-include plugins *.json *.md
+recursive-include docs *.md
+recursive-include tests *.py *.spice
+prune .git
+prune .ai-memory
+prune results
+prune designs
+prune projects
+prune experiments
+prune outputs
+prune prompt-test
+prune mbg-toplevel
+global-exclude *.ipynb *.pdf *.docx *.gds *.oas *.raw *.log *.pem *.key .env .env.*

@@ -1,22 +1,8 @@
-"""Per-module deliverables: LEF, Liberty, Verilog, and a manifest of everything.
-
-The layout flow already produces GDS, SVG, the schematic and extracted netlists,
-and the DRC / LVS / PEX reports. Integrating a block into a larger chip with
-LibreLane needs three more views:
-
-    LEF      abstract footprint and pin shapes, for the placer
-    LIB      Liberty timing/power abstract, for the synthesiser
-    Verilog  a black-box module declaration, so RTL can instantiate it
-
-An analog macro has no timing arcs to characterise, so the Liberty view here is
-a hard-macro abstract: correct pin directions and capacitances, no arcs. That is
-what LibreLane needs to place and route around the block, and it is honest about
-what it is — it does not claim characterisation that was never run.
-"""
-
+"""Physical LEF and interface-only Liberty/Verilog views; no system integration."""
 from __future__ import annotations
 
 import json
+import math
 import os
 import re
 import shutil
@@ -103,7 +89,10 @@ def write_lef(gds_path: str, cell: str, outdir: str, *,
 
     Returns the path, or None with the reason recorded by the caller.
     """
-    if shutil.which("magic") is None:
+    from mbg.config import magic_bin, ToolError
+    try:
+        magic = magic_bin()
+    except ToolError:
         return None
     gds_path = os.path.abspath(gds_path)
     outdir = os.path.abspath(outdir)
@@ -126,13 +115,15 @@ def write_lef(gds_path: str, cell: str, outdir: str, *,
     pdkpath = os.environ.get("PDKPATH") or os.path.join(
         os.environ.get("PDK_ROOT", os.path.expanduser("~/.volare")), tech)
     rcfile = os.path.join(pdkpath, "libs.tech", "magic", f"{tech}.magicrc")
-    cmd = ["magic", "-dnull", "-noconsole"]
+    cmd = [magic, "-dnull", "-noconsole"]
     if os.path.isfile(rcfile):
         cmd += ["-rcfile", rcfile]
     cmd.append(script)
     try:
-        subprocess.run(cmd, capture_output=True, text=True,
-                       timeout=timeout, cwd=outdir)
+        completed = subprocess.run(cmd, capture_output=True, text=True,
+                                   timeout=timeout, cwd=outdir)
+        if completed.returncode:
+            return None
     except Exception:
         return None
     if not os.path.isfile(lef_path):
@@ -178,72 +169,33 @@ def write_verilog(cell: str, ports: Sequence[PortSpec], outdir: str) -> str:
 # ── Liberty ────────────────────────────────────────────────────────────
 
 def write_lib(cell: str, ports: Sequence[PortSpec], outdir: str, *,
-              library_name: Optional[str] = None,
-              default_cap: float = 0.005) -> str:
-    """Minimal Liberty abstract for a hard analog macro.
-
-    No timing arcs: none were characterised, and inventing them would make a
-    synthesiser trust numbers nobody measured. Pin directions and a nominal
-    capacitance are enough for LibreLane to treat the block as a hard macro.
-    """
-    os.makedirs(outdir, exist_ok=True)
-    path = os.path.join(outdir, f"{cell}.lib")
-    lib = library_name or f"{cell}_lib"
-    pin_blocks = []
-    for p in ports:
-        if p.direction == "power":
-            pin_blocks.append(
-                f'    pg_pin({p.name}) {{\n'
-                f'      voltage_name : VDD;\n'
-                f'      pg_type : primary_power;\n'
-                f'    }}')
-        elif p.direction == "ground":
-            pin_blocks.append(
-                f'    pg_pin({p.name}) {{\n'
-                f'      voltage_name : VSS;\n'
-                f'      pg_type : primary_ground;\n'
-                f'    }}')
+              library_name: Optional[str] = None, default_cap: Optional[float] = None) -> str:
+    """Interface-only Liberty: no invented timing, voltage or capacitance."""
+    from mbg.macro import validate_identifier
+    validate_identifier(cell, 'cell')
+    lib = validate_identifier(library_name or cell+'_lib', 'library')
+    lines = ['/* Interface abstract; timing is NOT RUN. */', 'library ('+lib+') {',
+             '  delay_model : table_lookup;', '  time_unit : "1ns";',
+             '  voltage_unit : "1V";', '  capacitive_load_unit (1, pf);',
+             '  cell ('+cell+') {', '    is_macro_cell : true;', '    dont_touch : true;']
+    for pin in ports:
+        validate_identifier(pin.name, 'pin')
+        if pin.direction in ('power','ground'):
+            role = 'primary_power' if pin.direction=='power' else 'primary_ground'
+            lines += ['    pg_pin('+pin.name+') {', '      voltage_name : '+pin.name+';',
+                      '      pg_type : '+role+';', '    }']
         else:
-            pin_blocks.append(
-                f'    pin({p.name}) {{\n'
-                f'      direction : {p.liberty_dir};\n'
-                f'      capacitance : {default_cap};\n'
-                f'    }}')
-    with open(path, "w") as f:
-        f.write(
-            f'/*\n'
-            f' * Liberty abstract for the analog macro `{cell}`.\n'
-            f' * Generated by mbg.outputs.\n'
-            f' *\n'
-            f' * This is a HARD MACRO abstract, not a characterised cell: it carries\n'
-            f' * pin directions, supply pins and a nominal input capacitance so a\n'
-            f' * synthesiser and floorplanner can work around the block. It contains\n'
-            f' * no timing arcs, because none were characterised.\n'
-            f' */\n'
-            f'library ({lib}) {{\n'
-            f'  technology (cmos);\n'
-            f'  delay_model : table_lookup;\n'
-            f'  time_unit : "1ns";\n'
-            f'  voltage_unit : "1V";\n'
-            f'  current_unit : "1mA";\n'
-            f'  capacitive_load_unit (1, pf);\n'
-            f'  pulling_resistance_unit : "1kohm";\n'
-            f'  leakage_power_unit : "1nW";\n'
-            f'  default_max_transition : 1.0;\n\n'
-            f'  voltage_map (VDD, 3.3);\n'
-            f'  voltage_map (VSS, 0.0);\n\n'
-            f'  operating_conditions (typical) {{\n'
-            f'    process : 1.0;\n    temperature : 25.0;\n    voltage : 3.3;\n'
-            f'    tree_type : balanced_tree;\n  }}\n'
-            f'  default_operating_conditions : typical;\n\n'
-            f'  cell ({cell}) {{\n'
-            f'    is_macro_cell : true;\n'
-            f'    dont_touch : true;\n'
-            f'    dont_use : true;\n'
-            f'    interface_timing : true;\n\n'
-            + "\n".join(pin_blocks) + "\n"
-            f'  }}\n'
-            f'}}\n')
+            lines += ['    pin('+pin.name+') {', '      direction : '+pin.liberty_dir+';']
+            if default_cap is not None:
+                if not math.isfinite(default_cap) or default_cap < 0:
+                    raise ValueError('explicit pin capacitance must be nonnegative and finite')
+                lines.append('      capacitance : '+str(default_cap)+';')
+            lines.append('    }')
+    lines += ['  }','}']
+    os.makedirs(outdir,exist_ok=True)
+    path = os.path.join(outdir,cell+'.lib')
+    with open(path,'w') as f:
+        f.write('\n'.join(lines)+'\n')
     return path
 
 
@@ -289,7 +241,9 @@ def write_all(result: Dict, *, outdir: Optional[str] = None,
     out.files["verilog"] = write_verilog(cell, specs, outdir)
     out.files["lib"] = write_lib(cell, specs, outdir)
 
-    lef = write_lef(out.files["gds"], cell, outdir) if out.files["gds"] else None
+    interface = result.get("macro_interface") or {}
+    lef = (write_macro_lef(result, outdir) if interface.get("pins") else
+           write_lef(out.files["gds"], cell, outdir) if out.files["gds"] else None)
     out.files["lef"] = lef
     if lef is None:
         out.notes.append("LEF not generated (Magic unavailable or the write failed)")
@@ -300,7 +254,8 @@ def write_all(result: Dict, *, outdir: Optional[str] = None,
                    "ports": [{"name": p.name, "direction": p.direction} for p in specs],
                    "files": {k: (os.path.relpath(v, outdir) if v else None)
                              for k, v in out.files.items()},
-                   "notes": out.notes},
+                   "notes": out.notes,
+                   "interface": interface},
                   f, indent=2, sort_keys=True)
         f.write("\n")
     out.files["manifest"] = manifest
@@ -310,3 +265,56 @@ def write_all(result: Dict, *, outdir: Optional[str] = None,
         for n in out.notes:
             print(f"  [OUTPUTS] note: {n}")
     return out
+
+
+def write_macro_lef(result: Dict, outdir: str) -> str:
+    """Write an ordinary macro abstract from its actual physical pin contract."""
+    from mbg.macro import validate_identifier
+    interface = result.get('macro_interface') or getattr(result.get('context'), 'macro_interface', None)
+    if not interface or not interface.get('pins'):
+        raise ValueError('macro LEF requires physical pin geometry')
+    cell = validate_identifier(result.get('cell_name') or interface['cell'], 'cell')
+    x0,y0,x1,y1 = interface['bounds']
+    if x1 <= x0 or y1 <= y0:
+        raise ValueError('macro bounds must be positive')
+    lines = ['VERSION 5.8 ;','BUSBITCHARS "[]" ;','DIVIDERCHAR "/" ;',
+             'MACRO '+cell, '  CLASS BLOCK ;','  ORIGIN 0 0 ;',
+             f'  SIZE {x1-x0:.6f} BY {y1-y0:.6f} ;','  SYMMETRY X Y ;']
+    for pin in interface['pins']:
+        name = validate_identifier(pin['name'], 'pin')
+        a,b,c,d = pin['rect']
+        if not (x0 <= a < c <= x1 and y0 <= b < d <= y1):
+            raise ValueError('macro pin escapes the declared bounds')
+        direction = 'INPUT' if pin['direction']=='input' else 'OUTPUT' if pin['direction']=='output' else 'INOUT'
+        use = 'POWER' if pin['direction']=='power' else 'GROUND' if pin['direction']=='ground' else 'SIGNAL'
+        lines += ['  PIN '+name,'    DIRECTION '+direction+' ;','    USE '+use+' ;',
+                  '    PORT','      LAYER Metal'+pin['layer'][3:]+' ;',
+                  f'        RECT {a-x0:.6f} {b-y0:.6f} {c-x0:.6f} {d-y0:.6f} ;',
+                  '    END','  END '+name]
+    # Preserve actual internal metal as obstructions, subtracting this
+    # layer's published physical pin rectangles so pins remain accessible.
+    ctx = result.get('context')
+    component = result.get('component') or getattr(ctx,'component',None)
+    if component is not None and getattr(ctx,'rules',None) is not None:
+        import gdstk
+        geometry = component.get_polygons(by_spec=True)
+        lines.append('  OBS')
+        for layer in ctx.rules.metals:
+            metal = geometry.get(ctx.rules.layer_tuple(layer),[])
+            cuts = [gdstk.rectangle((p['rect'][0],p['rect'][1]),(p['rect'][2],p['rect'][3]))
+                    for p in interface['pins'] if p['layer']==layer]
+            pieces = gdstk.boolean(metal,cuts,'not',precision=ctx.rules.manufacturing_grid()) if metal else []
+            if not pieces:
+                continue
+            from mbg.geometry import rect_decompose
+            lines.append('    LAYER Metal'+layer[3:]+' ;')
+            for polygon in pieces:
+                for a,b,c,d in rect_decompose([tuple(pt) for pt in polygon.points]):
+                    lines.append(f'      RECT {a-x0:.6f} {b-y0:.6f} {c-x0:.6f} {d-y0:.6f} ;')
+        lines.append('  END')
+    lines += ['END '+cell,'END LIBRARY']
+    os.makedirs(outdir,exist_ok=True)
+    path = os.path.join(outdir,cell+'.lef')
+    with open(path,'w') as f:
+        f.write('\n'.join(lines)+'\n')
+    return path

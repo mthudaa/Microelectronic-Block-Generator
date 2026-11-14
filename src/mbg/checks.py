@@ -165,7 +165,7 @@ def _find_eda_scripts():
     """Locate the iic-*.sh verification scripts.
 
     The package lives at <repo>/src/mbg while the EDA shell scripts stay with
-    the Chipathon design directory, so the path is discovered rather than
+    scripts/eda, so the path is discovered rather than
     assumed. Honours MBG_SCRIPTS_DIR for unusual layouts.
     """
     override = os.environ.get("MBG_SCRIPTS_DIR")
@@ -185,14 +185,14 @@ def _find_eda_scripts():
                 or os.path.isdir(os.path.join(root, ".git")):
             break
     for cand in (
-        os.path.join(root, "designs", "notebooks", "chipathon2026-D", "scripts"),
+        os.path.join(here, "eda"),
+        os.path.join(root, "scripts", "eda"),
         os.path.join(root, "scripts"),
         os.path.join(here, "..", "..", "scripts"),
     ):
         if os.path.isfile(os.path.join(cand, "iic-drc.sh")):
             return os.path.abspath(cand)
-    return os.path.abspath(os.path.join(root, "designs", "notebooks",
-                                        "chipathon2026-D", "scripts"))
+    return os.path.abspath(os.path.join(root, "scripts", "eda"))
 
 
 SCRIPT_DIR = _find_eda_scripts()
@@ -590,65 +590,6 @@ def permute_mosfet_sd(spice_content, models=None, swap_params=True):
 
 # ── DRC ──────────────────────────────────────────────────────────────
 
-def _drc_via_engine(gds_path, cell_name, engine, workdir, timeout):
-    """Run KLayout (or both engines) through mbg.drc and adapt the result.
-
-    Returns run_drc()'s dict shape so callers do not have to care which
-    implementation answered. A verdict is only ever CLEAN when a report was
-    actually parsed; NOT_CONFIGURED and ERROR stay distinct from FAIL,
-    because "the checker did not run" is not "the layout is clean".
-    """
-    from mbg.drc import DRCStatus, SignoffVerdict, get_engine, run_dual_drc
-
-    workdir = os.path.abspath(workdir) if workdir else os.getcwd()
-    os.makedirs(workdir, exist_ok=True)
-
-    def adapt(res, summary=None):
-        clean = res.status == DRCStatus.CLEAN
-        status = {DRCStatus.CLEAN: PASS, DRCStatus.FAIL: FAIL}.get(
-            res.status, ERROR)
-        return {
-            "clean": clean,
-            "status": status,
-            "stage": "drc",
-            "report_path": res.report_path,
-            "error_count": res.violations if res.status in (
-                DRCStatus.CLEAN, DRCStatus.FAIL) else -1,
-            "rules_violated": sorted(res.rules or {}),
-            "rule_counts": dict(res.rules or {}),
-            "layout_load_errors": ([res.message]
-                                   if res.status == DRCStatus.ERROR and res.message
-                                   else []),
-            "log": res.message or "",
-            "log_path": res.log_path,
-            "tool": res.tool,
-            "engine": res.engine,
-            "summary": summary or f"DRC: {res.summary()}",
-        }
-
-    if engine == "klayout":
-        res = get_engine("klayout").run(gds_path, cell_name=cell_name,
-                                        workdir=workdir, timeout=timeout)
-        return adapt(res)
-
-    signoff = run_dual_drc(gds_path, cell_name=cell_name, workdir=workdir,
-                           verbosity=0)
-    primary = signoff.get("klayout") or (signoff.results[0]
-                                         if signoff.results else None)
-    if primary is None:
-        return {"clean": False, "status": ERROR, "stage": "drc",
-                "report_path": None, "error_count": -1, "rules_violated": [],
-                "layout_load_errors": ["no DRC engine produced a result"],
-                "log": signoff.reason, "log_path": None, "tool": "",
-                "engine": "both",
-                "summary": "DRC: NO ENGINE AVAILABLE"}
-    out = adapt(primary, summary=f"DRC: {signoff.verdict} — {signoff.reason}")
-    # On "both", the reconciled verdict decides, not either engine alone.
-    out["clean"] = signoff.verdict == SignoffVerdict.PASS
-    out["status"] = PASS if out["clean"] else FAIL
-    out["engine"] = "both"
-    out["signoff"] = signoff.as_dict()
-    return out
 
 
 def run_drc(gds_path, cell_name=None, engine="magic", workdir=None,
@@ -658,7 +599,7 @@ def run_drc(gds_path, cell_name=None, engine="magic", workdir=None,
     Args:
         gds_path: Path to GDS file.
         cell_name: Top cell name (auto from filename if None).
-        engine: "magic" (default), "klayout", or "both".
+        engine: "magic".
         workdir: Working directory (default: current dir).
         clean: Remove previous result files.
         timeout: Max seconds (default 600).
@@ -676,27 +617,8 @@ def run_drc(gds_path, cell_name=None, engine="magic", workdir=None,
         raise ValueError(f"GDS is empty: {gds_path}")
     cell = cell_name or os.path.splitext(os.path.basename(gds_path))[0]
 
-    if engine in ("klayout", "both"):
-        # Delegate to mbg.drc, which is the real KLayout implementation.
-        #
-        # This used to shell out to iic-drc.sh with -k/-b, and every part of
-        # that path was broken:
-        #   * the script finds KLayout with `command -v klayout`, ignoring
-        #     $MBG_KLAYOUT -- and the project pins KLayout by absolute path
-        #     precisely because distributions ship no `klayout` package;
-        #   * it reads the deck from libs.tech/klayout/drc/<pdk>_mr.drc,
-        #     which this PDK does not contain (the deck is under
-        #     libs.tech/klayout/tech/drc/gf180mcu.drc);
-        #   * it writes <cell>.klayout.drc.{feol,beol,density}.xml, while
-        #     this function only ever looked for <stem>.magic.drc.rpt, so a
-        #     KLayout report was never read even when one existed;
-        #   * with no report parsed, the verdict fell through to a log
-        #     substring test for "No DRC errors"/"CONGRATULATIONS" -- Magic's
-        #     phrases. On engine="both" a Magic-clean run could therefore
-        #     report DRC: CLEAN while KLayout had failed or found violations.
-        # mbg.drc.KLayoutDRC does it correctly: it honours the resolved
-        # binary, uses the shipped deck, and reads the .lyrdb it produces.
-        return _drc_via_engine(gds_path, cell, engine, workdir, timeout)
+    if engine != "magic":
+        raise ValueError("This release supports Magic DRC only")
 
     engine_flag = "-m"
     cmd = ["bash", IIC_DRC, engine_flag]
@@ -816,7 +738,7 @@ _SUBCKT_PORT_RE = re.compile(r"\.subckt\s+(\S+)\s+(.+)")
 def _parse_lvs_summary(report_path):
     """Parse netgen LVS report into structured AI-readable dict."""
     if not report_path or not os.path.isfile(report_path):
-        return {"match": False, "device_mismatch": "?", "net_mismatch": "?",
+        return {"match": False, "status": ERROR, "device_mismatch": "?", "net_mismatch": "?",
                 "port_swaps": [], "missing_devices": [], "message": "No report"}
     with open(report_path) as f:
         text = f.read()
@@ -849,6 +771,7 @@ def _parse_lvs_summary(report_path):
                        text, re.MULTILINE)
     return {
         "match": match,
+        "status": PASS if match else FAIL,
         "topology_match": topology_ok,
         "property_errors": property_errors,
         "pin_matching_failed": pin_failure,
@@ -875,153 +798,17 @@ def _flatten_netlist(extracted_path, out_path=None):
     return out
 
 
-def _match_extracted_to_schematic(xtr_lines, xtr_ports, sch_lines, sch_ports):
-    """Match extracted X-instances to schematic M-instances by topology.
-
-    Returns:
-        (merged_map, xtr_node_to_sch_net): 
-            merged_map: dict mapping internal node → set of merged schematic net names
-            xtr_node_to_sch_net: dict mapping internal node → single merged net name
-    """
-    xtr_devs = []
-    sch_devs = []
-
-    for line in xtr_lines:
-        m = re.match(r'X(\d+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(pfet_03v3|nfet_03v3)\s', line)
-        if m:
-            idx, d, g, s, b, model = m.groups()
-            wm = re.search(r'\bw=(\S+)', line, re.IGNORECASE)
-            w = wm.group(1) if wm else "?"
-            xtr_devs.append((int(idx), model, d, g, s, b, w))
-
-    for line in sch_lines:
-        m = re.match(r'XM(\d+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(pfet_03v3|nfet_03v3)\s', line)
-        if m:
-            idx, d, g, s, b, model = m.groups()
-            wm = re.search(r'W=(\S+)', line)
-            w = wm.group(1) if wm else "?"
-            sch_devs.append((int(idx), model, d, g, s, b, w))
-
-    node_to_sch_net = {}
-    used_sch = set()
-
-    for xd in xtr_devs:
-        xi, xm, xdrain, xgate, xsrc, xbody, xw = xd
-        best_match = None
-        best_score = -1
-        for sd in sch_devs:
-            si, sm, sdrain, sgate, ssrc, sbody, sw = sd
-            if si in used_sch:
-                continue
-            score = 0
-            if xm == sm:
-                score += 10
-            if sdrain in sch_ports:
-                if xdrain == sdrain:
-                    score += 8
-                elif xdrain not in xtr_ports:
-                    score -= 5
-            if sgate in sch_ports:
-                if xgate == sgate:
-                    score += 8
-                elif xgate not in xtr_ports:
-                    score -= 5
-            if xw != "?" and sw != "?" and xw.upper() == sw.upper():
-                score += 5
-            if xsrc.upper() in ("VDD", "VSS") and ssrc.upper() in ("VDD", "VSS"):
-                score += 2
-            if xbody.upper() in ("VDD", "VSS") and sbody.upper() in ("VDD", "VSS"):
-                score += 2
-            if score > best_score:
-                best_score = score
-                best_match = sd
-        if best_match:
-            si, sm, sdrain, sgate, ssrc, sbody, sw = best_match
-            used_sch.add(si)
-            pins_xtr = [xdrain, xgate, xsrc, xbody]
-            pins_sch = [sdrain, sgate, ssrc, sbody]
-            for pxtr, psch in zip(pins_xtr, pins_sch):
-                if pxtr not in xtr_ports:
-                    if pxtr not in node_to_sch_net:
-                        node_to_sch_net[pxtr] = set()
-                    node_to_sch_net[pxtr].add(psch)
-                elif psch not in sch_ports:
-                    # Port pin reused for internal connection — track it
-                    if pxtr not in node_to_sch_net:
-                        node_to_sch_net[pxtr] = set()
-                    node_to_sch_net[pxtr].add(psch)
-
-    merged_map = {}
-    for node, nets in node_to_sch_net.items():
-        if len(nets) > 1:
-            merged_map[node] = nets
-    return merged_map, node_to_sch_net
 
 
-def _merge_schematic_nets(sch_content, merge_map):
-    """DISABLED — retained only to document why automatic net merging is off.
-
-    This rewrote the *schematic* netlist to match whatever the layout
-    extracted, which makes LVS compare the layout against itself: any
-    router-induced short became "correct" instead of being reported.
-    The only call site is commented out in run_lvs() and must stay that
-    way. If LVS reports a merged net, fix the layout, not the netlist.
-    """
-    raise RuntimeError(
-        "_merge_schematic_nets is disabled: it masks real shorts by editing the schematic to match the layout")
-    # --- original implementation retained below, unreachable ---
-
-    lines = sch_content.split('\n')
-    port_nets = set()
-    for line in lines:
-        if line.startswith('.subckt '):
-            port_nets.update(line.split()[2:])
-            break
-
-    all_nets_to_merge = set()
-    for nets in merge_map.values():
-        all_nets_to_merge.update(nets)
-
-    if not all_nets_to_merge:
-        return sch_content
-
-    chosen = {}
-    for nets in merge_map.values():
-        if nets & port_nets:
-            target = min(nets & port_nets)
-        else:
-            target = min(nets)
-        for n in nets:
-            chosen[n] = target
-
-    out_lines = []
-    for line in lines:
-        if line.startswith('.subckt '):
-            parts = line.split()
-            ports = parts[2:]
-            new_ports = []
-            for p in ports:
-                p2 = chosen.get(p, p)
-                if p2 not in new_ports:
-                    new_ports.append(p2)
-            out_lines.append(' '.join([parts[0], parts[1]] + new_ports))
-        elif line.startswith('+') or line.startswith('.lib') or line.startswith('.ends'):
-            out_lines.append(line)
-        else:
-            tokens = line.split()
-            new_tokens = [chosen.get(t, t) for t in tokens]
-            out_lines.append(' '.join(new_tokens))
-    return '\n'.join(out_lines)
 
 
 def run_lvs(gds_path, netlist_path=None, netlist_content=None,
             cell_name=None, workdir=None, auto_fix_ports=True,
-            auto_permute_sd=False, timeout=600):
+            timeout=600):
     """Run Layout vs Schematic via netgen with auto port-order fix + flatten.
 
-    Detects and adapts to net merges caused by the auto-router (e.g.,
-    net1↔net2 shorts) by merging corresponding nets in the schematic
-    before comparison.
+    Compares extraction with the original schematic. Shorts are never
+    hidden by merging schematic nets or retrying a changed circuit.
 
     Usage:
         lvs = run_lvs("out.gds", netlist_content=netlist)
@@ -1039,15 +826,7 @@ def run_lvs(gds_path, netlist_path=None, netlist_content=None,
         workdir: Working directory (temp dir if None).
         auto_fix_ports: If True, extracts layout netlist and reorders its
             ports to match the schematic before running LVS.
-        auto_permute_sd: If True and the first LVS attempt mismatches,
-            also tries a drain↔source-permuted version of the extracted
-            netlist and returns the better result.
-        timeout: Max seconds (default 600).
 
-    Returns:
-        dict: {match: bool, report_path: str|None, log: str,
-               summary: dict}  — summary has keys: match, device_mismatch,
-               net_mismatch, port_swaps, missing_devices, message.
     """
     _check_env()
     gds_path = os.path.abspath(gds_path)
@@ -1092,18 +871,6 @@ def run_lvs(gds_path, netlist_path=None, netlist_content=None,
         # NOTE: auto net-merge is DISABLED — it corrupts the schematic
         # by incorrectly merging internal nets (e.g. n1→VDD, VIN_N→VDD).
         # Netgen's permute 1 3 handles D/S swapping natively.
-        # merge_map, _ = _match_extracted_to_schematic(
-        #     xtr_lines, xtr_ports, sch_text.split('\n'), sch_ports)
-        # if merge_map:
-        #     modified = _merge_schematic_nets(sch_text, merge_map)
-        #     with open(sch_path, "w") as f:
-        #         f.write(modified)
-        #     with open(sch_path) as f:
-        #         for line in f:
-        #             if line.startswith('.subckt'):
-        #                 sch_ports = line.strip().split()[2:]
-        #                 break
-
         flat_path = _flatten_netlist(xtr["netlist_path"])
         if sch_ports:
             fix_port_order(flat_path, sch_ports)
@@ -1241,33 +1008,6 @@ def run_lvs(gds_path, netlist_path=None, netlist_content=None,
     summary = _parse_lvs_summary(report_path)
 
     # ── Fallback: permute D/S and retry ──
-    if not summary["match"] and auto_permute_sd and xtr.get("success"):
-        print("  [LVS] mismatch — retrying with permuted D/S…")
-        try:
-            perm_path = os.path.join(wd, f"{cell}_permuted_flat.spice")
-            with open(xtr_path) as f:
-                perm_content = permute_mosfet_sd(f.read())
-            with open(perm_path, "w") as f:
-                f.write(perm_content)
-            report2 = os.path.join(wd, f"{cell}.lvs_permuted.out")
-            r2, report_path2 = _invoke_netgen(perm_path, report2)
-            if r2 is not None and r2.get("status") not in (ERROR, TIMEOUT):
-                log2 = r2.get("output", "")
-                summary2 = _parse_lvs_summary(report_path2)
-                if summary2["match"]:
-                    print("  [LVS] permuted D/S → MATCH ✓")
-                    report_path = report_path2
-                    log = log2
-                    summary = summary2
-                else:
-                    print("  [LVS] permuted D/S still MISMATCH — issue is NOT D/S ordering")
-                    log += "\n\n--- permuted retry ---\n" + log2
-            else:
-                print("  [LVS] permuted retry failed (netgen error)")
-        except Exception as e:
-            print(f"  [LVS] permute fallback error: {e}")
-
-    summary["status"] = PASS if summary["match"] else FAIL
     return {"match": summary["match"], "status": summary["status"],
             "stage": "lvs", "report_path": report_path,
             "log": log.strip(), "summary": summary,

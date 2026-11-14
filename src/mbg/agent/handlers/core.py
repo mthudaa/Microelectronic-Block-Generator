@@ -42,8 +42,6 @@ def doctor(args, ctx) -> Result:
         "simulation": tools["ngspice"].ok and prof.installed(),
         "layout": bool(py["glayout"] and py["gdsfactory"]),
         "drc_magic": tools["magic"].ok and prof.installed(),
-        "drc_klayout": ("klayout" not in prof.drc_engines)
-                       or (tools["klayout"].ok and _klayout_new_enough(tools["klayout"])),
         "lvs": tools["netgen"].ok and tools["magic"].ok and prof.installed(),
         "pex": tools["magic"].ok and prof.installed(),
     }
@@ -61,13 +59,6 @@ def doctor(args, ctx) -> Result:
                 name == "klayout" and "klayout" in prof.drc_engines) else "error"
             r.issue(f"NO_{name.upper()}", (t.reason or f"{name} unusable").splitlines()[0],
                     severity=sev, hint="./install.sh --stage eda")
-    if tools["klayout"].ok and "klayout" in prof.drc_engines \
-            and not _klayout_new_enough(tools["klayout"]):
-        r.issue("KLAYOUT_TOO_OLD",
-                f"KLayout {tools['klayout'].version_string} is older than the "
-                f"0.30.9 the {prof.name} deck needs for sign-off",
-                hint="./install.sh --stage eda")
-
     ready = [s for s, ok in stages.items() if ok]
     blocked = [s for s, ok in stages.items() if not ok]
     if not blocked:
@@ -79,14 +70,6 @@ def doctor(args, ctx) -> Result:
     r.next = ["mbg pdk info --section devices", "mbg tools"]
     return r
 
-
-def _klayout_new_enough(info) -> bool:
-    try:
-        from mbg.drc import MIN_KLAYOUT_VERSION
-    except Exception:
-        MIN_KLAYOUT_VERSION = (0, 30, 9)
-    v = tuple(x for x in (info.version or ()) if x is not None)
-    return bool(v) and v >= MIN_KLAYOUT_VERSION
 
 
 def pdk_list(args, ctx) -> Result:

@@ -1,4 +1,4 @@
-"""High-level SPICE analyses: operating point, DC, AC, transient, Monte Carlo, FFT.
+"""High-level SPICE analyses: operating point, DC, AC, transient, FFT.
 
 ``mbg.simulation`` is the transport layer — it hands a deck to ngspice and gives
 back files. This module is the part a person (or an agent) actually wants to
@@ -16,7 +16,6 @@ and get structured numbers back.
     tb.dc("inp", 0, 3.3, 0.01)       # DC sweep
     tb.ac(1, 1e9, points=50)         # AC sweep
     tb.tran("1n", "1u")              # transient
-    tb.monte_carlo("op", runs=50)    # mismatch spread
 
 Two things this module handles that are easy to get wrong by hand:
 
@@ -30,13 +29,14 @@ from __future__ import annotations
 
 import math
 import os
+from pathlib import Path
 import re
 from dataclasses import dataclass, field
 from typing import Dict, Iterable, List, Optional, Sequence, Tuple
 
 from mbg.simulation import run_spice
 
-__all__ = ["Testbench", "SimResult", "MonteCarloResult", "fft"]
+__all__ = ["Testbench", "SimResult", "fft"]
 
 
 # ── results ────────────────────────────────────────────────────────────
@@ -129,38 +129,6 @@ class SimResult:
         return head
 
 
-@dataclass
-class MonteCarloResult:
-    """A set of runs plus the spread of each measured quantity."""
-    runs: List[SimResult] = field(default_factory=list)
-    measure: str = ""
-
-    def values(self, name: str) -> List[float]:
-        out = []
-        for r in self.runs:
-            try:
-                out.append(r.value(name))
-            except KeyError:
-                continue
-        return out
-
-    def stats(self, name: str) -> Dict[str, float]:
-        v = self.values(name)
-        if not v:
-            return {"n": 0}
-        n = len(v)
-        mean = sum(v) / n
-        var = sum((x - mean) ** 2 for x in v) / (n - 1) if n > 1 else 0.0
-        sd = math.sqrt(var)
-        return {"n": n, "mean": mean, "sigma": sd, "min": min(v), "max": max(v),
-                "sigma_over_mean": (sd / abs(mean)) if mean else float("nan")}
-
-    def summary(self, name: str) -> str:
-        s = self.stats(name)
-        if not s.get("n"):
-            return f"{name}: no data"
-        return (f"{name}: n={s['n']} mean={s['mean']:.6g} sigma={s['sigma']:.3g} "
-                f"({100 * s['sigma_over_mean']:.2f}%) range=[{s['min']:.6g}, {s['max']:.6g}]")
 
 
 # ── FFT ────────────────────────────────────────────────────────────────
@@ -219,7 +187,7 @@ class Testbench:
                  loads: Optional[Dict[str, str]] = None,
                  pdk_root: Optional[str] = None,
                  corner: str = "typical",
-                 workdir: str = "sim",
+                 workdir: Optional[str] = None,
                  timeout: int = 600,
                  pdk: Optional[str] = None,
                  temp: Optional[float] = None,
@@ -233,13 +201,9 @@ class Testbench:
         self.probes = list(probes or [])
         self.loads = dict(loads or {})
         self.corner = corner
-        self.workdir = workdir
+        from mbg.output_paths import new_run_directory
+        self.workdir = str(Path(workdir).expanduser()) if workdir is not None else str(new_run_directory("simulation", cell))
         self.timeout = timeout
-        # GF180 gates device mismatch behind sw_stat_mismatch; the typical
-        # corner leaves it at zero, so a Monte Carlo run on "typical" produces
-        # identical samples. Set by monte_carlo(), not normally by hand.
-        self.mismatch = False
-        self.seed: Optional[int] = None
         self.ports = list(ports) if ports else self._ports_from_netlist(netlist, cell)
 
         # Optional extensions, all off by default so an existing call builds
@@ -373,15 +337,13 @@ class Testbench:
             # must come before the model library or the models fail to evaluate
             head.append(f".include '{self.pdk_design}'")
         head.extend(self.lib_lines())
-        if self.mismatch:
-            head.append(".param sw_stat_mismatch=1")
         if self.temp is not None:
             head.append(f".temp {self.temp}")
 
         inst = f"Xdut {' '.join(self.ports)} {self.cell}"
         body = head + ["", self._core(), ""] + self._stimulus() + [inst, ""]
         body += list(analysis_lines)
-        pre = [f"set seed={self.seed}"] if self.seed is not None else []
+        pre = []
         body += [".control"] + pre + list(control) + [".endc", ".end", ""]
         return "\n".join(body)
 
@@ -500,31 +462,6 @@ class Testbench:
         return self._run("tran", self.build_deck([], ctrl), "time", probes,
                          datfile="tran.dat")
 
-    def monte_carlo(self, analysis: str = "op", runs: int = 25,
-                    corner: str = "statistical", mismatch: bool = True,
-                    **kwargs) -> MonteCarloResult:
-        """Repeat an analysis with fresh device-mismatch draws.
-
-        GF180 expresses mismatch as `delvto = mis_vth * sw_stat_mismatch`, so
-        two things are needed for the samples to actually differ: a corner that
-        carries the statistical parameters, and sw_stat_mismatch enabled. Just
-        re-seeding the typical corner returns the same number every run — the
-        mismatch term is multiplied by zero.
-        """
-        out = MonteCarloResult(measure=analysis)
-        fn = {"op": self.op, "dc": self.dc, "ac": self.ac, "tran": self.tran}[analysis]
-        base_wd, base_corner, base_mm, base_seed = (
-            self.workdir, self.corner, self.mismatch, self.seed)
-        self.corner, self.mismatch = corner, mismatch
-        try:
-            for i in range(runs):
-                self.workdir = os.path.join(base_wd, f"mc{i:03d}")
-                self.seed = i + 1
-                out.runs.append(fn(**kwargs))
-        finally:
-            self.workdir, self.corner = base_wd, base_corner
-            self.mismatch, self.seed = base_mm, base_seed
-        return out
 
 
 # ── parsing ────────────────────────────────────────────────────────────

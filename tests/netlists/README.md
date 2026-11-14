@@ -1,15 +1,10 @@
-# Regression netlists
+# Public demonstration netlists
 
-One SPICE subcircuit per file, loaded by `tests/fixtures.py`.
+These flat MOS/passive subcircuits exercise parsing, simulation, layout and
+ordinary physical verification. They are examples, not characterized IP.
 
-Every file keeps the project convention used by the inline designs these
-replaced: the model library is written as the literal placeholder
+`tests/fixtures.py` resolves the literal `{PDK_LIB}` placeholder against the
+selected local PDK. Keep generated artifacts outside the source tree.
 
-    .lib "{PDK_LIB}" typical
-
-and `fixtures.load()` resolves it against the live `$PDKPATH`. No personal
-path is ever committed, and the same file works on any machine.
-
-`complexity` in the header comment is the rung each design occupies on the
-scalability ladder (see `tests/test_complexity_ladder.py`); it is a label,
-not something the loader parses.
+A fixture being present does not establish a successful physical or electrical
+result. Check the actual reports produced by the public release tools.

@@ -1,7 +1,7 @@
 # Packaging metadata for the Microelectronic Block Generator engine.
 #
 # The layout is src/ style: the importable package is `mbg`, living at
-# <repo>/src/mbg/. Tests stay with the Chipathon design directory. Nothing here is required to *run* the code from a clone — every
+# <repo>/src/mbg/. The public tests live under tests/. Every
 # entry point resolves src/ from its own location — but declaring it makes the
 # package installable (`pip install -e .`) and tells editors and linters where
 # the source root is.
@@ -12,7 +12,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mbg"
-version = "0.2.0"
+version = "0.3.0"
 description = "Microelectronic Block Generator — SPICE to GDSII analog layout engine (gLayout + gdsfactory, GF180MCU)"
 readme = "README.md"
 # Upper bound matches what setup_env.sh will install into and what the
@@ -39,19 +39,22 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=7"]
-notebooks = ["nbformat>=5.9", "nbclient>=0.9", "ipykernel>=6", "matplotlib>=3.7"]
-all = ["mbg[dev,notebooks]"]
+all = ["mbg[dev]"]
 
 [project.scripts]
 mbg = "mbg.agent.cli:main"
 mbg-sync = "mbg.cli:sync_entry"
 mbg-validate = "mbg.cli:validate_entry"
 
+[tool.setuptools]
+include-package-data = false
+
 [tool.setuptools.packages.find]
 where = ["src"]
+include = ["mbg", "mbg.agent", "mbg.agent.handlers"]
 
 [tool.setuptools.package-data]
-mbg = ["pdks/*.json"]
+mbg = ["pdks/*.json", "eda/*.sh"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

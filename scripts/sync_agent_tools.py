@@ -39,7 +39,7 @@ from pathlib import Path
 REGEN_COMMAND = "python3 scripts/sync_agent_tools.py"
 
 VALID_SKILL_CLASSES = {"READ-ONLY", "GENERATING", "MUTATING", "DESTRUCTIVE"}
-VALID_OWNERS = {"huda", "ahmad", "jabir"}
+VALID_OWNERS = {"huda", "ahmad", "jabir", "maintainers"}
 VALID_PLATFORMS = {"opencode", "claude", "codex"}
 VALID_AGENTS = {"build", "plan"}
 
@@ -55,38 +55,12 @@ class SyncError(Exception):
 # --------------------------------------------------------------------------
 
 def find_repo_root() -> Path:
-    """Locate the repository root without ever hardcoding a path.
-
-    Primary strategy: ask git, using the *process* cwd (so this works when
-    invoked from any nested subdirectory). Fallback: walk upward from this
-    script's own on-disk location looking for .ai/manifest.json (covers the
-    case where git is unavailable).
-    """
-    try:
-        proc = subprocess.run(
-            ["git", "rev-parse", "--show-toplevel"],
-            capture_output=True, text=True, timeout=5,
-        )
-        if proc.returncode == 0:
-            candidate = Path(proc.stdout.strip())
-            if (candidate / ".ai" / "manifest.json").is_file():
-                return candidate
-    except (OSError, subprocess.SubprocessError):
-        pass
-
+    """Anchor generation/validation to this checkout, regardless of caller cwd."""
     cur = Path(__file__).resolve().parent
-    for _ in range(25):
-        if (cur / ".ai" / "manifest.json").is_file():
-            return cur
-        if cur.parent == cur:
-            break
-        cur = cur.parent
-
-    raise SyncError(
-        "could not locate repo root: no .ai/manifest.json found via "
-        "`git rev-parse --show-toplevel` or by walking up from "
-        f"{Path(__file__).resolve()}"
-    )
+    for candidate in (cur, *cur.parents):
+        if (candidate / ".ai" / "manifest.json").is_file():
+            return candidate
+    raise SyncError("No canonical manifest beside this script; use a source checkout")
 
 
 # --------------------------------------------------------------------------
@@ -235,12 +209,13 @@ def discover_workflows(root: Path) -> dict:
 def validate_manifest_refs(manifest: dict, skills: dict) -> None:
     """Cross-check manifest capabilities against discovered skills.
 
-    Deliberately tolerant during bootstrap: if .ai/skills is completely
-    empty (Sub-Agent D hasn't produced any canonical skills yet), there is
-    nothing meaningful to validate against, so we skip this check rather
-    than fail every run. Once at least one skill exists, every capability
-    that names a skill must resolve.
+    Public releases require the reviewed canonical skill allowlist. Other
+    manifests may bootstrap without skills; declared capability references
+    must resolve once skills are present.
     """
+    allowed = manifest.get("release", {}).get("canonical_skills")
+    if allowed is not None and set(skills) != set(allowed):
+        raise SyncError("Canonical skills differ from the reviewed public release allowlist")
     if not skills:
         return
     for cap_id, cap in manifest.get("capabilities", {}).items():

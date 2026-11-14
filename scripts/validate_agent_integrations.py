@@ -53,7 +53,10 @@ ABS_PATH_SCAN_ROOTS = [
     "plugins",
     ".agents",
     "scripts",
-    ".opencode/tools/setup",
+    "scripts/setup",
+    "README.md",
+    "AGENTS.md",
+    "docs",
 ]
 ABS_PATH_SCAN_EXCLUDE_DIRS = {"__pycache__", "node_modules", ".git"}
 # Built by concatenation, not as a literal, so this validator's own source
@@ -108,38 +111,12 @@ class Result:
 # --------------------------------------------------------------------------
 
 def find_repo_root() -> Path:
-    """Locate the repository root without ever hardcoding a path.
-
-    Primary strategy: ask git, using the *process* cwd (so this works when
-    invoked from any nested subdirectory). Fallback: walk upward from this
-    script's own on-disk location looking for .ai/manifest.json (covers the
-    case where git is unavailable, e.g. an extracted tarball).
-    """
-    try:
-        proc = subprocess.run(
-            ["git", "rev-parse", "--show-toplevel"],
-            capture_output=True, text=True, timeout=5,
-        )
-        if proc.returncode == 0:
-            candidate = Path(proc.stdout.strip())
-            if (candidate / ".ai" / "manifest.json").is_file():
-                return candidate
-    except (OSError, subprocess.SubprocessError):
-        pass
-
+    """Anchor generation/validation to this checkout, regardless of caller cwd."""
     cur = Path(__file__).resolve().parent
-    for _ in range(25):
-        if (cur / ".ai" / "manifest.json").is_file():
-            return cur
-        if cur.parent == cur:
-            break
-        cur = cur.parent
-
-    raise ValidationError(
-        "could not locate repo root: no .ai/manifest.json found via "
-        "`git rev-parse --show-toplevel` or by walking up from "
-        f"{Path(__file__).resolve()}"
-    )
+    for candidate in (cur, *cur.parents):
+        if (candidate / ".ai" / "manifest.json").is_file():
+            return candidate
+    raise ValidationError("No canonical manifest beside this script; use a source checkout")
 
 
 # --------------------------------------------------------------------------
@@ -683,7 +660,7 @@ def check_no_absolute_paths(root: Path, res: Result) -> None:
             return
         for lineno, line in enumerate(text.splitlines(), start=1):
             if ABS_PATH_NEEDLE in line:
-                hits.append(f"{path.relative_to(root)}:{lineno}: {line.strip()[:160]}")
+                hits.append(f"{path.relative_to(root)}:{lineno}:personal_home_path")
 
     for rel in ABS_PATH_SCAN_ROOTS:
         target = root / rel

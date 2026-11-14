@@ -9,7 +9,8 @@ from mbg.agent.handlers import ensure_pdk, profile_for, record
 
 
 def _gds(args) -> Path:
-    p = Path(args["gds"])
+    from mbg.output_paths import input_path
+    p = input_path(args["gds"])
     if not p.is_file():
         raise FileNotFoundError(f"GDS {args['gds']!r} not found")
     return p
@@ -27,41 +28,31 @@ def _top_cell(gds: Path, given) -> str:
 
 def drc(args, ctx) -> Result:
     r = Result(tool="verify.drc")
-    prof = profile_for(args)
-    if not ensure_pdk(prof, r):
+    profile = profile_for(args)
+    if not ensure_pdk(profile, r):
         return r
     gds = _gds(args)
     cell = _top_cell(gds, args.get("cell"))
-    from mbg.drc import run_dual_drc
-    ctx.stage(f"DRC with {', '.join(prof.drc_engines)}")
-    with prof.env():
-        s = run_dual_drc(str(gds), cell_name=cell, workdir=str(ctx.run_dir),
-                         engines=prof.drc_engines, primary=prof.drc_primary)
-    d = s.as_dict()
-    r.metrics = {"verdict": d.get("verdict"), "pdk": prof.name, "cell": cell,
-                 "engines": {e.get("engine"): {"status": e.get("status"),
-                                               "violations": e.get("violations")}
-                             for e in d.get("results") or []}}
-    for e in d.get("results") or []:
-        for rule, n in sorted((e.get("rules") or {}).items(), key=lambda kv: -kv[1])[:10]:
-            r.issue("DRC_RULE", f"{e.get('engine')}: {rule} x{n}", rule=rule,
-                    engine=e.get("engine"))
-        if e.get("status") in ("NOT_CONFIGURED", "ERROR"):
-            r.issue("DRC_ENGINE_" + e.get("status"), f"{e.get('engine')}: {e.get('message')}",
-                    hint="mbg doctor")
-        if e.get("report_path"):
-            r.artifacts[f"{e.get('engine')}_report"] = runio.rel(e["report_path"])
-    r.artifacts["summary"] = runio.rel(ctx.run_dir / "verification" / "drc_summary.json")
-    ok = d.get("verdict") == "PASS"
-    r.set("PASS" if ok else "FAIL", f"{cell}: DRC sign-off {d.get('verdict')} — {d.get('reason', '')}"[:300])
-    record(args.get("design"), stage="drc", status=r.status,
-           artifact=ctx.run_dir / "verification" / "drc_summary.json")
+    from mbg.checks import run_drc
+    ctx.stage("Magic DRC")
+    with profile.env():
+        result = run_drc(str(gds), cell_name=cell, engine="magic", workdir=str(ctx.run_dir))
+    clean = bool(result.get("clean"))
+    r.metrics = {"clean": clean, "engine": "magic", "cell": cell, "pdk": profile.name,
+                 "error_count": result.get("error_count", -1)}
+    if result.get("report_path"):
+        r.artifacts["report"] = runio.rel(result["report_path"])
+    if not clean:
+        r.issue("DRC_FAILED", result.get("summary", "Magic DRC did not pass"), hint="Inspect the DRC report")
+    r.set("PASS" if clean else "FAIL", result.get("summary", "Magic DRC result unavailable"))
+    record(args.get("design"), stage="drc", status=r.status, artifact=result.get("report_path"))
     return r
 
 
 def lvs(args, ctx) -> Result:
     r = Result(tool="verify.lvs")
-    net_path = Path(args["netlist"])
+    from mbg.output_paths import input_path
+    net_path = input_path(args["netlist"])
     if not net_path.is_file():
         raise FileNotFoundError(f"netlist {args['netlist']!r} not found")
     text = net_path.read_text()

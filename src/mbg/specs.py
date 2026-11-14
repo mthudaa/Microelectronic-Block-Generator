@@ -1,17 +1,4 @@
-"""Target specifications, evaluation, and pre-layout vs post-layout degradation.
-
-One evaluator, used by both optimization loops. That is the point: a metric
-that "passes" before layout and "fails" after it must be judged by exactly
-the same rule, or the comparison means nothing. The same :class:`Spec` list
-is handed to the pre-layout evaluation and to the PEX evaluation unless the
-caller deliberately overrides it.
-
-    specs = [Spec("gain_db", ">=", 60), Spec("bw_hz", ">=", 15e6)]
-    pre  = evaluate_specs({"gain_db": 64.5, "bw_hz": 18.2e6}, specs)
-    post = evaluate_specs({"gain_db": 57.8, "bw_hz": 13.4e6}, specs)
-    for d in compare_degradation(pre, post):
-        print(d.describe())
-"""
+"""Evaluate measured metrics against explicit limits and format results."""
 
 from __future__ import annotations
 
@@ -20,8 +7,8 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Mapping, Optional, Sequence
 
 __all__ = [
-    "Spec", "SpecResult", "SpecReport", "Degradation",
-    "evaluate_specs", "compare_degradation", "format_spec_table",
+    "Spec", "SpecResult", "SpecReport",
+    "evaluate_specs", "format_spec_table",
 ]
 
 _OPS = {
@@ -189,71 +176,8 @@ def evaluate_specs(metrics: Mapping[str, Optional[float]],
     return report
 
 
-@dataclass
-class Degradation:
-    """What layout parasitics did to one metric."""
-    name: str
-    pre: Optional[float]
-    post: Optional[float]
-    unit: str = ""
-    delta: Optional[float] = None
-    delta_pct: Optional[float] = None
-    status: str = "FAIL"            # status of the POST value against target
-    worsened: bool = False
-
-    def describe(self) -> str:
-        if self.pre is None or self.post is None:
-            return f"{self.name}: incomparable (pre={self.pre}, post={self.post})"
-        arrow = "worse" if self.worsened else "better/equal"
-        pct = f" ({self.delta_pct:+.1f}%)" if self.delta_pct is not None else ""
-        return (f"{self.name}: {_fmt(self.pre)}{self.unit} -> "
-                f"{_fmt(self.post)}{self.unit}  "
-                f"delta {_fmt(self.delta)}{self.unit}{pct}  {arrow}  [{self.status}]")
 
 
-def compare_degradation(pre: SpecReport, post: SpecReport,
-                        specs: Optional[Sequence[Spec]] = None
-                        ) -> List[Degradation]:
-    """Quantify what changed between pre-layout and post-layout.
-
-    Answers the question a bare "PEX FAIL" leaves open: *which* metrics moved,
-    by how much, and in the direction that hurts. Metrics that got worse are
-    listed first and are the ones worth spending an optimization iteration on.
-    """
-    by_name = {s.name: s for s in (specs or [])}
-    out: List[Degradation] = []
-    for post_r in post.results:
-        pre_r = pre.get(post_r.name)
-        spec = by_name.get(post_r.name)
-        hib = spec.higher_is_better if spec else None
-
-        pre_v = pre_r.value if pre_r else None
-        post_v = post_r.value
-        delta = pct = None
-        worsened = False
-        if pre_v is not None and post_v is not None:
-            delta = post_v - pre_v
-            if pre_v:
-                pct = round(100.0 * delta / abs(pre_v), 3)
-            if hib is True:
-                worsened = delta < 0
-            elif hib is False:
-                worsened = delta > 0
-            else:
-                worsened = abs(post_v - (spec.target if spec else 0)) > \
-                           abs(pre_v - (spec.target if spec else 0))
-
-        out.append(Degradation(
-            name=post_r.name, pre=pre_v, post=post_v, unit=post_r.unit,
-            delta=delta, delta_pct=pct, status=post_r.status,
-            worsened=worsened))
-
-    # Worst offenders first: failing-and-worsened, then worsened, then the rest.
-    out.sort(key=lambda d: (
-        not (d.worsened and d.status != "PASS"),
-        not d.worsened,
-        -(abs(d.delta_pct) if d.delta_pct is not None else 0.0)))
-    return out
 
 
 def _fmt(v: Optional[float]) -> str:

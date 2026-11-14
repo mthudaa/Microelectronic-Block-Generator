@@ -151,8 +151,11 @@ def measure_vref(netlist: str, *, pdk: Optional[str] = None,
                  ibias: float = 20e-6, ibias_dir: str = "source",
                  ibias_sweep: Sequence[float] = (10e-6, 20e-6, 30e-6),
                  cl: str = "1p", corners: Any = None, quick: bool = False,
-                 workdir: str = "vref_meas", timeout: int = 600) -> Dict[str, Any]:
+                 workdir: Optional[str] = None, timeout: int = 600) -> Dict[str, Any]:
     """Characterise a voltage reference. See the module docstring for metrics."""
+    if workdir is None:
+        from mbg.output_paths import new_run_directory
+        workdir = str(new_run_directory("measurements", "vref"))
     from mbg import pdk_profile
     cell = re.search(r"^\s*\.subckt\s+(\S+)", netlist, re.I | re.M).group(1)
     sub_ports = Testbench._ports_from_netlist(netlist, cell)
@@ -321,8 +324,11 @@ def measure_ota(netlist: str, *, out: str, inp: str, inn: Optional[str] = None,
                 bias: Optional[Dict[str, float]] = None,
                 vcm: Optional[float] = None, cl: str = "1p",
                 pdk: Optional[str] = None, corner: Optional[str] = None,
-                workdir: str = "ota_meas", timeout: int = 600) -> Dict[str, Any]:
+                workdir: Optional[str] = None, timeout: int = 600) -> Dict[str, Any]:
     """DC gain, -3 dB bandwidth, unity-gain frequency, phase margin, supply current."""
+    if workdir is None:
+        from mbg.output_paths import new_run_directory
+        workdir = str(new_run_directory("measurements", "ota"))
     from mbg import pdk_profile
     cell = re.search(r"^\s*\.subckt\s+(\S+)", netlist, re.I | re.M).group(1)
     sub_ports = Testbench._ports_from_netlist(netlist, cell)

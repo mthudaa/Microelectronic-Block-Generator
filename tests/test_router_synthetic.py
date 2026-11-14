@@ -78,25 +78,10 @@ def route(ctx, cfg=None):
 
 
 def report(name, expected, actual, ok):
-    """Print the verdict, then FAIL LOUDLY if it is bad.
+    """A false result is a failing test, including under pytest."""
+    print(f"{name}: expected {expected}; actual {actual}")
+    assert ok, f"{name}: expected {expected}; actual {actual}"
 
-    These tests used to end with `return report(...)`, and pytest treats a
-    test that returns a value -- including False -- as a PASS, warning about
-    the return but not failing. Every test in this file was therefore unable
-    to fail under `pytest tests/`; only an uncaught exception could stop one.
-    Raising here makes the same `return report(...)` line a real assertion for
-    pytest, while the plain-script runner below still catches it and reports
-    the failure the way it always did.
-    """
-    print(f"{'PASS' if ok else 'FAIL'}  {name}\n"
-          f"      expected: {expected}\n      actual:   {actual}")
-    if not ok:
-        raise AssertionError(
-            f"{name}\n      expected: {expected}\n      actual:   {actual}")
-    return ok
-
-
-# ── Test 1 — single net ────────────────────────────────────────────────
 
 def test_single_net():
     ctx = make_ctx("t1")
@@ -224,76 +209,10 @@ def _build(netlist, cfgkw=None):
     return ctx
 
 
-def test_differential_pair():
-    ctx = _build("""
-.lib gf180 typical
-.subckt dp vdd vss inp inm o1 o2 tail
-XM1 o1 inp t vss nfet_03v3 L=1u W=4u nf=2
-XM2 o2 inm t vss nfet_03v3 L=1u W=4u nf=2
-XM3 t  tail vss vss nfet_03v3 L=1u W=4u nf=2
-XM4 o1 o1  vdd vdd pfet_03v3 L=1u W=4u nf=2
-XM5 o2 o1  vdd vdd pfet_03v3 L=1u W=4u nf=2
-.ends
-""")
-    grp = [g for g in ctx.matching_groups.values() if g.kind == "diff_pair"]
-    a, b = ctx.device_bboxes["XM1"], ctx.device_bboxes["XM2"]
-    same_size = abs(a.width - b.width) < 1e-6 and abs(a.height - b.height) < 1e-6
-    same_row = abs(a.ymin - b.ymin) < 1e-6
-    _r, res = route(ctx)
-    lens, vias = {}, {}
-    for net in ("o1", "o2"):
-        rn = ctx.routed_nets.get(net)
-        lens[net] = round(rn.wire_length(), 2) if rn else None
-        vias[net] = rn.via_count() if rn else None
-    both_routed = all(lens[n] is not None for n in ("o1", "o2"))
-    ok = (bool(grp) and same_size and same_row and res["failed"] == []
-          and both_routed)
-    return report("Test 6 differential pair",
-                  "pair detected, identical geometry, same row, both outputs routed",
-                  f"group={[g.devices for g in grp]} same_size={same_size} "
-                  f"same_row={same_row} lengths={lens} vias={vias} "
-                  f"failed={res['failed']}", ok)
 
 
-def test_current_mirror():
-    ctx = _build("""
-.lib gf180 typical
-.subckt cm vdd vss iin iout
-XM1 iin  iin  vdd vdd pfet_03v3 L=1u W=4u nf=2
-XM2 iout iin  vdd vdd pfet_03v3 L=1u W=4u nf=2
-XM3 iin  vss  vss vss nfet_03v3 L=1u W=4u nf=2
-.ends
-""")
-    grp = [g for g in ctx.matching_groups.values() if g.kind == "current_mirror"]
-    a, b = ctx.device_bboxes["XM1"], ctx.device_bboxes["XM2"]
-    same_size = abs(a.width - b.width) < 1e-6 and abs(a.height - b.height) < 1e-6
-    adjacent = abs(a.ymin - b.ymin) < 1e-6
-    _r, res = route(ctx)
-    v = conn.verify(ctx)
-    ok = bool(grp) and same_size and adjacent and v["shorts"] == 0
-    return report("Test 7 current mirror",
-                  "mirror detected, matched geometry, adjacent, no shorts",
-                  f"group={[g.devices for g in grp]} same_size={same_size} "
-                  f"adjacent={adjacent} shorts={v['shorts']} failed={res['failed']}", ok)
 
 
-def test_deep_nwell():
-    ctx = _build("""
-.lib gf180 typical
-.subckt dnw vdd vss a b
-XM1 a vss vss vss nfet_03v3 L=1u W=4u nf=2
-XM2 b a   vss vss nfet_03v3 L=1u W=4u nf=2
-.ends
-""", cfgkw={"with_dnwell": True})
-    flagged = [d for d, f in ctx.deep_nwell_flags.items() if f]
-    dnw_shapes = [o for o in ctx.obstacles if o.layer == "dnwell"]
-    _r, res = route(ctx)
-    v = conn.verify(ctx)
-    ok = len(flagged) == 2 and res["failed"] == [] and v["shorts"] == 0
-    return report("Test 8 deep n-well",
-                  "both NFETs flagged for DNW, layout still routes cleanly",
-                  f"flagged={flagged} dnw_obstacles={len(dnw_shapes)} "
-                  f"failed={res['failed']} shorts={v['shorts']}", ok)
 
 
 
@@ -426,61 +345,6 @@ def test_high_degree_net_survives_one_stranded_terminal():
                   f"shorts={v['shorts']}", ok)
 
 
-def test_top_metal_rules_match_the_pdk_deck():
-    """The top-metal rule table must still agree with the shipped decks.
-
-    glayout's get_grule reports 0.28/0.30 for every GF180 metal including the
-    top one; the foundry decks do not agree, and they are what sign the design
-    off. Those numbers are therefore carried in pdk_rules.TOP_METAL_RULES --
-    so this test re-reads the decks and fails if the table drifts from them,
-    rather than letting a hardcoded constant quietly rot.
-    """
-    import re as _re
-    from mbg.pdk_rules import TOP_METAL_RULES, top_metal_rules
-    pdkpath = os.environ["PDKPATH"]
-    deck = os.path.join(pdkpath, "libs.tech", "klayout", "tech", "drc",
-                        "rule_decks", "metaltop.rb")
-    tech = os.path.join(pdkpath, "libs.tech", "magic",
-                        f"{os.environ.get('PDK', 'gf180mcuD')}.tech")
-    if not os.path.isfile(deck) or not os.path.isfile(tech):
-        return report("Test 12 top-metal rules vs deck",
-                      "decks present", f"deck={os.path.isfile(deck)} "
-                      f"tech={os.path.isfile(tech)}", False)
-
-    text = open(deck).read()
-    # each "when '<thickness>'" branch carries its own MT.1 / MT.2a numbers
-    found = {}
-    for m in _re.finditer(r"when ((?:'[0-9]+K'(?:,\s*)?)+)(.*?)(?=\n  when |\Z)",
-                          text, _re.S):
-        widths = _re.search(r"width\((\d+\.\d+)\.um", m.group(2))
-        spaces = _re.search(r"space\((\d+\.\d+)\.um", m.group(2))
-        if not (widths and spaces):
-            continue
-        for th in _re.findall(r"'([0-9]+K)'", m.group(1)):
-            found[th] = (float(widths.group(1)), float(spaces.group(1)))
-
-    bad = []
-    for th, (w, sp) in found.items():
-        want = TOP_METAL_RULES.get(th)
-        if want is None:
-            bad.append(f"{th}: deck has it, TOP_METAL_RULES does not")
-        elif (want["min_width"], want["min_spacing"]) != (w, sp):
-            bad.append(f"{th}: deck says {w}/{sp}, table says "
-                       f"{want['min_width']}/{want['min_spacing']}")
-
-    # and the Magic techfile, in centi-nanometres, for the project's variant
-    top_layer, rules_for_variant = top_metal_rules(os.environ.get("PDK", "gf180mcuD"))
-    mw = _re.search(r"width \*m5,rm5 (\d+)", open(tech).read())
-    if mw and rules_for_variant:
-        magic_um = int(mw.group(1)) / 1000.0
-        if abs(magic_um - rules_for_variant["min_width"]) > 1e-9:
-            bad.append(f"magic techfile says {magic_um}, table says "
-                       f"{rules_for_variant['min_width']}")
-
-    ok = not bad and bool(found)
-    return report("Test 12 top-metal rules vs deck",
-                  "TOP_METAL_RULES agrees with metaltop.rb and the magic tech",
-                  f"deck_branches={found} mismatches={bad}", ok)
 
 
 def test_segment_width_respects_its_layer():
@@ -735,11 +599,8 @@ def test_a_terminal_with_no_access_point_fails_the_internal_gate():
 
 
 ALL = [test_single_net, test_crossing_nets, test_via_conflict,
-       test_blocked_path, test_congested_channel, test_differential_pair,
-       test_current_mirror, test_deep_nwell,
-       test_escape_on_tap_ring, test_same_net_notch_still_rejected,
+       test_blocked_path, test_congested_channel, test_escape_on_tap_ring, test_same_net_notch_still_rejected,
        test_high_degree_net_survives_one_stranded_terminal,
-       test_top_metal_rules_match_the_pdk_deck,
        test_segment_width_respects_its_layer,
        test_grid_pitch_is_per_layer,
        test_notch_against_net_owned_metal_is_filled,

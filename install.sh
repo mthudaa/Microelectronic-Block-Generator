@@ -206,23 +206,21 @@ do_python() {
         # fails later, deep inside an import, instead of here.
         if ! "${VENV}/bin/python" -c 'import sys' >/dev/null 2>&1; then
             say "  existing venv is broken (dangling interpreter) — recreating"
-            rm -rf "${VENV}"
-            "$py" -m venv "${VENV}"
+            die "existing environment is broken; preserve it and select a new MBG_VENV"
         fi
     fi
 
-    "${VENV}/bin/python" -m pip install --quiet --upgrade pip setuptools wheel
+    "${VENV}/bin/python" -m pip install --quiet "setuptools==68.2.2" "wheel==0.41.3" || die "pinned build-tool installation failed"
     if [ -f "${REPO_ROOT}/requirements-lock.txt" ] && [ "${MBG_LOCKED:-1}" = "1" ]; then
         say "  installing pinned dependencies (requirements-lock.txt)…"
         "${VENV}/bin/python" -m pip install --quiet -r "${REPO_ROOT}/requirements-lock.txt" || {
-            warn "locked install" "failed — falling back to requirements.txt"
-            "${VENV}/bin/python" -m pip install --quiet -r "${REPO_ROOT}/requirements.txt"
+            die "locked dependency installation failed; no unpinned fallback was attempted"
         }
     else
-        "${VENV}/bin/python" -m pip install --quiet -r "${REPO_ROOT}/requirements.txt"
+        "${VENV}/bin/python" -m pip install --quiet -r "${REPO_ROOT}/requirements.txt" || die "runtime dependency installation failed"
     fi
     say "  installing mbg (editable)…"
-    "${VENV}/bin/python" -m pip install --quiet -e "${REPO_ROOT}"
+    "${VENV}/bin/python" -m pip install --quiet --no-deps --no-build-isolation -e "${REPO_ROOT}" || die "editable package installation failed"
     ok "python env" "${VENV}"
 }
 
@@ -238,14 +236,18 @@ do_pdk() {
     fi
     [ -x "${VENV}/bin/python" ] || die "create the Python environment first: ./install.sh --stage python"
     say "  installing volare…"
-    "${VENV}/bin/python" -m pip install --quiet volare
+    [ -n "$VOLARE_PDK_VERSION" ] || die "set MBG_PDK_VERSION to a reviewed upstream revision before PDK installation"
+    if ! "${VENV}/bin/python" -m volare --help >/dev/null 2>&1; then
+        [ -n "${MBG_VOLARE_VERSION:-}" ] || die "set MBG_VOLARE_VERSION to a reviewed pinned volare version"
+        "${VENV}/bin/python" -m pip install --quiet "volare==${MBG_VOLARE_VERSION}" || die "pinned volare installation failed"
+    fi
     say "  fetching the PDK (this downloads a few hundred MB)…"
     mkdir -p "${PDK_ROOT_EFF}"
     if [ -n "$VOLARE_PDK_VERSION" ]; then
         PDK_ROOT="${PDK_ROOT_EFF}" "${VENV}/bin/python" -m volare enable \
             --pdk gf180mcu "$VOLARE_PDK_VERSION"
     else
-        PDK_ROOT="${PDK_ROOT_EFF}" "${VENV}/bin/python" -m volare enable --pdk gf180mcu
+        die "MBG_PDK_VERSION is required"
     fi
     if pdk_present; then ok "pdk" "installed at ${PDK_ROOT_EFF}/${PDK_NAME}"
     else bad "pdk" "volare finished but ${PDK_NAME} techfile is still missing"; fi
@@ -293,11 +295,11 @@ build_tool() {   # name repo version [jobs]
 
     say "  building ${name} ${version} -> ${prefix}"
     mkdir -p "${TOOLS_ROOT}/src"
-    rm -rf "${src}"
+    [ ! -e "${src}" ] || die "existing source cache ${src}; preserve it and select a new MBG_TOOLS_ROOT"
     # Pinned tag, shallow clone, from the maintainer's own repository. No
     # piping a downloaded script into a shell.
     git clone --quiet --depth 1 --branch "${version}" "${repo}" "${src}" 2>/dev/null \
-      || git clone --quiet --depth 1 "${repo}" "${src}"
+      || die "${name}: selected revision ${version} could not be fetched; no default-branch fallback"
     (
         cd "${src}"
         ./configure --prefix="${prefix}" >"${src}/configure.log" 2>&1 \
@@ -510,7 +512,11 @@ do_eda() {
            "${VENV}/bin/python" -c 'import sys;from mbg import config;sys.exit(0 if config.resolve_netgen().ok else 1)' 2>/dev/null
         then need_netgen=0; ok "netgen" "an existing installation is compatible"; fi
     fi
-    adopt_klayout
+    if [ "${MBG_INSTALL_KLAYOUT:-0}" = "1" ]; then
+        adopt_klayout
+    else
+        opt "klayout" "optional; set MBG_INSTALL_KLAYOUT=1 to install/adopt"
+    fi
     local jobs; jobs="$(nproc 2>/dev/null || echo 2)"
     [ "$need_magic" -eq 1 ]  && build_tool magic  "$MAGIC_REPO"  "$MAGIC_VERSION" "$jobs"
     # netgen is built with one job on purpose: its Makefile races under -j
