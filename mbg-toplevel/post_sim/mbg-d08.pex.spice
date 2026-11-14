@@ -1,0 +1,552 @@
+* NGSPICE file created from mbg_d08_post.ext - technology: gf180mcuD
+
+.subckt mbg_d08_post vdd vss deepseek_ota gpt_ota ibias oxa_ota deepseek_cmp gpt_cmp
++ oxa_cmp deepseek_vref gpt_vref oxa_vref temp_out inn inp clk
+D0 strongarm_comparator$2_0.INP vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+D1 vss io_secondary_3p3_4.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+D2 vss strongarm_comparator$2_0.CLK diode_nd2ps_03v3 pj=40p area=99.99999p
+X0 vdd a_461942_321988# a_463042_318970# vdd pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=4u
+D3 vss io_secondary_3p3_5.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X1 strongarm_comparator$3_0.OUTN io_secondary_3p3_5.to_gate a_460344_411233# vss nfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=0.6u
+X2 ibias vref_1v2$1_0.IBIAS vdd ppolyf_u r_width=40u r_length=10u
+X3 io_secondary_3p3_4.to_gate a_460450_465503# vdd vdd pfet_03v3 ad=0.42p pd=2.06u as=0.9p ps=4.2u w=1.5u l=0.8u
+X4 vdd strongarm_comparator$2_0.CLK strongarm_comparator$3_0.OUTN vdd pfet_03v3 ad=0.28p pd=1.56u as=0.6p ps=3.2u w=1u l=0.6u
+D4 vref_1v2$1_0.IBIAS vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X5 vref_1v2$1_0.IBIAS vref_1v2$1_0.IBIAS vss vss nfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=1u
+D5 io_secondary_3p3_9.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X6 a_460872_431778# strongarm_comparator$2_0.INP a_457916_431778# vss nfet_03v3 ad=0.56p pd=2.56u as=0.56p ps=2.56u w=2u l=0.6u
+X7 a_458324_411233# strongarm_comparator$2_0.CLK vdd vdd pfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=0.6u
+D6 io_secondary_3p3_1.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+D7 vss strongarm_comparator$2_0.INN diode_nd2ps_03v3 pj=40p area=99.99999p
+X8 a_461220_445704# strongarm_comparator$2_0.INP io_secondary_3p3_8.to_gate vss nfet_03v3 ad=3.6p pd=13.2u as=3.6p ps=13.2u w=6u l=2u
+X9 a_460220_472055# strongarm_comparator$2_0.INN ota_0.OUT vss nfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=1u
+X10 vss a_456326_321988# a_456234_319178# vss nfet_03v3 ad=0.6p pd=3.2u as=0.6p ps=3.2u w=1u l=4u
+X11 a_454954_322196# a_454154_321988# vss vdd pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=4u
+X12 a_459575_333180# io_secondary_3p3_2.to_gate io_secondary_3p3_2.to_gate vss nfet_03v3 ad=0.224p pd=1.36u as=0.224p ps=1.36u w=0.8u l=0.35u
+D8 vss io_secondary_3p3_0.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X13 vdd a_460450_465503# a_460450_465503# vdd pfet_03v3 ad=0.9p pd=4.2u as=0.42p ps=2.06u w=1.5u l=0.8u
+X14 vref_1v2$1_0.IBIAS vref_1v2$1_0.IBIAS vss vss nfet_03v3 ad=0.28p pd=1.56u as=0.6p ps=3.2u w=1u l=1u
+X15 io_secondary_3p3_2.to_gate io_secondary_3p3_2.to_gate a_459575_333180# vss nfet_03v3 ad=0.224p pd=1.36u as=0.224p ps=1.36u w=0.8u l=0.35u
+X16 vref_1v2$1_0.IBIAS vref_1v2$1_0.IBIAS vss vss nfet_03v3 ad=0.56p pd=2.56u as=1.2p ps=5.2u w=2u l=2u
+D9 vss strongarm_comparator$2_0.INP diode_nd2ps_03v3 pj=40p area=99.99999p
+X17 vdd vref_1v2$1_0.IBIAS io_secondary_3p3_2.to_gate vdd pfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=8u
+D10 vss io_secondary_3p3_2.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X18 vss io_secondary_3p3_0.to_gate io_secondary_3p3_0.to_gate vss nfet_03v3 ad=0.72p pd=3.6u as=0.72p ps=3.6u w=1.2u l=0.5u
+D11 ota_0.OUT vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X19 vdd a_457890_452332# io_secondary_3p3_8.to_gate vdd pfet_03v3 ad=4.5p pd=16.2u as=2.1p ps=8.06u w=7.5u l=4u
+X20 io_secondary_3p3_9.to_gate strongarm_comparator_0.OUTN vdd vdd pfet_03v3 ad=0.56p pd=2.56u as=0.56p ps=2.56u w=2u l=0.5u
+D12 io_secondary_3p3_2.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X21 vdd a_460290_474266# ota_0.OUT vdd pfet_03v3 ad=0.36p pd=2.4u as=0.168p ps=1.16u w=0.6u l=1u
+X22 a_460540_461792# strongarm_comparator$2_0.INN io_secondary_3p3_4.to_gate vss nfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=0.6u
+X23 vss strongarm_comparator$2_0.CLK a_457916_431778# vss nfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=0.5u
+D13 io_secondary_3p3_0.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+D14 vss io_secondary_3p3_4.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X24 a_457916_431778# strongarm_comparator$2_0.INP a_460872_431778# vss nfet_03v3 ad=0.56p pd=2.56u as=0.56p ps=2.56u w=2u l=0.6u
+X25 vss vref_1v2$1_0.IBIAS a_460220_472055# vss nfet_03v3 ad=0.56p pd=2.56u as=0.56p ps=2.56u w=2u l=1u
+X26 a_460540_461792# strongarm_comparator$2_0.INP a_460450_465503# vss nfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=0.6u
+X27 a_460872_431778# io_secondary_3p3_9.to_gate strongarm_comparator_0.OUTN vss nfet_03v3 ad=0.56p pd=2.56u as=1.2p ps=5.2u w=2u l=0.5u
+X28 io_secondary_3p3_2.to_gate io_secondary_3p3_2.to_gate a_459575_333180# vss nfet_03v3 ad=0.224p pd=1.36u as=0.224p ps=1.36u w=0.8u l=0.35u
+X29 a_460290_474266# a_460290_474266# vdd vdd pfet_03v3 ad=0.168p pd=1.16u as=0.36p ps=2.4u w=0.6u l=1u
+X30 a_460290_474266# strongarm_comparator$2_0.INP a_460220_472055# vss nfet_03v3 ad=0.28p pd=1.56u as=0.6p ps=3.2u w=1u l=1u
+X31 a_460450_465503# a_460450_465503# vdd vdd pfet_03v3 ad=0.42p pd=2.06u as=0.9p ps=4.2u w=1.5u l=0.8u
+D15 vss io_secondary_3p3_8.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X32 vss vref_1v2$1_0.IBIAS vref_1v2$1_0.IBIAS vss nfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=2u
+D16 vss io_secondary_3p3_5.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X33 a_461792_388524# strongarm_comparator$2_0.INN a_460164_392562# vss nfet_03v3 ad=1.8p pd=7.2u as=1.8p ps=7.2u w=3u l=0.7u
+D17 io_secondary_3p3_9.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+D18 io_secondary_3p3_4.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X34 a_457916_431778# strongarm_comparator$2_0.INN a_458156_431778# vss nfet_03v3 ad=0.56p pd=2.56u as=0.56p ps=2.56u w=2u l=0.6u
+X35 a_458156_431778# strongarm_comparator_0.OUTN io_secondary_3p3_9.to_gate vss nfet_03v3 ad=1.2p pd=5.2u as=0.56p ps=2.56u w=2u l=0.5u
+X36 oxa_cmp io_secondary_3p3_13.to_gate vdd ppolyf_u r_width=40u r_length=10u
+D19 io_secondary_3p3_5.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+D20 vss io_secondary_3p3_3.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+D21 vss io_secondary_3p3_9.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X37 a_461674_407313# strongarm_comparator$2_0.INN a_458324_411233# vss nfet_03v3 ad=0.28p pd=1.56u as=0.6p ps=3.2u w=1u l=0.6u
+X38 a_460220_472055# strongarm_comparator$2_0.INN ota_0.OUT vss nfet_03v3 ad=0.6p pd=3.2u as=0.28p ps=1.56u w=1u l=1u
+X39 vss strongarm_comparator$2_0.CLK a_461674_407313# vss nfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=0.6u
+X40 io_secondary_3p3_2.to_gate io_secondary_3p3_2.to_gate a_459575_333180# vss nfet_03v3 ad=0.224p pd=1.36u as=0.224p ps=1.36u w=0.8u l=0.35u
+X41 vdd a_460450_465503# a_460450_465503# vdd pfet_03v3 ad=0.42p pd=2.06u as=0.42p ps=2.06u w=1.5u l=0.8u
+X42 vss vref_1v2$1_0.IBIAS a_460540_461792# vss nfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=1u
+X43 vdd a_457890_452332# io_secondary_3p3_8.to_gate vdd pfet_03v3 ad=2.1p pd=8.06u as=2.1p ps=8.06u w=7.5u l=4u
+D22 strongarm_comparator$2_0.INP vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+D23 strongarm_comparator$2_0.CLK vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+D24 vss strongarm_comparator$2_0.CLK diode_nd2ps_03v3 pj=40p area=99.99999p
+X44 a_460450_465503# strongarm_comparator$2_0.INP a_460540_461792# vss nfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=0.6u
+X45 io_secondary_3p3_5.to_gate strongarm_comparator$3_0.OUTN a_458324_411233# vss nfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=0.6u
+X46 a_454954_322196# a_456326_321988# a_454154_321988# vdd pfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=4u
+D25 io_secondary_3p3_0.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X47 a_461792_388524# strongarm_comparator$2_0.INP a_461236_392562# vss nfet_03v3 ad=1.8p pd=7.2u as=1.8p ps=7.2u w=3u l=0.7u
+X48 a_457916_431778# strongarm_comparator$2_0.INN a_458156_431778# vss nfet_03v3 ad=1.2p pd=5.2u as=0.56p ps=2.56u w=2u l=0.6u
+X49 a_460344_411233# io_secondary_3p3_5.to_gate strongarm_comparator$3_0.OUTN vss nfet_03v3 ad=0.28p pd=1.56u as=0.6p ps=3.2u w=1u l=0.6u
+X50 vss a_463042_318970# a_463042_318970# vss nfet_03v3 ad=0.6p pd=3.2u as=0.6p ps=3.2u w=1u l=4u
+X51 a_456234_319178# a_454154_321988# vdd vss nfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=4u
+X52 vdd a_460514_375410# a_460514_375410# vdd pfet_03v3 ad=1.2p pd=5.2u as=0.56p ps=2.56u w=2u l=2u
+X53 strongarm_comparator$3_0.OUTN strongarm_comparator$2_0.CLK vdd vdd pfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=0.6u
+X54 vss strongarm_comparator$2_0.CLK a_461674_407313# vss nfet_03v3 ad=0.6p pd=3.2u as=0.28p ps=1.56u w=1u l=0.6u
+D26 vss io_secondary_3p3_13.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+D27 vref_1v2$1_0.IBIAS vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+D28 strongarm_comparator$2_0.INN vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X55 vdd strongarm_comparator$2_0.CLK a_458324_411233# vdd pfet_03v3 ad=0.6p pd=3.2u as=0.28p ps=1.56u w=1u l=0.6u
+X56 vdd vref_1v2$1_0.IBIAS io_secondary_3p3_1.to_gate vdd pfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=8u
+D29 vss strongarm_comparator$2_0.INN diode_nd2ps_03v3 pj=40p area=99.99999p
+D30 vss ota_0.OUT diode_nd2ps_03v3 pj=40p area=99.99999p
+D31 io_secondary_3p3_8.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X57 a_461220_445704# vref_1v2$1_0.IBIAS vss vss nfet_03v3 ad=1.68p pd=6.56u as=3.6p ps=13.2u w=6u l=4u
+X58 vdd vref_1v2$1_0.IBIAS vref_1v2$1_0.IBIAS vdd pfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=8u
+X59 a_460498_352580# io_secondary_3p3_1.to_gate io_secondary_3p3_1.to_gate vss nfet_03v3 ad=7.125p pd=20.5u as=7.125p ps=20.5u w=9.5u l=0.28u
+X60 a_460514_375410# a_460514_375410# vdd vdd pfet_03v3 ad=0.56p pd=2.56u as=1.2p ps=5.2u w=2u l=2u
+D32 io_secondary_3p3_13.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X61 a_459575_333180# io_secondary_3p3_2.to_gate io_secondary_3p3_2.to_gate vss nfet_03v3 ad=0.48p pd=2.8u as=0.224p ps=1.36u w=0.8u l=0.35u
+X62 vss vref_1v2$1_0.IBIAS a_460220_472055# vss nfet_03v3 ad=1.2p pd=5.2u as=0.56p ps=2.56u w=2u l=1u
+X63 a_458324_411233# strongarm_comparator$2_0.INN a_461674_407313# vss nfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=0.6u
+X64 vdd a_460514_375410# io_secondary_3p3_0.to_gate vdd pfet_03v3 ad=2.4p pd=9.2u as=1.12p ps=4.56u w=4u l=2u
+X65 vdd strongarm_comparator$2_0.CLK a_461236_392562# vdd pfet_03v3 ad=0.48p pd=2.8u as=0.48p ps=2.8u w=0.8u l=0.5u
+D33 vss strongarm_comparator$2_0.INP diode_nd2ps_03v3 pj=40p area=99.99999p
+D34 vss io_secondary_3p3_3.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+D35 vss io_secondary_3p3_1.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+D36 vss io_secondary_3p3_9.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X66 a_461674_407313# strongarm_comparator$2_0.INP a_460344_411233# vss nfet_03v3 ad=0.6p pd=3.2u as=0.28p ps=1.56u w=1u l=0.6u
+X67 vdd a_457890_452332# a_457890_452332# vdd pfet_03v3 ad=2.1p pd=8.06u as=2.1p ps=8.06u w=7.5u l=4u
+D37 io_secondary_3p3_1.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X68 a_460872_431778# strongarm_comparator$2_0.INP a_457916_431778# vss nfet_03v3 ad=0.56p pd=2.56u as=0.56p ps=2.56u w=2u l=0.6u
+X69 ota_0.OUT a_460290_474266# vdd vdd pfet_03v3 ad=0.168p pd=1.16u as=0.168p ps=1.16u w=0.6u l=1u
+D38 io_secondary_3p3_3.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+D39 strongarm_comparator$2_0.INP vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X70 a_460514_375410# vref_1v2$1_0.IBIAS vss vss nfet_03v3 ad=0.56p pd=2.56u as=1.2p ps=5.2u w=2u l=2u
+X71 a_461236_392562# io_secondary_3p3_13.to_gate strongarm_comparator$2_0.OUTN vss nfet_03v3 ad=1.38p pd=5.8u as=1.38p ps=5.8u w=2.3u l=0.5u
+D40 vss strongarm_comparator$2_0.CLK diode_nd2ps_03v3 pj=40p area=99.99999p
+X72 vref_1v2$1_0.IBIAS vref_1v2$1_0.IBIAS vss vss nfet_03v3 ad=0.28p pd=1.56u as=0.6p ps=3.2u w=1u l=1u
+X73 gpt_cmp io_secondary_3p3_5.to_gate vdd ppolyf_u r_width=40u r_length=10u
+D41 vss io_secondary_3p3_2.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X74 a_460450_465503# a_460450_465503# vdd vdd pfet_03v3 ad=0.42p pd=2.06u as=0.42p ps=2.06u w=1.5u l=0.8u
+X75 vss vref_1v2$1_0.IBIAS a_460540_461792# vss nfet_03v3 ad=0.6p pd=3.2u as=0.28p ps=1.56u w=1u l=1u
+D42 vref_1v2$1_0.IBIAS vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X76 a_460164_392562# strongarm_comparator$2_0.OUTN io_secondary_3p3_13.to_gate vss nfet_03v3 ad=1.38p pd=5.8u as=1.38p ps=5.8u w=2.3u l=0.5u
+D43 vss strongarm_comparator$2_0.INN diode_nd2ps_03v3 pj=40p area=99.99999p
+D44 io_secondary_3p3_8.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X77 a_459575_333180# io_secondary_3p3_2.to_gate io_secondary_3p3_2.to_gate vss nfet_03v3 ad=0.224p pd=1.36u as=0.224p ps=1.36u w=0.8u l=0.35u
+D45 io_secondary_3p3_13.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+D46 strongarm_comparator$2_0.CLK vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+D47 vss io_secondary_3p3_4.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+D48 vss io_secondary_3p3_5.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X78 vdd io_secondary_3p3_5.to_gate strongarm_comparator$3_0.OUTN vdd pfet_03v3 ad=0.28p pd=1.56u as=0.6p ps=3.2u w=1u l=0.6u
+X79 vss vref_1v2$1_0.IBIAS vref_1v2$1_0.IBIAS vss nfet_03v3 ad=1.2p pd=5.2u as=0.56p ps=2.56u w=2u l=2u
+X80 inn strongarm_comparator$2_0.INN vdd ppolyf_u r_width=40u r_length=10u
+D49 vss strongarm_comparator$2_0.INP diode_nd2ps_03v3 pj=40p area=99.99999p
+D50 vss io_secondary_3p3_8.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X81 a_458324_411233# strongarm_comparator$3_0.OUTN io_secondary_3p3_5.to_gate vss nfet_03v3 ad=0.28p pd=1.56u as=0.6p ps=3.2u w=1u l=0.6u
+X82 a_459575_333180# io_secondary_3p3_2.to_gate io_secondary_3p3_2.to_gate vss nfet_03v3 ad=0.224p pd=1.36u as=0.224p ps=1.36u w=0.8u l=0.35u
+D51 strongarm_comparator$2_0.INN vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X83 ota_0.OUT strongarm_comparator$2_0.INN a_460220_472055# vss nfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=1u
+D52 io_secondary_3p3_4.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X84 vdd strongarm_comparator$2_0.CLK a_460872_431778# vdd pfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=0.5u
+D53 io_secondary_3p3_9.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X85 strongarm_comparator$3_0.OUTN io_secondary_3p3_5.to_gate a_460344_411233# vss nfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=0.6u
+X86 vdd vref_1v2$1_0.IBIAS vref_1v2$1_0.IBIAS vdd pfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=8u
+X87 vss vref_1v2$1_0.IBIAS vref_1v2$1_0.IBIAS vss nfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=1u
+D54 io_secondary_3p3_5.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+D55 vss ota_0.OUT diode_nd2ps_03v3 pj=40p area=99.99999p
+X88 a_457890_452332# a_457890_452332# vdd vdd pfet_03v3 ad=2.1p pd=8.06u as=4.5p ps=16.2u w=7.5u l=4u
+X89 io_secondary_3p3_5.to_gate strongarm_comparator$3_0.OUTN vdd vdd pfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=0.6u
+X90 a_460220_472055# vref_1v2$1_0.IBIAS vss vss nfet_03v3 ad=0.56p pd=2.56u as=1.2p ps=5.2u w=2u l=1u
+X91 vdd io_secondary_3p3_5.to_gate strongarm_comparator$3_0.OUTN vdd pfet_03v3 ad=0.6p pd=3.2u as=0.28p ps=1.56u w=1u l=0.6u
+X92 a_465976_314570# vss vss ppolyf_u r_width=1u r_length=100u
+D56 vss io_secondary_3p3_2.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+D57 vss io_secondary_3p3_0.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+D58 io_secondary_3p3_0.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X93 vdd strongarm_comparator$2_0.CLK a_458156_431778# vdd pfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=0.5u
+D59 io_secondary_3p3_2.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X94 vdd a_461942_321988# a_456326_321988# vdd pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=4u
+X95 temp_out io_secondary_3p3_3.to_gate vdd ppolyf_u r_width=40u r_length=10u
+X96 deepseek_cmp io_secondary_3p3_9.to_gate vdd ppolyf_u r_width=40u r_length=10u
+X97 a_460290_474266# a_460290_474266# vdd vdd pfet_03v3 ad=0.168p pd=1.16u as=0.168p ps=1.16u w=0.6u l=1u
+X98 io_secondary_3p3_2.to_gate io_secondary_3p3_2.to_gate a_459575_333180# vss nfet_03v3 ad=0.224p pd=1.36u as=0.224p ps=1.36u w=0.8u l=0.35u
+D60 vss io_secondary_3p3_8.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X99 a_460540_461792# vref_1v2$1_0.IBIAS vss vss nfet_03v3 ad=0.28p pd=1.56u as=0.6p ps=3.2u w=1u l=1u
+X100 a_457916_431778# strongarm_comparator$2_0.INP a_460872_431778# vss nfet_03v3 ad=0.56p pd=2.56u as=0.56p ps=2.56u w=2u l=0.6u
+X101 vss io_secondary_3p3_2.to_gate a_459575_333180# vss nfet_03v3 ad=5.7p pd=20.2u as=5.7p ps=20.2u w=9.5u l=7.45u
+X102 strongarm_comparator_0.OUTN io_secondary_3p3_9.to_gate a_460872_431778# vss nfet_03v3 ad=0.56p pd=2.56u as=0.56p ps=2.56u w=2u l=0.5u
+D61 vss vref_1v2$1_0.IBIAS diode_nd2ps_03v3 pj=40p area=99.99999p
+D62 io_secondary_3p3_4.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X103 a_465976_314570# a_463042_318970# a_461942_321988# vss nfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=4u
+X104 vdd strongarm_comparator$2_0.CLK io_secondary_3p3_9.to_gate vdd pfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=0.5u
+X105 vdd strongarm_comparator$2_0.CLK a_458324_411233# vdd pfet_03v3 ad=0.28p pd=1.56u as=0.6p ps=3.2u w=1u l=0.6u
+D63 io_secondary_3p3_5.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X106 io_secondary_3p3_0.to_gate a_460514_375410# vdd vdd pfet_03v3 ad=1.12p pd=4.56u as=2.4p ps=9.2u w=4u l=2u
+X107 a_460344_411233# strongarm_comparator$2_0.CLK vdd vdd pfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=0.6u
+X108 vdd a_456326_321988# a_454954_322196# vdd pfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=4u
+D64 vss io_secondary_3p3_3.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+D65 vss io_secondary_3p3_9.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+D66 vss io_secondary_3p3_1.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X109 vss vref_1v2$1_0.IBIAS vref_1v2$1_0.IBIAS vss nfet_03v3 ad=0.6p pd=3.2u as=0.28p ps=1.56u w=1u l=1u
+X110 strongarm_comparator_0.OUTN io_secondary_3p3_9.to_gate vdd vdd pfet_03v3 ad=0.56p pd=2.56u as=0.56p ps=2.56u w=2u l=0.5u
+X111 vdd strongarm_comparator$2_0.CLK io_secondary_3p3_5.to_gate vdd pfet_03v3 ad=0.28p pd=1.56u as=0.6p ps=3.2u w=1u l=0.6u
+D67 strongarm_comparator$2_0.CLK vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+D68 io_secondary_3p3_3.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X112 a_458156_431778# strongarm_comparator$2_0.INN a_457916_431778# vss nfet_03v3 ad=0.56p pd=2.56u as=0.56p ps=2.56u w=2u l=0.6u
+X113 io_secondary_3p3_4.to_gate a_460450_465503# vdd vdd pfet_03v3 ad=0.42p pd=2.06u as=0.42p ps=2.06u w=1.5u l=0.8u
+X114 a_460450_465503# strongarm_comparator$2_0.INP a_460540_461792# vss nfet_03v3 ad=0.28p pd=1.56u as=0.6p ps=3.2u w=1u l=0.6u
+X115 io_secondary_3p3_5.to_gate strongarm_comparator$3_0.OUTN a_458324_411233# vss nfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=0.6u
+D69 strongarm_comparator$2_0.INN vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X116 vdd a_457890_452332# a_457890_452332# vdd pfet_03v3 ad=4.5p pd=16.2u as=2.1p ps=8.06u w=7.5u l=4u
+X117 a_457916_431778# strongarm_comparator$2_0.INN a_458156_431778# vss nfet_03v3 ad=0.56p pd=2.56u as=0.56p ps=2.56u w=2u l=0.6u
+X118 a_460872_431778# strongarm_comparator$2_0.INP a_457916_431778# vss nfet_03v3 ad=0.56p pd=2.56u as=1.2p ps=5.2u w=2u l=0.6u
+X119 io_secondary_3p3_4.to_gate strongarm_comparator$2_0.INN a_460540_461792# vss nfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=0.6u
+X120 a_460344_411233# io_secondary_3p3_5.to_gate strongarm_comparator$3_0.OUTN vss nfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=0.6u
+D70 ota_0.OUT vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+D71 io_secondary_3p3_8.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+D72 vss io_secondary_3p3_13.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X121 vdd strongarm_comparator$2_0.CLK io_secondary_3p3_13.to_gate vdd pfet_03v3 ad=0.96p pd=4.4u as=0.96p ps=4.4u w=1.6u l=0.5u
+D73 io_secondary_3p3_13.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+D74 vss ota_0.OUT diode_nd2ps_03v3 pj=40p area=99.99999p
+X122 a_460290_474266# strongarm_comparator$2_0.INP a_460220_472055# vss nfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=1u
+X123 vdd a_454154_321988# io_secondary_3p3_3.to_gate vdd pfet_03v3 ad=3.6p pd=13.2u as=3.6p ps=13.2u w=6u l=1u
+X124 vdd strongarm_comparator$3_0.OUTN io_secondary_3p3_5.to_gate vdd pfet_03v3 ad=0.6p pd=3.2u as=0.28p ps=1.56u w=1u l=0.6u
+X125 a_458156_431778# strongarm_comparator_0.OUTN io_secondary_3p3_9.to_gate vss nfet_03v3 ad=0.56p pd=2.56u as=1.2p ps=5.2u w=2u l=0.5u
+X126 a_456326_321988# vss cap_mim_2f0_m4m5_noshield c_width=34u c_length=34u
+X127 oxa_vref io_secondary_3p3_2.to_gate vdd ppolyf_u r_width=40u r_length=10u
+X128 vss vref_1v2$1_0.IBIAS a_460514_375410# vss nfet_03v3 ad=1.2p pd=5.2u as=0.56p ps=2.56u w=2u l=2u
+X129 oxa_ota io_secondary_3p3_8.to_gate vdd ppolyf_u r_width=40u r_length=10u
+X130 a_460344_411233# io_secondary_3p3_5.to_gate strongarm_comparator$3_0.OUTN vss nfet_03v3 ad=0.6p pd=3.2u as=0.28p ps=1.56u w=1u l=0.6u
+D75 vss io_secondary_3p3_1.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X131 io_secondary_3p3_8.to_gate a_457890_452332# vdd vdd pfet_03v3 ad=2.1p pd=8.06u as=4.5p ps=16.2u w=7.5u l=4u
+X132 a_461674_407313# strongarm_comparator$2_0.INP a_460344_411233# vss nfet_03v3 ad=0.28p pd=1.56u as=0.6p ps=3.2u w=1u l=0.6u
+X133 vdd strongarm_comparator$2_0.CLK strongarm_comparator$2_0.OUTN vdd pfet_03v3 ad=0.96p pd=4.4u as=0.96p ps=4.4u w=1.6u l=0.5u
+D76 vss vref_1v2$1_0.IBIAS diode_nd2ps_03v3 pj=40p area=99.99999p
+D77 strongarm_comparator$2_0.CLK vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X134 vss vref_1v2$1_0.IBIAS vref_1v2$1_0.IBIAS vss nfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=1u
+X135 a_458156_431778# strongarm_comparator$2_0.INN a_457916_431778# vss nfet_03v3 ad=0.56p pd=2.56u as=0.56p ps=2.56u w=2u l=0.6u
+D78 io_secondary_3p3_3.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+D79 io_secondary_3p3_1.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X136 vdd a_461942_321988# a_461942_321988# vdd pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=4u
+D80 vss io_secondary_3p3_2.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X137 ota_0.OUT strongarm_comparator$2_0.INN a_460220_472055# vss nfet_03v3 ad=0.28p pd=1.56u as=0.6p ps=3.2u w=1u l=1u
+X138 a_461674_407313# strongarm_comparator$2_0.CLK vss vss nfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=0.6u
+X139 vss io_secondary_3p3_1.to_gate a_460498_352580# vss nfet_03v3 ad=5.7p pd=20.2u as=5.7p ps=20.2u w=9.5u l=8u
+D81 vss io_secondary_3p3_0.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X140 vss a_463042_318970# a_461670_319178# vss nfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=4u
+X141 a_456234_319178# a_456326_321988# a_454154_321988# vss nfet_03v3 ad=0.6p pd=3.2u as=0.6p ps=3.2u w=1u l=4u
+X142 io_secondary_3p3_2.to_gate io_secondary_3p3_2.to_gate a_459575_333180# vss nfet_03v3 ad=0.224p pd=1.36u as=0.224p ps=1.36u w=0.8u l=0.35u
+D82 strongarm_comparator$2_0.INN vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X143 ota_0.OUT a_460290_474266# vdd vdd pfet_03v3 ad=0.168p pd=1.16u as=0.36p ps=2.4u w=0.6u l=1u
+X144 vdd a_460290_474266# a_460290_474266# vdd pfet_03v3 ad=0.168p pd=1.16u as=0.168p ps=1.16u w=0.6u l=1u
+X145 vdd io_secondary_3p3_13.to_gate strongarm_comparator$2_0.OUTN vdd pfet_03v3 ad=1.8p pd=7.2u as=1.8p ps=7.2u w=3u l=0.5u
+X146 vdd strongarm_comparator$2_0.CLK a_460344_411233# vdd pfet_03v3 ad=0.6p pd=3.2u as=0.28p ps=1.56u w=1u l=0.6u
+D83 io_secondary_3p3_2.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+D84 vss ota_0.OUT diode_nd2ps_03v3 pj=40p area=99.99999p
+X147 vdd a_460450_465503# io_secondary_3p3_4.to_gate vdd pfet_03v3 ad=0.9p pd=4.2u as=0.42p ps=2.06u w=1.5u l=0.8u
+X148 a_460872_431778# strongarm_comparator$2_0.INP a_457916_431778# vss nfet_03v3 ad=0.56p pd=2.56u as=0.56p ps=2.56u w=2u l=0.6u
+X149 io_secondary_3p3_2.to_gate io_secondary_3p3_2.to_gate a_459575_333180# vss nfet_03v3 ad=0.224p pd=1.36u as=0.48p ps=2.8u w=0.8u l=0.35u
+X150 vdd a_460450_465503# io_secondary_3p3_4.to_gate vdd pfet_03v3 ad=0.42p pd=2.06u as=0.42p ps=2.06u w=1.5u l=0.8u
+D85 vss io_secondary_3p3_8.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+D86 vss io_secondary_3p3_4.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X151 io_secondary_3p3_5.to_gate strongarm_comparator$2_0.CLK vdd vdd pfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=0.6u
+X152 vdd strongarm_comparator$2_0.CLK strongarm_comparator$3_0.OUTN vdd pfet_03v3 ad=0.6p pd=3.2u as=0.28p ps=1.56u w=1u l=0.6u
+X153 deepseek_ota ota_0.OUT vdd ppolyf_u r_width=40u r_length=10u
+X154 clk strongarm_comparator$2_0.CLK vdd ppolyf_u r_width=40u r_length=10u
+D87 vss io_secondary_3p3_5.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X155 vdd strongarm_comparator$2_0.OUTN io_secondary_3p3_13.to_gate vdd pfet_03v3 ad=1.8p pd=7.2u as=1.8p ps=7.2u w=3u l=0.5u
+D88 ota_0.OUT vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+D89 io_secondary_3p3_4.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X156 vref_1v2$1_0.IBIAS vref_1v2$1_0.IBIAS vss vss nfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=1u
+X157 a_457916_431778# strongarm_comparator$2_0.INN a_458156_431778# vss nfet_03v3 ad=0.56p pd=2.56u as=0.56p ps=2.56u w=2u l=0.6u
+X158 a_459575_333180# io_secondary_3p3_2.to_gate io_secondary_3p3_2.to_gate vss nfet_03v3 ad=0.224p pd=1.36u as=0.224p ps=1.36u w=0.8u l=0.35u
+X159 io_secondary_3p3_9.to_gate strongarm_comparator_0.OUTN a_458156_431778# vss nfet_03v3 ad=0.56p pd=2.56u as=0.56p ps=2.56u w=2u l=0.5u
+D90 io_secondary_3p3_5.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X160 a_458324_411233# strongarm_comparator$3_0.OUTN io_secondary_3p3_5.to_gate vss nfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=0.6u
+D91 io_secondary_3p3_9.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X161 a_457916_431778# strongarm_comparator$2_0.INP a_460872_431778# vss nfet_03v3 ad=0.56p pd=2.56u as=0.56p ps=2.56u w=2u l=0.6u
+X162 gpt_vref io_secondary_3p3_1.to_gate vdd ppolyf_u r_width=40u r_length=10u
+X163 a_461670_319178# io_secondary_3p3_3.to_gate a_456326_321988# vss nfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=0.6u
+X164 a_460540_461792# strongarm_comparator$2_0.INN io_secondary_3p3_4.to_gate vss nfet_03v3 ad=0.6p pd=3.2u as=0.28p ps=1.56u w=1u l=0.6u
+X165 vdd strongarm_comparator_0.OUTN io_secondary_3p3_9.to_gate vdd pfet_03v3 ad=1.2p pd=5.2u as=0.56p ps=2.56u w=2u l=0.5u
+X166 vdd strongarm_comparator$3_0.OUTN io_secondary_3p3_5.to_gate vdd pfet_03v3 ad=0.28p pd=1.56u as=0.6p ps=3.2u w=1u l=0.6u
+X167 strongarm_comparator$3_0.OUTN io_secondary_3p3_5.to_gate vdd vdd pfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=0.6u
+X168 vss a_454154_321988# io_secondary_3p3_3.to_gate vss nfet_03v3 ad=1.8p pd=7.2u as=1.8p ps=7.2u w=3u l=1u
+D92 vss io_secondary_3p3_0.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X169 vss strongarm_comparator$2_0.CLK a_461792_388524# vss nfet_03v3 ad=5.46p pd=19.4u as=5.46p ps=19.4u w=9.1u l=0.5u
+X170 vss vref_1v2$1_0.IBIAS vref_1v2$1_0.IBIAS vss nfet_03v3 ad=0.6p pd=3.2u as=0.28p ps=1.56u w=1u l=1u
+X171 vdd strongarm_comparator_0.OUTN io_secondary_3p3_9.to_gate vdd pfet_03v3 ad=0.56p pd=2.56u as=1.2p ps=5.2u w=2u l=0.5u
+X172 a_460220_472055# strongarm_comparator$2_0.INP a_460290_474266# vss nfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=1u
+X173 a_460540_461792# strongarm_comparator$2_0.INP a_460450_465503# vss nfet_03v3 ad=0.6p pd=3.2u as=0.28p ps=1.56u w=1u l=0.6u
+X174 a_458324_411233# strongarm_comparator$3_0.OUTN io_secondary_3p3_5.to_gate vss nfet_03v3 ad=0.6p pd=3.2u as=0.28p ps=1.56u w=1u l=0.6u
+D93 strongarm_comparator$2_0.INP vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X175 vdd strongarm_comparator$2_0.CLK io_secondary_3p3_5.to_gate vdd pfet_03v3 ad=0.6p pd=3.2u as=0.28p ps=1.56u w=1u l=0.6u
+D94 io_secondary_3p3_2.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+D95 io_secondary_3p3_0.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+D96 vss strongarm_comparator$2_0.CLK diode_nd2ps_03v3 pj=40p area=99.99999p
+X176 io_secondary_3p3_8.to_gate a_457890_452332# vdd vdd pfet_03v3 ad=2.1p pd=8.06u as=2.1p ps=8.06u w=7.5u l=4u
+X177 vdd vss a_462642_316153# vdd pfet_03v3 ad=0.36p pd=2.4u as=0.36p ps=2.4u w=0.6u l=9.5u
+X178 a_459575_333180# io_secondary_3p3_2.to_gate io_secondary_3p3_2.to_gate vss nfet_03v3 ad=0.224p pd=1.36u as=0.224p ps=1.36u w=0.8u l=0.35u
+X179 gpt_ota io_secondary_3p3_4.to_gate vdd ppolyf_u r_width=40u r_length=10u
+X180 vdd a_460290_474266# a_460290_474266# vdd pfet_03v3 ad=0.36p pd=2.4u as=0.168p ps=1.16u w=0.6u l=1u
+D97 vss io_secondary_3p3_13.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+D98 vref_1v2$1_0.IBIAS vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X181 vdd io_secondary_3p3_9.to_gate strongarm_comparator_0.OUTN vdd pfet_03v3 ad=0.56p pd=2.56u as=1.2p ps=5.2u w=2u l=0.5u
+X182 a_460344_411233# strongarm_comparator$2_0.INP a_461674_407313# vss nfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=0.6u
+D99 vss vref_1v2$1_0.IBIAS diode_nd2ps_03v3 pj=40p area=99.99999p
+D100 vss strongarm_comparator$2_0.INN diode_nd2ps_03v3 pj=40p area=99.99999p
+X183 a_460872_431778# io_secondary_3p3_9.to_gate strongarm_comparator_0.OUTN vss nfet_03v3 ad=1.2p pd=5.2u as=0.56p ps=2.56u w=2u l=0.5u
+X184 a_461674_407313# strongarm_comparator$2_0.INN a_458324_411233# vss nfet_03v3 ad=0.6p pd=3.2u as=0.28p ps=1.56u w=1u l=0.6u
+X185 vdd strongarm_comparator$2_0.CLK a_460164_392562# vdd pfet_03v3 ad=0.48p pd=2.8u as=0.48p ps=2.8u w=0.8u l=0.5u
+X186 io_secondary_3p3_4.to_gate strongarm_comparator$2_0.INN a_460540_461792# vss nfet_03v3 ad=0.28p pd=1.56u as=0.6p ps=3.2u w=1u l=0.6u
+X187 vss vref_1v2$1_0.IBIAS a_461220_445704# vss nfet_03v3 ad=3.6p pd=13.2u as=1.68p ps=6.56u w=6u l=4u
+D101 vss io_secondary_3p3_1.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+D102 vss strongarm_comparator$2_0.INP diode_nd2ps_03v3 pj=40p area=99.99999p
+X188 a_460220_472055# vref_1v2$1_0.IBIAS vss vss nfet_03v3 ad=0.56p pd=2.56u as=0.56p ps=2.56u w=2u l=1u
+X189 vdd strongarm_comparator$2_0.CLK strongarm_comparator_0.OUTN vdd pfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=0.5u
+D103 vss io_secondary_3p3_3.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X190 vss a_463042_318970# a_462642_316153# vss nfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=0.6u
+D104 vss io_secondary_3p3_9.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+D105 io_secondary_3p3_3.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+D106 io_secondary_3p3_1.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X191 vdd io_secondary_3p3_9.to_gate strongarm_comparator_0.OUTN vdd pfet_03v3 ad=1.2p pd=5.2u as=0.56p ps=2.56u w=2u l=0.5u
+X192 a_457916_431778# strongarm_comparator$2_0.INP a_460872_431778# vss nfet_03v3 ad=1.2p pd=5.2u as=0.56p ps=2.56u w=2u l=0.6u
+X193 a_457890_452332# a_457890_452332# vdd vdd pfet_03v3 ad=2.1p pd=8.06u as=2.1p ps=8.06u w=7.5u l=4u
+X194 a_461220_445704# strongarm_comparator$2_0.INN a_457890_452332# vss nfet_03v3 ad=3.6p pd=13.2u as=3.6p ps=13.2u w=6u l=2u
+X195 vdd a_460290_474266# ota_0.OUT vdd pfet_03v3 ad=0.168p pd=1.16u as=0.168p ps=1.16u w=0.6u l=1u
+X196 a_458156_431778# strongarm_comparator$2_0.INN a_457916_431778# vss nfet_03v3 ad=0.56p pd=2.56u as=1.2p ps=5.2u w=2u l=0.6u
+D107 ota_0.OUT vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X197 a_460220_472055# strongarm_comparator$2_0.INP a_460290_474266# vss nfet_03v3 ad=0.6p pd=3.2u as=0.28p ps=1.56u w=1u l=1u
+X198 a_458156_431778# strongarm_comparator$2_0.INN a_457916_431778# vss nfet_03v3 ad=0.56p pd=2.56u as=0.56p ps=2.56u w=2u l=0.6u
+D108 vss io_secondary_3p3_13.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X199 a_460540_461792# vref_1v2$1_0.IBIAS vss vss nfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=1u
+X200 a_461674_407313# strongarm_comparator$2_0.CLK vss vss nfet_03v3 ad=0.28p pd=1.56u as=0.6p ps=3.2u w=1u l=0.6u
+D109 vss vref_1v2$1_0.IBIAS diode_nd2ps_03v3 pj=40p area=99.99999p
+X201 vdd strongarm_comparator$2_0.CLK a_460344_411233# vdd pfet_03v3 ad=0.28p pd=1.56u as=0.6p ps=3.2u w=1u l=0.6u
+X202 inp strongarm_comparator$2_0.INP vdd ppolyf_u r_width=40u r_length=10u
+D110 io_secondary_3p3_8.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X203 vss a_462642_316153# a_461942_321988# vss nfet_03v3 ad=0.6p pd=3.2u as=0.6p ps=3.2u w=1u l=1u
+X204 deepseek_vref io_secondary_3p3_0.to_gate vdd ppolyf_u r_width=40u r_length=10u
+D111 io_secondary_3p3_13.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+C0 a_454154_321988# vdd 5.39078f
+C1 a_461942_321988# a_461670_319178# 0.0476f
+C2 deepseek_vref vdd 18.5925f
+C3 a_461670_319178# a_463042_318970# 0.18157f
+C4 io_secondary_3p3_9.to_gate strongarm_comparator$2_0.CLK 0.98117f
+C5 a_458324_411233# strongarm_comparator$2_0.INN 0.20365f
+C6 strongarm_comparator$2_0.INP a_458156_431778# 0.06078f
+C7 a_460164_392562# io_secondary_3p3_13.to_gate 0.7538f
+C8 strongarm_comparator$2_0.INP a_461220_445704# 0.76388f
+C9 strongarm_comparator$3_0.OUTN strongarm_comparator$2_0.CLK 0.21888f
+C10 a_460344_411233# strongarm_comparator$2_0.INP 0.18443f
+C11 strongarm_comparator$2_0.INP a_460290_474266# 0.27014f
+C12 io_secondary_3p3_8.to_gate vdd 59.8627f
+C13 a_461670_319178# io_secondary_3p3_3.to_gate 0.12645f
+C14 a_461670_319178# a_456326_321988# 0.7544f
+C15 oxa_ota vdd 18.5925f
+C16 a_460164_392562# strongarm_comparator$2_0.INP 0.02585f
+C17 gpt_ota vdd 19.1344f
+C18 a_454154_321988# a_456234_319178# 1.69852f
+C19 strongarm_comparator$2_0.INP vref_1v2$1_0.IBIAS 19.2068f
+C20 io_secondary_3p3_13.to_gate a_461792_388524# 0.04836f
+C21 ota_0.OUT a_460290_474266# 0.67284f
+C22 a_461236_392562# strongarm_comparator$2_0.CLK 0.25661f
+C23 strongarm_comparator$2_0.INN a_458156_431778# 0.70772f
+C24 strongarm_comparator$2_0.INN a_461220_445704# 0.41863f
+C25 a_457916_431778# a_458156_431778# 4.17529f
+C26 a_460344_411233# strongarm_comparator$2_0.INN 0.04975f
+C27 strongarm_comparator$2_0.INN a_460290_474266# 0.01597f
+C28 strongarm_comparator$2_0.INP a_461792_388524# 0.17906f
+C29 ota_0.OUT vref_1v2$1_0.IBIAS 0.32136f
+C30 strongarm_comparator$2_0.INN io_secondary_3p3_4.to_gate 0.31108f
+C31 io_secondary_3p3_0.to_gate vref_1v2$1_0.IBIAS 0.02814f
+C32 strongarm_comparator$3_0.OUTN io_secondary_3p3_5.to_gate 2.31353f
+C33 a_460164_392562# strongarm_comparator$2_0.INN 0.11347f
+C34 a_454154_321988# a_454954_322196# 1.4225f
+C35 strongarm_comparator$2_0.INN vref_1v2$1_0.IBIAS 3.47636f
+C36 a_465976_314570# a_462642_316153# 0.18828f
+C37 vdd a_462642_316153# 2.96508f
+C38 a_460540_461792# a_460450_465503# 1.58029f
+C39 inn vdd 18.5587f
+C40 a_460514_375410# vref_1v2$1_0.IBIAS 0.41001f
+C41 io_secondary_3p3_5.to_gate strongarm_comparator$2_0.CLK 0.17786f
+C42 a_461674_407313# strongarm_comparator$2_0.INP 0.36521f
+C43 io_secondary_3p3_8.to_gate a_461220_445704# 0.64531f
+C44 io_secondary_3p3_2.to_gate a_459575_333180# 6.17729f
+C45 strongarm_comparator$2_0.INN a_461792_388524# 0.15018f
+C46 a_460872_431778# io_secondary_3p3_9.to_gate 0.62257f
+C47 a_461674_407313# strongarm_comparator$2_0.INN 0.38359f
+C48 vdd strongarm_comparator_0.OUTN 9.14528f
+C49 a_460872_431778# strongarm_comparator$2_0.CLK 0.28267f
+C50 io_secondary_3p3_9.to_gate strongarm_comparator$2_0.INP 0.20341f
+C51 io_secondary_3p3_13.to_gate strongarm_comparator$2_0.CLK 0.11951f
+C52 a_454154_321988# io_secondary_3p3_3.to_gate 0.54646f
+C53 a_454154_321988# a_456326_321988# 1.04748f
+C54 a_461236_392562# io_secondary_3p3_13.to_gate 0.17181f
+C55 a_460540_461792# strongarm_comparator$2_0.INP 0.53892f
+C56 a_460220_472055# strongarm_comparator$2_0.INP 0.86513f
+C57 strongarm_comparator$2_0.INP strongarm_comparator$2_0.CLK 1.81732f
+C58 vdd deepseek_cmp 18.5925f
+C59 strongarm_comparator$2_0.INN io_secondary_3p3_9.to_gate 0.0408f
+C60 a_461236_392562# strongarm_comparator$2_0.INP 0.08248f
+C61 a_457916_431778# io_secondary_3p3_9.to_gate 0.03264f
+C62 oxa_cmp vdd 18.5925f
+C63 vdd gpt_cmp 18.5925f
+C64 a_460220_472055# ota_0.OUT 1.42717f
+C65 a_458324_411233# vdd 2.58006f
+C66 vdd ibias 18.5587f
+C67 a_460540_461792# strongarm_comparator$2_0.INN 0.3586f
+C68 a_460220_472055# strongarm_comparator$2_0.INN 0.48669f
+C69 vdd a_456234_319178# 0.71418f
+C70 strongarm_comparator_0.OUTN a_458156_431778# 0.65529f
+C71 strongarm_comparator$2_0.INN strongarm_comparator$2_0.CLK 15.6452f
+C72 a_457916_431778# strongarm_comparator$2_0.CLK 0.62865f
+C73 a_461942_321988# a_462642_316153# 0.80509f
+C74 a_463042_318970# a_462642_316153# 0.61741f
+C75 a_460450_465503# strongarm_comparator$2_0.INP 0.26577f
+C76 vdd io_secondary_3p3_1.to_gate 57.7534f
+C77 vdd strongarm_comparator$2_0.OUTN 4.98631f
+C78 vdd a_458156_431778# 1.73701f
+C79 a_460344_411233# vdd 2.65684f
+C80 a_454954_322196# vdd 3.72699f
+C81 vdd a_460290_474266# 9.04042f
+C82 vdd io_secondary_3p3_4.to_gate 57.2932f
+C83 a_460164_392562# vdd 1.68981f
+C84 strongarm_comparator$2_0.INP a_457890_452332# 0.13598f
+C85 vdd vref_1v2$1_0.IBIAS 99.0899f
+C86 a_458324_411233# a_460344_411233# 0.99149f
+C87 a_460872_431778# strongarm_comparator$2_0.INP 0.78694f
+C88 a_461942_321988# a_465976_314570# 0.63482f
+C89 a_461942_321988# vdd 10.7114f
+C90 strongarm_comparator$2_0.INN a_457890_452332# 0.30502f
+C91 a_465976_314570# a_463042_318970# 0.85674f
+C92 vdd a_463042_318970# 2.41128f
+C93 a_460872_431778# strongarm_comparator$2_0.INN 0.01484f
+C94 a_457916_431778# a_460872_431778# 3.73892f
+C95 io_secondary_3p3_1.to_gate vref_1v2$1_0.IBIAS 0.62612f
+C96 inp vdd 18.5587f
+C97 a_460164_392562# strongarm_comparator$2_0.OUTN 0.23079f
+C98 a_460498_352580# vdd 0.01369f
+C99 vdd io_secondary_3p3_3.to_gate 57.6941f
+C100 a_456326_321988# vdd 8.64278f
+C101 a_461220_445704# vref_1v2$1_0.IBIAS 0.84338f
+C102 io_secondary_3p3_9.to_gate strongarm_comparator_0.OUTN 2.66446f
+C103 a_461674_407313# a_458324_411233# 1.37005f
+C104 io_secondary_3p3_8.to_gate a_457890_452332# 2.4919f
+C105 strongarm_comparator$2_0.INN strongarm_comparator$2_0.INP 39.9802f
+C106 a_457916_431778# strongarm_comparator$2_0.INP 0.78207f
+C107 a_461670_319178# a_462642_316153# 0.44392f
+C108 strongarm_comparator_0.OUTN strongarm_comparator$2_0.CLK 0.05446f
+C109 io_secondary_3p3_9.to_gate vdd 62.9892f
+C110 io_secondary_3p3_3.to_gate a_456234_319178# 0.01731f
+C111 a_456326_321988# a_456234_319178# 0.48479f
+C112 strongarm_comparator$2_0.INN ota_0.OUT 0.38251f
+C113 clk vdd 18.5587f
+C114 strongarm_comparator$3_0.OUTN vdd 7.9219f
+C115 a_460164_392562# a_461792_388524# 1.00181f
+C116 a_460498_352580# io_secondary_3p3_1.to_gate 2.78004f
+C117 io_secondary_3p3_0.to_gate a_460514_375410# 0.59715f
+C118 strongarm_comparator$2_0.INP io_secondary_3p3_8.to_gate 0.39351f
+C119 a_457916_431778# strongarm_comparator$2_0.INN 0.93145f
+C120 a_461674_407313# a_460344_411233# 1.36771f
+C121 vdd strongarm_comparator$2_0.CLK 79.1041f
+C122 strongarm_comparator$3_0.OUTN a_458324_411233# 0.58984f
+C123 io_secondary_3p3_2.to_gate vdd 57.3035f
+C124 a_461236_392562# vdd 1.7739f
+C125 a_454954_322196# a_456326_321988# 0.50803f
+C126 vdd temp_out 18.5925f
+C127 vdd deepseek_ota 18.5587f
+C128 a_458324_411233# strongarm_comparator$2_0.CLK 0.37018f
+C129 io_secondary_3p3_9.to_gate a_458156_431778# 1.91595f
+C130 a_461942_321988# a_463042_318970# 1.22898f
+C131 vdd a_459575_333180# 0.01823f
+C132 a_460450_465503# vdd 8.66544f
+C133 io_secondary_3p3_5.to_gate vdd 61.3762f
+C134 strongarm_comparator$3_0.OUTN a_460344_411233# 1.83943f
+C135 strongarm_comparator$2_0.CLK strongarm_comparator$2_0.OUTN 0.1727f
+C136 a_461942_321988# io_secondary_3p3_3.to_gate 0.03471f
+C137 a_461942_321988# a_456326_321988# 0.26656f
+C138 a_458156_431778# strongarm_comparator$2_0.CLK 0.49538f
+C139 a_460872_431778# strongarm_comparator_0.OUTN 2.02404f
+C140 a_460344_411233# strongarm_comparator$2_0.CLK 0.30369f
+C141 a_460220_472055# a_460290_474266# 1.38238f
+C142 a_461236_392562# strongarm_comparator$2_0.OUTN 0.63663f
+C143 a_460540_461792# io_secondary_3p3_4.to_gate 1.34454f
+C144 a_458324_411233# io_secondary_3p3_5.to_gate 2.02651f
+C145 vdd oxa_vref 18.5925f
+C146 a_460540_461792# vref_1v2$1_0.IBIAS 0.43888f
+C147 vdd a_457890_452332# 25.7127f
+C148 a_460220_472055# vref_1v2$1_0.IBIAS 0.42473f
+C149 a_460164_392562# strongarm_comparator$2_0.CLK 0.29164f
+C150 strongarm_comparator$2_0.CLK vref_1v2$1_0.IBIAS 1.67993f
+C151 gpt_vref vdd 18.5925f
+C152 a_456326_321988# io_secondary_3p3_3.to_gate 1.53866f
+C153 a_460872_431778# vdd 1.80229f
+C154 strongarm_comparator$2_0.INP strongarm_comparator_0.OUTN 0.11248f
+C155 io_secondary_3p3_2.to_gate vref_1v2$1_0.IBIAS 0.33406f
+C156 a_460164_392562# a_461236_392562# 0.73046f
+C157 io_secondary_3p3_13.to_gate vdd 59.5927f
+C158 a_461792_388524# strongarm_comparator$2_0.CLK 0.49113f
+C159 a_460344_411233# io_secondary_3p3_5.to_gate 0.37272f
+C160 strongarm_comparator$2_0.INP vdd 64.0765f
+C161 a_461236_392562# a_461792_388524# 1.05329f
+C162 a_460450_465503# io_secondary_3p3_4.to_gate 0.6927f
+C163 a_461674_407313# strongarm_comparator$2_0.CLK 0.4952f
+C164 vdd ota_0.OUT 58.0467f
+C165 a_457890_452332# a_461220_445704# 0.734f
+C166 io_secondary_3p3_0.to_gate vdd 56.6073f
+C167 a_460872_431778# a_458156_431778# 0.93605f
+C168 strongarm_comparator$2_0.INN vdd 64.0765f
+C169 io_secondary_3p3_13.to_gate strongarm_comparator$2_0.OUTN 2.4802f
+C170 vdd a_460514_375410# 7.64579f
+C171 temp_out vss 30.6029f
+C172 oxa_vref vss 30.9378f
+C173 gpt_vref vss 31.2728f
+C174 deepseek_vref vss 31.6077f
+C175 oxa_cmp vss 31.9426f
+C176 gpt_cmp vss 32.2776f
+C177 deepseek_cmp vss 32.4506f
+C178 oxa_ota vss 32.9474f
+C179 gpt_ota vss 32.4447f
+C180 clk vss 9.23192f
+C181 inn vss 9.23192f
+C182 inp vss 9.23192f
+C183 ibias vss 9.23192f
+C184 deepseek_ota vss 9.23192f
+C185 vdd vss 3.42703p
+C186 a_465976_314570# vss 2.83985f ; **FLOATING
+C187 a_461670_319178# vss 3.64413f ; **FLOATING
+C188 a_456234_319178# vss 4.43619f ; **FLOATING
+C189 a_462642_316153# vss 6.34937f ; **FLOATING
+C190 a_463042_318970# vss 11.8837f ; **FLOATING
+C191 a_461942_321988# vss 5.3867f ; **FLOATING
+C192 a_456326_321988# vss 32.0867f ; **FLOATING
+C193 a_454954_322196# vss 1.96604f ; **FLOATING
+C194 a_454154_321988# vss 10.387f ; **FLOATING
+C195 io_secondary_3p3_3.to_gate vss 0.16536p ; **FLOATING
+C196 a_459575_333180# vss 6.13782f ; **FLOATING
+C197 io_secondary_3p3_2.to_gate vss 0.17582p ; **FLOATING
+C198 a_460498_352580# vss 5.91326f ; **FLOATING
+C199 io_secondary_3p3_1.to_gate vss 0.17195p ; **FLOATING
+C200 a_460514_375410# vss 3.16287f ; **FLOATING
+C201 io_secondary_3p3_0.to_gate vss 0.16516p ; **FLOATING
+C202 a_461792_388524# vss 6.22471f ; **FLOATING
+C203 a_461236_392562# vss 2.87736f ; **FLOATING
+C204 a_460164_392562# vss 3.33479f ; **FLOATING
+C205 strongarm_comparator$2_0.OUTN vss 2.98364f ; **FLOATING
+C206 io_secondary_3p3_13.to_gate vss 0.16478p ; **FLOATING
+C207 a_461674_407313# vss 5.75695f ; **FLOATING
+C208 a_460344_411233# vss 4.15838f ; **FLOATING
+C209 a_458324_411233# vss 4.90949f ; **FLOATING
+C210 strongarm_comparator$3_0.OUTN vss 7.02216f ; **FLOATING
+C211 io_secondary_3p3_5.to_gate vss 0.16754p ; **FLOATING
+C212 a_457916_431778# vss 6.06492f ; **FLOATING
+C213 a_460872_431778# vss 3.98919f ; **FLOATING
+C214 a_458156_431778# vss 3.73155f ; **FLOATING
+C215 strongarm_comparator_0.OUTN vss 3.94113f ; **FLOATING
+C216 io_secondary_3p3_9.to_gate vss 0.16718p ; **FLOATING
+C217 a_461220_445704# vss 6.43921f ; **FLOATING
+C218 a_457890_452332# vss 3.49428f ; **FLOATING
+C219 a_460540_461792# vss 6.03541f ; **FLOATING
+C220 io_secondary_3p3_8.to_gate vss 0.16402p ; **FLOATING
+C221 a_460450_465503# vss 2.32174f ; **FLOATING
+C222 a_460220_472055# vss 6.45097f ; **FLOATING
+C223 a_460290_474266# vss 2.3545f ; **FLOATING
+C224 io_secondary_3p3_4.to_gate vss 0.16664p ; **FLOATING
+C225 strongarm_comparator$2_0.CLK vss 0.29231p ; **FLOATING
+C226 strongarm_comparator$2_0.INN vss 0.30501p ; **FLOATING
+C227 strongarm_comparator$2_0.INP vss 0.31223p ; **FLOATING
+C228 vref_1v2$1_0.IBIAS vss 0.37757p ; **FLOATING
+C229 ota_0.OUT vss 0.17503p ; **FLOATING
+.ends

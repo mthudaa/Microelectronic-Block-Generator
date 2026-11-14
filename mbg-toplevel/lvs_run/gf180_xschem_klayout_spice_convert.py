@@ -1,0 +1,1 @@
+/foss/pdks/ciel/gf180mcu/versions/7b70722e33c03fcb5dabcf4d479fb0822d9251c9/gf180mcuD/libs.tech/klayout/tech/lvs/gf180_xschem_klayout_spice_convert.py

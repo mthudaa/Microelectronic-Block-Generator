@@ -8,6 +8,14 @@ macro views, and run DRC, LVS and parasitic extraction.
 See [public feature levels](docs/features.md) for the supported scope and
 [validation](docs/validation.md) for checks executed on this release.
 
+## Chipathon 2026 submission
+
+The existing MBG-D08 submission is preserved in [mbg-toplevel](mbg-toplevel/),
+with its [pin map](info.yaml) and [LVS configuration](lvs_config.json).
+These are previously published submission artifacts; their presence does not
+expand the generator's supported feature levels. Preserve them during tool
+updates and repository cleanup.
+
 ## Install
 
 Use Python 3.11 for the supplied dependency lock. No PDK or EDA binary is bundled.

@@ -14,6 +14,14 @@ Git push and other publication require explicit user authorization. Preserve the
 existing human Git identity and license; do not add AI authorship trailers.
 Do not overwrite user work or delete generated evidence without authorization.
 
+## Preserve the Chipathon submission
+
+Keep `info.yaml`, `D08_info.yaml`, both `lvs_config*.json` files and
+`mbg-toplevel/` intact during tool releases and repository cleanup. These are
+the existing public Chipathon submission, separate from the generator's feature
+levels. Removing or renaming submission assets requires explicit user approval.
+Restoring public artifacts does not authorize copying unpublished private work.
+
 ## Working safely
 
 Use repository-relative paths for source inputs and reject parent traversal and

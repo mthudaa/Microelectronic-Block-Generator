@@ -1,0 +1,52 @@
+* Extended pre-layout top-level simulation for mbg-d08.
+.include "mbg-d08_pre_sim.spice"
+.temp 27
+
+VDD_SRC VDD 0 3.3
+VSS_SRC VSS 0 0
+VCLK CLK 0 PULSE(0 3.3 20n 0.1n 0.1n 5u 10u)
+* Complementary linear ramp: INP offset -200 mV to +200 mV; INN offset +200 mV to -200 mV.
+* The 1.65 V common-mode level gives actual pin ramps of 1.45 V to 1.85 V and 1.85 V to 1.45 V over 100 us.
+VINP INP 0 PWL(0 1.450 100u 1.850)
+VINN INN 0 PWL(0 1.850 100u 1.450)
+I_BIAS 0 IBIAS DC 20u
+
+* Pad loads and output observation capacitance.
+RLOAD_DS_OTA deepseek_ota 0 1G
+RLOAD_GPT_OTA gpt_ota 0 1G
+RLOAD_OXA_OTA oxa_ota 0 1G
+RLOAD_DS_CMP deepseek_cmp 0 1G
+RLOAD_GPT_CMP gpt_cmp 0 1G
+RLOAD_OXA_CMP oxa_cmp 0 1G
+RLOAD_DS_VREF deepseek_vref 0 1G
+RLOAD_GPT_VREF gpt_vref 0 1G
+RLOAD_OXA_VREF oxa_vref 0 1G
+RLOAD_TEMP temp_out 0 1G
+CLOAD_DS_OTA deepseek_ota 0 1p
+CLOAD_GPT_OTA gpt_ota 0 1p
+CLOAD_OXA_OTA oxa_ota 0 1p
+CLOAD_DS_CMP deepseek_cmp 0 20f
+CLOAD_GPT_CMP gpt_cmp 0 20f
+CLOAD_OXA_CMP oxa_cmp 0 20f
+CLOAD_DS_VREF deepseek_vref 0 1p
+CLOAD_GPT_VREF gpt_vref 0 1p
+CLOAD_OXA_VREF oxa_vref 0 1p
+CLOAD_TEMP temp_out 0 20f
+
+XDUT VDD VSS CLK INP INN IBIAS TEMP_OUT
++ deepseek_ota gpt_ota oxa_ota
++ deepseek_cmp gpt_cmp oxa_cmp
++ deepseek_vref gpt_vref oxa_vref mbg-d08
+
+.control
+set noaskquit
+op
+print v(deepseek_ota) v(gpt_ota) v(oxa_ota)
+print v(deepseek_cmp) v(gpt_cmp) v(oxa_cmp)
+print v(deepseek_vref) v(gpt_vref) v(oxa_vref)
+print v(temp_out)
+tran 1n 100u
+let vdiff = v(INP)-v(INN)
+wrdata mbg-d08_pre_tr.dat v(deepseek_ota) v(gpt_ota) v(oxa_ota) v(deepseek_cmp) v(gpt_cmp) v(oxa_cmp) v(deepseek_vref) v(gpt_vref) v(oxa_vref) v(temp_out) vdiff
+.endc
+.end

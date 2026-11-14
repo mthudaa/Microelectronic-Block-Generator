@@ -1,0 +1,40 @@
+* Standalone ox-alpha strong-arm comparator with input/output io_secondary_3p3 pads.
+.include "/foss/pdks/ciel/gf180mcu/versions/7b70722e33c03fcb5dabcf4d479fb0822d9251c9/gf180mcuD/libs.tech/ngspice/design.ngspice"
+.lib "/foss/pdks/ciel/gf180mcu/versions/7b70722e33c03fcb5dabcf4d479fb0822d9251c9/gf180mcuD/libs.tech/ngspice/sm141064.ngspice" typical
+.lib "/foss/pdks/ciel/gf180mcu/versions/7b70722e33c03fcb5dabcf4d479fb0822d9251c9/gf180mcuD/libs.tech/ngspice/sm141064.ngspice" diode_typical
+.lib "/foss/pdks/ciel/gf180mcu/versions/7b70722e33c03fcb5dabcf4d479fb0822d9251c9/gf180mcuD/libs.tech/ngspice/sm141064.ngspice" res_typical
+.include "../spice/ox_alpha_strongarm_comparator.spice"
+.include "../spice/io_secondary_3p3.spice"
+.options rshunt=1e12 method=gear maxord=2 reltol=1e-3 vntol=1e-4 abstol=1e-9
+.temp 27
+
+VDD_SRC VDD 0 3.3
+VSS_SRC VSS 0 0
+VCLK CLK_PAD 0 PULSE(0 3.3 20n 0.1n 0.1n 5u 10u)
+* Complementary linear input ramp: INP -200 mV to +200 mV,
+* INN +200 mV to -200 mV, relative to 1.65 V common mode.
+VINP INP_PAD 0 PWL(0 1.450 100u 1.850)
+VINN INN_PAD 0 PWL(0 1.850 100u 1.450)
+
+XINP VDD INP_PAD inp_core VSS io_secondary_3p3
+XINN VDD INN_PAD inn_core VSS io_secondary_3p3
+XCLK VDD CLK_PAD clk_core VSS io_secondary_3p3
+XCMP VDD VSS inp_core inn_core clk_core outp_core outn_core ox_alpha_strongarm_comparator
+XOUTP VDD OUTP_PAD outp_core VSS io_secondary_3p3
+XOUTN VDD OUTN_PAD outn_core VSS io_secondary_3p3
+
+RLOAD_OUTP OUTP_PAD 0 1G
+RLOAD_OUTN OUTN_PAD 0 1G
+CLOAD_OUTP OUTP_PAD 0 20f
+CLOAD_OUTN OUTN_PAD 0 20f
+
+.control
+set noaskquit
+op
+print v(inp_core) v(inn_core) v(clk_core)
+print v(outp_core) v(outn_core) v(OUTP_PAD) v(OUTN_PAD)
+tran 100n 100u 0 100n
+let vdiff = v(inp_core)-v(inn_core)
+wrdata oxa_cmp_io_tr.dat v(OUTP_PAD) v(OUTN_PAD) v(outp_core) v(outn_core) vdiff v(clk_core)
+.endc
+.end
