@@ -82,6 +82,48 @@ class PlacementConfig:
 _DEV_CACHE: Dict[tuple, object] = {}
 
 
+#: Most fingers one drawn row may carry when SPICE ``m`` is folded into
+#: fingers (see :func:`drawn_geometry`).
+MAX_FOLDED_FINGERS = 32
+
+
+def drawn_geometry(dev: Device) -> Tuple[float, int, int]:
+    """``(width_per_finger, fingers, multipliers)`` handed to gLayout.
+
+    SPICE semantics: ``W`` is the width of ONE instance, split over its ``nf``
+    fingers; ``m`` is the number of identical instances in parallel, each of
+    full ``W``.  ``W=10u nf=1 m=24`` is therefore 24 fingers of 10 um (240 um
+    in total), which is what netgen sees on the schematic side.  The parser's
+    ``Device.finger_width`` divides W by ``nf * m`` instead; for ``m > 1`` that
+    drew 24 fingers of 0.42 um, narrower than the active-to-met1 contact
+    (0.46 um), and gLayout's ``via_array`` raised.  ``finger_width`` is kept
+    for non-MOS devices and as a fallback when W is unknown.
+
+    ``m`` is folded into the finger row, as AGENTS.md prefers ``nf`` over
+    ``m``: a single row keeps one drain/gate/source ladder (the ports the
+    router uses exist on multiplier row 0 only) and an aspect ratio near 1.
+    Folding stops at :data:`MAX_FOLDED_FINGERS` fingers per row; the remaining
+    copies become gLayout multiplier rows.  The unit count
+    ``fingers * multipliers`` always equals ``nf * m``.
+    """
+    nf = max(1, int(dev.fingers))
+    m = max(1, int(dev.multipliers))
+    if not dev.is_mos:
+        return (dev.finger_width if dev.finger_width else (dev.width or 3.0)), nf, m
+    if dev.width:
+        w = float(dev.width) / nf
+    else:
+        w = dev.finger_width if dev.finger_width else 3.0
+    k = max((d for d in range(1, m + 1)
+             if m % d == 0 and nf * d <= MAX_FOLDED_FINGERS), default=1)
+    return w, nf * k, m // k
+
+
+def unit_width(dev: Device) -> float:
+    """Width of one drawn finger / unit transistor, in um."""
+    return drawn_geometry(dev)[0]
+
+
 def build_device(pdk, dev: Device, cfg: PlacementConfig):
     """Create the gLayout primitive for one logical device.
 
@@ -91,20 +133,20 @@ def build_device(pdk, dev: Device, cfg: PlacementConfig):
     the SPICE W straight through made every multi-finger device nf x m times
     too wide.  Device.finger_width carries the corrected value.
     """
-    w = dev.finger_width if dev.finger_width else (dev.width or 3.0)
+    w, nfing, nmult = drawn_geometry(dev)
     l = dev.length or 0.5
     # The model and PDK are part of the identity: a ppolyf_u and a
     # ppolyf_u_1k of the same size are different drawings, and a process
     # switch must never reuse the other PDK's cell.
     key = (getattr(pdk, "name", str(id(pdk))), (dev.model or "").lower(), dev.kind,
-           round(w, 6), round(l, 6), dev.fingers, dev.multipliers,
+           round(w, 6), round(l, 6), nfing, nmult,
            cfg.with_tie)
     if key in _DEV_CACHE:
         return _DEV_CACHE[key]
 
     if dev.kind == "pmos":
-        c = pmos(pdk, width=w, length=l, fingers=dev.fingers,
-                 multipliers=dev.multipliers, with_substrate_tap=False,
+        c = pmos(pdk, width=w, length=l, fingers=nfing,
+                 multipliers=nmult, with_substrate_tap=False,
                  with_tie=cfg.with_tie, with_dummy=False)
     elif dev.kind == "nmos":
         # A deep n-well needs a PCOMP guard ring around it, tied to the
@@ -113,8 +155,8 @@ def build_device(pdk, dev: Device, cfg: PlacementConfig):
         # the ring has to be outside. glayout's substrate tap is exactly that
         # ring, so it is switched on for DNW devices and left off otherwise,
         # where it would only cost area (roughly 2.3x on a single device).
-        c = nmos(pdk, width=w, length=l, fingers=dev.fingers,
-                 multipliers=dev.multipliers, with_substrate_tap=False,
+        c = nmos(pdk, width=w, length=l, fingers=nfing,
+                 multipliers=nmult, with_substrate_tap=False,
                  with_dnwell=False, with_tie=cfg.with_tie,
                  with_dummy=False)
     elif dev.kind == "res":
@@ -598,7 +640,7 @@ def place(ctx, pdk, cfg: Optional[PlacementConfig] = None) -> Component:
         pads[name] = pad
         sizes[name] = (w_dev + 2 * pad, h_dev + 2 * pad)
         cfg.log(2, f"  [PLACEMENT] {name}: W_total={dev.width} nf={dev.fingers} "
-                   f"-> finger_w={dev.finger_width} size={sizes[name][0]:.2f}"
+                   f"-> finger_w={unit_width(dev)} size={sizes[name][0]:.2f}"
                    f"x{sizes[name][1]:.2f}um")
 
     if not comps:

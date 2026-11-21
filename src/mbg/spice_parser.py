@@ -662,9 +662,12 @@ def build_design_context(config, pdk=None, name=None, profile=None):
             multipliers=max(1, m),
             params=dict(p),
         )
-        # SPICE W is the TOTAL device width; glayout wants per-finger width.
+        # SPICE W is the width of ONE instance (netgen semantics): its nf
+        # fingers share W, and m copies run in parallel at full W. The
+        # per-finger width is therefore W/nf; placement_engine.drawn_geometry
+        # decides how the m copies are folded into fingers and rows.
         if dev.is_mos and w_total:
-            dev.finger_width = w_total / float(max(1, nf) * max(1, m))
+            dev.finger_width = w_total / float(max(1, nf))
         else:
             dev.finger_width = w_total
         _validate_device(dev, comp)

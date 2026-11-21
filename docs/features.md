@@ -25,6 +25,11 @@ The layout entry point is `mbg.pipeline.spice_to_gds_with_checks`. Inputs must b
 flat subcircuits with supported MOS/passive models and explicit dimensions.
 Ordinary guarded macros require declared power and ground ports. They are
 currently supported on GF180MCU D; other PDK profiles have separate limits.
+SPICE `m` means that many parallel copies of the full instance width `W`
+(netgen semantics); the layout draws them as one finger row and its extracted
+width matches the schematic. Layouts with `m > 1` currently still report a
+Metal2 spacing violation (M2.2a) from Magic DRC, so `all_pass` is false for
+them; prefer `nf` over `m`.
 Unsupported device/layout requests produce a diagnostic instead of a substitute
 physical device. Use trusted input files and licensed, locally installed PDKs.
 

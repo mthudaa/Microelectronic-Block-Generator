@@ -82,7 +82,7 @@
         "path": "src/mbg/pipeline.py"
       },
       {
-        "lines": 778,
+        "lines": 820,
         "path": "src/mbg/placement_engine.py"
       },
       {
@@ -102,7 +102,7 @@
         "path": "src/mbg/specs.py"
       },
       {
-        "lines": 694,
+        "lines": 697,
         "path": "src/mbg/spice_parser.py"
       },
       {
