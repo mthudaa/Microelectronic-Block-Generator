@@ -90,5 +90,19 @@ class TestParsedMultiplicity(unittest.TestCase):
         self.assertGreater(c.xmax - c.xmin, 0)
 
 
+class TestPinMarkerAnchor(unittest.TestCase):
+    """A port is on the EDGE of its metal; its pin marker must stay inside."""
+
+    def test_marker_is_moved_inward_from_every_edge(self):
+        from mbg.pipeline import _pin_marker_anchor
+        for angle, want in ((90, (1.0, 1.86)), (270, (1.0, 2.14)),
+                            (0, (0.86, 2.0)), (180, (1.14, 2.0))):
+            with self.subTest(angle=angle):
+                ap = NS(x=1.0, y=2.0, orientation=angle)
+                got = _pin_marker_anchor(ap, 0.28)
+                self.assertAlmostEqual(got[0], want[0])
+                self.assertAlmostEqual(got[1], want[1])
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -1,4 +1,5 @@
 """Public flat-SPICE layout pipeline: conventional placement and Magic/netgen checks."""
+import math
 import os
 import re
 from pathlib import Path
@@ -163,6 +164,18 @@ def spice_to_gds(netlist_input,**kwargs):
     return spice_to_gds_ctx(netlist_input,**kwargs)['component']
 
 
+def _pin_marker_anchor(ap, side):
+    """Centre of a ``side`` square pin marker placed inside an access point's metal.
+
+    A gLayout port sits on the EDGE of its metal and points outward. A marker
+    centred there sticks half its size into the gap, and Magic reads met2_pin
+    as met2, so it breaks M2.2a against the neighbouring strap.
+    """
+    angle = math.radians(ap.orientation or 0.0)
+    return (ap.x - side / 2.0 * round(math.cos(angle), 6),
+            ap.y - side / 2.0 * round(math.sin(angle), 6))
+
+
 def _add_pin_labels(ctx, top, pdk):
     """Put a pin + label on every subcircuit port so LVS can match them.
 
@@ -225,9 +238,9 @@ def _add_pin_labels(ctx, top, pdk):
             rn = ctx.routed_nets.get(net)
             connected = (rn is not None and rn.complete) or len(terminals) <= 1
             if aps and connected:
-                anchor = (aps[0].x, aps[0].y)
                 layer_name = aps[0].layer
                 side = ctx.rules.min_width(layer_name)
+                anchor = _pin_marker_anchor(aps[0], side)
                 size = (side, side)
             elif aps:
                 print(f"[PINS] REFUSING to label port {port_name!r}: net "
