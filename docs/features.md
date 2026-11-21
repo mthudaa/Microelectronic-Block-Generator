@@ -27,9 +27,10 @@ Ordinary guarded macros require declared power and ground ports. They are
 currently supported on GF180MCU D; other PDK profiles have separate limits.
 SPICE `m` means that many parallel copies of the full instance width `W`
 (netgen semantics); the layout draws them as one finger row and its extracted
-width matches the schematic. Layouts with `m > 1` currently still report a
-Metal2 spacing violation (M2.2a) from Magic DRC, so `all_pass` is false for
-them; prefer `nf` over `m`.
+width matches the schematic. Devices drawn with more than one finger, whether
+from `nf > 1` or from `m > 1`, currently report a Metal2 spacing violation
+(M2.2a) from Magic DRC in the isolated-device cases tried, so `all_pass` is
+false for them. The reference netlists use `nf=1` only.
 Unsupported device/layout requests produce a diagnostic instead of a substitute
 physical device. Use trusted input files and licensed, locally installed PDKs.
 
