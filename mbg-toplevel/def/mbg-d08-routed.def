@@ -1,0 +1,1267 @@
+VERSION 5.8 ;
+DIVIDERCHAR "/" ;
+BUSBITCHARS "[]" ;
+DESIGN mbg_d08 ;
+UNITS DISTANCE MICRONS 2000 ;
+DIEAREA ( 0 0 ) ( 1210000 2220000 ) ;
+TRACKS X 1120 DO 1080 STEP 1120 LAYER Metal1 ;
+TRACKS Y 1120 DO 1981 STEP 1120 LAYER Metal1 ;
+TRACKS X 1120 DO 1080 STEP 1120 LAYER Metal2 ;
+TRACKS Y 1120 DO 1981 STEP 1120 LAYER Metal2 ;
+TRACKS X 1120 DO 1080 STEP 1120 LAYER Metal3 ;
+TRACKS Y 1120 DO 1981 STEP 1120 LAYER Metal3 ;
+TRACKS X 1120 DO 1080 STEP 1120 LAYER Metal4 ;
+TRACKS Y 1120 DO 1981 STEP 1120 LAYER Metal4 ;
+TRACKS X 1800 DO 671 STEP 1800 LAYER Metal5 ;
+TRACKS Y 1800 DO 1233 STEP 1800 LAYER Metal5 ;
+GCELLGRID X 0 DO 72 STEP 16800 ;
+GCELLGRID Y 0 DO 132 STEP 16800 ;
+NONDEFAULTRULES 2 ;
+    - d08_analog
+      + LAYER Metal1 WIDTH 920
+      + LAYER Metal2 WIDTH 560
+      + LAYER Metal3 WIDTH 2000
+      + LAYER Metal4 WIDTH 2000
+      + LAYER Metal5 WIDTH 2000
+    ;
+    - d08_supply
+      + LAYER Metal1 WIDTH 920
+      + LAYER Metal2 WIDTH 3360
+      + LAYER Metal3 WIDTH 3360
+      + LAYER Metal4 WIDTH 3360
+      + LAYER Metal5 WIDTH 3600
+    ;
+END NONDEFAULTRULES
+COMPONENTS 31 ;
+    - esd_clk d08_esd + FIXED ( 859000 1968000 ) E ;
+    - esd_gemini4argon_cmp d08_esd + FIXED ( 16000 1197000 ) N ;
+    - esd_gemini4argon_ota d08_esd + FIXED ( 16000 1797000 ) N ;
+    - esd_gemini4argon_vref d08_esd + FIXED ( 16000 597000 ) N ;
+    - esd_gpt62sol_cmp d08_esd + FIXED ( 16000 997000 ) N ;
+    - esd_gpt62sol_ota d08_esd + FIXED ( 16000 1597000 ) N ;
+    - esd_gpt62sol_vref d08_esd + FIXED ( 16000 397000 ) N ;
+    - esd_ibias d08_esd + FIXED ( 259000 1968000 ) E ;
+    - esd_inn d08_esd + FIXED ( 659000 1968000 ) E ;
+    - esd_inp d08_esd + FIXED ( 459000 1968000 ) E ;
+    - esd_opus55_cmp d08_esd + FIXED ( 16000 797000 ) N ;
+    - esd_opus55_ota d08_esd + FIXED ( 16000 1397000 ) N ;
+    - esd_opus55_vref d08_esd + FIXED ( 16000 197000 ) N ;
+    - esd_temp_out d08_esd + FIXED ( 16000 12000 ) N ;
+    - u_bias_gemini4argon_ota d08_bias_source + FIXED ( 464000 1821000 ) N ;
+    - u_bias_gemini4argon_vref d08_bias_source + FIXED ( 472000 669000 ) N ;
+    - u_bias_gpt62sol_ota d08_bias_source + FIXED ( 272000 1437000 ) N ;
+    - u_bias_gpt62sol_vref d08_bias_source + FIXED ( 272000 357000 ) N ;
+    - u_bias_opus55_ota d08_bias_source + FIXED ( 448000 1413000 ) N ;
+    - u_bias_opus55_vref d08_bias_source + FIXED ( 520000 285000 ) N ;
+    - u_bias_reference d08_bias_reference + FIXED ( 352000 1875000 ) N ;
+    - u_gemini4argon_cmp d08_gemini4argon_cmp + FIXED ( 850000 1160000 ) N ;
+    - u_gemini4argon_ota d08_gemini4argon_ota + FIXED ( 600000 1700000 ) N ;
+    - u_gemini4argon_vref d08_gemini4argon_vref + FIXED ( 730000 530000 ) N ;
+    - u_gpt62sol_cmp d08_gpt62sol_cmp + FIXED ( 340000 930000 ) N ;
+    - u_gpt62sol_ota d08_gpt62sol_ota + FIXED ( 340000 1560000 ) N ;
+    - u_gpt62sol_vref d08_gpt62sol_vref + FIXED ( 340000 490000 ) N ;
+    - u_neuro1b neuro1b + FIXED ( 272000 20000 ) N ;
+    - u_opus55_cmp d08_opus55_cmp + FIXED ( 600000 784000 ) N ;
+    - u_opus55_ota d08_opus55_ota + FIXED ( 584000 1400000 ) N ;
+    - u_opus55_vref d08_opus55_vref + FIXED ( 650000 290000 ) N ;
+END COMPONENTS
+PINS 16 ;
+    - clk + NET clk + DIRECTION INOUT + USE SIGNAL
+      + PORT
+        + LAYER Metal2 ( -2540 -1000 ) ( 2540 1000 )
+        + LAYER Metal2 ( 8820 -1000 ) ( 13900 1000 )
+        + LAYER Metal2 ( 20180 -1000 ) ( 25260 1000 )
+        + LAYER Metal2 ( 31540 -1000 ) ( 36620 1000 )
+        + LAYER Metal2 ( 46940 -1000 ) ( 52020 1000 )
+        + LAYER Metal2 ( 58300 -1000 ) ( 63380 1000 )
+        + LAYER Metal2 ( 69660 -1000 ) ( 74740 1000 )
+        + LAYER Metal2 ( 81020 -1000 ) ( 86100 1000 )
+        + FIXED ( 893220 2219000 ) N ;
+    - deepseek_cmp + NET deepseek_cmp + DIRECTION INOUT + USE SIGNAL
+      + PORT
+        + LAYER Metal2 ( -1000 -2540 ) ( 1000 2540 )
+        + LAYER Metal2 ( -1000 8820 ) ( 1000 13900 )
+        + LAYER Metal2 ( -1000 20180 ) ( 1000 25260 )
+        + LAYER Metal2 ( -1000 31540 ) ( 1000 36620 )
+        + LAYER Metal2 ( -1000 46940 ) ( 1000 52020 )
+        + LAYER Metal2 ( -1000 58300 ) ( 1000 63380 )
+        + LAYER Metal2 ( -1000 69660 ) ( 1000 74740 )
+        + LAYER Metal2 ( -1000 81020 ) ( 1000 86100 )
+        + FIXED ( 1000 1243220 ) N ;
+    - deepseek_ota + NET deepseek_ota + DIRECTION INOUT + USE SIGNAL
+      + PORT
+        + LAYER Metal2 ( -1000 -2540 ) ( 1000 2540 )
+        + LAYER Metal2 ( -1000 8820 ) ( 1000 13900 )
+        + LAYER Metal2 ( -1000 20180 ) ( 1000 25260 )
+        + LAYER Metal2 ( -1000 31540 ) ( 1000 36620 )
+        + LAYER Metal2 ( -1000 46940 ) ( 1000 52020 )
+        + LAYER Metal2 ( -1000 58300 ) ( 1000 63380 )
+        + LAYER Metal2 ( -1000 69660 ) ( 1000 74740 )
+        + LAYER Metal2 ( -1000 81020 ) ( 1000 86100 )
+        + FIXED ( 1000 1843220 ) N ;
+    - deepseek_vref + NET deepseek_vref + DIRECTION INOUT + USE SIGNAL
+      + PORT
+        + LAYER Metal2 ( -1000 -2540 ) ( 1000 2540 )
+        + LAYER Metal2 ( -1000 8820 ) ( 1000 13900 )
+        + LAYER Metal2 ( -1000 20180 ) ( 1000 25260 )
+        + LAYER Metal2 ( -1000 31540 ) ( 1000 36620 )
+        + LAYER Metal2 ( -1000 46940 ) ( 1000 52020 )
+        + LAYER Metal2 ( -1000 58300 ) ( 1000 63380 )
+        + LAYER Metal2 ( -1000 69660 ) ( 1000 74740 )
+        + LAYER Metal2 ( -1000 81020 ) ( 1000 86100 )
+        + FIXED ( 1000 643220 ) N ;
+    - gpt_cmp + NET gpt_cmp + DIRECTION INOUT + USE SIGNAL
+      + PORT
+        + LAYER Metal2 ( -1000 -2540 ) ( 1000 2540 )
+        + LAYER Metal2 ( -1000 8820 ) ( 1000 13900 )
+        + LAYER Metal2 ( -1000 20180 ) ( 1000 25260 )
+        + LAYER Metal2 ( -1000 31540 ) ( 1000 36620 )
+        + LAYER Metal2 ( -1000 46940 ) ( 1000 52020 )
+        + LAYER Metal2 ( -1000 58300 ) ( 1000 63380 )
+        + LAYER Metal2 ( -1000 69660 ) ( 1000 74740 )
+        + LAYER Metal2 ( -1000 81020 ) ( 1000 86100 )
+        + FIXED ( 1000 1043220 ) N ;
+    - gpt_ota + NET gpt_ota + DIRECTION INOUT + USE SIGNAL
+      + PORT
+        + LAYER Metal2 ( -1000 -2540 ) ( 1000 2540 )
+        + LAYER Metal2 ( -1000 8820 ) ( 1000 13900 )
+        + LAYER Metal2 ( -1000 20180 ) ( 1000 25260 )
+        + LAYER Metal2 ( -1000 31540 ) ( 1000 36620 )
+        + LAYER Metal2 ( -1000 46940 ) ( 1000 52020 )
+        + LAYER Metal2 ( -1000 58300 ) ( 1000 63380 )
+        + LAYER Metal2 ( -1000 69660 ) ( 1000 74740 )
+        + LAYER Metal2 ( -1000 81020 ) ( 1000 86100 )
+        + FIXED ( 1000 1643220 ) N ;
+    - gpt_vref + NET gpt_vref + DIRECTION INOUT + USE SIGNAL
+      + PORT
+        + LAYER Metal2 ( -1000 -2540 ) ( 1000 2540 )
+        + LAYER Metal2 ( -1000 8820 ) ( 1000 13900 )
+        + LAYER Metal2 ( -1000 20180 ) ( 1000 25260 )
+        + LAYER Metal2 ( -1000 31540 ) ( 1000 36620 )
+        + LAYER Metal2 ( -1000 46940 ) ( 1000 52020 )
+        + LAYER Metal2 ( -1000 58300 ) ( 1000 63380 )
+        + LAYER Metal2 ( -1000 69660 ) ( 1000 74740 )
+        + LAYER Metal2 ( -1000 81020 ) ( 1000 86100 )
+        + FIXED ( 1000 443220 ) N ;
+    - ibias + NET ibias + DIRECTION INOUT + USE SIGNAL
+      + PORT
+        + LAYER Metal2 ( -2540 -1000 ) ( 2540 1000 )
+        + LAYER Metal2 ( 8820 -1000 ) ( 13900 1000 )
+        + LAYER Metal2 ( 20180 -1000 ) ( 25260 1000 )
+        + LAYER Metal2 ( 31540 -1000 ) ( 36620 1000 )
+        + LAYER Metal2 ( 46940 -1000 ) ( 52020 1000 )
+        + LAYER Metal2 ( 58300 -1000 ) ( 63380 1000 )
+        + LAYER Metal2 ( 69660 -1000 ) ( 74740 1000 )
+        + LAYER Metal2 ( 81020 -1000 ) ( 86100 1000 )
+        + FIXED ( 293220 2219000 ) N ;
+    - inn + NET inn + DIRECTION INOUT + USE SIGNAL
+      + PORT
+        + LAYER Metal2 ( -2540 -1000 ) ( 2540 1000 )
+        + LAYER Metal2 ( 8820 -1000 ) ( 13900 1000 )
+        + LAYER Metal2 ( 20180 -1000 ) ( 25260 1000 )
+        + LAYER Metal2 ( 31540 -1000 ) ( 36620 1000 )
+        + LAYER Metal2 ( 46940 -1000 ) ( 52020 1000 )
+        + LAYER Metal2 ( 58300 -1000 ) ( 63380 1000 )
+        + LAYER Metal2 ( 69660 -1000 ) ( 74740 1000 )
+        + LAYER Metal2 ( 81020 -1000 ) ( 86100 1000 )
+        + FIXED ( 693220 2219000 ) N ;
+    - inp + NET inp + DIRECTION INOUT + USE SIGNAL
+      + PORT
+        + LAYER Metal2 ( -2540 -1000 ) ( 2540 1000 )
+        + LAYER Metal2 ( 8820 -1000 ) ( 13900 1000 )
+        + LAYER Metal2 ( 20180 -1000 ) ( 25260 1000 )
+        + LAYER Metal2 ( 31540 -1000 ) ( 36620 1000 )
+        + LAYER Metal2 ( 46940 -1000 ) ( 52020 1000 )
+        + LAYER Metal2 ( 58300 -1000 ) ( 63380 1000 )
+        + LAYER Metal2 ( 69660 -1000 ) ( 74740 1000 )
+        + LAYER Metal2 ( 81020 -1000 ) ( 86100 1000 )
+        + FIXED ( 493220 2219000 ) N ;
+    - oxa_cmp + NET oxa_cmp + DIRECTION INOUT + USE SIGNAL
+      + PORT
+        + LAYER Metal2 ( -1000 -2540 ) ( 1000 2540 )
+        + LAYER Metal2 ( -1000 8820 ) ( 1000 13900 )
+        + LAYER Metal2 ( -1000 20180 ) ( 1000 25260 )
+        + LAYER Metal2 ( -1000 31540 ) ( 1000 36620 )
+        + LAYER Metal2 ( -1000 46940 ) ( 1000 52020 )
+        + LAYER Metal2 ( -1000 58300 ) ( 1000 63380 )
+        + LAYER Metal2 ( -1000 69660 ) ( 1000 74740 )
+        + LAYER Metal2 ( -1000 81020 ) ( 1000 86100 )
+        + FIXED ( 1000 843220 ) N ;
+    - oxa_ota + NET oxa_ota + DIRECTION INOUT + USE SIGNAL
+      + PORT
+        + LAYER Metal2 ( -1000 -2540 ) ( 1000 2540 )
+        + LAYER Metal2 ( -1000 8820 ) ( 1000 13900 )
+        + LAYER Metal2 ( -1000 20180 ) ( 1000 25260 )
+        + LAYER Metal2 ( -1000 31540 ) ( 1000 36620 )
+        + LAYER Metal2 ( -1000 46940 ) ( 1000 52020 )
+        + LAYER Metal2 ( -1000 58300 ) ( 1000 63380 )
+        + LAYER Metal2 ( -1000 69660 ) ( 1000 74740 )
+        + LAYER Metal2 ( -1000 81020 ) ( 1000 86100 )
+        + FIXED ( 1000 1443220 ) N ;
+    - oxa_vref + NET oxa_vref + DIRECTION INOUT + USE SIGNAL
+      + PORT
+        + LAYER Metal2 ( -1000 -2540 ) ( 1000 2540 )
+        + LAYER Metal2 ( -1000 8820 ) ( 1000 13900 )
+        + LAYER Metal2 ( -1000 20180 ) ( 1000 25260 )
+        + LAYER Metal2 ( -1000 31540 ) ( 1000 36620 )
+        + LAYER Metal2 ( -1000 46940 ) ( 1000 52020 )
+        + LAYER Metal2 ( -1000 58300 ) ( 1000 63380 )
+        + LAYER Metal2 ( -1000 69660 ) ( 1000 74740 )
+        + LAYER Metal2 ( -1000 81020 ) ( 1000 86100 )
+        + FIXED ( 1000 243220 ) N ;
+    - temp_out + NET temp_out + DIRECTION INOUT + USE SIGNAL
+      + PORT
+        + LAYER Metal2 ( -1000 -2540 ) ( 1000 2540 )
+        + LAYER Metal2 ( -1000 8820 ) ( 1000 13900 )
+        + LAYER Metal2 ( -1000 20180 ) ( 1000 25260 )
+        + LAYER Metal2 ( -1000 31540 ) ( 1000 36620 )
+        + LAYER Metal2 ( -1000 46940 ) ( 1000 52020 )
+        + LAYER Metal2 ( -1000 58300 ) ( 1000 63380 )
+        + LAYER Metal2 ( -1000 69660 ) ( 1000 74740 )
+        + LAYER Metal2 ( -1000 81020 ) ( 1000 86100 )
+        + FIXED ( 1000 43220 ) N ;
+    - vdd + NET vdd + DIRECTION INOUT + USE POWER
+      + PORT
+        + LAYER Metal2 ( -9500 -1000 ) ( 9500 1000 )
+        + LAYER Metal2 ( 15300 -1000 ) ( 35800 1000 )
+        + LAYER Metal2 ( 39000 -1000 ) ( 59500 1000 )
+        + LAYER Metal2 ( 66060 -1000 ) ( 86560 1000 )
+        + LAYER Metal2 ( 89760 -1000 ) ( 110260 1000 )
+        + LAYER Metal2 ( 116060 -1000 ) ( 135060 1000 )
+        + FIXED ( 72220 2219000 ) N ;
+    - vss + NET vss + DIRECTION INOUT + USE GROUND
+      + PORT
+        + LAYER Metal2 ( -1000 -9500 ) ( 1000 9500 )
+        + LAYER Metal2 ( -1000 15300 ) ( 1000 35800 )
+        + LAYER Metal2 ( -1000 39000 ) ( 1000 59500 )
+        + LAYER Metal2 ( -1000 66060 ) ( 1000 86560 )
+        + LAYER Metal2 ( -1000 89760 ) ( 1000 110260 )
+        + LAYER Metal2 ( -1000 116060 ) ( 1000 135060 )
+        + FIXED ( 1000 2022220 ) N ;
+END PINS
+NETS 39 ;
+    - clk ( PIN clk ) ( esd_clk ASIG3V3 ) + USE SIGNAL + NONDEFAULTRULE d08_analog
+      + ROUTED Metal2 ( 903840 2217600 ) ( * 2218720 0 )
+      NEW Metal3 ( 893760 2217600 1000 ) ( 903840 * 1000 )
+      NEW Metal2 ( 893760 2217600 ) ( * 2218720 0 )
+      NEW Metal2 ( 915040 2217600 ) ( * 2218720 0 )
+      NEW Metal3 ( 903840 2217600 1000 ) ( 915040 * 1000 )
+      NEW Metal2 ( 926240 2217600 ) ( * 2218720 0 )
+      NEW Metal3 ( 915040 2217600 1000 ) ( 926240 * 1000 )
+      NEW Metal2 ( 941920 2217600 ) ( * 2218720 0 )
+      NEW Metal3 ( 926240 2217600 1000 ) ( 941920 * 1000 )
+      NEW Metal2 ( 953120 2217600 ) ( * 2218720 0 )
+      NEW Metal3 ( 941920 2217600 1000 ) ( 953120 * 1000 )
+      NEW Metal2 ( 964320 2217600 ) ( * 2218720 0 )
+      NEW Metal3 ( 953120 2217600 1000 ) ( 964320 * 1000 )
+      NEW Metal2 ( 974400 2217600 ) ( * 2218720 0 )
+      NEW Metal3 ( 964320 2217600 1000 ) ( 974400 * 1000 )
+      NEW Metal3 ( 938560 2204160 1000 ) ( 941920 * 1000 )
+      NEW Metal3 ( 941920 2204160 1000 ) ( * 2213120 1000 )
+      NEW Metal2 ( 941920 2213120 ) ( * 2217600 )
+      NEW Metal2 ( 903840 2217600 ) Via2_VH
+      NEW Metal2 ( 893760 2217600 ) Via2_VH
+      NEW Metal2 ( 915040 2217600 ) Via2_VH
+      NEW Metal2 ( 926240 2217600 ) Via2_VH
+      NEW Metal2 ( 941920 2217600 ) Via2_VH
+      NEW Metal2 ( 953120 2217600 ) Via2_VH
+      NEW Metal2 ( 964320 2217600 ) Via2_VH
+      NEW Metal2 ( 974400 2217600 ) Via2_VH
+      NEW Metal2 TAPER ( 938560 2204160 ) Via2_VH
+      NEW Metal2 ( 941920 2213120 ) Via2_VH ;
+    - clk_core ( u_gpt62sol_cmp CLK ) ( u_opus55_cmp CLK ) ( u_gemini4argon_cmp CLK ) ( esd_clk to_gate ) + USE SIGNAL
+      + ROUTED Metal3 ( 916160 1333920 0 ) ( * 1335040 )
+      NEW Metal3 ( 936320 1972320 ) ( 957600 * )
+      NEW Metal4 ( 957600 1419040 ) ( * 1972320 )
+      NEW Metal3 ( 595840 1182720 ) ( 602560 * )
+      NEW Metal3 ( 346080 1182720 0 ) ( 595840 * )
+      NEW Metal3 ( 906080 1419040 ) ( 957600 * )
+      NEW Metal3 ( 602560 1044960 0 ) ( * 1050560 )
+      NEW Metal2 ( 602560 1050560 ) ( * 1182720 )
+      NEW Metal2 ( 595840 1182720 ) ( * 1335040 )
+      NEW Metal4 ( 906080 1335040 ) ( * 1419040 )
+      NEW Metal3 ( 595840 1335040 ) ( 916160 * )
+      NEW Metal3 ( 957600 1419040 ) Via3_HV
+      NEW Metal3 ( 957600 1972320 ) Via3_HV
+      NEW Metal2 ( 936320 1972320 ) Via2_HH
+      NEW Metal2 ( 595840 1182720 ) Via2_VH
+      NEW Metal2 ( 602560 1182720 ) Via2_VH
+      NEW Metal3 ( 906080 1419040 ) Via3_HV
+      NEW Metal2 ( 602560 1050560 ) Via2_VH
+      NEW Metal2 ( 595840 1335040 ) Via2_VH
+      NEW Metal3 ( 906080 1335040 ) Via3_HV
+      NEW Metal3 ( 906080 1335040 ) RECT ( -660 -280 0 280 )  ;
+    - deepseek_cmp ( PIN deepseek_cmp ) ( esd_gemini4argon_cmp ASIG3V3 ) + USE SIGNAL + NONDEFAULTRULE d08_analog
+      + ROUTED Metal2 ( 1120 1245440 0 ) ( * 1253280 0 )
+      NEW Metal2 ( 1120 1317120 0 ) ( * 1324960 0 )
+      NEW Metal2 ( 1120 1305920 0 ) ( * 1313760 0 )
+      NEW Metal2 ( 1120 1294720 0 ) ( * 1302560 0 )
+      NEW Metal2 ( 1120 1279040 0 ) ( * 1291360 0 )
+      NEW Metal2 ( 1120 1267840 0 ) ( * 1275680 0 )
+      NEW Metal3 ( 1120 1274560 1000 ) ( 22400 * 1000 )
+      NEW Metal2 ( 1120 1256640 0 ) ( * 1264480 0 )
+      NEW Metal2 TAPER ( 22400 1274560 ) Via2_VH
+      NEW Metal2 ( 1120 1274560 ) Via2_VH
+      NEW Metal2 TAPER ( 1120 1274560 ) RECT ( -280 -660 280 0 )  ;
+    - gemini4argon_cmp_core ( u_gemini4argon_cmp OUTP ) ( esd_gemini4argon_cmp to_gate ) + USE SIGNAL
+      + ROUTED Metal3 ( 254240 1274560 ) ( 260960 * )
+      NEW Metal2 ( 260960 1274560 ) ( * 1336160 )
+      NEW Metal3 ( 948640 1333920 0 ) ( * 1336160 )
+      NEW Metal3 ( 260960 1336160 ) ( 948640 * )
+      NEW Metal2 ( 254240 1274560 ) Via2_HH
+      NEW Metal2 ( 260960 1274560 ) Via2_VH
+      NEW Metal2 ( 260960 1336160 ) Via2_VH ;
+    - gemini4argon_cmp_outn ( u_gemini4argon_cmp OUTN ) + USE SIGNAL ;
+    - deepseek_ota ( PIN deepseek_ota ) ( esd_gemini4argon_ota ASIG3V3 ) + USE SIGNAL + NONDEFAULTRULE d08_analog
+      + ROUTED Metal2 ( 1120 1917440 0 ) ( * 1925280 0 )
+      NEW Metal2 ( 1120 1906240 0 ) ( * 1914080 0 )
+      NEW Metal2 ( 1120 1893920 0 ) ( * 1902880 0 )
+      NEW Metal2 ( 1120 1879360 0 ) ( * 1890560 0 )
+      NEW Metal2 ( 1120 1868160 0 ) ( * 1876000 0 )
+      NEW Metal2 ( 1120 1855840 0 ) ( * 1863680 0 )
+      NEW Metal3 ( 1120 1873760 1000 ) ( 22400 * 1000 )
+      NEW Metal2 ( 1120 1844640 0 ) ( * 1852480 0 )
+      NEW Metal2 TAPER ( 22400 1873760 ) Via2_VH
+      NEW Metal2 ( 1120 1873760 ) Via2_VH
+      NEW Metal2 TAPER ( 1120 1873760 ) RECT ( -280 -660 280 0 )  ;
+    - gemini4argon_ota_core ( u_gemini4argon_ota OUT ) ( esd_gemini4argon_ota to_gate ) + USE SIGNAL
+      + ROUTED Metal3 ( 254240 1873760 ) ( 260960 * )
+      NEW Metal2 ( 260960 1873760 ) ( * 1946560 )
+      NEW Metal3 ( 554400 1945440 ) ( * 1946560 )
+      NEW Metal3 ( 906080 1945440 0 ) ( * 1946560 )
+      NEW Metal3 ( 554400 1946560 ) ( 906080 * )
+      NEW Metal3 ( 504000 1945440 ) ( 554400 * )
+      NEW Metal3 ( 504000 1945440 ) ( * 1946560 )
+      NEW Metal3 ( 260960 1946560 ) ( 504000 * )
+      NEW Metal2 ( 254240 1873760 ) Via2_VH
+      NEW Metal2 ( 260960 1873760 ) Via2_VH
+      NEW Metal2 ( 260960 1946560 ) Via2_VH ;
+    - gemini4argon_ota_ibias ( u_gemini4argon_ota IBIAS ) ( u_bias_gemini4argon_ota IOUT ) + USE SIGNAL
+      + ROUTED Metal3 ( 543200 1932000 0 ) ( 579040 * )
+      NEW Metal3 ( 579040 1702400 ) ( 855680 * 0 )
+      NEW Metal4 ( 579040 1702400 ) ( * 1932000 )
+      NEW Metal3 ( 579040 1702400 ) Via3_HV
+      NEW Metal3 ( 579040 1932000 ) Via3_HV ;
+    - deepseek_vref ( PIN deepseek_vref ) ( esd_gemini4argon_vref ASIG3V3 ) + USE SIGNAL + NONDEFAULTRULE d08_analog
+      + ROUTED Metal2 ( 1120 674240 ) ( * 675360 0 )
+      NEW Metal3 ( 1120 674240 1000 ) ( 22400 * 1000 )
+      NEW Metal2 ( 1120 678720 0 ) ( * 691040 0 )
+      NEW Metal2 ( 1120 694400 0 ) ( * 702240 0 )
+      NEW Metal2 ( 1120 705600 0 ) ( * 713440 0 )
+      NEW Metal2 ( 1120 716800 0 ) ( * 724640 0 )
+      NEW Metal2 ( 1120 645120 0 ) ( * 652960 0 )
+      NEW Metal2 ( 1120 656320 0 ) ( * 664160 0 )
+      NEW Metal2 ( 1120 667520 0 ) ( * 674240 )
+      NEW Metal2 ( 1120 674240 ) Via2_VH
+      NEW Metal2 TAPER ( 22400 674240 ) Via2_VH ;
+    - gemini4argon_vref_core ( u_gemini4argon_vref VREF ) ( esd_gemini4argon_vref to_gate ) + USE SIGNAL
+      + ROUTED Metal3 ( 512960 677600 ) ( * 679840 )
+      NEW Metal3 ( 1008000 648480 ) ( 1015840 * 0 )
+      NEW Metal2 ( 1008000 648480 ) ( * 677600 )
+      NEW Metal3 ( 254240 674240 ) ( 319200 * )
+      NEW Metal3 ( 319200 674240 ) ( * 677600 )
+      NEW Metal3 ( 319200 677600 ) ( 512960 * )
+      NEW Metal3 ( 512960 679840 ) ( 554400 * )
+      NEW Metal3 ( 554400 677600 ) ( * 679840 )
+      NEW Metal3 ( 554400 677600 ) ( 1008000 * )
+      NEW Metal2 ( 254240 674240 ) Via2_VH
+      NEW Metal2 ( 1008000 677600 ) Via2_VH
+      NEW Metal2 ( 1008000 648480 ) Via2_VH ;
+    - gemini4argon_vref_ibias ( u_gemini4argon_vref IBIAS ) ( u_bias_gemini4argon_vref IOUT ) + USE SIGNAL
+      + ROUTED Metal4 ( 730240 532000 ) ( * 780640 )
+      NEW Metal3 ( 551040 780640 0 ) ( 730240 * )
+      NEW Metal3 ( 730240 532000 ) ( 922880 * 0 )
+      NEW Metal3 ( 730240 532000 ) Via3_HV
+      NEW Metal3 ( 730240 780640 ) Via3_HV ;
+    - gpt_cmp ( PIN gpt_cmp ) ( esd_gpt62sol_cmp ASIG3V3 ) + USE SIGNAL + NONDEFAULTRULE d08_analog
+      + ROUTED Metal2 ( 1120 1116640 0 ) ( * 1125600 0 )
+      NEW Metal2 ( 1120 1105440 0 ) ( * 1113280 0 )
+      NEW Metal2 ( 1120 1094240 0 ) ( * 1102080 0 )
+      NEW Metal2 ( 1120 1078560 0 ) ( * 1090880 0 )
+      NEW Metal2 ( 1120 1067360 0 ) ( * 1075200 0 )
+      NEW Metal2 ( 1120 1056160 0 ) ( * 1064000 0 )
+      NEW Metal2 ( 1120 1044960 0 ) ( * 1052800 0 )
+      NEW Metal3 ( 1120 1074080 1000 ) ( 22400 * 1000 )
+      NEW Metal2 TAPER ( 22400 1074080 ) Via2_VH
+      NEW Metal2 ( 1120 1074080 ) Via2_VH
+      NEW Metal2 TAPER ( 1120 1074080 ) RECT ( -280 -660 280 0 )  ;
+    - gpt62sol_cmp_core ( u_gpt62sol_cmp OUTP ) ( esd_gpt62sol_cmp to_gate ) + USE SIGNAL
+      + ROUTED Metal3 ( 254240 1074080 ) ( 262080 * )
+      NEW Metal2 ( 262080 1074080 ) ( * 1266720 )
+      NEW Metal3 ( 262080 1266720 ) ( 439040 * 0 )
+      NEW Metal2 ( 254240 1074080 ) Via2_VH
+      NEW Metal2 ( 262080 1074080 ) Via2_VH
+      NEW Metal2 ( 262080 1266720 ) Via2_VH ;
+    - gpt62sol_cmp_outn ( u_gpt62sol_cmp OUTN ) + USE SIGNAL ;
+    - gpt_ota ( PIN gpt_ota ) ( esd_gpt62sol_ota ASIG3V3 ) + USE SIGNAL + NONDEFAULTRULE d08_analog
+      + ROUTED Metal2 ( 1120 1716960 0 ) ( * 1724800 0 )
+      NEW Metal2 ( 1120 1705760 0 ) ( * 1713600 0 )
+      NEW Metal2 ( 1120 1694560 0 ) ( * 1702400 0 )
+      NEW Metal2 ( 1120 1678880 0 ) ( * 1691200 0 )
+      NEW Metal2 ( 1120 1667680 0 ) ( * 1675520 0 )
+      NEW Metal2 ( 1120 1656480 0 ) ( * 1664320 0 )
+      NEW Metal2 ( 1120 1645280 0 ) ( * 1653120 0 )
+      NEW Metal3 ( 1120 1674400 1000 ) ( 22400 * 1000 )
+      NEW Metal2 TAPER ( 22400 1674400 ) Via2_VH
+      NEW Metal2 ( 1120 1674400 ) Via2_VH
+      NEW Metal2 TAPER ( 1120 1674400 ) RECT ( -280 -660 280 0 )  ;
+    - gpt62sol_ota_core ( u_gpt62sol_ota OUT ) ( esd_gpt62sol_ota to_gate ) + USE SIGNAL
+      + ROUTED Metal2 ( 260960 1637440 ) ( * 1671040 )
+      NEW Metal3 ( 254240 1671040 ) ( 260960 * )
+      NEW Metal3 ( 260960 1637440 ) ( 504000 * 0 )
+      NEW Metal2 ( 260960 1637440 ) Via2_VH
+      NEW Metal2 ( 260960 1671040 ) Via2_VH
+      NEW Metal2 ( 254240 1671040 ) Via2_HH ;
+    - gpt62sol_ota_ibias ( u_gpt62sol_ota IBIAS ) ( u_bias_gpt62sol_ota IOUT ) + USE SIGNAL
+      + ROUTED Metal3 ( 504000 1715840 ) ( * 1716960 0 )
+      NEW Metal3 ( 349440 1715840 ) ( 423360 * )
+      NEW Metal2 ( 423360 1715840 ) ( 427840 * )
+      NEW Metal3 ( 427840 1715840 ) ( 504000 * )
+      NEW Metal4 ( 349440 1551200 ) ( * 1715840 )
+      NEW Metal3 ( 349440 1715840 ) Via3_HV
+      NEW Metal2 ( 423360 1715840 ) Via2_VH
+      NEW Metal2 ( 427840 1715840 ) Via2_VH
+      NEW Metal3 ( 349440 1551200 ) Via3_HV ;
+    - gpt_vref ( PIN gpt_vref ) ( esd_gpt62sol_vref ASIG3V3 ) + USE SIGNAL + NONDEFAULTRULE d08_analog
+      + ROUTED Metal2 ( 1120 517440 0 ) ( * 525280 0 )
+      NEW Metal2 ( 1120 506240 0 ) ( * 514080 0 )
+      NEW Metal2 ( 1120 493920 0 ) ( * 502880 0 )
+      NEW Metal2 ( 1120 479360 0 ) ( * 490560 0 )
+      NEW Metal2 ( 1120 468160 0 ) ( * 476000 0 )
+      NEW Metal2 ( 1120 455840 0 ) ( * 463680 0 )
+      NEW Metal2 ( 1120 444640 0 ) ( * 452480 0 )
+      NEW Metal3 ( 1120 473760 1000 ) ( 22400 * 1000 )
+      NEW Metal2 TAPER ( 22400 473760 ) Via2_VH
+      NEW Metal2 ( 1120 473760 ) Via2_VH
+      NEW Metal2 TAPER ( 1120 473760 ) RECT ( -280 -660 280 0 )  ;
+    - gpt62sol_vref_core ( u_gpt62sol_vref VREF ) ( esd_gpt62sol_vref to_gate ) + USE SIGNAL
+      + ROUTED Metal3 ( 254240 473760 ) ( 260960 * )
+      NEW Metal2 ( 260960 473760 ) ( * 577920 )
+      NEW Metal3 ( 599200 573440 0 ) ( * 577920 )
+      NEW Metal3 ( 260960 577920 ) ( 599200 * )
+      NEW Metal2 ( 254240 473760 ) Via2_VH
+      NEW Metal2 ( 260960 473760 ) Via2_VH
+      NEW Metal2 ( 260960 577920 ) Via2_VH ;
+    - gpt62sol_vref_ibias ( u_gpt62sol_vref IBIAS ) ( u_bias_gpt62sol_vref IOUT ) + USE SIGNAL
+      + ROUTED Metal3 ( 511840 642880 ) ( * 647360 0 )
+      NEW Metal3 ( 351680 470400 0 ) ( 377440 * )
+      NEW Metal4 ( 377440 470400 ) ( * 642880 )
+      NEW Metal3 ( 377440 642880 ) ( 511840 * )
+      NEW Metal3 ( 377440 470400 ) Via3_HV
+      NEW Metal3 ( 377440 642880 ) Via3_HV ;
+    - ibias ( PIN ibias ) ( esd_ibias ASIG3V3 ) + USE SIGNAL + NONDEFAULTRULE d08_analog
+      + ROUTED Metal2 ( 303520 2217600 ) ( * 2218720 0 )
+      NEW Metal3 ( 295680 2217600 1000 ) ( 303520 * 1000 )
+      NEW Metal2 ( 295680 2217600 ) ( * 2218720 0 )
+      NEW Metal2 ( 313600 2217600 ) ( * 2218720 0 )
+      NEW Metal3 ( 303520 2217600 1000 ) ( 313600 * 1000 )
+      NEW Metal2 ( 366240 2217600 ) ( * 2218720 0 )
+      NEW Metal3 ( 366240 2217600 1000 ) ( 376320 * 1000 )
+      NEW Metal2 ( 376320 2217600 ) ( * 2218720 0 )
+      NEW Metal2 ( 355040 2217600 ) ( * 2218720 0 )
+      NEW Metal3 ( 355040 2217600 1000 ) ( 366240 * 1000 )
+      NEW Metal2 ( 344960 2217600 ) ( * 2218720 0 )
+      NEW Metal3 ( 344960 2217600 1000 ) ( 355040 * 1000 )
+      NEW Metal2 ( 328160 2217600 ) ( * 2218720 0 )
+      NEW Metal3 ( 328160 2217600 1000 ) ( 344960 * 1000 )
+      NEW Metal3 ( 338240 2204160 1000 ) ( * 2217600 1000 )
+      NEW Metal3 ( 313600 2217600 1000 ) ( 328160 * 1000 )
+      NEW Metal2 ( 303520 2217600 ) Via2_VH
+      NEW Metal2 ( 295680 2217600 ) Via2_VH
+      NEW Metal2 ( 313600 2217600 ) Via2_VH
+      NEW Metal2 ( 366240 2217600 ) Via2_VH
+      NEW Metal2 ( 376320 2217600 ) Via2_VH
+      NEW Metal2 ( 355040 2217600 ) Via2_VH
+      NEW Metal2 ( 344960 2217600 ) Via2_VH
+      NEW Metal2 ( 328160 2217600 ) Via2_VH
+      NEW Metal2 TAPER ( 338240 2204160 ) Via2_VH ;
+    - ibias_core ( esd_ibias to_gate ) ( u_bias_reference VBN ) ( u_bias_gpt62sol_ota VBN ) ( u_bias_gpt62sol_vref VBN ) ( u_bias_opus55_ota VBN ) ( u_bias_opus55_vref VBN ) ( u_bias_gemini4argon_ota VBN )
+      ( u_bias_gemini4argon_vref VBN ) ( u_neuro1b VBN ) + USE SIGNAL
+      + ROUTED Metal4 ( 537600 288960 ) ( * 301280 )
+      NEW Metal4 ( 525280 1415680 ) ( * 1441440 )
+      NEW Metal4 ( 537600 301280 ) ( * 319200 )
+      NEW Metal4 ( 537600 319200 ) ( 538720 * )
+      NEW Metal3 ( 551040 672000 0 ) ( 553280 * )
+      NEW Metal4 ( 525280 797440 ) ( * 1415680 )
+      NEW Metal3 ( 472640 1509760 ) ( * 1528800 )
+      NEW Metal3 ( 461440 1818880 ) ( 472640 * )
+      NEW Metal3 ( 539840 1818880 ) ( * 1823360 0 )
+      NEW Metal3 ( 472640 1818880 ) ( 539840 * )
+      NEW Metal4 ( 472640 1528800 ) ( * 1818880 )
+      NEW Metal3 ( 413280 301280 ) ( 537600 * )
+      NEW Metal3 ( 336000 1952160 ) ( 377440 * 0 )
+      NEW Metal3 ( 537600 288960 ) ( 554400 * )
+      NEW Metal3 ( 554400 287840 ) ( * 288960 )
+      NEW Metal3 ( 554400 287840 ) ( 595840 * 0 )
+      NEW Metal3 ( 553280 672000 ) ( 554400 * )
+      NEW Metal3 ( 554400 672000 ) ( * 673120 )
+      NEW Metal3 ( 554400 673120 ) ( 581280 * )
+      NEW Metal3 ( 351680 359520 0 ) ( 413280 * )
+      NEW Metal4 ( 413280 193760 ) ( * 359520 )
+      NEW Metal3 ( 336000 1966720 ) ( * 1972320 )
+      NEW Metal2 ( 336000 1952160 ) ( * 1966720 )
+      NEW Metal3 ( 525280 797440 ) ( 581280 * )
+      NEW Metal2 ( 581280 673120 ) ( * 797440 )
+      NEW Metal2 ( 497280 1441440 ) ( 501760 * )
+      NEW Metal3 ( 472640 1441440 ) ( 497280 * )
+      NEW Metal3 ( 351680 1441440 0 ) ( 472640 * )
+      NEW Metal4 ( 472640 1441440 ) ( * 1509760 )
+      NEW Metal3 ( 501760 1441440 ) ( 525280 * )
+      NEW Metal3 ( 380800 1952160 0 ) ( 461440 * )
+      NEW Metal4 ( 461440 1818880 ) ( * 1952160 )
+      NEW Metal4 ( 553280 504000 ) ( * 672000 )
+      NEW Metal3 ( 538720 502880 ) ( 553280 * )
+      NEW Metal3 ( 553280 502880 ) ( * 504000 )
+      NEW Metal4 ( 538720 319200 ) ( * 502880 )
+      NEW Metal3 ( 537600 301280 ) Via3_HV
+      NEW Metal3 ( 537600 288960 ) Via3_HV
+      NEW Metal3 ( 525280 1415680 ) Via3_HV
+      NEW Metal3 ( 525280 1441440 ) Via3_HV
+      NEW Metal3 ( 553280 672000 ) Via3_HV
+      NEW Metal3 ( 525280 797440 ) Via3_HV
+      NEW Metal3 ( 472640 1509760 ) Via3_HV
+      NEW Metal3 ( 472640 1528800 ) Via3_HV
+      NEW Metal3 ( 461440 1818880 ) Via3_HV
+      NEW Metal3 ( 472640 1818880 ) Via3_HV
+      NEW Metal3 ( 413280 301280 ) Via3_HV
+      NEW Metal2 ( 336000 1952160 ) Via2_VH
+      NEW Metal2 ( 581280 673120 ) Via2_VH
+      NEW Metal3 ( 413280 193760 ) Via3_HV
+      NEW Metal3 ( 413280 359520 ) Via3_HV
+      NEW Metal2 ( 336000 1966720 ) Via2_VH
+      NEW Metal2 ( 336000 1972320 ) Via2_HH
+      NEW Metal2 ( 581280 797440 ) Via2_VH
+      NEW Metal3 ( 472640 1441440 ) Via3_HV
+      NEW Metal2 ( 501760 1441440 ) Via2_VH
+      NEW Metal2 ( 497280 1441440 ) Via2_VH
+      NEW Metal3 ( 461440 1952160 ) Via3_HV
+      NEW Metal3 ( 538720 502880 ) Via3_HV
+      NEW Metal3 ( 553280 504000 ) Via3_HV
+      NEW Metal4 ( 413280 301280 ) RECT ( -280 -660 280 0 )  ;
+    - inn ( PIN inn ) ( esd_inn ASIG3V3 ) + USE SIGNAL + NONDEFAULTRULE d08_analog
+      + ROUTED Metal2 ( 766080 2217600 ) ( * 2218720 0 )
+      NEW Metal3 ( 766080 2217600 1000 ) ( 776160 * 1000 )
+      NEW Metal2 ( 776160 2217600 ) ( * 2218720 0 )
+      NEW Metal2 ( 754880 2217600 ) ( * 2218720 0 )
+      NEW Metal3 ( 754880 2217600 1000 ) ( 766080 * 1000 )
+      NEW Metal2 ( 743680 2217600 ) ( * 2218720 0 )
+      NEW Metal3 ( 743680 2217600 1000 ) ( 754880 * 1000 )
+      NEW Metal2 ( 728000 2217600 ) ( * 2218720 0 )
+      NEW Metal3 ( 728000 2217600 1000 ) ( 743680 * 1000 )
+      NEW Metal2 ( 716800 2217600 ) ( * 2218720 0 )
+      NEW Metal3 ( 716800 2217600 1000 ) ( 728000 * 1000 )
+      NEW Metal2 ( 705600 2217600 ) ( * 2218720 0 )
+      NEW Metal3 ( 705600 2217600 1000 ) ( 716800 * 1000 )
+      NEW Metal2 ( 695520 2217600 ) ( * 2218720 0 )
+      NEW Metal3 ( 695520 2217600 1000 ) ( 705600 * 1000 )
+      NEW Metal3 ( 738080 2204160 1000 ) ( 740320 * 1000 )
+      NEW Metal3 ( 740320 2204160 1000 ) ( * 2213120 1000 )
+      NEW Metal2 ( 740320 2213120 ) ( * 2218720 0 )
+      NEW Metal2 ( 766080 2217600 ) Via2_VH
+      NEW Metal2 ( 776160 2217600 ) Via2_VH
+      NEW Metal2 ( 754880 2217600 ) Via2_VH
+      NEW Metal2 ( 743680 2217600 ) Via2_VH
+      NEW Metal2 ( 728000 2217600 ) Via2_VH
+      NEW Metal2 ( 716800 2217600 ) Via2_VH
+      NEW Metal2 ( 705600 2217600 ) Via2_VH
+      NEW Metal2 ( 695520 2217600 ) Via2_VH
+      NEW Metal2 TAPER ( 738080 2204160 ) Via2_VH
+      NEW Metal2 ( 740320 2213120 ) Via2_VH ;
+    - inn_core ( u_gpt62sol_ota INN ) ( u_gpt62sol_cmp INN ) ( u_opus55_ota INN ) ( u_opus55_cmp INN ) ( u_gemini4argon_ota INN ) ( u_gemini4argon_cmp INN ) ( esd_inn to_gate ) + USE SIGNAL
+      + ROUTED Metal3 ( 975520 1160320 ) ( * 1162560 0 )
+      NEW Metal4 ( 735840 1942080 ) ( * 1972320 )
+      NEW Metal3 ( 389760 1678880 ) ( * 1682240 )
+      NEW Metal3 ( 346080 1682240 0 ) ( 389760 * )
+      NEW Metal3 ( 562240 959840 ) ( 602560 * 0 )
+      NEW Metal3 ( 562240 1411200 ) ( 570080 * )
+      NEW Metal3 ( 570080 1402240 ) ( 772800 * 0 )
+      NEW Metal3 ( 562240 1678880 ) ( 563360 * )
+      NEW Metal3 ( 389760 1678880 ) ( 562240 * )
+      NEW Metal3 ( 563360 1942080 ) ( 735840 * )
+      NEW Metal3 ( 570080 1160320 ) ( 975520 * )
+      NEW Metal4 ( 828800 1945440 ) ( * 1947680 )
+      NEW Metal3 ( 735840 1947680 ) ( 828800 * )
+      NEW Metal3 ( 346080 1093120 ) ( * 1097600 0 )
+      NEW Metal3 ( 346080 1093120 ) ( 570080 * )
+      NEW Metal2 ( 562240 959840 ) ( * 1093120 )
+      NEW Metal2 ( 570080 1093120 ) ( * 1411200 )
+      NEW Metal2 ( 562240 1411200 ) ( * 1678880 )
+      NEW Metal4 ( 563360 1678880 ) ( * 1942080 )
+      NEW Metal3 ( 735840 1942080 ) Via3_HV
+      NEW Metal3 ( 735840 1947680 ) Via3_HV
+      NEW Metal2 ( 735840 1972320 ) Via2_HH
+      NEW Metal3 ( 735840 1972320 ) Via3_HV
+      NEW Metal2 ( 562240 959840 ) Via2_VH
+      NEW Metal2 ( 570080 1160320 ) Via2_VH
+      NEW Metal2 ( 570080 1411200 ) Via2_VH
+      NEW Metal2 ( 562240 1411200 ) Via2_VH
+      NEW Metal2 ( 570080 1402240 ) Via2_VH
+      NEW Metal2 ( 562240 1678880 ) Via2_VH
+      NEW Metal3 ( 563360 1678880 ) Via3_HV
+      NEW Metal3 ( 563360 1942080 ) Via3_HV
+      NEW Metal3 ( 828800 1947680 ) Via3_HV
+      NEW Metal3 ( 828800 1945440 ) Via3_HV
+      NEW Metal2 ( 570080 1093120 ) Via2_VH
+      NEW Metal2 ( 562240 1093120 ) Via2_VH
+      NEW Metal4 ( 735840 1947680 ) RECT ( -280 -660 280 0 ) 
+      NEW Metal3 ( 735840 1972320 ) RECT ( -660 -280 0 280 ) 
+      NEW Metal2 ( 570080 1160320 ) RECT ( -280 -660 280 0 ) 
+      NEW Metal2 ( 570080 1402240 ) RECT ( -280 -660 280 0 ) 
+      NEW Metal3 ( 562240 1093120 ) RECT ( -660 -280 0 280 )  ;
+    - inp ( PIN inp ) ( esd_inp ASIG3V3 ) + USE SIGNAL + NONDEFAULTRULE d08_analog
+      + ROUTED Metal2 ( 504000 2217600 ) ( * 2218720 0 )
+      NEW Metal3 ( 493920 2217600 1000 ) ( 504000 * 1000 )
+      NEW Metal2 ( 493920 2217600 ) ( * 2218720 0 )
+      NEW Metal2 ( 515200 2217600 ) ( * 2218720 0 )
+      NEW Metal3 ( 504000 2217600 1000 ) ( 515200 * 1000 )
+      NEW Metal2 ( 526400 2217600 ) ( * 2218720 0 )
+      NEW Metal3 ( 515200 2217600 1000 ) ( 526400 * 1000 )
+      NEW Metal2 ( 542080 2217600 ) ( * 2218720 0 )
+      NEW Metal3 ( 526400 2217600 1000 ) ( 542080 * 1000 )
+      NEW Metal2 ( 553280 2217600 ) ( * 2218720 0 )
+      NEW Metal3 ( 542080 2217600 1000 ) ( 553280 * 1000 )
+      NEW Metal3 ( 538720 2204160 1000 ) ( 542080 * 1000 )
+      NEW Metal3 ( 542080 2204160 1000 ) ( * 2213120 1000 )
+      NEW Metal2 ( 542080 2213120 ) ( * 2217600 )
+      NEW Metal2 ( 567840 2217600 ) ( * 2218720 0 )
+      NEW Metal3 ( 567840 2217600 1000 ) ( 575680 * 1000 )
+      NEW Metal2 ( 575680 2217600 ) ( * 2218720 0 )
+      NEW Metal2 ( 554400 2217600 ) ( * 2218720 0 )
+      NEW Metal3 ( 554400 2217600 1000 ) ( 567840 * 1000 )
+      NEW Metal2 ( 504000 2217600 ) Via2_VH
+      NEW Metal2 ( 493920 2217600 ) Via2_VH
+      NEW Metal2 ( 515200 2217600 ) Via2_VH
+      NEW Metal2 ( 526400 2217600 ) Via2_VH
+      NEW Metal2 ( 542080 2217600 ) Via2_VH
+      NEW Metal2 ( 553280 2217600 ) Via2_VH
+      NEW Metal2 TAPER ( 538720 2204160 ) Via2_VH
+      NEW Metal2 ( 542080 2213120 ) Via2_VH
+      NEW Metal2 ( 567840 2217600 ) Via2_VH
+      NEW Metal2 ( 575680 2217600 ) Via2_VH
+      NEW Metal2 ( 554400 2217600 ) Via2_VH ;
+    - inp_core ( u_gpt62sol_ota INP ) ( u_gpt62sol_cmp INP ) ( u_opus55_ota INP ) ( u_opus55_cmp INP ) ( u_gemini4argon_ota INP ) ( u_gemini4argon_cmp INP ) ( esd_inp to_gate ) + USE SIGNAL
+      + ROUTED Metal3 ( 502880 981120 ) ( 511840 * )
+      NEW Metal4 ( 449120 991200 ) ( * 1010240 )
+      NEW Metal3 ( 449120 991200 ) ( 502880 * )
+      NEW Metal4 ( 511840 868000 ) ( * 981120 )
+      NEW Metal2 ( 502880 981120 ) ( * 1162560 )
+      NEW Metal3 ( 444640 1796480 ) ( 450240 * 0 )
+      NEW Metal3 ( 533120 1966720 ) ( * 1972320 )
+      NEW Metal2 ( 533120 1939840 ) ( * 1966720 )
+      NEW Metal3 ( 346080 1010240 ) ( * 1011360 0 )
+      NEW Metal3 ( 346080 1010240 ) ( 368480 * )
+      NEW Metal3 ( 368480 1010240 ) ( 449120 * )
+      NEW Metal3 ( 620480 1665440 ) ( 772800 * 0 )
+      NEW Metal3 ( 672000 1940960 ) ( 751520 * 0 )
+      NEW Metal3 ( 672000 1939840 ) ( * 1940960 )
+      NEW Metal3 ( 502880 1162560 ) ( 934080 * 0 )
+      NEW Metal3 ( 436800 1796480 ) ( 444640 * )
+      NEW Metal3 ( 368480 1797600 ) ( 436800 * )
+      NEW Metal3 ( 436800 1796480 ) ( * 1797600 )
+      NEW Metal3 ( 511840 868000 ) ( 602560 * 0 )
+      NEW Metal4 ( 620480 1665440 ) ( * 1939840 )
+      NEW Metal3 ( 444640 1926400 ) ( 453600 * )
+      NEW Metal2 ( 453600 1926400 ) ( * 1939840 )
+      NEW Metal4 ( 444640 1796480 ) ( * 1926400 )
+      NEW Metal3 ( 453600 1939840 ) ( 672000 * )
+      NEW Metal4 ( 368480 1010240 ) ( * 1797600 )
+      NEW Metal2 ( 502880 981120 ) Via2_VH
+      NEW Metal3 ( 511840 981120 ) Via3_HV
+      NEW Metal3 ( 449120 1010240 ) Via3_HV
+      NEW Metal3 ( 449120 991200 ) Via3_HV
+      NEW Metal2 ( 502880 991200 ) Via2_VH
+      NEW Metal2 ( 502880 1162560 ) Via2_VH
+      NEW Metal2 ( 533120 1939840 ) Via2_VH
+      NEW Metal3 ( 511840 868000 ) Via3_HV
+      NEW Metal3 ( 444640 1796480 ) Via3_HV
+      NEW Metal2 ( 533120 1966720 ) Via2_VH
+      NEW Metal2 ( 533120 1972320 ) Via2_HH
+      NEW Metal3 ( 368480 1010240 ) Via3_HV
+      NEW Metal3 ( 620480 1665440 ) Via3_HV
+      NEW Metal3 ( 620480 1939840 ) Via3_HV
+      NEW Metal3 ( 368480 1797600 ) Via3_HV
+      NEW Metal3 ( 444640 1926400 ) Via3_HV
+      NEW Metal2 ( 453600 1926400 ) Via2_VH
+      NEW Metal2 ( 453600 1939840 ) Via2_VH
+      NEW Metal2 ( 502880 991200 ) RECT ( -280 -660 280 0 ) 
+      NEW Metal3 ( 533120 1939840 ) RECT ( -660 -280 0 280 ) 
+      NEW Metal3 ( 620480 1939840 ) RECT ( -660 -280 0 280 )  ;
+    - oxa_cmp ( PIN oxa_cmp ) ( esd_opus55_cmp ASIG3V3 ) + USE SIGNAL + NONDEFAULTRULE d08_analog
+      + ROUTED Metal2 ( 1120 917280 0 ) ( * 925120 0 )
+      NEW Metal2 ( 1120 844480 0 ) ( * 852320 0 )
+      NEW Metal2 ( 1120 856800 0 ) ( * 864640 0 )
+      NEW Metal2 ( 1120 868000 0 ) ( * 875840 0 )
+      NEW Metal2 ( 1120 879200 0 ) ( * 891520 0 )
+      NEW Metal2 ( 1120 894880 0 ) ( * 902720 0 )
+      NEW Metal3 ( 1120 874720 1000 ) ( 22400 * 1000 )
+      NEW Metal2 ( 1120 906080 0 ) ( * 913920 0 )
+      NEW Metal2 TAPER ( 22400 874720 ) Via2_VH
+      NEW Metal2 ( 1120 874720 ) Via2_VH
+      NEW Metal2 TAPER ( 1120 874720 ) RECT ( -280 -660 280 0 )  ;
+    - opus55_cmp_core ( u_opus55_cmp OUTP ) ( esd_opus55_cmp to_gate ) + USE SIGNAL
+      + ROUTED Metal3 ( 254240 873600 ) ( 260960 * )
+      NEW Metal2 ( 260960 873600 ) ( * 1124480 )
+      NEW Metal3 ( 260960 1124480 ) ( 700000 * 0 )
+      NEW Metal2 ( 254240 873600 ) Via2_VH
+      NEW Metal2 ( 260960 873600 ) Via2_VH
+      NEW Metal2 ( 260960 1124480 ) Via2_VH ;
+    - opus55_cmp_outn ( u_opus55_cmp OUTN ) + USE SIGNAL ;
+    - oxa_ota ( PIN oxa_ota ) ( esd_opus55_ota ASIG3V3 ) + USE SIGNAL + NONDEFAULTRULE d08_analog
+      + ROUTED Metal2 ( 1120 1444800 0 ) ( * 1452640 0 )
+      NEW Metal2 ( 1120 1456000 0 ) ( * 1463840 0 )
+      NEW Metal2 ( 1120 1467200 0 ) ( * 1475040 0 )
+      NEW Metal2 ( 1120 1479520 0 ) ( * 1490720 0 )
+      NEW Metal3 ( 1120 1473920 1000 ) ( 22400 * 1000 )
+      NEW Metal2 ( 1120 1494080 0 ) ( * 1495200 )
+      NEW Metal2 ( 1120 1517600 0 ) ( * 1525440 0 )
+      NEW Metal2 ( 1120 1505280 0 ) ( * 1514240 0 )
+      NEW Metal2 ( 1120 1495200 ) ( * 1501920 0 )
+      NEW Metal2 TAPER ( 22400 1473920 ) Via2_VH
+      NEW Metal2 ( 1120 1473920 ) Via2_VH
+      NEW Metal2 TAPER ( 1120 1473920 ) RECT ( -280 -660 280 0 )  ;
+    - opus55_ota_core ( u_opus55_ota OUT ) ( esd_opus55_ota to_gate ) + USE SIGNAL
+      + ROUTED Metal3 ( 254240 1473920 ) ( 260960 * )
+      NEW Metal2 ( 260960 1473920 ) ( * 1495200 )
+      NEW Metal2 ( 260960 1495200 ) ( 262080 * )
+      NEW Metal2 ( 262080 1495200 ) ( * 1667680 )
+      NEW Metal3 ( 262080 1667680 ) ( 789600 * )
+      NEW Metal3 ( 789600 1665440 ) ( * 1667680 )
+      NEW Metal3 ( 789600 1665440 ) ( 865760 * 0 )
+      NEW Metal2 ( 254240 1473920 ) Via2_VH
+      NEW Metal2 ( 260960 1473920 ) Via2_VH
+      NEW Metal2 ( 262080 1667680 ) Via2_VH ;
+    - opus55_ota_ibias ( u_opus55_ota IBIAS ) ( u_bias_opus55_ota IOUT ) + USE SIGNAL
+      + ROUTED Metal3 ( 865760 1400000 ) ( * 1402240 0 )
+      NEW Metal3 ( 612640 1400000 ) ( 865760 * )
+      NEW Metal3 ( 527520 1524320 0 ) ( 612640 * )
+      NEW Metal4 ( 612640 1400000 ) ( * 1524320 )
+      NEW Metal3 ( 612640 1400000 ) Via3_HV
+      NEW Metal3 ( 612640 1524320 ) Via3_HV ;
+    - oxa_vref ( PIN oxa_vref ) ( esd_opus55_vref ASIG3V3 ) + USE SIGNAL + NONDEFAULTRULE d08_analog
+      + ROUTED Metal2 ( 1120 245280 0 ) ( * 253120 0 )
+      NEW Metal2 ( 1120 256480 0 ) ( * 264320 0 )
+      NEW Metal2 ( 1120 267680 0 ) ( * 275520 0 )
+      NEW Metal2 ( 1120 278880 0 ) ( * 291200 0 )
+      NEW Metal2 ( 1120 294560 0 ) ( * 302400 0 )
+      NEW Metal2 ( 1120 305760 0 ) ( * 313600 0 )
+      NEW Metal3 ( 1120 274400 1000 ) ( 22400 * 1000 )
+      NEW Metal2 ( 1120 316960 0 ) ( * 324800 0 )
+      NEW Metal2 TAPER ( 22400 274400 ) Via2_VH
+      NEW Metal2 ( 1120 274400 ) Via2_VH
+      NEW Metal2 TAPER ( 1120 274400 ) RECT ( -280 -660 280 0 )  ;
+    - opus55_vref_core ( u_opus55_vref VREF ) ( esd_opus55_vref to_gate ) + USE SIGNAL
+      + ROUTED Metal3 ( 919520 372960 ) ( * 378560 0 )
+      NEW Metal2 ( 919520 272160 ) ( * 372960 )
+      NEW Metal3 ( 254240 272160 ) ( 919520 * )
+      NEW Metal2 ( 254240 272160 ) Via2_VH
+      NEW Metal2 ( 919520 272160 ) Via2_VH
+      NEW Metal2 ( 919520 372960 ) Via2_VH ;
+    - opus55_vref_ibias ( u_opus55_vref IBIAS ) ( u_bias_opus55_vref IOUT ) + USE SIGNAL
+      + ROUTED Metal4 ( 673120 399840 ) ( * 458080 )
+      NEW Metal3 ( 832160 458080 ) ( * 461440 0 )
+      NEW Metal3 ( 673120 458080 ) ( 832160 * )
+      NEW Metal3 ( 599200 399840 0 ) ( 673120 * )
+      NEW Metal3 ( 673120 458080 ) Via3_HV
+      NEW Metal3 ( 673120 399840 ) Via3_HV ;
+    - temp_out ( PIN temp_out ) ( esd_temp_out ASIG3V3 ) + USE SIGNAL + NONDEFAULTRULE d08_analog
+      + ROUTED Metal2 ( 1120 44800 0 ) ( * 52640 0 )
+      NEW Metal2 ( 1120 56000 0 ) ( * 63840 0 )
+      NEW Metal2 ( 1120 67200 0 ) ( * 75040 0 )
+      NEW Metal2 ( 1120 89600 ) ( * 90720 0 )
+      NEW Metal3 ( 1120 89600 1000 ) ( 22400 * 1000 )
+      NEW Metal2 ( 1120 94080 0 ) ( * 101920 0 )
+      NEW Metal2 ( 1120 105280 0 ) ( * 114240 0 )
+      NEW Metal2 ( 1120 117600 0 ) ( * 125440 0 )
+      NEW Metal2 ( 1120 79520 0 ) ( * 89600 )
+      NEW Metal2 ( 1120 89600 ) Via2_VH
+      NEW Metal2 TAPER ( 22400 89600 ) Via2_VH ;
+    - temp_out_core ( esd_temp_out to_gate ) ( u_neuro1b IO ) + USE SIGNAL
+      + ROUTED Metal3 ( 254240 89600 ) ( 260960 * )
+      NEW Metal2 ( 260960 89600 ) ( * 189280 )
+      NEW Metal3 ( 260960 189280 ) ( 316960 * 0 )
+      NEW Metal2 ( 254240 89600 ) Via2_HH
+      NEW Metal2 ( 260960 89600 ) Via2_VH
+      NEW Metal2 ( 260960 189280 ) Via2_VH ;
+    - vdd ( PIN vdd ) ( u_gpt62sol_ota VDD ) ( u_gpt62sol_cmp VDD ) ( u_gpt62sol_vref VDD ) ( u_opus55_ota VDD ) ( u_opus55_cmp VDD ) ( u_opus55_vref VDD )
+      ( u_gemini4argon_ota VDD ) ( u_gemini4argon_cmp VDD ) ( u_gemini4argon_vref VDD ) ( esd_temp_out VDD ) ( esd_opus55_vref VDD ) ( esd_gpt62sol_vref VDD ) ( esd_gemini4argon_vref VDD ) ( esd_opus55_cmp VDD )
+      ( esd_gpt62sol_cmp VDD ) ( esd_gemini4argon_cmp VDD ) ( esd_opus55_ota VDD ) ( esd_gpt62sol_ota VDD ) ( esd_gemini4argon_ota VDD ) ( esd_ibias VDD ) ( esd_inp VDD ) ( esd_inn VDD )
+      ( esd_clk VDD ) ( u_bias_reference VDD ) ( u_bias_gpt62sol_ota VDD ) ( u_bias_gpt62sol_vref VDD ) ( u_bias_opus55_ota VDD ) ( u_bias_opus55_vref VDD ) ( u_bias_gemini4argon_ota VDD ) ( u_bias_gemini4argon_vref VDD )
+      ( u_neuro1b VDD ) + USE POWER + NONDEFAULTRULE d08_supply
+      + ROUTED Metal4 TAPER ( 291200 460800 ) ( 292320 * 0 )
+      NEW Metal4 TAPER ( 490560 772200 ) ( 492800 * 0 )
+      NEW Metal4 TAPER ( 490560 772200 ) ( * 772800 )
+      NEW Metal3 ( 437920 772800 1680 ) ( 490560 * 1680 )
+      NEW Metal4 TAPER ( 529760 779400 0 ) ( * 783000 )
+      NEW Metal4 ( 529760 783000 1680 ) ( * 786240 1680 )
+      NEW Metal4 ( 553280 1928640 1680 ) ( * 1938600 1680 )
+      NEW Metal3 ( 524160 1928640 1680 ) ( 553280 * 1680 )
+      NEW Metal4 TAPER ( 524160 1927800 ) ( * 1928640 )
+      NEW Metal4 TAPER ( 520800 1927800 0 ) ( 524160 * )
+      NEW Metal5 TAPER ( 728000 763200 ) ( 734720 * )
+      NEW Metal5 TAPER ( 734720 759600 0 ) ( * 763200 )
+      NEW Metal2 ( 80640 2217600 1680 ) ( * 2218720 0 )
+      NEW Metal5 TAPER ( 271040 190800 ) ( 276640 * 0 )
+      NEW Metal5 ( 235200 1258200 1800 ) ( * 1261800 1800 )
+      NEW Metal5 TAPER ( 437920 649800 0 ) ( * 655200 )
+      NEW Metal4 ( 437920 655200 1680 ) ( * 772800 1680 )
+      NEW Metal4 TAPER ( 505120 1522800 0 ) ( * 1526560 )
+      NEW Metal4 ( 505120 1526560 1680 ) ( * 1545600 1680 )
+      NEW Metal3 ( 505120 1545600 1680 ) ( 528640 * 1680 )
+      NEW Metal4 TAPER ( 468160 1522800 0 ) ( * 1526560 )
+      NEW Metal4 ( 528640 1545600 1680 ) ( * 1663200 1680 )
+      NEW Metal2 ( 977760 2054080 1680 ) ( * 2065280 1680 )
+      NEW Metal1 ( 977760 2054080 460 ) ( 1008000 * 460 )
+      NEW Metal2 ( 1008000 2054080 1680 ) ( * 2055200 1680 )
+      NEW Metal2 TAPER ( 1008000 2055200 ) ( 1012480 * )
+      NEW Metal5 ( 169120 460800 1800 ) ( 291200 * 1800 )
+      NEW Metal5 TAPER ( 650720 462600 0 ) ( * 468160 )
+      NEW Metal5 ( 650720 468160 1800 ) ( * 469800 1800 )
+      NEW Metal5 TAPER ( 650720 457200 ) ( * 460800 0 )
+      NEW Metal5 ( 601440 763200 1800 ) ( 650720 * 1800 )
+      NEW Metal3 ( 529760 786240 1680 ) ( 601440 * 1680 )
+      NEW Metal5 ( 650720 763200 1800 ) ( 728000 * 1800 )
+      NEW Metal5 TAPER ( 579040 1663200 ) ( 584640 * 0 )
+      NEW Metal5 ( 528640 1663200 1800 ) ( 579040 * 1800 )
+      NEW Metal5 TAPER ( 612640 1942200 0 ) ( * 1947600 )
+      NEW Metal4 ( 555520 1936800 1680 ) ( * 1938600 1680 )
+      NEW Metal5 ( 555520 1936800 1800 ) ( 595840 * 1800 )
+      NEW Metal5 TAPER ( 595840 1936800 ) ( 601440 * )
+      NEW Metal5 TAPER ( 601440 1936800 ) ( * 1938600 0 )
+      NEW Metal4 ( 553280 1938600 1680 ) ( 555520 * 1680 )
+      NEW Metal2 TAPER ( 169120 168000 ) ( * 172480 )
+      NEW Metal2 ( 169120 172480 1680 ) ( * 201600 1680 )
+      NEW Metal4 ( 169120 190400 1680 ) ( * 190800 1680 )
+      NEW Metal5 ( 169120 190800 1800 ) ( 271040 * 1800 )
+      NEW Metal4 ( 169120 201600 1680 ) ( * 352800 1680 )
+      NEW Metal4 ( 169120 352800 1680 ) ( * 460800 1680 )
+      NEW Metal4 ( 169120 460800 1680 ) ( * 750400 1680 )
+      NEW Metal4 ( 169120 750400 1680 ) ( * 953120 1680 )
+      NEW Metal4 ( 169120 1261800 1680 ) ( * 1350720 1680 )
+      NEW Metal4 ( 169120 953120 1680 ) ( * 1261800 1680 )
+      NEW Metal5 ( 169120 1261800 1800 ) ( 235200 * 1800 )
+      NEW Metal4 ( 169120 1752800 1680 ) ( * 1792800 1680 )
+      NEW Metal2 ( 181440 2217600 1680 ) ( * 2218720 0 )
+      NEW Metal1 ( 181440 2217600 460 ) ( 189280 * 460 )
+      NEW Metal2 ( 189280 2217600 1680 ) ( * 2218720 0 )
+      NEW Metal2 ( 157920 2217600 1680 ) ( * 2218720 0 )
+      NEW Metal2 ( 157920 2217600 1680 ) ( 162400 * 1680 )
+      NEW Metal2 ( 162400 2217600 1680 ) ( * 2218720 0 )
+      NEW Metal2 ( 131040 2217600 1680 ) ( * 2218720 0 )
+      NEW Metal1 ( 131040 2217600 460 ) ( 138880 * 460 )
+      NEW Metal2 ( 138880 2217600 1680 ) ( * 2218720 0 )
+      NEW Metal2 ( 107520 2217600 1680 ) ( * 2218720 0 )
+      NEW Metal2 ( 107520 2217600 1680 ) ( 112000 * 1680 )
+      NEW Metal2 ( 112000 2217600 1680 ) ( * 2218720 0 )
+      NEW Metal2 ( 88480 2217600 1680 ) ( * 2218720 0 )
+      NEW Metal1 ( 80640 2217600 460 ) ( 88480 * 460 )
+      NEW Metal5 TAPER ( 334880 646200 ) ( 340480 * 0 )
+      NEW Metal5 ( 169120 646200 1800 ) ( 334880 * 1800 )
+      NEW Metal5 ( 169120 1792800 1800 ) ( 319200 * 1800 )
+      NEW Metal5 ( 319200 1789200 1800 ) ( * 1792800 1800 )
+      NEW Metal5 ( 319200 1789200 1800 ) ( 336000 * 1800 )
+      NEW Metal5 TAPER ( 336000 1789200 ) ( 342720 * )
+      NEW Metal5 TAPER ( 342720 1789200 ) ( * 1792800 0 )
+      NEW Metal2 ( 406560 2055200 1680 ) ( 407680 * 1680 )
+      NEW Metal2 TAPER ( 407680 2055200 ) ( 412160 * )
+      NEW Metal4 ( 650720 469800 1680 ) ( * 763200 1680 )
+      NEW Metal5 TAPER ( 601440 1125000 0 ) ( * 1126800 )
+      NEW Metal4 ( 601440 763200 1680 ) ( * 1126800 1680 )
+      NEW Metal4 ( 601440 1126800 1680 ) ( * 1330200 1680 )
+      NEW Metal4 ( 612640 2055200 1680 ) ( * 2065280 1680 )
+      NEW Metal4 ( 612640 1947600 1680 ) ( * 2055200 1680 )
+      NEW Metal5 TAPER ( 846720 1330200 ) ( 852320 * 0 )
+      NEW Metal5 ( 601440 1330200 1800 ) ( 846720 * 1800 )
+      NEW Metal2 TAPER ( 815360 2057440 ) ( 818720 * )
+      NEW Metal2 TAPER ( 818720 2057440 ) ( * 2061000 )
+      NEW Metal2 ( 818720 2061000 1680 ) ( * 2065280 1680 )
+      NEW Metal3 ( 612640 2065280 1680 ) ( 818720 * 1680 )
+      NEW Metal3 ( 818720 2065280 1680 ) ( 977760 * 1680 )
+      NEW Metal4 ( 425600 1932000 1680 ) ( * 1936800 1680 )
+      NEW Metal4 TAPER ( 425600 1936800 ) ( * 1940400 0 )
+      NEW Metal3 ( 425600 1932000 1680 ) ( 482720 * 1680 )
+      NEW Metal4 TAPER ( 482720 1931400 ) ( * 1932000 )
+      NEW Metal4 TAPER ( 482720 1931400 ) ( 484960 * 0 )
+      NEW Metal4 TAPER ( 387520 1947600 ) ( 388640 * 0 )
+      NEW Metal5 ( 235200 1258200 1800 ) ( 268800 * 1800 )
+      NEW Metal5 ( 268800 1258200 1800 ) ( * 1260000 1800 )
+      NEW Metal5 ( 268800 1260000 1800 ) ( 334880 * 1800 )
+      NEW Metal5 TAPER ( 334880 1260000 ) ( 338240 * )
+      NEW Metal5 TAPER ( 338240 1258200 ) ( * 1260000 )
+      NEW Metal5 TAPER ( 338240 1258200 ) ( 341600 * )
+      NEW Metal5 TAPER ( 341600 1258200 ) ( * 1261800 0 )
+      NEW Metal2 ( 406560 1965600 1680 ) ( * 2055200 1680 )
+      NEW Metal4 TAPER ( 387520 1947600 ) ( * 1948800 )
+      NEW Metal4 TAPER ( 407680 1947600 0 ) ( * 1948800 )
+      NEW Metal5 ( 169120 1949400 1800 ) ( 387520 * 1800 )
+      NEW Metal4 ( 387520 1948800 1680 ) ( * 1949400 1680 )
+      NEW Metal4 ( 169120 1949400 1680 ) ( * 1949920 1680 )
+      NEW Metal2 TAPER ( 169120 1949920 ) ( * 1957760 )
+      NEW Metal4 ( 406560 1948800 1680 ) ( * 1965600 1680 )
+      NEW Metal4 ( 406560 1948800 1680 ) ( 407680 * 1680 )
+      NEW Metal4 ( 169120 1792800 1680 ) ( * 1949400 1680 )
+      NEW Metal2 ( 169120 1957760 1680 ) ( * 2218720 0 )
+      NEW Metal4 TAPER ( 576800 392400 0 ) ( 581280 * )
+      NEW Metal4 ( 581280 392400 1680 ) ( 583520 * 1680 )
+      NEW Metal4 ( 583520 392000 1680 ) ( * 392400 1680 )
+      NEW Metal3 ( 583520 392000 1680 ) ( 650720 * 1680 )
+      NEW Metal4 ( 650720 392000 1680 ) ( * 457200 1680 )
+      NEW Metal4 TAPER ( 329280 1546200 0 ) ( 331520 * )
+      NEW Metal5 ( 331520 1546200 1800 ) ( 468160 * 1800 )
+      NEW Metal5 ( 169120 1546200 1800 ) ( 285600 * 1800 )
+      NEW Metal4 ( 285600 1546200 1680 ) ( 287840 * 1680 )
+      NEW Metal4 TAPER ( 287840 1546200 ) ( 292320 * 0 )
+      NEW Metal4 ( 169120 1350720 1680 ) ( * 1546200 1680 )
+      NEW Metal4 ( 169120 1546200 1680 ) ( * 1752800 1680 )
+      NEW Metal4 ( 468160 1526560 1680 ) ( * 1546200 1680 )
+      NEW Metal4 TAPER ( 291200 460800 ) Via4_VH
+      NEW Metal3 TAPER ( 490560 772800 ) Via3_HV
+      NEW Metal3 ( 437920 772800 ) Via3_HV
+      NEW Metal3 ( 529760 786240 ) Via3_HV
+      NEW Metal4 ( 528640 1663200 ) Via4_VH
+      NEW Metal3 ( 553280 1928640 ) Via3_HV
+      NEW Metal3 TAPER ( 524160 1928640 ) Via3_HV
+      NEW Metal1 ( 80640 2217600 ) Via1_HV
+      NEW Metal4 TAPER ( 437920 655200 ) Via4_VH
+      NEW Metal3 ( 505120 1545600 ) Via3_HV
+      NEW Metal3 ( 528640 1545600 ) Via3_HV
+      NEW Metal2 ( 977760 2065280 ) Via2_VH
+      NEW Metal1 ( 977760 2054080 ) Via1_HV
+      NEW Metal1 ( 1008000 2054080 ) Via1_HV
+      NEW Metal1 TAPER ( 1012480 2055200 ) Via1_HV
+      NEW Metal4 ( 169120 460800 ) Via4_VH
+      NEW Metal1 TAPER ( 169120 549920 ) Via1_VV
+      NEW Metal2 TAPER ( 169120 549920 ) Via2_VH
+      NEW Metal3 TAPER ( 169120 549920 ) Via3_HV
+      NEW Metal1 TAPER ( 169120 750400 ) Via1_VV
+      NEW Metal2 TAPER ( 169120 750400 ) Via2_VH
+      NEW Metal3 TAPER ( 169120 750400 ) Via3_HV
+      NEW Metal1 TAPER ( 169120 953120 ) Via1_VV
+      NEW Metal2 TAPER ( 169120 953120 ) Via2_VH
+      NEW Metal3 TAPER ( 169120 953120 ) Via3_HV
+      NEW Metal1 TAPER ( 169120 1152480 ) Via1_VV
+      NEW Metal2 TAPER ( 169120 1152480 ) Via2_VH
+      NEW Metal3 TAPER ( 169120 1152480 ) Via3_HV
+      NEW Metal4 ( 650720 469800 ) Via4_VH
+      NEW Metal4 TAPER ( 650720 457200 ) Via4_VH
+      NEW Metal4 ( 650720 763200 ) Via4_VH
+      NEW Metal4 ( 601440 763200 ) Via4_VH
+      NEW Metal3 ( 601440 786240 ) Via3_HV
+      NEW Metal4 TAPER ( 612640 1947600 ) Via4_VH
+      NEW Metal4 ( 555520 1936800 ) Via4_VH
+      NEW Metal2 ( 169120 201600 ) Via2_VH
+      NEW Metal3 ( 169120 201600 ) Via3_HV
+      NEW Metal1 TAPER ( 169120 168000 ) Via1_VV
+      NEW Metal4 ( 169120 190800 ) Via4_VH
+      NEW Metal2 ( 169120 190400 ) Via2_VH
+      NEW Metal3 ( 169120 190400 ) Via3_HV
+      NEW Metal1 TAPER ( 169120 352800 ) Via1_VV
+      NEW Metal2 TAPER ( 169120 352800 ) Via2_VH
+      NEW Metal3 TAPER ( 169120 352800 ) Via3_HV
+      NEW Metal4 ( 169120 646200 ) Via4_VH
+      NEW Metal4 ( 169120 1261800 ) Via4_VH
+      NEW Metal1 TAPER ( 169120 1350720 ) Via1_VV
+      NEW Metal2 TAPER ( 169120 1350720 ) Via2_VH
+      NEW Metal3 TAPER ( 169120 1350720 ) Via3_HV
+      NEW Metal4 ( 169120 1792800 ) Via4_VH
+      NEW Metal1 TAPER ( 169120 1752800 ) Via1_VV
+      NEW Metal2 TAPER ( 169120 1752800 ) Via2_VH
+      NEW Metal3 TAPER ( 169120 1752800 ) Via3_HV
+      NEW Metal1 ( 181440 2217600 ) Via1_HV
+      NEW Metal1 ( 189280 2217600 ) Via1_HV
+      NEW Metal1 ( 131040 2217600 ) Via1_HV
+      NEW Metal1 ( 138880 2217600 ) Via1_HV
+      NEW Metal1 ( 88480 2217600 ) Via1_HV
+      NEW Metal1 TAPER ( 412160 2055200 ) Via1_HV
+      NEW Metal4 TAPER ( 601440 1126800 ) Via4_VH
+      NEW Metal4 ( 601440 1330200 ) Via4_VH
+      NEW Metal1 TAPER ( 612640 2055200 ) Via1_HV
+      NEW Metal2 TAPER ( 612640 2055200 ) Via2_VH
+      NEW Metal3 TAPER ( 612640 2055200 ) Via3_HV
+      NEW Metal3 ( 612640 2065280 ) Via3_HV
+      NEW Metal1 TAPER ( 815360 2057440 ) Via1_VV
+      NEW Metal2 ( 818720 2065280 ) Via2_VH
+      NEW Metal3 ( 425600 1932000 ) Via3_HV
+      NEW Metal3 TAPER ( 482720 1932000 ) Via3_HV
+      NEW Metal4 ( 169120 1949400 ) Via4_VH
+      NEW Metal4 ( 387520 1949400 ) Via4_VH
+      NEW Metal1 TAPER ( 169120 1949920 ) Via1_VV
+      NEW Metal2 TAPER ( 169120 1949920 ) Via2_VH
+      NEW Metal3 TAPER ( 169120 1949920 ) Via3_HV
+      NEW Metal2 ( 406560 1965600 ) Via2_VH
+      NEW Metal3 ( 406560 1965600 ) Via3_HV
+      NEW Metal3 ( 583520 392000 ) Via3_HV
+      NEW Metal3 ( 650720 392000 ) Via3_HV
+      NEW Metal4 TAPER ( 331520 1546200 ) Via4_VH
+      NEW Metal4 ( 468160 1546200 ) Via4_VH
+      NEW Metal4 ( 169120 1546200 ) Via4_VH
+      NEW Metal4 ( 285600 1546200 ) Via4_VH
+      NEW Metal1 TAPER ( 169120 1550080 ) Via1_VV
+      NEW Metal2 TAPER ( 169120 1550080 ) Via2_VH
+      NEW Metal3 TAPER ( 169120 1550080 ) Via3_HV
+      NEW Metal2 TAPER ( 169120 549920 ) RECT ( -280 -660 280 0 ) 
+      NEW Metal3 TAPER ( 169120 549920 ) RECT ( -660 -280 0 280 ) 
+      NEW Metal4 TAPER ( 169120 549920 ) RECT ( -280 -660 280 0 ) 
+      NEW Metal2 TAPER ( 169120 750400 ) RECT ( -280 -660 280 0 ) 
+      NEW Metal3 TAPER ( 169120 750400 ) RECT ( -660 -280 0 280 ) 
+      NEW Metal2 TAPER ( 169120 953120 ) RECT ( -280 -660 280 0 ) 
+      NEW Metal3 TAPER ( 169120 953120 ) RECT ( -660 -280 0 280 ) 
+      NEW Metal2 TAPER ( 169120 1152480 ) RECT ( -280 -660 280 0 ) 
+      NEW Metal3 TAPER ( 169120 1152480 ) RECT ( -660 -280 0 280 ) 
+      NEW Metal4 TAPER ( 169120 1152480 ) RECT ( -280 -660 280 0 ) 
+      NEW Metal4 TAPER ( 601440 786240 ) RECT ( -280 -660 280 0 ) 
+      NEW Metal3 TAPER ( 169120 201600 ) RECT ( -660 -280 0 280 ) 
+      NEW Metal3 TAPER ( 169120 190400 ) RECT ( -660 -280 0 280 ) 
+      NEW Metal2 TAPER ( 169120 190400 ) RECT ( -280 -660 280 0 ) 
+      NEW Metal2 TAPER ( 169120 352800 ) RECT ( -280 -660 280 0 ) 
+      NEW Metal3 TAPER ( 169120 352800 ) RECT ( -660 -280 0 280 ) 
+      NEW Metal4 TAPER ( 169120 646200 ) RECT ( -280 -660 280 0 ) 
+      NEW Metal2 TAPER ( 169120 1350720 ) RECT ( -280 -660 280 0 ) 
+      NEW Metal3 TAPER ( 169120 1350720 ) RECT ( -660 -280 0 280 ) 
+      NEW Metal2 TAPER ( 169120 1752800 ) RECT ( -280 -660 280 0 ) 
+      NEW Metal3 TAPER ( 169120 1752800 ) RECT ( -660 -280 0 280 ) 
+      NEW Metal2 TAPER ( 612640 2055200 ) RECT ( -280 -660 280 0 ) 
+      NEW Metal3 TAPER ( 612640 2055200 ) RECT ( -660 -280 0 280 ) 
+      NEW Metal2 TAPER ( 169120 1949920 ) RECT ( -280 -660 280 0 ) 
+      NEW Metal3 TAPER ( 169120 1949920 ) RECT ( -660 -280 0 280 ) 
+      NEW Metal4 TAPER ( 169120 1949920 ) RECT ( -280 0 280 520 ) 
+      NEW Metal3 TAPER ( 406560 1965600 ) RECT ( -660 -280 0 280 ) 
+      NEW Metal2 TAPER ( 169120 1550080 ) RECT ( -280 -660 280 0 ) 
+      NEW Metal3 TAPER ( 169120 1550080 ) RECT ( -660 -280 0 280 ) 
+      NEW Metal4 TAPER ( 169120 1550080 ) RECT ( -280 -660 280 0 )  ;
+    - vss ( PIN vss ) ( u_gpt62sol_ota VSS ) ( u_gpt62sol_cmp VSS ) ( u_gpt62sol_vref VSS ) ( u_opus55_ota VSS ) ( u_opus55_cmp VSS ) ( u_opus55_vref VSS )
+      ( u_gemini4argon_ota VSS ) ( u_gemini4argon_cmp VSS ) ( u_gemini4argon_vref VSS ) ( esd_temp_out VSS ) ( esd_opus55_vref VSS ) ( esd_gpt62sol_vref VSS ) ( esd_gemini4argon_vref VSS ) ( esd_opus55_cmp VSS )
+      ( esd_gpt62sol_cmp VSS ) ( esd_gemini4argon_cmp VSS ) ( esd_opus55_ota VSS ) ( esd_gpt62sol_ota VSS ) ( esd_gemini4argon_ota VSS ) ( esd_ibias VSS ) ( esd_inp VSS ) ( esd_inn VSS )
+      ( esd_clk VSS ) ( u_bias_reference VSS ) ( u_bias_gpt62sol_ota VSS ) ( u_bias_gpt62sol_vref VSS ) ( u_bias_opus55_ota VSS ) ( u_bias_opus55_vref VSS ) ( u_bias_gemini4argon_ota VSS ) ( u_bias_gemini4argon_vref VSS )
+      ( u_neuro1b VSS ) + USE GROUND + NONDEFAULTRULE d08_supply
+      + ROUTED Metal2 ( 1120 2139200 0 ) ( 2240 * 1680 )
+      NEW Metal1 ( 1120 2114560 460 ) ( * 2116800 460 )
+      NEW Metal1 ( 1120 2114560 460 ) ( 2240 * 460 )
+      NEW Metal2 ( 1120 2105600 0 ) ( 2240 * 1680 )
+      NEW Metal5 TAPER ( 271040 25200 ) ( 276640 * 0 )
+      NEW Metal4 ( 302400 292320 1680 ) ( * 309600 1680 )
+      NEW Metal4 ( 302400 1400400 1680 ) ( * 1409400 1680 )
+      NEW Metal4 ( 302400 1409400 1680 ) ( * 1440000 1680 )
+      NEW Metal4 TAPER ( 302400 1440000 ) ( * 1443600 0 )
+      NEW Metal4 TAPER ( 538720 291600 ) ( * 292320 )
+      NEW Metal4 TAPER ( 538720 291600 ) ( 540960 * 0 )
+      NEW Metal4 TAPER ( 520800 673320 ) ( * 676800 0 )
+      NEW Metal5 ( 706720 531000 1800 ) ( 725760 * 1800 )
+      NEW Metal5 TAPER ( 725760 531000 ) ( 731360 * )
+      NEW Metal5 TAPER ( 731360 531000 ) ( * 534600 0 )
+      NEW Metal5 TAPER ( 706720 786600 ) ( * 788400 0 )
+      NEW Metal1 ( 1120 2016000 460 ) ( * 2018240 460 )
+      NEW Metal1 ( 1120 2018240 460 ) ( 2240 * 460 )
+      NEW Metal1 ( 1120 2064160 460 ) ( * 2066400 460 )
+      NEW Metal1 ( 1120 2064160 460 ) ( 2240 * 460 )
+      NEW Metal2 ( 1120 2042880 0 ) ( 2240 * 1680 )
+      NEW Metal2 ( 2240 2016000 1680 ) ( * 2139200 1680 )
+      NEW Metal4 TAPER ( 302400 360000 ) ( * 363600 0 )
+      NEW Metal4 ( 302400 309600 1680 ) ( * 360000 1680 )
+      NEW Metal2 ( 260960 2048480 1680 ) ( * 2055600 1680 )
+      NEW Metal2 TAPER ( 260960 2055600 ) ( * 2059680 )
+      NEW Metal2 ( 256480 2048480 1680 ) ( 260960 * 1680 )
+      NEW Metal2 ( 256480 2028320 1680 ) ( * 2048480 1680 )
+      NEW Metal4 ( 520800 667520 1680 ) ( * 673320 1680 )
+      NEW Metal4 TAPER ( 487200 1825320 ) ( * 1828800 0 )
+      NEW Metal3 ( 456960 1831200 1680 ) ( 482720 * 1680 )
+      NEW Metal4 TAPER ( 482720 1830600 ) ( * 1831200 )
+      NEW Metal4 TAPER ( 482720 1830600 ) ( 484960 * 0 )
+      NEW Metal2 ( 456960 1831200 1680 ) ( * 1879360 1680 )
+      NEW Metal4 ( 487200 1704600 1680 ) ( * 1825320 1680 )
+      NEW Metal2 ( 463680 2049600 1680 ) ( * 2055600 1680 )
+      NEW Metal2 TAPER ( 463680 2055600 ) ( * 2059680 )
+      NEW Metal4 ( 706720 531000 1680 ) ( * 786600 1680 )
+      NEW Metal5 ( 164640 25200 1800 ) ( 271040 * 1800 )
+      NEW Metal5 ( 164640 309600 1800 ) ( 302400 * 1800 )
+      NEW Metal4 ( 164640 932400 1680 ) ( * 999040 1680 )
+      NEW Metal5 ( 164640 1400400 1800 ) ( 302400 * 1800 )
+      NEW Metal3 ( 302400 292320 1680 ) ( 538720 * 1680 )
+      NEW Metal5 TAPER ( 337120 932400 ) ( 342720 * )
+      NEW Metal5 TAPER ( 342720 932400 ) ( * 934200 0 )
+      NEW Metal5 ( 164640 932400 1800 ) ( 337120 * 1800 )
+      NEW Metal4 TAPER ( 411040 1879360 ) ( * 1882800 0 )
+      NEW Metal3 ( 411040 1879360 1680 ) ( 456960 * 1680 )
+      NEW Metal5 ( 604800 302400 1800 ) ( 647360 * 1800 )
+      NEW Metal5 TAPER ( 647360 302400 ) ( 652960 * )
+      NEW Metal5 TAPER ( 652960 298800 0 ) ( * 302400 )
+      NEW Metal4 TAPER ( 571200 298800 0 ) ( * 302400 )
+      NEW Metal3 ( 571200 302400 1680 ) ( 604800 * 1680 )
+      NEW Metal5 ( 610400 531000 1800 ) ( 706720 * 1800 )
+      NEW Metal5 ( 554400 1407600 1800 ) ( * 1409400 1800 )
+      NEW Metal5 ( 554400 1407600 1800 ) ( 579040 * 1800 )
+      NEW Metal5 TAPER ( 579040 1407600 ) ( 584640 * 0 )
+      NEW Metal5 ( 487200 1704600 1800 ) ( 554400 * 1800 )
+      NEW Metal5 ( 554400 1701000 1800 ) ( * 1704600 1800 )
+      NEW Metal5 ( 554400 1701000 1800 ) ( 595840 * 1800 )
+      NEW Metal5 TAPER ( 595840 1701000 ) ( 602560 * )
+      NEW Metal5 TAPER ( 602560 1701000 ) ( * 1704600 0 )
+      NEW Metal5 TAPER ( 852320 1159200 ) ( * 1164600 0 )
+      NEW Metal4 ( 164640 16800 1680 ) ( * 399840 1680 )
+      NEW Metal4 ( 164640 399840 1680 ) ( * 602560 1680 )
+      NEW Metal4 ( 164640 602560 1680 ) ( * 932400 1680 )
+      NEW Metal4 ( 164640 999040 1680 ) ( * 1201760 1680 )
+      NEW Metal4 ( 164640 1201760 1680 ) ( * 1402240 1680 )
+      NEW Metal4 ( 164640 1562400 1680 ) ( * 1599360 1680 )
+      NEW Metal4 ( 164640 1402240 1680 ) ( * 1562400 1680 )
+      NEW Metal4 ( 164640 1599360 1680 ) ( * 1799840 1680 )
+      NEW Metal4 ( 159040 2016000 1680 ) ( * 2028320 1680 )
+      NEW Metal3 ( 159040 2016000 1680 ) ( 164640 * 1680 )
+      NEW Metal3 ( 2240 2016000 1680 ) ( 159040 * 1680 )
+      NEW Metal4 ( 164640 1799840 1680 ) ( * 2016000 1680 )
+      NEW Metal3 ( 159040 2028320 1680 ) ( 256480 * 1680 )
+      NEW Metal3 ( 260960 2049600 1680 ) ( 463680 * 1680 )
+      NEW Metal3 ( 520800 667520 1680 ) ( 554400 * 1680 )
+      NEW Metal3 ( 554400 667520 1680 ) ( * 668640 1680 )
+      NEW Metal3 ( 554400 668640 1680 ) ( 706720 * 1680 )
+      NEW Metal2 ( 661920 2049600 1680 ) ( * 2055600 1680 )
+      NEW Metal2 TAPER ( 661920 2055600 ) ( * 2059680 )
+      NEW Metal5 TAPER ( 799680 792000 0 ) ( 806400 * )
+      NEW Metal5 ( 806400 792000 1800 ) ( 852320 * 1800 )
+      NEW Metal4 ( 852320 792000 1680 ) ( * 1159200 1680 )
+      NEW Metal1 ( 818720 2049600 460 ) ( 857920 * 460 )
+      NEW Metal2 ( 857920 2049600 1680 ) ( 861280 * 1680 )
+      NEW Metal2 ( 861280 2049600 1680 ) ( * 2055600 1680 )
+      NEW Metal2 TAPER ( 861280 2055600 ) ( * 2059680 )
+      NEW Metal3 ( 463680 2049600 1680 ) ( 818720 * 1680 )
+      NEW Metal2 ( 455840 2032800 1680 ) ( * 2049600 1680 )
+      NEW Metal2 ( 455840 2032800 1680 ) ( 456960 * 1680 )
+      NEW Metal2 ( 456960 1879360 1680 ) ( * 2032800 1680 )
+      NEW Metal5 TAPER ( 596960 498600 0 ) ( 603680 * )
+      NEW Metal5 ( 603680 498600 1800 ) ( 610400 * 1800 )
+      NEW Metal4 ( 604800 302400 1680 ) ( * 498600 1680 )
+      NEW Metal4 ( 610400 498600 1680 ) ( * 531000 1680 )
+      NEW Metal5 ( 164640 1562400 1800 ) ( 268800 * 1800 )
+      NEW Metal5 TAPER ( 343840 1562400 ) ( * 1564200 0 )
+      NEW Metal5 ( 268800 1560600 1800 ) ( * 1562400 1800 )
+      NEW Metal5 ( 268800 1560600 1800 ) ( 342720 * 1800 )
+      NEW Metal4 ( 342720 1560600 1680 ) ( * 1562400 1680 )
+      NEW Metal4 ( 342720 1562400 1680 ) ( 343840 * 1680 )
+      NEW Metal4 TAPER ( 505120 1422000 0 ) ( 508480 * )
+      NEW Metal4 ( 508480 1409400 1680 ) ( * 1416800 1680 )
+      NEW Metal4 TAPER ( 508480 1416800 ) ( * 1422000 )
+      NEW Metal4 ( 465920 1409400 1680 ) ( * 1416800 1680 )
+      NEW Metal4 TAPER ( 465920 1416800 ) ( * 1420200 )
+      NEW Metal4 TAPER ( 465920 1420200 ) ( 468160 * 0 )
+      NEW Metal5 ( 302400 1409400 1800 ) ( 465920 * 1800 )
+      NEW Metal5 ( 508480 1409400 1800 ) ( 554400 * 1800 )
+      NEW Metal1 ( 1120 2116800 ) Via1_HV
+      NEW Metal1 ( 2240 2114560 ) Via1_HV
+      NEW Metal4 ( 302400 309600 ) Via4_VH
+      NEW Metal3 ( 302400 292320 ) Via3_HV
+      NEW Metal4 ( 302400 1409400 ) Via4_VH
+      NEW Metal4 ( 302400 1400400 ) Via4_VH
+      NEW Metal3 TAPER ( 538720 292320 ) Via3_HV
+      NEW Metal4 ( 487200 1704600 ) Via4_VH
+      NEW Metal2 ( 456960 1879360 ) Via2_VH
+      NEW Metal4 ( 706720 531000 ) Via4_VH
+      NEW Metal4 TAPER ( 706720 786600 ) Via4_VH
+      NEW Metal2 ( 2240 2016000 ) Via2_VH
+      NEW Metal1 ( 1120 2016000 ) Via1_HV
+      NEW Metal1 ( 2240 2018240 ) Via1_HV
+      NEW Metal1 ( 1120 2066400 ) Via1_HV
+      NEW Metal1 ( 2240 2064160 ) Via1_HV
+      NEW Metal1 TAPER ( 260960 2059680 ) Via1_VV
+      NEW Metal2 ( 256480 2028320 ) Via2_VH
+      NEW Metal2 ( 260960 2049600 ) Via2_VH
+      NEW Metal3 ( 520800 667520 ) Via3_HV
+      NEW Metal2 ( 456960 1831200 ) Via2_VH
+      NEW Metal3 TAPER ( 482720 1831200 ) Via3_HV
+      NEW Metal1 TAPER ( 463680 2059680 ) Via1_HV
+      NEW Metal2 ( 463680 2049600 ) Via2_VH
+      NEW Metal2 ( 455840 2049600 ) Via2_VH
+      NEW Metal3 ( 706720 668640 ) Via3_HV
+      NEW Metal1 TAPER ( 164640 16800 ) Via1_HV
+      NEW Metal2 TAPER ( 164640 16800 ) Via2_VH
+      NEW Metal3 TAPER ( 164640 16800 ) Via3_HV
+      NEW Metal4 ( 164640 25200 ) Via4_VH
+      NEW Metal4 ( 164640 309600 ) Via4_VH
+      NEW Metal4 ( 164640 932400 ) Via4_VH
+      NEW Metal1 TAPER ( 164640 999040 ) Via1_HV
+      NEW Metal2 TAPER ( 164640 999040 ) Via2_VH
+      NEW Metal3 TAPER ( 164640 999040 ) Via3_HV
+      NEW Metal1 TAPER ( 164640 1201760 ) Via1_HV
+      NEW Metal2 TAPER ( 164640 1201760 ) Via2_VH
+      NEW Metal3 TAPER ( 164640 1201760 ) Via3_HV
+      NEW Metal1 TAPER ( 164640 1402240 ) Via1_HV
+      NEW Metal2 TAPER ( 164640 1402240 ) Via2_VH
+      NEW Metal3 TAPER ( 164640 1402240 ) Via3_HV
+      NEW Metal4 ( 164640 1400400 ) Via4_VH
+      NEW Metal3 ( 411040 1879360 ) Via3_HV
+      NEW Metal4 ( 604800 302400 ) Via4_VH
+      NEW Metal3 TAPER ( 571200 302400 ) Via3_HV
+      NEW Metal3 ( 604800 302400 ) Via3_HV
+      NEW Metal4 ( 610400 531000 ) Via4_VH
+      NEW Metal4 TAPER ( 852320 1159200 ) Via4_VH
+      NEW Metal1 TAPER ( 164640 199360 ) Via1_HV
+      NEW Metal2 TAPER ( 164640 199360 ) Via2_VH
+      NEW Metal3 TAPER ( 164640 199360 ) Via3_HV
+      NEW Metal1 TAPER ( 164640 399840 ) Via1_HV
+      NEW Metal2 TAPER ( 164640 399840 ) Via2_VH
+      NEW Metal3 TAPER ( 164640 399840 ) Via3_HV
+      NEW Metal1 TAPER ( 164640 602560 ) Via1_HV
+      NEW Metal2 TAPER ( 164640 602560 ) Via2_VH
+      NEW Metal3 TAPER ( 164640 602560 ) Via3_HV
+      NEW Metal1 TAPER ( 164640 801920 ) Via1_HV
+      NEW Metal2 TAPER ( 164640 801920 ) Via2_VH
+      NEW Metal3 TAPER ( 164640 801920 ) Via3_HV
+      NEW Metal4 ( 164640 1562400 ) Via4_VH
+      NEW Metal1 TAPER ( 164640 1599360 ) Via1_HV
+      NEW Metal2 TAPER ( 164640 1599360 ) Via2_VH
+      NEW Metal3 TAPER ( 164640 1599360 ) Via3_HV
+      NEW Metal1 TAPER ( 164640 1799840 ) Via1_HV
+      NEW Metal2 TAPER ( 164640 1799840 ) Via2_VH
+      NEW Metal3 TAPER ( 164640 1799840 ) Via3_HV
+      NEW Metal3 ( 159040 2028320 ) Via3_HV
+      NEW Metal3 ( 159040 2016000 ) Via3_HV
+      NEW Metal3 ( 164640 2016000 ) Via3_HV
+      NEW Metal1 TAPER ( 661920 2059680 ) Via1_HV
+      NEW Metal2 ( 661920 2049600 ) Via2_VH
+      NEW Metal4 ( 852320 792000 ) Via4_VH
+      NEW Metal1 ( 818720 2049600 ) Via1_HV
+      NEW Metal2 ( 818720 2049600 ) Via2_VH
+      NEW Metal1 ( 857920 2049600 ) Via1_HV
+      NEW Metal1 TAPER ( 861280 2059680 ) Via1_HV
+      NEW Metal4 ( 610400 498600 ) Via4_VH
+      NEW Metal4 ( 604800 498600 ) Via4_VH
+      NEW Metal4 ( 342720 1560600 ) Via4_VH
+      NEW Metal4 ( 343840 1562400 ) Via4_VH
+      NEW Metal4 ( 508480 1409400 ) Via4_VH
+      NEW Metal4 ( 465920 1409400 ) Via4_VH
+      NEW Metal2 TAPER ( 2240 2114560 ) RECT ( -280 -660 280 0 ) 
+      NEW Metal2 TAPER ( 2240 2018240 ) RECT ( -280 -660 280 0 ) 
+      NEW Metal2 TAPER ( 2240 2064160 ) RECT ( -280 -660 280 0 ) 
+      NEW Metal2 TAPER ( 260960 2049600 ) RECT ( -280 -660 280 0 ) 
+      NEW Metal3 TAPER ( 455840 2049600 ) RECT ( -660 -280 0 280 ) 
+      NEW Metal4 TAPER ( 706720 668640 ) RECT ( -280 -660 280 0 ) 
+      NEW Metal2 TAPER ( 164640 16800 ) RECT ( -280 -660 280 0 ) 
+      NEW Metal3 TAPER ( 164640 16800 ) RECT ( -660 -280 0 280 ) 
+      NEW Metal4 TAPER ( 164640 25200 ) RECT ( -280 -660 280 0 ) 
+      NEW Metal4 TAPER ( 164640 309600 ) RECT ( -280 -660 280 0 ) 
+      NEW Metal2 TAPER ( 164640 999040 ) RECT ( -280 -660 280 0 ) 
+      NEW Metal3 TAPER ( 164640 999040 ) RECT ( -660 -280 0 280 ) 
+      NEW Metal2 TAPER ( 164640 1201760 ) RECT ( -280 -660 280 0 ) 
+      NEW Metal3 TAPER ( 164640 1201760 ) RECT ( -660 -280 0 280 ) 
+      NEW Metal2 TAPER ( 164640 1402240 ) RECT ( -280 -660 280 0 ) 
+      NEW Metal3 TAPER ( 164640 1402240 ) RECT ( -660 -280 0 280 ) 
+      NEW Metal4 TAPER ( 164640 1400400 ) RECT ( -280 -660 280 0 ) 
+      NEW Metal4 TAPER ( 604800 302400 ) RECT ( -280 -660 280 0 ) 
+      NEW Metal2 TAPER ( 164640 199360 ) RECT ( -280 -660 280 0 ) 
+      NEW Metal3 TAPER ( 164640 199360 ) RECT ( -660 -280 0 280 ) 
+      NEW Metal4 TAPER ( 164640 199360 ) RECT ( -280 -660 280 0 ) 
+      NEW Metal2 TAPER ( 164640 399840 ) RECT ( -280 -660 280 0 ) 
+      NEW Metal3 TAPER ( 164640 399840 ) RECT ( -660 -280 0 280 ) 
+      NEW Metal2 TAPER ( 164640 602560 ) RECT ( -280 -660 280 0 ) 
+      NEW Metal3 TAPER ( 164640 602560 ) RECT ( -660 -280 0 280 ) 
+      NEW Metal2 TAPER ( 164640 801920 ) RECT ( -280 -660 280 0 ) 
+      NEW Metal3 TAPER ( 164640 801920 ) RECT ( -660 -280 0 280 ) 
+      NEW Metal4 TAPER ( 164640 801920 ) RECT ( -280 -660 280 0 ) 
+      NEW Metal2 TAPER ( 164640 1599360 ) RECT ( -280 -660 280 0 ) 
+      NEW Metal3 TAPER ( 164640 1599360 ) RECT ( -660 -280 0 280 ) 
+      NEW Metal2 TAPER ( 164640 1799840 ) RECT ( -280 -660 280 0 ) 
+      NEW Metal3 TAPER ( 164640 1799840 ) RECT ( -660 -280 0 280 ) 
+      NEW Metal3 TAPER ( 661920 2049600 ) RECT ( -660 -280 0 280 ) 
+      NEW Metal2 TAPER ( 818720 2049600 ) RECT ( -280 -660 280 0 ) 
+      NEW Metal5 TAPER ( 604800 498600 ) RECT ( -2320 -440 0 440 ) 
+      NEW Metal5 TAPER ( 343840 1562400 ) RECT ( 0 -440 760 440 )  ;
+END NETS
+END DESIGN

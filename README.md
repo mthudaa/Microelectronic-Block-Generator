@@ -16,6 +16,12 @@ These are previously published submission artifacts; their presence does not
 expand the generator's supported feature levels. Preserve them during tool
 updates and repository cleanup.
 
+![MBG-D08 block layout](mbg-toplevel/mbg_d08_layout.svg)
+
+*MBG-D08 + NEURO1B block layout (`mbg-toplevel/layout/mbg_d08.gds`, 605 x 1110 um, GF180MCU-D).
+The author name is drawn on the top metal at the lower right. DRC (Magic and KLayout) is clean and LVS matches;
+see [the report](mbg-toplevel/mbg-d08_report.md).*
+
 ## Install
 
 Use Python 3.11 for the supplied dependency lock. No PDK or EDA binary is bundled.

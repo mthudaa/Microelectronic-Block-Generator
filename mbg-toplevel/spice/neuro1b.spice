@@ -1,0 +1,17 @@
+* NEURO1B temperature sensor: designed with Opus 5.5.
+* NEURO1B: Axon-Hillock neuron for the D08 frame. Leak is biased from the shared VBN.
+* VBN is a gate-only load. IO connects to temp_out_core behind the W12 ESD cell.
+.subckt neuro1b IO VDD VSS VBN
+XM1 N1 IO VDD VDD pfet_03v3 L=10u W=1u nf=1
+XM2 N1 IO VSS VSS nfet_03v3 L=10u W=0.5u nf=1
+XM3 SPK N1 VDD VDD pfet_03v3 L=1u W=1u nf=1
+XM4 SPK N1 VSS VSS nfet_03v3 L=1u W=0.5u nf=1
+XM5 IO SPK VSS VSS nfet_03v3 L=1u W=2u nf=1
+* Four series long devices: about 1/160 of the 20 uA reference
+XM6 IO VBN L1 VSS nfet_03v3 L=10u W=0.5u nf=1
+XM7 L1 VBN L2 VSS nfet_03v3 L=10u W=0.5u nf=1
+XM8 L2 VBN L3 VSS nfet_03v3 L=10u W=0.5u nf=1
+XM9 L3 VBN VSS VSS nfet_03v3 L=10u W=0.5u nf=1
+XC1 IO VSS cap_mim_2f0_m4m5_noshield c_width=30u c_length=30u
+XC2 SPK IO cap_mim_2f0_m4m5_noshield c_width=22u c_length=22u
+.ends

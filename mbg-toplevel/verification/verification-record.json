@@ -1,0 +1,27 @@
+{
+  "gds_sha256": "de202cd8d79c6b45fcd94ee88524b32538ff66ce3a8da0da91988ba6b6ffbcb1",
+  "orientation": "normal (mirror_x=false, mirror_y=false); matches committee D08_BV.def",
+  "legs": {
+    "drc": "PASS",
+    "lvs": "PASS",
+    "pex_coupled": "PASS",
+    "pex_full_rc": "FAIL",
+    "landing_connectivity": "PASS"
+  },
+  "notes": {
+    "drc": "Magic 0 and KLayout 0 on submission-prep/layout/mbg_d08.gds (user layout + name on Metal5; re-run 2026-11-23)",
+    "lvs": "match vs submission-prep/mbg-d08_lvs.spice (re-run 2026-11-23)",
+    "pex_coupled": "raw extraction 405 C, 0 R (includes 47 floating name-artwork nodes); simulation netlist 318 C without the artwork capacitors (sim/make_sim_netlist.py)",
+    "pex_full_rc": "FAIL: Magic PEX stops after its start message (open)",
+    "landing_connectivity": "124 rectangles in 16 clusters against the committee D08_BV.def (re-run after the rename)"
+  },
+  "evidence_dir": "outputs/d08-neuro1-integration/orientation-normal/",
+  "rename": "Model names renamed in cells/instances/nets: gpt->gpt62sol (GPT-6.2 Sol), oxa->opus55 (Opus 5.5), deepseek->gemini4argon (Gemini 4 Argon, neon fallback). Pin names unchanged. NEURO1B designed with Opus 5.5.",
+  "author_labels": "Name drawn as 47 polygons on Metal5 (81/0), x 260-481 um, y 36-72 um; replaces the earlier text records on layer 0/0. Floating metal; verified with DRC, LVS, PEX and landing.",
+  "user_update": "GDS built from the D08 team layout eda/designs/mbg_d08.gds (hand-widened ESD-to-pad connections). Two orphan Via2/Metal3 stubs (rule M3.3) removed at (169.1,1102.1) and (369.0,1102.1) um. DEF is the router output and does not include these edits.",
+  "team_decisions": {
+    "temp_out": "NEURO1B replaces the earlier temperature sensor on temp_out/W12 (not an overlay); pin name kept by team decision",
+    "waived": "full-RC PEX not pursued; power pad cells and density fill handled by the committee; post-layout results scored by the committee testbench",
+    "scope": "D08 team responsibility is the block area only; wafer.space frame confirmation, power pads and density fill are handled by the committee; ws_def_ready is true on that basis (declared by the team, not verified against a wafer.space frame)"
+  }
+}

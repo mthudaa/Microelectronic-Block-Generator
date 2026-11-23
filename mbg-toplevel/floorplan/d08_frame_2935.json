@@ -1,0 +1,69 @@
+{
+  "chip_type": "gf180mcuD",
+  "frame_um": [
+    2935,
+    2935
+  ],
+  "margin_um": 350,
+  "interior_um": [
+    350,
+    350,
+    2585,
+    2585
+  ],
+  "source": "d-m-bailey/chipathon-floorplanner config/chip_frames.json and spec sections 3-5 (read via subagent summary; verify verbatim)",
+  "block": {
+    "name": "D08 (BV)",
+    "catalog_type": "BV",
+    "size_um": [
+      605,
+      1110
+    ],
+    "catalog_pin_count": 17,
+    "design_pin_count": 16,
+    "base_lower_left_um": [
+      350,
+      1475
+    ],
+    "archive_origin_um": [
+      350,
+      1475
+    ],
+    "orientation_in_use": "normal"
+  },
+  "placements": {
+    "normal": {
+      "mirror_x": false,
+      "mirror_y": false,
+      "lower_left_um": [
+        350,
+        1475,
+        955,
+        2585
+      ],
+      "matches_archive_origin": true,
+      "status": "IN USE. Matches the committee D08_BV.def; verified DRC/LVS/PEX/landing."
+    },
+    "mirror_xy": {
+      "mirror_x": true,
+      "mirror_y": true,
+      "status": "NOT IN USE. Rotated copy kept at outputs/d08-neuro1-integration/orientation-mirror-xy/. Fails landing against the committee D08_BV.def."
+    }
+  },
+  "pads": "not defined in config/chip_frames.json (pads: []); pad-to-pin mapping unverified",
+  "open": [
+    "confirm chip_05 mirror flags verbatim in floorplan-chipathon2026.json",
+    "confirm no overlap with other chips' footprints",
+    "pin-count capacity 17 >= 16 ok",
+    "Planner lists D08 as mirror_xy; D08 team decided NORMAL (matches committee D08_BV.def). Organizers to acknowledge."
+  ],
+  "decisions": {
+    "orientation": "normal",
+    "pr_boundary_um": [
+      605,
+      1110
+    ],
+    "pr_boundary_rule": "committee D08_BV.def DIEAREA",
+    "top_cell": "mbg_d08 (equals file name)"
+  }
+}

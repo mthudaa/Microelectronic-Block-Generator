@@ -1,0 +1,201 @@
+{
+ "frame_block_um": [
+  605,
+  1110
+ ],
+ "transform": "normal orientation (mirror_x=false, mirror_y=false); matches committee D08_BV.def",
+ "pins_normal": {
+  "clk": {
+   "edge": "north",
+   "x_range_um": [
+    446.61,
+    488.39
+   ],
+   "y_range_um": [
+    1109.5,
+    1109.5
+   ],
+   "label_count": 9
+  },
+  "deepseek_cmp": {
+   "edge": "west",
+   "x_range_um": [
+    0.5,
+    0.5
+   ],
+   "y_range_um": [
+    621.61,
+    663.39
+   ],
+   "label_count": 9
+  },
+  "deepseek_ota": {
+   "edge": "west",
+   "x_range_um": [
+    0.5,
+    0.5
+   ],
+   "y_range_um": [
+    921.61,
+    963.39
+   ],
+   "label_count": 9
+  },
+  "deepseek_vref": {
+   "edge": "west",
+   "x_range_um": [
+    0.5,
+    0.5
+   ],
+   "y_range_um": [
+    321.61,
+    363.39
+   ],
+   "label_count": 9
+  },
+  "gpt_cmp": {
+   "edge": "west",
+   "x_range_um": [
+    0.5,
+    0.5
+   ],
+   "y_range_um": [
+    521.61,
+    563.39
+   ],
+   "label_count": 9
+  },
+  "gpt_ota": {
+   "edge": "west",
+   "x_range_um": [
+    0.5,
+    0.5
+   ],
+   "y_range_um": [
+    821.61,
+    863.39
+   ],
+   "label_count": 9
+  },
+  "gpt_vref": {
+   "edge": "west",
+   "x_range_um": [
+    0.5,
+    0.5
+   ],
+   "y_range_um": [
+    221.61,
+    263.39
+   ],
+   "label_count": 9
+  },
+  "ibias": {
+   "edge": "north",
+   "x_range_um": [
+    146.61,
+    188.39
+   ],
+   "y_range_um": [
+    1109.5,
+    1109.5
+   ],
+   "label_count": 9
+  },
+  "inn": {
+   "edge": "north",
+   "x_range_um": [
+    346.61,
+    388.39
+   ],
+   "y_range_um": [
+    1109.5,
+    1109.5
+   ],
+   "label_count": 9
+  },
+  "inp": {
+   "edge": "north",
+   "x_range_um": [
+    246.61,
+    288.39
+   ],
+   "y_range_um": [
+    1109.5,
+    1109.5
+   ],
+   "label_count": 9
+  },
+  "oxa_cmp": {
+   "edge": "west",
+   "x_range_um": [
+    0.5,
+    0.5
+   ],
+   "y_range_um": [
+    421.61,
+    463.39
+   ],
+   "label_count": 9
+  },
+  "oxa_ota": {
+   "edge": "west",
+   "x_range_um": [
+    0.5,
+    0.5
+   ],
+   "y_range_um": [
+    721.61,
+    763.39
+   ],
+   "label_count": 9
+  },
+  "oxa_vref": {
+   "edge": "west",
+   "x_range_um": [
+    0.5,
+    0.5
+   ],
+   "y_range_um": [
+    121.61,
+    163.39
+   ],
+   "label_count": 9
+  },
+  "temp_out": {
+   "edge": "west",
+   "x_range_um": [
+    0.5,
+    0.5
+   ],
+   "y_range_um": [
+    21.61,
+    63.39
+   ],
+   "label_count": 9
+  },
+  "vdd": {
+   "edge": "north",
+   "x_range_um": [
+    36.11,
+    98.89
+   ],
+   "y_range_um": [
+    1109.5,
+    1109.5
+   ],
+   "label_count": 7
+  },
+  "vss": {
+   "edge": "west",
+   "x_range_um": [
+    0.5,
+    0.5
+   ],
+   "y_range_um": [
+    1011.11,
+    1073.89
+   ],
+   "label_count": 7
+  }
+ }
+}

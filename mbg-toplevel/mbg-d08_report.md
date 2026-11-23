@@ -1,332 +1,202 @@
-# MBG-D08 pre/post-layout verification report
+# MBG-D08 + NEURO1B: pre/post-layout verification report
 
-Date: 2026-09-02 (re-verified; first issued 2026-08-28)  
-Layout: `layout/mbg-d08.gds`  
-Technology: GF180MCU-D, 5LM, nominal 3.3 V
+Date: 2026-11-23  
+Layout: `layout/mbg_d08.gds` (single top cell `mbg_d08`, 605 x 1110 um)  
+GDS sha256: `de202cd8d79c6b45fcd94ee88524b32538ff66ce3a8da0da91988ba6b6ffbcb1`  
+Technology: GF180MCU-D, 5LM, MIM option B, 3.3 V devices
 
+This report replaces the earlier report for the previous layout (relaxation-oscillator temperature sensor on `temp_out`). `temp_out` is now the NEURO1B spiking temperature sensor, designed with Opus 5.5.
+
+## Models and names
+
+| Model | Block identifier | Top-level pins (committee-fixed) |
+|---|---|---|
+| GPT-6.2 Sol | `gpt62sol_vref`, `gpt62sol_ota`, `gpt62sol_cmp` | `gpt_vref`, `gpt_ota`, `gpt_cmp` |
+| Opus 5.5 | `opus55_vref`, `opus55_ota`, `opus55_cmp`, NEURO1B | `oxa_vref`, `oxa_ota`, `oxa_cmp`, `temp_out` |
+| Gemini 4 Argon (neon fallback) | `gemini4argon_vref`, `gemini4argon_ota`, `gemini4argon_cmp` | `deepseek_vref`, `deepseek_ota`, `deepseek_cmp` |
+
+Block, instance and net names inside the layout, netlists and DEF use the identifiers. The 16 pin names are fixed by the committee `D08_BV.def` and pad map and keep the old prefixes, so renaming the models changed no pin and no geometry.
+
+## Decisions applied
+
+- Orientation: **normal**, matching the committee `def/D08_BV.def`. The floorplanner lists D08 as mirrored; flagged for the organizers.
+- PR boundary: follows the committee `D08_BV.def` `DIEAREA` = 605 x 1110 um (layer 0/0, top level).
+- Top cell name equals the GDS file name: `mbg_d08`.
+- `temp_out` / W12: NEURO1B (designed with Opus 5.5) replaces the earlier relaxation-oscillator temperature sensor on this pin; it is not an overlay. The pin name `temp_out` is kept by team decision, so the pad map and `D08_BV.def` are unchanged. NEURO1B is a spiking neuron: its single pad takes an input current and shows the spikes on the same pin, so a testbench must drive `temp_out` (about 2 uA gives roughly 300-400 kHz).
+- Author name: `M Taufiqul Huda` and `D08 - Microelectronic Block Generator` are drawn as polygons on the top metal (Metal5, layer 81/0) in the empty region x 260-481 um, y 36-72 um (47 shapes, generated with the KLayout text generator; clean against the Metal5 width, spacing and area rules). They replace the earlier text records on layer 0/0. The artwork is floating metal, with no electrical connection.
+- Manual layout edits (from the D08 team's `eda/designs/mbg_d08.gds`): the ESD-to-pad connections were widened by hand (Metal2 +5194 um2, plus Metal1, Metal3, Metal4 and Via1-Via3 changes near the pins). Two orphan Via2 + Metal3 stubs left by that edit, at (169.1, 1102.1) um and (369.0, 1102.1) um, broke rule M3.3 (Metal3 minimum area) and were removed. `def/mbg-d08-routed.def` is the router output and does not include these manual edits.
 ## Result summary
-
-Current status, from the 2026-09-02 re-verification below.
 
 | Check | Result |
 |---|---|
-| Magic DRC | **PASS** — 0 violations |
-| KLayout DRC | **PASS** — 0 violations, 728 rules / 168 decks, 0 exceptions |
-| netgen LVS | **PASS** — circuits match uniquely, 94/94 devices, 60/60 nets, no property errors |
-| KLayout LVS | **PASS** — netlists match |
-| PEX extraction | **PASS** — 205 devices, 230 parasitic capacitors, 112 diodes |
-| Pre-layout ngspice simulation | **PASS** — 100,543 points over 100 µs, 0 errors |
-| Post-layout ngspice simulation | **PASS** — 100,466 points over 100 µs, 0 errors |
-| Comparator functional coverage | **PARTIAL** — only `deepseek_cmp` toggles; see finding 1 |
-| Metal / poly density | **PARTIAL** — 8 whole-die coverage minima need dummy fill at integration |
+| Magic DRC | **PASS**, 0 violations |
+| KLayout DRC (variant D, 5LM, MIM B deck) | **PASS**, 0 violations |
+| netgen LVS vs `mbg-d08_lvs.spice` | **PASS**, circuits match uniquely |
+| Coupled PEX (Magic, mode 2) | **PASS**, 405 C, 0 R raw (`post_sim/mbg-d08.pex.raw.spice`); 318 C in the simulation netlist `post_sim/mbg-d08.pex.spice`, which leaves out the 87 capacitors of the floating name artwork (finding 6) |
+| Full-RC PEX (mode 3) | **FAIL**, Magic stops after its start message (open) |
+| Landing connectivity vs committee `D08_BV.def` | **PASS**, 124 rectangles in 16 clusters |
+| Pin names / order vs committee pad map | **PASS**, 16/16 |
+| Simulation vs the previous layout (before the manual widening) | pre-layout **identical**; post-layout: 31 of 2048 values changed by at most 3 %, no pass/fail changed |
+| Pre-layout simulation (harness, 45 PVT where run) | **PASS** for references and OTAs; comparators see finding 1 |
+| Post-layout simulation (capacitance-only extraction) | **PASS** for references and OTAs; comparators see finding 1 |
+| Integrated NEURO1B transient (2 uA step, top-level bench) | **PARTIAL**: spikes at 408.7 kHz pre-layout and 325.9 kHz post-layout, inside the standalone 45-PVT range (310.9-423.5 / 269.4-367.5 kHz); it couples ripple into the references (finding 3); `ibias` loading not isolated |
+| Metal / poly density (die-level fill) | **PARTIAL**, not run |
 
-The earlier `mslot` DRC caveat no longer applies: on the host deck those rule
-tables execute normally with no exception, so the DRC result is unconditional.
+Set aside by the D08 team (2026-11-23): full-RC PEX is not pursued; power pad cells and density fill are handled by the Chipathon committee; post-layout results are scored by the committee testbench. `verification/readiness.md` lists them as waived, not as passed.
 
-## Full re-verification — 2026-09-02
+Evidence files: `verification/` (DRC, LVS, PEX records, landing audit, readiness). Readiness is **NOT READY** until the open items below are closed.
 
-Everything below was re-run on the host against
-`layout/mbg-d08.gds` (sha256 `36ba59a65221c207…`), which is now byte-identical
-to `final-uverified/mbg-d08.gds`. DRC, LVS, PEX extraction and both
-simulations were regenerated from that single file — nothing is carried over
-from an earlier run.
+## Top-level DC
 
-### Physical verification
+| Stage | Supply current | gpt_vref | oxa_vref | deepseek_vref |
+|---|---|---|---|---|
+| pre-layout | 0.6966 mA | 1.20149 V | 1.212 V | 1.20336 V |
+| post-layout | 0.6943 mA | 1.20149 V | 1.212 V | 1.20343 V |
 
-| Check | Engine | Result |
+At DC this is identical to the baseline D08 (`outputs/d08-route-all`, same harness): NEURO1B idle does not move the references or the supply current. The harness numbers below are with NEURO1B idle; with NEURO1B spiking see the transient plot and finding 3.
+
+## Simulation plots
+
+### Top-level transient, pre-layout vs post-layout
+
+![MBG-D08 + NEURO1B pre-layout vs post-layout transient](mbg-d08_simulation_plot.png)
+
+100 us transient at 27 C, CLK = 10 us, complementary linear ramp on INP/INN (INP-INN from -400 mV to +400 mV), 20 uA on `ibias`, and a 2 uA current step into `temp_out` at 1 us that makes NEURO1B spike (same stimulus as its standalone bench). Blue = pre-layout schematic (`mbg-d08_pre_tb.spice`), red = post-layout with extracted capacitance (`mbg-d08_post_tb.spice`). Panels are titled with the model, the block and the committee-fixed pin name; the last panel zooms into the NEURO1B spikes. Regenerate with `make_plots.py`.
+
+| Output (pin) | Block | Pre-layout at 100 us (V) | Post-layout at 100 us (V) | Post - pre (V) |
+|---|---|---|---|---|
+| `deepseek_ota` | Gemini 4 Argon OTA | 3.2992 | 3.2991 | -0.000124 |
+| `gpt_ota` | GPT-6.2 Sol OTA | 3.2386 | 3.2387 | +3.24e-05 |
+| `oxa_ota` | Opus 5.5 OTA | 3.3 | 3.3 | +1.32e-05 |
+| `deepseek_cmp` | Gemini 4 Argon comparator | 3.3 | 3.3 | +1.66e-06 |
+| `gpt_cmp` | GPT-6.2 Sol comparator | 3.3 | 3.3 | +5e-08 |
+| `oxa_cmp` | Opus 5.5 comparator | 3.3 | 3.3 | -1.21e-06 |
+| `deepseek_vref` | Gemini 4 Argon 1.2 V reference | 1.2033 | 1.2035 | +0.000206 |
+| `gpt_vref` | GPT-6.2 Sol 1.2 V reference | 1.2014 | 1.2015 | +3.32e-05 |
+| `oxa_vref` | Opus 5.5 1.2 V reference | 1.2121 | 1.212 | -0.000122 |
+
+Reading the plot: the OTAs and comparators are unaffected by NEURO1B (the OTA outputs sit at their rails and only the Gemini 4 Argon comparator toggles on the ramp; the other two show decision spikes without a full swing, finding 1). The three references show downward spikes in step with NEURO1B (finding 3).
+
+### NEURO1B inside the integrated chip (2 uA step into `temp_out`)
+
+| Stage | Spike rate on `temp_out` | Standalone 45-PVT range at 2 uA | `temp_out` min / max (V) | Rate with NEURO1B off |
+|---|---|---|---|---|
+| pre-layout | 408.7 kHz (37 spikes after 8 us) | 310.9-423.5 kHz | 0.000 / 1.773 | 0 kHz |
+| post-layout | 325.9 kHz (30 spikes after 8 us) | 269.4-367.5 kHz | -0.046 / 1.770 | 0 kHz |
+
+Reference ripple at t >= 8 us (peak-to-peak, mV; control = same bench with NEURO1B off):
+
+| Reference (pin) | Pre-layout, NEURO1B off | Pre-layout, NEURO1B spiking | Post-layout, NEURO1B off | Post-layout, NEURO1B spiking |
+|---|---|---|---|---|
+| GPT-6.2 Sol (`gpt_vref`) | 0.063 | 0.988 | 0.025 | 2.388 |
+| Opus 5.5 (`oxa_vref`) | 0.728 | 1.407 | 0.037 | 3.222 |
+| Gemini 4 Argon (neon fallback) (`deepseek_vref`) | 0.029 | 1.872 | 0.034 | 3.766 |
+
+
+### Comparator diagnostic with the io_secondary_3p3 pad
+
+![Standalone comparator plus io_secondary_3p3 diagnostic](cmp_debug/cmp_io_simulation_plot.png)
+
+Standalone comparator through the `io_secondary_3p3` ESD cell (`cmp_debug/`): the pad waveform (red, dashed) follows the core node (blue) for all three models, so the ESD cell does not change the comparator behavior in this bench.
+
+## Benchmark per AI model
+
+Pre = schematic top level; Post = capacitance-only extraction of `layout/mbg_d08.gds`; Baseline post = previous D08 layout without NEURO1B. Harness: `run_submission_sim.py` (kept in the MBG working repository under `submission-prep/sim/`, not part of this tree; ngspice, typical models; PVT = 5 process x 3 VDD x 3 temperature).
+
+### GPT-6.2 Sol
+
+Blocks `gpt62sol_vref`, `gpt62sol_ota`, `gpt62sol_cmp` (pins `gpt_vref`, `gpt_ota`, `gpt_cmp`).
+
+| Metric | Pre-layout | Post-layout | Baseline post |
+|---|---|---|---|
+| vref nominal_V | 1.20149 | 1.20149 | 1.20149 |
+| vref tc_ppm_C | 52.37 | 52.37 | 52.37 |
+| vref line_reg_mV_V | 11.7 | 11.7 | 11.7 |
+| vref pvt_ok | 45 | 45 | 45 |
+| ota dc_gain_dB | 70.75 | 70.74 | 70.74 |
+| ota gbw_MHz | 2.186 | 2.173 | 2.173 |
+| ota pm_deg | 68.92 | 68.17 | 68.18 |
+| ota sr_fall_V_us | 6.11 | 6.116 | 6.197 |
+| ota pvt_ac_pass | 45/45 | 45/45 | 45/45 |
+| cmp nom_5mV_delay_pos_ns | 0.152 | 0.294 | 0.295 |
+| cmp nom_5mV_pass | False | False | False |
+| cmp pvt_pass | 45/90 | 45/90 | 45/90 |
+
+### Opus 5.5
+
+Blocks `opus55_vref`, `opus55_ota`, `opus55_cmp` (pins `oxa_vref`, `oxa_ota`, `oxa_cmp`).
+
+| Metric | Pre-layout | Post-layout | Baseline post |
+|---|---|---|---|
+| vref nominal_V | 1.212 | 1.212 | 1.212 |
+| vref tc_ppm_C | 35.15 | 35.14 | 35.14 |
+| vref line_reg_mV_V | 9.64 | 9.64 | 9.64 |
+| vref pvt_ok | 45 | 45 | 45 |
+| ota dc_gain_dB | 48.75 | 48.71 | 48.71 |
+| ota gbw_MHz | 2.799 | 2.677 | 2.678 |
+| ota pm_deg | 84.48 | 83.85 | 83.85 |
+| ota sr_fall_V_us | 1.577 | 1.441 | 1.442 |
+| ota pvt_ac_pass | 45/45 | 45/45 | 45/45 |
+| cmp nom_5mV_delay_pos_ns | 0.205 | 0.349 | 0.349 |
+| cmp nom_5mV_pass | False | False | False |
+| cmp pvt_pass | 45/90 | 45/90 | 45/90 |
+
+#### NEURO1B (spiking temperature sensor on `temp_out`, designed with Opus 5.5; standalone, 45 PVT)
+
+| Metric | Pre-layout | Post-layout |
 |---|---|---|
-| DRC | Magic 8.3.669 | **CLEAN** — 0 violations |
-| DRC | KLayout 0.30.9, GF180 deck | **CLEAN** — 0 violations, **728 rules over 168 decks**, 0 exceptions, 18.5 s |
-| LVS | netgen 1.5.322 vs `mbg-d08_pre_sim.spice` | **Circuits match uniquely** — 94/94 devices, 60/60 nets, 0 unmatched nets, 0 property errors |
-| LVS | KLayout vs `mbg-d08_lvs.spice` | **Netlists match** |
-| PEX | Magic, `cthresh 0.01`, `scale off` | extracted — 205 devices, 230 parasitic capacitors, 112 diodes |
-
-All sixteen top-level pins bind correctly, `vdd`/`vss` included.
-
-**The `mslot` caveat recorded above is resolved.** On the host deck with
-KLayout 0.30.9 the `mslot` tables execute normally and the log contains no
-exception, so the DRC result is now unconditional rather than
-"clean for completed tables".
-
-The one remaining note from netgen is cosmetic: the pad cell's terminal is
-named `ASIG5V` in the layout (inherited from the 5 V pad it derives from) and
-`ASIG3V3` in the schematic. netgen resolves it positionally, prints
-`Cell pin lists are equivalent`, and the verdict is unaffected.
-
-### Pre- and post-layout simulation
-
-Both decks ran to completion at 27 °C, 3.3 V, 20 µA bias, 100 µs transient
-with a 1 ns maximum step. Stimulus is the complementary ramp
-`INP` 1.450 → 1.850 V against `INN` 1.850 → 1.450 V about a 1.65 V common
-mode, clock 10 µs period / 5 µs high.
-
-| | Pre-layout | Post-layout (PEX) |
-|---|---:|---:|
-| Data rows | 100,543 | 100,466 |
-| ngspice errors | 0 | 0 |
-| Runtime | ~9 s | 77 s |
-
-**Operating point**
-
-| Output | Pre-layout (V) | Post-layout (V) | Δ |
-|---|---:|---:|---:|
-| `deepseek_ota` | 0.46167 | 0.46720 | +5.5 mV |
-| `gpt_ota` | 0.53302 | 0.53539 | +2.4 mV |
-| `oxa_ota` | 3.29980 | 3.29982 | +0.0 mV |
-| `deepseek_cmp` | 3.29998 | 3.29998 | 0.0 mV |
-| `gpt_cmp` | 3.29998 | 3.29999 | +0.0 mV |
-| `oxa_cmp` | 3.29997 | 3.29998 | +0.0 mV |
-| `deepseek_vref` | 0.98467 | 0.97931 | −5.4 mV |
-| `gpt_vref` | 0.96043 | 0.96122 | +0.8 mV |
-| `oxa_vref` | 0.95348 | 0.95277 | −0.7 mV |
-| `temp_out` | 1.03078 | 1.03078 | 0.0 mV |
-
-**Transient behaviour over 0–100 µs**
-
-| Output | Pre-layout | Post-layout |
-|---|---|---|
-| `deepseek_ota` | 0.4616 – 3.2974 V | 0.4667 – 3.2980 V |
-| `gpt_ota` | 0.5329 – 3.2999 V | 0.5350 – 3.2999 V |
-| `oxa_ota` | 0.4979 – 3.2998 V | 0.5000 – 3.2998 V |
-| `deepseek_cmp` | −0.0040 – 3.3585 V, 2 transitions | −0.0051 – 3.3537 V, 2 transitions |
-| `gpt_cmp` | 3.1322 – 3.3433 V, **0 transitions** | 3.0653 – 3.3441 V, **0 transitions** |
-| `oxa_cmp` | 3.2139 – 3.3251 V, **0 transitions** | 3.1707 – 3.3277 V, **0 transitions** |
-| `deepseek_vref` | mean 0.98467 V, ripple 0.001 mV | mean 0.97931 V, ripple **1.328 mV** |
-| `gpt_vref` | mean 0.96043 V, ripple 0.001 mV | mean 0.96122 V, ripple 0.119 mV |
-| `oxa_vref` | mean 0.95348 V, ripple 0.001 mV | mean 0.95277 V, ripple 0.119 mV |
-| `temp_out` | −0.0014 – 3.3012 V, 213 transitions, **1.065 MHz** | −0.0012 – 3.3010 V, 201 transitions, **1.005 MHz** |
-
-**What parasitics cost.** The temperature sensor slows by 5.6 %
-(1.065 → 1.005 MHz) — the expected loading of the relaxation node. Reference
-ripple rises from essentially zero to 1.33 mV on the DeepSeek reference and
-0.12 mV on the other two, coupled from the oscillating sensor through the
-shared supply. The three OTA outputs and all DC levels move by single-digit
-millivolts. Nothing degrades qualitatively.
-
-### Three findings worth recording
-
-**1 — `gpt_cmp` and `oxa_cmp` never toggle under this stimulus.** Both sit
-between 3.07 V and 3.34 V for the whole 100 µs and register zero 1.65 V
-crossings, pre- and post-layout alike. Only `deepseek_cmp` resolves (2
-transitions). The ±200 mV differential ramp about a 1.65 V common mode does
-not move those two comparators through their decision point; only `OUTP` is
-bonded out, so their true differential polarity and offset remain
-uncharacterised. **This is not evidence that they work.** It needs a stimulus
-that sweeps the input across each comparator's actual trip point before the
-array can be called functional.
-
-**2 — The 1.2 V references settle near 0.95–0.98 V.** All three
-`vref_1v2` blocks produce 0.953 V, 0.960 V and 0.979 V post-layout — roughly
-20 % below the 1.2 V the block name implies. The outputs are stable and
-low-ripple, so the circuits work; they are simply not at the nominal target.
-
-**3 — ngspice cannot instantiate the hyphenated top cell in this deck.**
-With `.subckt mbg-d08`, ngspice fails with
-`Too many parameters for subcircuit type "deepseek_ota"` — the top-level pin
-names are identical to subcircuit names (`deepseek_ota` is both a pin and a
-cell), and with a hyphen ngspice binds the instance to the wrong one. The
-simulations above were therefore run from a name-aliased copy using
-`mbg_d08`; the electrical content is unchanged.
-
-This completes the naming picture across all four tools:
-
-| Tool | `mbg-d08` (hyphen) | Notes |
-|---|---|---|
-| GDS / Magic | ✅ | top cell name |
-| netgen LVS | ✅ | matches uniquely |
-| KLayout LVS | ❌ | SPICE reader truncates `mbg-d08` → `MBG`; needs `mbg_d08` + `same_circuits` |
-| ngspice | ❌ | mis-binds the instance; needs `mbg_d08` |
-
-Two of the four tools cannot consume the hyphenated name. Keeping
-`mbg-d08` in the GDS while naming the SPICE subcircuit `mbg_d08` — and
-declaring the correspondence explicitly — removes both workarounds.
-
-### One netlist was out of sync
-
-`mbg-d08_lvs.spice` still carried the old pad orientation after
-`mbg-d08_pre_sim.spice` was updated, so KLayout LVS failed on an otherwise
-correct layout. The `TO_GATE` / `ASIG3V3` arguments of all fourteen
-`io_secondary_3p3` instances were swapped to match, after which KLayout
-reports `Netlists match`. Both netlists now describe the same circuit; they
-must be kept in step whenever the pad wiring changes.
-
-## Superseded: updated true top-level functionality results — 2026-08-29
-
-This supersedes the historical simulation ranges below. The supplied top-level
-hierarchy and GDS were simulated as complete circuits; no individual module
-simulation was used. The PEX testbench used the freshly extracted top-cell
-port order. No OUTN pads or ports were added to the layout.
-
-The stimulus is a legal wide differential ramp at constant common mode:
-`INP` ramps 0–3.3 V while `INN` ramps 3.3–0 V, producing
-`V(INP)-V(INN) = -3.3–+3.3 V` with both pins inside the GF180MCU 3.3 V range.
-The clock remains 10 µs period / 5 µs high, supply is 3.3 V, bias is 20 µA,
-and temperature is 27 °C. A 1 ns maximum step was used so the relaxation
-oscillator could start.
-
-| Output | Pre-layout range (V), 200 µs | Fresh PEX range (V), 100 µs |
-|---|---:|---:|
-| `deepseek_ota` | -0.000421–3.299955 | -0.000300–3.299970 |
-| `gpt_ota` | -0.000322–3.299956 | -0.000228–3.299972 |
-| `oxa_ota` | -0.000849–3.299962 | -0.000242–3.300044 |
-| `deepseek_cmp` | -0.004422–3.355253 | -0.005788–3.351494 |
-| `gpt_cmp` | -0.011459–3.341549 | -0.007962–3.343015 |
-| `oxa_cmp` | -0.004910–3.324225 | -0.003652–3.327067 |
-| `deepseek_vref` | 0.984668–0.984675 | 0.978646–0.979971 |
-| `gpt_vref` | 0.960422–0.960440 | 0.961157–0.961276 |
-| `oxa_vref` | 0.953472–0.953490 | 0.952715–0.952834 |
-| `temp_out` | -0.001401–3.301223 | -0.001173–3.301020 |
-
-All ten monitored outputs were written successfully: 201,141 pre-layout
-points through 200 µs and 100,501 PEX points through 100 µs. The attempted
-200 µs PEX run stopped at ngspice's memory limit (~154 MB); the completed
-100 µs PEX run is sufficient to demonstrate sustained behavior.
-
-The three OTA outputs sweep across the supply range. The three references are
-stable near 0.953–0.985 V. The exported comparator outputs resolve low at a
-sufficiently negative differential input and high at positive input; because
-only OUTP is routed, their differential decision polarity and offset are not
-fully characterized. `temp_out` has 213 rising 1.65 V crossings pre-layout
-(median period 942.53 ns, 1.061 MHz) and 101 crossings PEX (998.00 ns,
-1.002 MHz), demonstrating sustained top-level temperature-sensor oscillation.
-
-![Updated all-module top-level simulation](top_level_sim_20260829/all_modules_temp_long/mbg-d08_all_modules_with_temp.png)
-
-![Updated temperature-sensor top-level simulation](top_level_sim_20260829/all_modules_temp_long/mbg-d08_temp_sensor_long.png)
-
-## Netlists and mapping
-
-The generated pre-simulation netlist is [mbg-d08_pre_sim.spice](/foss/designs/mbg-toplevel/mbg-d08_pre_sim.spice). It includes all 14 files in `spice/` as subcircuit sources. The three legacy oscillator subcircuits are included but not instantiated; the new `temp_sensor` GDS cell is instantiated as the Claude Opus 5 relaxation-oscillator temperature sensor.
-
-| GDS cell | Referenced SPICE subcircuit |
-|---|---|
-| `ota` | `deepseek_ota` |
-| `ota$1` | `gpt-5.6-luna_ota` |
-| `ota$2` | `ox_alpha_ota` |
-| `strongarm_comparator` | `deepseek_strongarm_comparator` |
-| `strongarm_comparator$3` | `gpt-5.6-luna_strongarm_comparator` |
-| `strongarm_comparator$2` | `ox_alpha_strongarm_comparator` |
-| `vref_1v2` | `deepseek_vref_1v2` |
-| `vref_1v2$1` | `gpt-5.6-luna_vref_1v2` |
-| `vref_1v2$2` | `ox_alpha_vref_1v2` |
-| `temp_sensor` | `claude-opus-5_temp_sensor` |
-| `io_secondary_3p3` | `io_secondary_3p3` |
-
-The named top-level pads include `VDD`, `VSS`, `CLK`, `INP`, `INN`, `IBIAS`, `TEMP_OUT`, nine named analog outputs, and the `io_secondary_3p3` pad cells. `TEMP_OUT` was included after confirming it is a named GDS port.
-
-The active GF180 model library is loaded once in the top-level simulation decks. The `mimcap_typical` section is also loaded for the sensor's M4/M5 2 fF/µm² timing capacitor. The sensor's poly resistor and MIM capacitor use the GF180-required `r_width/r_length` and `c_width/c_length` parameters.
-
-## Historical simulation setup — superseded by the 2026-08-29 results above
-
-The testbenches are [mbg-d08_pre_tb.spice](/foss/designs/mbg-toplevel/mbg-d08_pre_tb.spice) and [mbg-d08_post_tb.spice](/foss/designs/mbg-toplevel/mbg-d08_post_tb.spice). Their stimulus follows the patterns in `/foss/designs/results`: 3.3 V supply, 20 µA bias, 1.65 V common-mode inputs, 10 µs clock period with 5 µs high time, 27 °C, and a 1 ns to 100 µs transient analysis. The inputs use a single complementary linear ramp: `INP` is -200 mV to +200 mV relative to common mode while `INN` is +200 mV to -200 mV. Therefore, the actual pins ramp 1.45 V to 1.85 V and 1.85 V to 1.45 V over 100 µs, and `V(INP)-V(INN)` ramps -400 mV to +400 mV.
-
-### Operating point
-
-| Output | Pre-layout (V) | Post-layout (V) |
-|---|---:|---:|
-| `deepseek_ota` | 0.461669 | 0.467198 |
-| `gpt_ota` | 0.533016 | 0.535390 |
-| `oxa_ota` | 3.299819 | 3.299820 |
-| `deepseek_cmp` | 3.299980 | 3.299981 |
-| `gpt_cmp` | 3.299983 | 3.299984 |
-| `oxa_cmp` | 3.299974 | 3.299976 |
-| `deepseek_vref` | 0.984673 | 0.979306 |
-| `gpt_vref` | 0.960434 | 0.961217 |
-| `oxa_vref` | 0.953484 | 0.952775 |
-| `temp_out` | 1.030780 | 1.030780 |
-
-### Transient ranges over 0–100 µs
-
-| Output | Pre-layout min–max (V) | Post-layout min–max (V) |
-|---|---:|---:|
-| `deepseek_ota` | 0.461536–3.297381 | 0.466708–3.297999 |
-| `gpt_ota` | 0.532884–3.299909 | 0.535012–3.299912 |
-| `oxa_ota` | 0.497873–3.299814 | 0.500000–3.299844 |
-| `deepseek_cmp` | -0.003484–3.357636 | -0.005077–3.352012 |
-| `gpt_cmp` | 3.127698–3.343060 | 3.060043–3.343027 |
-| `oxa_cmp` | 3.209509–3.325152 | 3.171269–3.327072 |
-| `deepseek_vref` | 0.984673–0.984674 | 0.978645–0.979969 |
-| `gpt_vref` | 0.960433–0.960435 | 0.961157–0.961276 |
-| `oxa_vref` | 0.953483–0.953485 | 0.952715–0.952834 |
-| `temp_out` | -0.001409–3.301228 | -0.001173–3.301020 |
-| `INP-INN` | -0.400000–0.400000 | -0.400000–0.400000 |
-
-Both simulations completed without ngspice errors and wrote 100,599 pre-layout and 100,519 post-layout transient data rows, respectively, through 100.000 µs.
-
-### Simulation plot
-
-The figure below overlays the pre-layout and post-layout top-level transient results for the 100 µs run with a 10 µs clock period. It includes the ten monitored outputs, including the new `temp_out` waveform, and the complementary `INP/INN` differential ramp. Time is shown in µs, output voltage in V, and differential input in mV.
-
-![MBG-D08 pre-layout versus post-layout transient simulation](mbg-d08_simulation_plot.png)
-
-### Claude Opus 5 relaxation-oscillator temperature sensor
-
-The new `temp_sensor` layout cell is connected to the named `temp_out` pad through `io_secondary_3p3`. Its source is [claude-opus-5_temp_sensor.spice](/foss/designs/mbg-toplevel/spice/claude-opus-5_temp_sensor.spice): a self-starting beta-multiplier/PTAT reference, 35 kΩ poly degeneration resistor, 34 µm × 34 µm M4/M5 MIM timing capacitor, Schmitt trigger, and output buffer. It produces a continuous rail-to-rail relaxation waveform at 27 °C.
-
-| View | Rising edges in 100 µs | Median period | Frequency | Extraction shift |
-|---|---:|---:|---:|---:|
-| Pre-layout | 107 | 941.5 ns | 1.062 MHz | — |
-| Post-layout PEX | 101 | 998.0 ns | 1.002 MHz | -5.66% |
-
-The sensor waveform and frequency comparison are shown below. The standalone PVT corner runs were not used for signoff because the isolated closed-loop oscillator remains numerically startup-sensitive; the verified top-level pre- and post-layout runs include the real `temp_out` pad and demonstrate startup plus sustained oscillation. Temperature-to-frequency calibration still needs a dedicated PVT characterization with a defined power-up/noise protocol.
-
-![Claude Opus 5 temperature-sensor simulation](temp_sensor_simulation_plot.png)
-
-### Comparator behavior
-
-The comparator cells are clocked strong-arm latches with pins `VDD VSS INP INN CLK OUTP OUTN`. The top-level netlist connects each named comparator output pad to `OUTP` (for example, `deepseek_cmp_core`) and keeps `OUTN` internal (`deepseek_cmp_n`). Consequently, the report plot shows only one side of each differential comparator output. During the reset phase, both latch outputs are precharged near `VDD`; the decision is visible during the active clock phase and should be interpreted together with the complementary `OUTN` node.
-
-In this 10 µs-clock run, the exported `OUTP` ranges were `-3.5 mV..3.358 V` pre-layout and `-5.1 mV..3.352 V` post-layout for `deepseek_cmp`, but only `3.128..3.343 V` / `3.059..3.343 V` for `gpt_cmp` and `3.210..3.325 V` / `3.171..3.327 V` for `oxa_cmp`. This means the single exported node does not provide a clean rail-to-rail logic indication for all three supplied comparator subcircuits; the clock-correlated pulses are latch activity, not a static comparator output. A functional signoff should expose or probe both `OUTP` and `OUTN` and sample them after the active clock edge.
-
-### Standalone comparator + `io_secondary_3p3` diagnostic
-
-Each supplied comparator was simulated separately with `io_secondary_3p3` on `INP`, `INN`, `CLK`, `OUTP`, and `OUTN`. The test used the same 3.3 V supply, 10 µs clock period (5 µs high), 100 µs transient, and complementary input ramp. Both the comparator core nodes and the external pad-side nodes were saved. The standalone decks used a 100 ns transient reporting interval with Gear integration to make the regenerative latch/IO network converge; the source clock edges remain 0.1 ns.
-
-| Comparator | `OUTP` core min–max (V) | `OUTN` core min–max (V) | `OUTP` pad min–max (V) | `OUTN` pad min–max (V) |
-|---|---:|---:|---:|---:|
-| deepseek | -0.0058–3.3213 | -0.0058–3.3213 | -0.0024–3.3211 | -0.0024–3.3211 |
-| gpt-5.6-luna | -0.0172–3.3277 | -0.0172–3.3277 | -0.0065–3.3216 | -0.0065–3.3216 |
-| ox-alpha | -0.0075–3.3123 | -0.0075–3.3123 | -0.0027–3.3093 | -0.0027–3.3093 |
-
-At settled active-clock sample points, all three models produce complementary outputs: for negative differential input, `OUTP` is low and `OUTN` is high; for positive differential input, `OUTP` is high and `OUTN` is low. Deepseek and ox-alpha switch between the -60 mV and +20 mV sampled points. GPT-5.6-luna remains in the negative-input state at +20 mV and switches by the +100 mV sampled point, indicating a larger positive input-referred offset or slower regeneration in this simplified model. During the low-clock reset phase, both outputs return high by design.
-
-The pad-side traces closely follow their corresponding core nodes, so `io_secondary_3p3` is not the primary cause of the logic-level problem. Its maximum transient core-to-pad differences were approximately 56 mV (deepseek), 63 mV (gpt-5.6-luna), and 34 mV (ox-alpha). The larger issue is that these supplied cells are bare dynamic strong-arm latches with differential `OUTP/OUTN` nodes and no output buffer. The top-level netlist exports only `OUTP` and leaves `OUTN` internal; therefore a single exported waveform can look stuck high during reset or fail to show the valid complementary decision. Both outputs should be routed/probed and interpreted only after the active clock edge, or followed by an explicit single-ended sense/buffer stage.
-
-The standalone result plot is [cmp_io_simulation_plot.png](/foss/designs/mbg-toplevel/cmp_debug/cmp_io_simulation_plot.png). The individual testbenches and logs are [deepseek_cmp_io_tb.spice](/foss/designs/mbg-toplevel/cmp_debug/deepseek_cmp_io_tb.spice), [gpt_luna_cmp_io_tb.spice](/foss/designs/mbg-toplevel/cmp_debug/gpt_luna_cmp_io_tb.spice), [oxa_cmp_io_tb.spice](/foss/designs/mbg-toplevel/cmp_debug/oxa_cmp_io_tb.spice), [deepseek_cmp_io.log](/foss/designs/mbg-toplevel/cmp_debug/deepseek_cmp_io.log), [gpt_luna_cmp_io.log](/foss/designs/mbg-toplevel/cmp_debug/gpt_luna_cmp_io.log), and [oxa_cmp_io.log](/foss/designs/mbg-toplevel/cmp_debug/oxa_cmp_io.log). All three standalone ngspice runs completed with exit code 0 and no fatal/convergence errors.
-
-## Historical: Post-layout extraction
-
-Magic was rerun in coupled-capacitance mode (`m=2`, subcircuit output enabled). The extracted file is [post_sim/mbg-d08.pex.spice](/foss/designs/mbg-toplevel/post_sim/mbg-d08.pex.spice), which now includes the `temp_sensor` MOS devices, 35 kΩ resistor, MIM capacitor, and `temp_out` pad parasitics. It contains the physical-unit output from `ext2spice scale off`; this is required for correct extracted diode area/perimeter values in ngspice. The extraction log is [post_sim/pex_run.log](/foss/designs/mbg-toplevel/post_sim/pex_run.log). Magic completed extraction but logged that a duplicate `via_dev$8` placement was ignored while reading the GDS.
-
-## Historical: DRC
-
-KLayout GF180MCU-D DRC was run with variant `C` (`metal_top=9K`, `metal_level=5LM`, MIM option B), deep mode, and two worker threads. The aggregate log is [drc_run/drc_run.log](/foss/designs/mbg-toplevel/drc_run/drc_run.log).
-
-The run generated 51 `.lyrdb` databases. XML inspection found zero `<items>` in all completed databases. The driver reported `Klayout DRC run is clean. GDS has no DRC violations.` The `mslot` exception noted above is recorded in the same log.
-
-## Historical: LVS
-
-KLayout LVS used the GF180MCU-D 5LM/9K runset and explicit cell mappings for the three OTA, comparator, voltage-reference, and new `temp_sensor` variants. The source topology file is [mbg-d08_lvs.spice](/foss/designs/mbg-toplevel/mbg-d08_lvs.spice); it is an LVS-only native-MOS representation of the supplied module topologies. The mapped sensor comparison contains 18 MOS devices and the 35 kΩ poly resistor. The GF180 LVS runset extracts the MIM-cap geometry but does not emit that device into the comparison netlist, so the LVS source follows the runset representation.
-
-The LVS log is [lvs_run/mbg-d08_lvs.log](/foss/designs/mbg-toplevel/lvs_run/mbg-d08_lvs.log), the extracted comparison netlist is [lvs_run/mbg-d08_lvs_extracted.cir](/foss/designs/mbg-toplevel/lvs_run/mbg-d08_lvs_extracted.cir), and the KLayout database is [lvs_run/mbg-d08_lvs.lvsdb](/foss/designs/mbg-toplevel/lvs_run/mbg-d08_lvs.lvsdb). The log ends with `INFO : Congratulations! Netlists match.`
-
-## Current artifacts (2026-09-02 re-verification)
-
-| Artifact | Path |
-|---|---|
-| Signed-off layout | [`layout/mbg-d08.gds`](layout/mbg-d08.gds) |
-| LVS schematic (netgen) | [`mbg-d08_pre_sim.spice`](mbg-d08_pre_sim.spice) |
-| LVS schematic (KLayout) | [`mbg-d08_lvs.spice`](mbg-d08_lvs.spice) |
-| Parasitic netlist | [`post_sim/mbg-d08.pex.spice`](post_sim/mbg-d08.pex.spice) |
-| PEX extraction script / log | [`post_sim/pex_mbg-d08.tcl`](post_sim/pex_mbg-d08.tcl) · [`post_sim/pex_run.log`](post_sim/pex_run.log) |
-| Pre-layout log / waveforms | [`mbg-d08_pre_tb.log`](mbg-d08_pre_tb.log) · `mbg-d08_pre_tr.dat` (35 MB) |
-| Post-layout log / waveforms | [`mbg-d08_post_tb.log`](mbg-d08_post_tb.log) · `mbg-d08_post_tr.dat` (35 MB) |
-
-All five were regenerated on 2026-09-02 from the current
-`layout/mbg-d08.gds`. Sections below this point predate that run and are kept
-for history only; where they disagree with the 2026-09-02 section, the newer
-result stands.
-
-The two sections marked *Historical* above describe earlier container-side
-runs. Their file links use `/foss/designs/...` container paths, which do not
-resolve on the host.
+| linearity_typ_pct | 1.14847 | 1.18408 |
+| linearity_pvt_pct | 1.79397 | 1.81853 |
+| rate_2uA_min_hz | 310852 | 269390 |
+| rate_2uA_max_hz | 423480 | 367511 |
+| silent_spikes_max | 0 | 0 |
+| monotonic_violations | 0 | 0 |
+
+Standalone numbers from `projects/ai_neuro1/results/`. Inside the integrated chip (2 uA step on `temp_out`) it spikes at 408.7 kHz pre-layout and 325.9 kHz post-layout; see the NEURO1B section under Simulation plots.
+
+### Gemini 4 Argon (neon fallback)
+
+Blocks `gemini4argon_vref`, `gemini4argon_ota`, `gemini4argon_cmp` (pins `deepseek_vref`, `deepseek_ota`, `deepseek_cmp`).
+
+| Metric | Pre-layout | Post-layout | Baseline post |
+|---|---|---|---|
+| vref nominal_V | 1.20336 | 1.20343 | 1.20343 |
+| vref tc_ppm_C | 20.72 | 20.43 | 20.43 |
+| vref line_reg_mV_V | 8.58 | 8.71 | 8.71 |
+| vref pvt_ok | 45 | 45 | 45 |
+| ota dc_gain_dB | 51.0 | 50.74 | 50.74 |
+| ota gbw_MHz | 13.882 | 12.857 | 12.865 |
+| ota pm_deg | 81.1 | 79.22 | 79.22 |
+| ota sr_fall_V_us | 14.658 | 12.671 | 12.672 |
+| ota pvt_ac_pass | 45/45 | 45/45 | 45/45 |
+| cmp nom_5mV_delay_pos_ns | 0.781 | 1.858 | 1.859 |
+| cmp nom_5mV_pass | False | False | False |
+| cmp pvt_pass | 45/90 | 45/90 | 45/90 |
+
+## Findings
+
+1. **Comparators fail the nominal -5 mV check** in the baseline and in this layout (pre-existing, not caused by NEURO1B). In the 100 us ramp bench only the Gemini 4 Argon comparator (`deepseek_cmp`) toggles on the complementary ramp; the GPT-6.2 Sol and Opus 5.5 comparators show decision spikes without a full output swing. The OUTP pin drives an ESD cell while OUTN is internal.
+2. **Full-RC PEX fails because Magic crashes.** Magic 8.3.681 segfaults (exit 139) in its resistance extractor (`extresist`). The capacitance extraction works (modes 1 and 2). Isolating it cell by cell: `extresist` completes on every macro alone (references, OTAs, comparators, NEURO1B, bias cells) and on a plain metal rectangle, and crashes only on the `d08_esd` ESD cell, which the chip instantiates 14 times. Flat, hierarchical, `simplify off`, `lumped on` and `blackbox on` all crash. `extresist ignore to_gate` avoids the crash, but the result is 143 MB with 1.88 million resistors (dominated by the supply and top-metal meshes) covering only 193 of 628 nets, too large to simulate as is. The distro Magic cannot load the gf180mcuD tech, so it was not a usable comparison. The geometry in `d08_esd` that triggers the crash is not identified. Only coupled-capacitance results are available.
+3. **NEURO1B couples into the references while it spikes.** With a 2 uA input on `temp_out`, NEURO1B fires at 409 kHz (pre-layout) and 326 kHz (post-layout), inside its standalone range, and all three references show downward spikes in step with it. Reference ripple (peak-to-peak) rises from 0.02-0.04 mV with NEURO1B off to 2.4-3.8 mV post-layout (1.0-1.9 mV pre-layout), i.e. about 0.1-0.3 % of 1.2 V, and the extracted parasitics make it worse. The earlier statement that NEURO1B does not disturb the references holds only at DC. The coupling path (shared `vdd`, the shared `ibias` net `ibias_core`) and the effect on the OTA and comparator specs were not isolated; the OTA and comparator panels in this bench are unaffected.
+4. **Committee items**: orientation (the planner lists D08 as mirrored; the committee `D08_BV.def` is normal and is followed) and double ESD (block `io_secondary_3p3` plus pad `asig_5p0`). Power pad cells, density fill and the wafer.space frame confirmation are handled by the committee; the D08 team is responsible for the block area only.
+5. **KLayout LVS (`lvs_run/`) was not re-run** for this layout: the previous `.lvsdb` and extracted netlist described the old design and were removed from this folder. Sign-off LVS here is netgen.
+
+6. **Simulating the name artwork needs care.** The name is floating Metal5, so Magic extracts it as 47 nodes connected only through 87 capacitors (41 fF of 2014 fF). With those nodes in the netlist, ngspice reports a singular matrix and converges to non-physical points (wrong OTA outputs; 250 mA supply current at 5 of 45 PVT corners), even with `rshunt=1e12`. The simulation netlist therefore omits those capacitors (`sim/make_sim_netlist.py`); the raw extraction is kept in `post_sim/mbg-d08.pex.raw.spice`. With the artwork omitted, all gates are unchanged from the previous layout.
+## Files
+
+- `layout/mbg_d08.gds`, `layout/gds.sha256`
+- `def/D08_BV.def` (committee), `def/mbg-d08-routed.def`
+- `mbg-d08.spice`, `mbg-d08_pre_sim.spice`, `mbg-d08_lvs.spice`; block netlists in `spice/` (`gpt62sol_*`, `opus55_*`, `gemini4argon_*`, `neuro1b.spice`; the `*_oscillator` and `opus55_temp_sensor` netlists are the earlier sensor designs, kept for reference and not part of the current design)
+- `mbg-d08_pre_tb.spice`, `mbg-d08_post_tb.spice`, `make_plots.py`, `mbg-d08_simulation_plot.png`; comparator diagnostics in `cmp_debug/` (`*_cmp_io_tb.spice`, `.dat`, plot)
+- `post_sim/mbg-d08.pex.spice` (simulation netlist), `post_sim/mbg-d08.pex.raw.spice` (full extraction incl. name artwork), `post_sim/pex_mbg_d08.tcl`, `post_sim/mbg_d08_coupled.ext`
+- `floorplan/` (pin positions, frame record), `verification/` (records and readiness)
+
+## Reproduce
+
+```
+scripts/mbg verify drc --gds mbg-toplevel/layout/mbg_d08.gds --cell mbg_d08
+scripts/mbg verify lvs --gds mbg-toplevel/layout/mbg_d08.gds --netlist mbg-toplevel/mbg-d08_lvs.spice --cell mbg_d08
+scripts/mbg verify pex --gds mbg-toplevel/layout/mbg_d08.gds --cell mbg_d08 --mode 2
+```
+
+The testbenches `mbg-d08_pre_tb.spice` / `mbg-d08_post_tb.spice` use the container PDK path of the original submission; edit the `.lib`/`.include` paths to your PDK location before running them with `ngspice -b`, then `python3 make_plots.py`.

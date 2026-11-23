@@ -1,0 +1,895 @@
+* NGSPICE file created from mbg_d08.ext - technology: gf180mcuD
+
+.subckt mbg_d08 clk inn inp gpt_ota deepseek_ota vss vdd ibias deepseek_cmp
++ oxa_ota gpt_vref deepseek_vref oxa_cmp gpt_cmp oxa_vref temp_out
+X0 d08_esd_10.to_gate d08_esd_10.to_gate vss vss nfet_03v3 ad=0.762p pd=3.74u as=0.762p ps=3.74u w=1.27u l=0.5u
+X1 a_72223_153784# d08_gpt62sol_cmp_0.INN a_71313_153784# vss nfet_03v3 ad=3.6p pd=13.2u as=3.6p ps=13.2u w=6u l=1u
+X2 vss vss vss vss nfet_03v3 ad=1.7632p pd=7.24u as=0.35782n ps=1.39496m w=3.04u l=1.2u
+X3 vdd a_82280_70418# a_82280_70418# vdd pfet_03v3 ad=2.4p pd=9.2u as=1.12p ps=4.56u w=4u l=4u
+X4 inp d08_gpt62sol_cmp_0.INP vdd ppolyf_u r_width=40u r_length=10u
+X5 vss neuro1b_0.VBN a_31638_41836# vss nfet_03v3 ad=1.2p pd=5.2u as=0.56p ps=2.56u w=2u l=2u
+D0 d08_esd_9.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X6 vdd vdd vdd vdd pfet_03v3 ad=5.8p pd=21.16u as=0.58648n ps=2.201m w=10u l=1u
+X7 vss d08_bias_source_1.IOUT d08_bias_source_1.IOUT vss nfet_03v3 ad=2.4p pd=9.2u as=1.12p ps=4.56u w=4u l=2u
+X8 a_31638_149836# a_31638_149836# vdd vdd pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=2u
+X9 vdd vdd vdd vdd pfet_03v3 ad=4.64p pd=17.16u as=0 ps=0 w=8u l=2u
+X10 vdd vdd vdd vdd pfet_03v3 ad=2.32p pd=9.16u as=0 ps=0 w=4u l=2u
+X11 deepseek_vref d08_esd_10.to_gate vdd ppolyf_u r_width=40u r_length=10u
+X12 d08_gpt62sol_cmp_0.OUTN d08_esd_9.to_gate vdd vdd pfet_03v3 ad=3.75p pd=11.5u as=3.75p ps=11.5u w=5u l=0.28u
+D1 d08_gpt62sol_cmp_0.CLK vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X13 vdd vdd vdd vdd pfet_03v3 ad=2.32p pd=9.16u as=0 ps=0 w=4u l=2u
+X14 a_67021_91987# d08_gpt62sol_cmp_0.INN a_66311_91987# vss nfet_03v3 ad=4.8p pd=17.2u as=4.8p ps=17.2u w=8u l=0.5u
+X15 vss vss vss vss nfet_03v3 ad=2.19p pd=7.46u as=0 ps=0 w=3u l=0.28u
+X16 vss vss vss vss nfet_03v3 ad=2.7144p pd=10.52u as=0 ps=0 w=4.68u l=1u
+X17 vss vss vss vss nfet_03v3 ad=1.16p pd=5.16u as=0 ps=0 w=2u l=2u
+X18 vss d08_gpt62sol_cmp_0.CLK a_91685_122220# vss nfet_03v3 ad=0.3p pd=2.2u as=0.14p ps=1.06u w=0.5u l=1.1u
+X19 vss vss vss vss nfet_03v3 ad=1.392p pd=5.96u as=0 ps=0 w=2.4u l=0.3u
+X20 vdd vdd vdd vdd pfet_03v3 ad=2.32p pd=9.16u as=0 ps=0 w=4u l=2u
+X21 vss vss vss vss nfet_03v3 ad=1.16p pd=5.16u as=0 ps=0 w=2u l=2u
+X22 vss vss vss vss nfet_03v3 ad=1.74p pd=7.16u as=0 ps=0 w=3u l=1.2u
+X23 vss vss vss vss nfet_03v3 ad=1.16p pd=5.16u as=0 ps=0 w=2u l=0.4u
+X24 vss vss vss vss nfet_03v3 ad=0.58p pd=3.16u as=0 ps=0 w=1u l=2u
+X25 vss vss vss vss nfet_03v3 ad=0.58p pd=3.16u as=0 ps=0 w=1u l=1.4u
+X26 a_50838_188236# a_50838_188236# vdd vdd pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=2u
+D2 d08_esd_10.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X27 a_80779_183394# d08_gpt62sol_cmp_0.INP a_79469_183394# vss nfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=2u
+X28 vdd a_66358_159612# d08_esd_2.to_gate vdd pfet_03v3 ad=6p pd=21.2u as=2.8p ps=10.56u w=10u l=1u
+X29 vdd vdd vdd vdd pfet_03v3 ad=1.74p pd=7.16u as=0 ps=0 w=3u l=1.5u
+X30 a_37154_13119# neuro1b_0.VBN vss vss nfet_03v3 ad=0.3p pd=2.2u as=0.3p ps=2.2u w=0.5u l=10u
+X31 vdd vdd vdd vdd pfet_03v3 ad=5.8p pd=21.16u as=0 ps=0 w=10u l=1u
+X32 vdd a_72223_153784# a_72223_153784# vdd pfet_03v3 ad=2.8p pd=10.56u as=2.8p ps=10.56u w=10u l=1u
+X33 vss vss vss vss nfet_03v3 ad=1.0324p pd=4.72u as=0 ps=0 w=1.78u l=1.2u
+X34 vss vss vss vss nfet_03v3 ad=2.32p pd=9.16u as=0 ps=0 w=4u l=2u
+X35 vdd a_72223_153784# a_79278_159820# vdd pfet_03v3 ad=2.8p pd=10.56u as=2.8p ps=10.56u w=10u l=1u
+X36 a_31944_15439# d08_esd_0.to_gate cap_mim_2f0_m4m5_noshield c_width=22u c_length=22u
+X37 a_51638_73036# a_51638_73036# vdd vdd pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=2u
+X38 vss vss vss vss nfet_03v3 ad=3.65p pd=11.46u as=0 ps=0 w=5u l=0.28u
+D3 d08_esd_1.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X39 d08_esd_3.to_gate d08_gpt62sol_cmp_0.CLK vdd vdd pfet_03v3 ad=3p pd=9.5u as=3p ps=9.5u w=4u l=0.28u
+D4 vss d08_gpt62sol_cmp_0.INP diode_nd2ps_03v3 pj=40p area=99.99999p
+D5 vss d08_gpt62sol_cmp_0.CLK diode_nd2ps_03v3 pj=40p area=99.99999p
+D6 d08_esd_8.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X40 a_67021_91987# d08_gpt62sol_cmp_0.INN a_66311_91987# vss nfet_03v3 ad=4.8p pd=17.2u as=4.8p ps=17.2u w=8u l=0.5u
+X41 d08_gpt62sol_cmp_0.OUTN d08_esd_9.to_gate a_40596_120915# vss nfet_03v3 ad=3.75p pd=11.5u as=3.75p ps=11.5u w=5u l=0.28u
+X42 vss vss vss vss nfet_03v3 ad=2.32p pd=9.16u as=0 ps=0 w=4u l=2u
+D7 neuro1b_0.VBN vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X43 a_64996_106469# d08_gpt62sol_cmp_0.INP a_66311_91987# vss nfet_03v3 ad=4.8p pd=17.2u as=4.8p ps=17.2u w=8u l=0.5u
+X44 a_39698_172336# d08_bias_source_3.IOUT vss vss nfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=1u
+X45 vss vss vss vss nfet_03v3 ad=0.58p pd=3.16u as=0 ps=0 w=1u l=2u
+D8 d08_esd_7.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X46 vss vss vss vss nfet_03v3 ad=1.16p pd=5.16u as=0 ps=0 w=2u l=0.4u
+X47 vdd vdd vdd vdd pfet_03v3 ad=4.64p pd=17.16u as=0 ps=0 w=8u l=2u
+X48 d08_esd_12.to_gate d08_gemini4argon_cmp_0.OUTN a_92313_122220# vss nfet_03v3 ad=2.25p pd=7.5u as=2.25p ps=7.5u w=3u l=0.28u
+X49 vss vss vss vss nfet_03v3 ad=1.16p pd=5.16u as=0 ps=0 w=2u l=1.2u
+X50 a_90436_128817# d08_gpt62sol_cmp_0.INP a_91685_122220# vss nfet_03v3 ad=1.44p pd=6u as=1.44p ps=6u w=2.4u l=0.3u
+D9 d08_esd_1.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X51 vdd vdd vdd vdd pfet_03v3 ad=2.32p pd=9.16u as=0 ps=0 w=4u l=2u
+X52 vss d08_bias_source_4.IOUT a_87998_58971# vss nfet_03v3 ad=0.6p pd=3.2u as=0.28p ps=1.56u w=1u l=2u
+X53 d08_esd_7.to_gate d08_esd_7.to_gate vss vss nfet_03v3 ad=0.36p pd=2.4u as=0.36p ps=2.4u w=0.6u l=0.56u
+X54 a_66570_175761# a_76586_188822# vdd vdd pfet_03v3 ad=0.84p pd=3.56u as=1.8p ps=7.2u w=3u l=1.2u
+D10 vss d08_esd_1.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X55 d08_esd_3.to_gate d08_opus55_cmp_0.OUTN vdd vdd pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=0.5u
+X56 vss vss vss vss nfet_03v3 ad=2.32p pd=9.16u as=0 ps=0 w=4u l=2u
+X57 vss vss vss vss nfet_03v3 ad=3.48p pd=13.16u as=0 ps=0 w=6u l=0.55u
+X58 a_44719_53656# d08_bias_source_2.IOUT vss vss nfet_03v3 ad=1.068p pd=4.76u as=1.068p ps=4.76u w=1.78u l=1.2u
+X59 a_72223_153784# a_72223_153784# vdd vdd pfet_03v3 ad=2.8p pd=10.56u as=2.8p ps=10.56u w=10u l=1u
+X60 vdd a_76537_33657# a_76537_33657# vdd pfet_03v3 ad=4.8p pd=17.2u as=2.24p ps=8.56u w=8u l=2u
+D11 d08_gpt62sol_cmp_0.INN vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X61 a_49238_147436# neuro1b_0.VBN vss vss nfet_03v3 ad=0.56p pd=2.56u as=1.2p ps=5.2u w=2u l=2u
+D12 vss d08_gpt62sol_cmp_0.INN diode_nd2ps_03v3 pj=40p area=99.99999p
+X62 vdd a_80779_183394# a_80779_183394# vdd pfet_03v3 ad=1.8p pd=7.2u as=0.84p ps=3.56u w=3u l=1.5u
+X63 a_87998_58971# d08_bias_source_4.IOUT vss vss nfet_03v3 ad=0.28p pd=1.56u as=0.6p ps=3.2u w=1u l=2u
+X64 vdd vdd vdd vdd pfet_03v3 ad=2.32p pd=9.16u as=0 ps=0 w=4u l=4u
+X65 d08_opus55_cmp_0.OUTN d08_esd_3.to_gate vdd vdd pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=0.5u
+X66 a_72223_153784# d08_gpt62sol_cmp_0.INN a_71313_153784# vss nfet_03v3 ad=3.6p pd=13.2u as=3.6p ps=13.2u w=6u l=1u
+X67 a_64996_106469# d08_gpt62sol_cmp_0.INP a_66311_91987# vss nfet_03v3 ad=4.8p pd=17.2u as=4.8p ps=17.2u w=8u l=0.5u
+D13 d08_esd_0.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X68 d08_esd_0.to_gate vss cap_mim_2f0_m4m5_noshield c_width=30u c_length=30u
+D14 d08_esd_2.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X69 a_90436_128817# d08_gpt62sol_cmp_0.CLK vdd vdd pfet_03v3 ad=0.215p pd=1.36u as=0.375p ps=2.5u w=0.5u l=0.28u
+X70 d08_opus55_cmp_0.OUTN d08_gpt62sol_cmp_0.CLK vdd vdd pfet_03v3 ad=3p pd=9.5u as=3p ps=9.5u w=4u l=0.28u
+D15 d08_esd_3.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+D16 d08_esd_12.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X71 vdd vdd vdd vdd pfet_03v3 ad=2.32p pd=9.16u as=0 ps=0 w=4u l=4u
+D17 d08_esd_12.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+D18 vss d08_esd_2.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+D19 d08_esd_0.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X72 a_31744_15231# d08_esd_0.to_gate vss vss nfet_03v3 ad=0.3p pd=2.2u as=0.3p ps=2.2u w=0.5u l=10u
+X73 a_67021_91987# d08_gpt62sol_cmp_0.CLK vdd vdd pfet_03v3 ad=3p pd=9.5u as=3p ps=9.5u w=4u l=0.28u
+X74 vdd vdd vdd vdd pfet_03v3 ad=1.314p pd=5.06u as=0 ps=0 w=1.8u l=0.28u
+D20 d08_esd_3.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X75 a_42968_107285# d08_gpt62sol_cmp_0.CLK vss vss nfet_03v3 ad=3.225p pd=8.36u as=5.625p ps=16.5u w=7.5u l=0.28u
+D21 d08_gpt62sol_cmp_0.CLK vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X76 a_66311_91987# d08_gpt62sol_cmp_0.CLK vss vss nfet_03v3 ad=1.72p pd=4.86u as=3p ps=9.5u w=4u l=0.28u
+X77 a_31638_41836# a_31638_41836# vdd vdd pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=2u
+D22 vss d08_esd_3.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X78 d08_bias_source_0.IOUT a_56438_34636# vdd vdd pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=2u
+X79 vdd a_80779_183394# d08_gemini4argon_ota_0.OUT vdd pfet_03v3 ad=1.8p pd=7.2u as=0.84p ps=3.56u w=3u l=1.2u
+X80 vdd vdd vdd vdd pfet_03v3 ad=1.624p pd=6.76u as=0 ps=0 w=2.8u l=3.5u
+X81 vdd vdd vdd vdd pfet_03v3 ad=1.74p pd=7.16u as=0 ps=0 w=3u l=1.5u
+X82 a_76586_188822# a_76586_188822# vdd vdd pfet_03v3 ad=0.84p pd=3.56u as=1.8p ps=7.2u w=3u l=1.5u
+X83 gpt_cmp d08_esd_9.to_gate vdd ppolyf_u r_width=40u r_length=10u
+X84 d08_esd_3.to_gate d08_opus55_cmp_0.OUTN a_67021_91987# vss nfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=0.5u
+X85 vss a_66570_175761# a_66570_175761# vss nfet_03v3 ad=1.824p pd=7.28u as=0.8512p ps=3.6u w=3.04u l=1.2u
+X86 temp_out d08_esd_0.to_gate vdd ppolyf_u r_width=40u r_length=10u
+X87 vdd a_82280_70418# a_82280_70418# vdd pfet_03v3 ad=1.12p pd=4.56u as=1.12p ps=4.56u w=4u l=4u
+X88 a_66311_91987# d08_gpt62sol_cmp_0.CLK vss vss nfet_03v3 ad=1.72p pd=4.86u as=1.72p ps=4.86u w=4u l=0.28u
+D23 vss d08_esd_7.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X89 vdd vdd vdd vdd pfet_03v3 ad=2.32p pd=9.16u as=0 ps=0 w=4u l=2u
+D24 d08_gemini4argon_ota_0.OUT vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+D25 vss d08_esd_12.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X90 d08_opus55_cmp_0.OUTN d08_esd_3.to_gate a_64996_106469# vss nfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=0.5u
+D26 d08_gemini4argon_ota_0.OUT vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+D27 vss d08_esd_9.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+D28 vss d08_esd_10.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X91 vss neuro1b_0.VBN a_50838_188236# vss nfet_03v3 ad=1.2p pd=5.2u as=0.56p ps=2.56u w=2u l=2u
+X92 a_51638_73036# neuro1b_0.VBN vss vss nfet_03v3 ad=0.56p pd=2.56u as=1.2p ps=5.2u w=2u l=2u
+D29 vss d08_esd_9.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X93 vdd vdd vdd vdd pfet_03v3 ad=2.32p pd=9.16u as=0 ps=0 w=4u l=2u
+D30 vss d08_gpt62sol_cmp_0.CLK diode_nd2ps_03v3 pj=40p area=99.99999p
+X94 d08_esd_8.to_gate a_42608_174955# vdd vdd pfet_03v3 ad=4.3575p pd=13.12u as=4.3575p ps=13.12u w=5.81u l=0.28u
+D31 neuro1b_0.VBN vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X95 vss vss vss vss nfet_03v3 ad=4.06p pd=15.16u as=0 ps=0 w=7u l=0.5u
+D32 vss d08_esd_7.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X96 neuro1b_0.VBN neuro1b_0.VBN vss vss nfet_03v3 ad=0.56p pd=2.56u as=1.2p ps=5.2u w=2u l=2u
+X97 vdd vdd vdd vdd pfet_03v3 ad=1.74p pd=7.16u as=0 ps=0 w=3u l=1.5u
+X98 d08_bias_source_2.IOUT d08_bias_source_2.IOUT vss vss nfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=1.2u
+X99 d08_bias_source_3.IOUT d08_bias_source_3.IOUT vss vss nfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=1u
+X100 vdd vdd vdd vdd pfet_03v3 ad=1.624p pd=6.76u as=0 ps=0 w=2.8u l=3.5u
+X101 a_49238_147436# a_49238_147436# vdd vdd pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=2u
+X102 inn d08_gpt62sol_cmp_0.INN vdd ppolyf_u r_width=40u r_length=10u
+X103 vss a_79278_159820# d08_esd_2.to_gate vss nfet_03v3 ad=1.3104p pd=5.24u as=1.3104p ps=5.24u w=4.68u l=1u
+X104 vdd vdd vdd vdd pfet_03v3 ad=5.8p pd=21.16u as=0 ps=0 w=10u l=1u
+X105 gpt_ota d08_esd_8.to_gate vdd ppolyf_u r_width=40u r_length=10u
+X106 a_92313_122220# d08_gpt62sol_cmp_0.INN a_91685_122220# vss nfet_03v3 ad=1.44p pd=6u as=1.44p ps=6u w=2.4u l=0.3u
+X107 vss vss vss vss nfet_03v3 ad=1.74p pd=7.16u as=0 ps=0 w=3u l=1.2u
+X108 a_67021_91987# d08_gpt62sol_cmp_0.INN a_66311_91987# vss nfet_03v3 ad=4.8p pd=17.2u as=4.8p ps=17.2u w=8u l=0.5u
+X109 d08_gemini4argon_cmp_0.OUTN d08_gpt62sol_cmp_0.CLK vdd vdd pfet_03v3 ad=0.215p pd=1.36u as=0.375p ps=2.5u w=0.5u l=0.28u
+X110 vss vss vss vss nfet_03v3 ad=2.32p pd=9.16u as=0 ps=0 w=4u l=2u
+X111 a_92313_122220# d08_gpt62sol_cmp_0.CLK vdd vdd pfet_03v3 ad=0.215p pd=1.36u as=0.375p ps=2.5u w=0.5u l=0.28u
+X112 vdd vdd vdd vdd pfet_03v3 ad=3.65p pd=11.46u as=0 ps=0 w=5u l=0.28u
+D33 vss d08_gemini4argon_ota_0.OUT diode_nd2ps_03v3 pj=40p area=99.99999p
+X113 d08_gemini4argon_cmp_0.OUTN d08_esd_12.to_gate a_90436_128817# vss nfet_03v3 ad=2.25p pd=7.5u as=2.25p ps=7.5u w=3u l=0.28u
+X114 a_92313_122220# d08_gpt62sol_cmp_0.INN a_91685_122220# vss nfet_03v3 ad=1.44p pd=6u as=1.44p ps=6u w=2.4u l=0.3u
+X115 a_80779_183394# d08_gpt62sol_cmp_0.INP a_79469_183394# vss nfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=2u
+D34 vss neuro1b_0.VBN diode_nd2ps_03v3 pj=40p area=99.99999p
+D35 vss d08_esd_8.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X116 vss vss vss vss nfet_03v3 ad=4.64p pd=17.16u as=0 ps=0 w=8u l=0.5u
+X117 a_92313_122220# d08_gpt62sol_cmp_0.INN a_91685_122220# vss nfet_03v3 ad=1.44p pd=6u as=1.44p ps=6u w=2.4u l=0.3u
+X118 d08_bias_source_4.IOUT d08_bias_source_4.IOUT a_80130_58971# vss nfet_03v3 ad=0.56p pd=2.56u as=1.2p ps=5.2u w=2u l=0.4u
+D36 vss d08_esd_8.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X119 oxa_vref d08_esd_1.to_gate vdd ppolyf_u r_width=40u r_length=10u
+X120 vdd a_66358_159612# d08_esd_2.to_gate vdd pfet_03v3 ad=2.8p pd=10.56u as=2.8p ps=10.56u w=10u l=1u
+X121 a_80779_183394# d08_gpt62sol_cmp_0.INP a_79469_183394# vss nfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=2u
+X122 vdd a_66358_159612# a_66358_159612# vdd pfet_03v3 ad=2.8p pd=10.56u as=2.8p ps=10.56u w=10u l=1u
+X123 a_66570_175761# a_66570_175761# vss vss nfet_03v3 ad=0.8512p pd=3.6u as=1.824p ps=7.28u w=3.04u l=1.2u
+X124 vdd vdd vdd vdd pfet_03v3 ad=1.624p pd=6.76u as=0 ps=0 w=2.8u l=3.5u
+X125 a_90436_128817# d08_gpt62sol_cmp_0.INP a_91685_122220# vss nfet_03v3 ad=1.44p pd=6u as=1.44p ps=6u w=2.4u l=0.3u
+X126 vdd a_76537_33657# d08_esd_1.to_gate vdd pfet_03v3 ad=4.8p pd=17.2u as=2.24p ps=8.56u w=8u l=2u
+D37 d08_esd_1.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X127 a_64996_106469# d08_gpt62sol_cmp_0.INP a_66311_91987# vss nfet_03v3 ad=4.8p pd=17.2u as=4.8p ps=17.2u w=8u l=0.5u
+X128 d08_bias_source_3.IOUT a_31638_149836# vdd vdd pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=2u
+D38 vss d08_gpt62sol_cmp_0.INN diode_nd2ps_03v3 pj=40p area=99.99999p
+X129 a_66358_159612# d08_gpt62sol_cmp_0.INP a_71313_153784# vss nfet_03v3 ad=3.6p pd=13.2u as=3.6p ps=13.2u w=6u l=1u
+X130 a_49238_147436# a_49238_147436# vdd vdd pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=2u
+D39 d08_gpt62sol_cmp_0.INP vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X131 vss vss vss vss nfet_03v3 ad=2.32p pd=9.16u as=0 ps=0 w=4u l=1u
+X132 vdd vdd vdd vdd pfet_03v3 ad=1.74p pd=7.16u as=0 ps=0 w=3u l=1.2u
+X133 vss vss vss vss nfet_03v3 ad=3.65p pd=11.46u as=0 ps=0 w=5u l=0.28u
+X134 vss vss vss vss nfet_03v3 ad=2.9p pd=11.16u as=0 ps=0 w=5u l=1u
+X135 d08_bias_source_0.IOUT d08_bias_source_0.IOUT vss vss nfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=2u
+X136 vdd vdd vdd vdd pfet_03v3 ad=1.314p pd=5.06u as=0 ps=0 w=1.8u l=0.28u
+X137 d08_bias_source_3.IOUT a_31638_149836# vdd vdd pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=2u
+X138 vss vss vss vss nfet_03v3 ad=0.58p pd=3.16u as=0 ps=0 w=1u l=1.4u
+X139 d08_esd_3.to_gate d08_opus55_cmp_0.OUTN vdd vdd pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=0.5u
+D40 d08_esd_12.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X140 d08_gemini4argon_ota_0.IBIAS a_50838_188236# vdd vdd pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=2u
+X141 vss vss vss vss nfet_03v3 ad=0.58p pd=3.16u as=0 ps=0 w=1u l=2u
+X142 vdd vdd vdd vdd pfet_03v3 ad=1.74p pd=7.16u as=0 ps=0 w=3u l=1.5u
+X143 d08_bias_source_2.IOUT a_31638_41836# vdd vdd pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=2u
+X144 vdd d08_gpt62sol_cmp_0.CLK d08_esd_12.to_gate vdd pfet_03v3 ad=0.375p pd=2.5u as=0.215p ps=1.36u w=0.5u l=0.28u
+X145 oxa_cmp d08_esd_3.to_gate vdd ppolyf_u r_width=40u r_length=10u
+X146 d08_gemini4argon_ota_0.IBIAS a_50838_188236# vdd vdd pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=2u
+X147 d08_opus55_cmp_0.OUTN d08_esd_3.to_gate vdd vdd pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=0.5u
+D41 d08_gpt62sol_cmp_0.CLK vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X148 a_31944_15439# a_31744_15231# vdd vdd pfet_03v3 ad=0.6p pd=3.2u as=0.6p ps=3.2u w=1u l=1u
+X149 a_64996_106469# d08_gpt62sol_cmp_0.CLK vdd vdd pfet_03v3 ad=3p pd=9.5u as=3p ps=9.5u w=4u l=0.28u
+X150 d08_esd_2.to_gate a_79278_159820# vss vss nfet_03v3 ad=1.3104p pd=5.24u as=1.3104p ps=5.24u w=4.68u l=1u
+X151 a_71313_153784# d08_bias_source_1.IOUT vss vss nfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=2u
+D42 vss d08_gpt62sol_cmp_0.CLK diode_nd2ps_03v3 pj=40p area=99.99999p
+X152 vdd vdd vdd vdd pfet_03v3 ad=5.8p pd=21.16u as=0 ps=0 w=10u l=1u
+X153 vss a_79278_159820# a_79278_159820# vss nfet_03v3 ad=1.4p pd=5.56u as=1.4p ps=5.56u w=5u l=1u
+D43 neuro1b_0.VBN vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+D44 d08_esd_0.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X154 a_40596_120915# d08_gpt62sol_cmp_0.INP a_42968_107285# vss nfet_03v3 ad=3.6p pd=13.2u as=3.6p ps=13.2u w=6u l=0.55u
+X155 vss vss vss vss nfet_03v3 ad=0.58p pd=3.16u as=0 ps=0 w=1u l=1.4u
+D45 d08_esd_3.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X156 a_82280_70418# d08_bias_source_4.IOUT a_87998_58971# vss nfet_03v3 ad=0.56p pd=2.56u as=0.56p ps=2.56u w=2u l=0.4u
+X157 d08_bias_source_1.IOUT a_49238_147436# vdd vdd pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=2u
+X158 d08_esd_9.to_gate d08_gpt62sol_cmp_0.CLK vdd vdd pfet_03v3 ad=1.5p pd=5.5u as=1.5p ps=5.5u w=2u l=0.28u
+X159 a_72223_153784# d08_gpt62sol_cmp_0.INN a_71313_153784# vss nfet_03v3 ad=3.6p pd=13.2u as=3.6p ps=13.2u w=6u l=1u
+X160 a_72223_153784# a_72223_153784# vdd vdd pfet_03v3 ad=2.8p pd=10.56u as=2.8p ps=10.56u w=10u l=1u
+X161 a_31638_41836# neuro1b_0.VBN vss vss nfet_03v3 ad=0.56p pd=2.56u as=1.2p ps=5.2u w=2u l=2u
+X162 a_87998_58971# d08_bias_source_4.IOUT a_82280_70418# vss nfet_03v3 ad=1.2p pd=5.2u as=0.56p ps=2.56u w=2u l=0.4u
+X163 a_79278_159820# a_72223_153784# vdd vdd pfet_03v3 ad=2.8p pd=10.56u as=2.8p ps=10.56u w=10u l=1u
+X164 vss d08_gemini4argon_ota_0.IBIAS a_79469_183394# vss nfet_03v3 ad=0.56p pd=2.56u as=0.56p ps=2.56u w=2u l=2u
+X165 vdd vdd vdd vdd pfet_03v3 ad=2.32p pd=9.16u as=0 ps=0 w=4u l=2u
+D46 vss d08_esd_0.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X166 d08_esd_12.to_gate d08_gemini4argon_cmp_0.OUTN vdd vdd pfet_03v3 ad=1.35p pd=5.1u as=1.35p ps=5.1u w=1.8u l=0.28u
+D47 d08_esd_9.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+D48 d08_esd_7.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+D49 d08_gemini4argon_ota_0.OUT vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X167 vdd a_72223_153784# a_79278_159820# vdd pfet_03v3 ad=2.8p pd=10.56u as=2.8p ps=10.56u w=10u l=1u
+X168 a_39928_174747# d08_gpt62sol_cmp_0.INN a_39698_172336# vss nfet_03v3 ad=0.6p pd=3.2u as=0.6p ps=3.2u w=1u l=1.4u
+X169 vss neuro1b_0.VBN a_49238_147436# vss nfet_03v3 ad=1.2p pd=5.2u as=0.56p ps=2.56u w=2u l=2u
+X170 vss a_79278_159820# a_79278_159820# vss nfet_03v3 ad=3p pd=11.2u as=1.4p ps=5.56u w=5u l=1u
+D50 d08_esd_10.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+D51 vss d08_esd_9.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X171 d08_esd_3.to_gate d08_opus55_cmp_0.OUTN a_67021_91987# vss nfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=0.5u
+X172 vdd d08_gpt62sol_cmp_0.CLK d08_gemini4argon_cmp_0.OUTN vdd pfet_03v3 ad=0.375p pd=2.5u as=0.215p ps=1.36u w=0.5u l=0.28u
+X173 vdd a_66358_159612# d08_esd_2.to_gate vdd pfet_03v3 ad=2.8p pd=10.56u as=2.8p ps=10.56u w=10u l=1u
+X174 vss vss vss vss nfet_03v3 ad=1.392p pd=5.96u as=0 ps=0 w=2.4u l=0.3u
+X175 vdd d08_gpt62sol_cmp_0.CLK a_92313_122220# vdd pfet_03v3 ad=0.375p pd=2.5u as=0.215p ps=1.36u w=0.5u l=0.28u
+D52 vss neuro1b_0.VBN diode_nd2ps_03v3 pj=40p area=99.99999p
+X176 vss vss vss vss nfet_03v3 ad=3.48p pd=13.16u as=0 ps=0 w=6u l=0.55u
+X177 vdd a_66358_159612# a_66358_159612# vdd pfet_03v3 ad=6p pd=21.2u as=2.8p ps=10.56u w=10u l=1u
+X178 vss neuro1b_0.VBN a_56438_34636# vss nfet_03v3 ad=1.2p pd=5.2u as=0.56p ps=2.56u w=2u l=2u
+X179 vdd vdd vdd vdd pfet_03v3 ad=5.8p pd=21.16u as=0 ps=0 w=10u l=1u
+D53 d08_esd_7.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X180 a_64996_106469# d08_gpt62sol_cmp_0.INP a_66311_91987# vss nfet_03v3 ad=4.8p pd=17.2u as=4.8p ps=17.2u w=8u l=0.5u
+X181 a_90436_128817# d08_gpt62sol_cmp_0.INP a_91685_122220# vss nfet_03v3 ad=1.44p pd=6u as=1.44p ps=6u w=2.4u l=0.3u
+X182 vss vss vss vss nfet_03v3 ad=2.32p pd=9.16u as=0 ps=0 w=4u l=2u
+X183 a_92313_122220# d08_gpt62sol_cmp_0.INN a_91685_122220# vss nfet_03v3 ad=1.44p pd=6u as=1.44p ps=6u w=2.4u l=0.3u
+D54 vss d08_esd_7.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X184 d08_gemini4argon_cmp_0.OUTN d08_esd_12.to_gate a_90436_128817# vss nfet_03v3 ad=2.25p pd=7.5u as=2.25p ps=7.5u w=3u l=0.28u
+X185 a_51638_73036# a_51638_73036# vdd vdd pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=2u
+X186 d08_opus55_cmp_0.OUTN d08_esd_3.to_gate a_64996_106469# vss nfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=0.5u
+X187 vss vss vss vss nfet_03v3 ad=3.65p pd=11.46u as=0 ps=0 w=5u l=0.28u
+X188 a_39928_174747# a_39928_174747# vdd vdd pfet_03v3 ad=3.6p pd=13.2u as=3.6p ps=13.2u w=6u l=1u
+X189 a_82280_70418# d08_bias_source_4.IOUT a_87998_58971# vss nfet_03v3 ad=0.56p pd=2.56u as=1.2p ps=5.2u w=2u l=0.4u
+X190 vss a_66570_175761# d08_gemini4argon_ota_0.OUT vss nfet_03v3 ad=1.8p pd=7.2u as=0.84p ps=3.56u w=3u l=1.2u
+X191 a_80779_183394# a_80779_183394# vdd vdd pfet_03v3 ad=0.84p pd=3.56u as=1.8p ps=7.2u w=3u l=1.5u
+X192 vdd vdd vdd vdd pfet_03v3 ad=2.32p pd=9.16u as=0 ps=0 w=4u l=0.5u
+X193 vdd vdd vdd vdd pfet_03v3 ad=2.32p pd=9.16u as=0 ps=0 w=4u l=2u
+X194 a_50838_188236# neuro1b_0.VBN vss vss nfet_03v3 ad=0.56p pd=2.56u as=1.2p ps=5.2u w=2u l=2u
+X195 a_64996_106469# d08_gpt62sol_cmp_0.INP a_66311_91987# vss nfet_03v3 ad=4.8p pd=17.2u as=4.8p ps=17.2u w=8u l=0.5u
+D55 d08_esd_8.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X196 a_31944_15439# a_31744_15231# vss vss nfet_03v3 ad=0.3p pd=2.2u as=0.3p ps=2.2u w=0.5u l=1u
+X197 vss d08_bias_source_0.IOUT a_76537_33657# vss nfet_03v3 ad=2.4p pd=9.2u as=1.12p ps=4.56u w=4u l=2u
+D56 d08_esd_2.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+D57 d08_gpt62sol_cmp_0.INP vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X198 vdd vdd vdd vdd pfet_03v3 ad=2.32p pd=9.16u as=0 ps=0 w=4u l=2u
+X199 d08_bias_source_0.IOUT a_56438_34636# vdd vdd pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=2u
+D58 d08_esd_2.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X200 a_87998_58971# d08_bias_source_4.IOUT vss vss nfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=2u
+D59 vss d08_esd_1.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+D60 vss d08_esd_8.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X201 vdd vdd vdd vdd pfet_03v3 ad=3.65p pd=11.46u as=0 ps=0 w=5u l=0.28u
+X202 vss d08_gpt62sol_cmp_0.CLK a_66311_91987# vss nfet_03v3 ad=3p pd=9.5u as=1.72p ps=4.86u w=4u l=0.28u
+X203 a_90436_128817# d08_gpt62sol_cmp_0.INP a_91685_122220# vss nfet_03v3 ad=1.44p pd=6u as=1.44p ps=6u w=2.4u l=0.3u
+X204 clk d08_gpt62sol_cmp_0.CLK vdd ppolyf_u r_width=40u r_length=10u
+X205 vss vss vss vss nfet_03v3 ad=1.7632p pd=7.24u as=0 ps=0 w=3.04u l=1.2u
+X206 vss vss vss vss nfet_03v3 ad=2.32p pd=9.16u as=0 ps=0 w=4u l=2u
+X207 a_76537_33657# a_76537_33657# vdd vdd pfet_03v3 ad=2.24p pd=8.56u as=4.8p ps=17.2u w=8u l=2u
+X208 a_67021_91987# d08_gpt62sol_cmp_0.INN a_66311_91987# vss nfet_03v3 ad=4.8p pd=17.2u as=4.8p ps=17.2u w=8u l=0.5u
+X209 vdd a_80779_183394# d08_gemini4argon_ota_0.OUT vdd pfet_03v3 ad=0.84p pd=3.56u as=0.84p ps=3.56u w=3u l=1.2u
+X210 a_42608_174955# d08_gpt62sol_cmp_0.INP a_39698_172336# vss nfet_03v3 ad=0.6p pd=3.2u as=0.6p ps=3.2u w=1u l=1.4u
+X211 a_42608_174955# d08_esd_8.to_gate cap_mim_2f0_m4m5_noshield c_width=36u c_length=36u
+X212 vdd vdd vdd vdd pfet_03v3 ad=3.48p pd=13.16u as=0 ps=0 w=6u l=1u
+X213 a_80130_58971# d08_bias_source_4.IOUT vss vss nfet_03v3 ad=0.28p pd=1.56u as=0.6p ps=3.2u w=1u l=2u
+X214 deepseek_cmp d08_esd_12.to_gate vdd ppolyf_u r_width=40u r_length=10u
+D61 vss d08_gpt62sol_cmp_0.INP diode_nd2ps_03v3 pj=40p area=99.99999p
+X215 d08_gemini4argon_ota_0.OUT a_80779_183394# vdd vdd pfet_03v3 ad=0.84p pd=3.56u as=1.8p ps=7.2u w=3u l=1.2u
+X216 a_34182_13119# neuro1b_0.VBN a_37154_13119# vss nfet_03v3 ad=0.3p pd=2.2u as=0.3p ps=2.2u w=0.5u l=10u
+X217 vss vss vss vss nfet_03v3 ad=2.32p pd=9.16u as=0 ps=0 w=4u l=1u
+D62 vss d08_esd_0.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X218 vss vss vss vss nfet_03v3 ad=1.16p pd=5.16u as=0 ps=0 w=2u l=1.2u
+D63 vss d08_esd_10.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X219 d08_esd_9.to_gate d08_gpt62sol_cmp_0.OUTN a_43696_107285# vss nfet_03v3 ad=3.75p pd=11.5u as=3.75p ps=11.5u w=5u l=0.28u
+X220 vss d08_bias_source_4.IOUT a_80130_58971# vss nfet_03v3 ad=0.6p pd=3.2u as=0.28p ps=1.56u w=1u l=2u
+X221 vdd vdd vdd vdd pfet_03v3 ad=2.32p pd=9.16u as=0 ps=0 w=4u l=2u
+X222 vss vss vss vss nfet_03v3 ad=2.32p pd=9.16u as=0 ps=0 w=4u l=0.5u
+X223 a_43696_107285# d08_gpt62sol_cmp_0.INN a_42968_107285# vss nfet_03v3 ad=3.6p pd=13.2u as=3.6p ps=13.2u w=6u l=0.55u
+D64 vss d08_esd_2.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+D65 vss d08_esd_12.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X224 d08_bias_source_2.IOUT a_31638_41836# vdd vdd pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=2u
+X225 a_66311_91987# d08_gpt62sol_cmp_0.CLK vss vss nfet_03v3 ad=1.72p pd=4.86u as=1.72p ps=4.86u w=4u l=0.28u
+D66 vss d08_esd_3.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X226 a_56438_34636# a_56438_34636# vdd vdd pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=2u
+X227 d08_bias_source_1.IOUT a_49238_147436# vdd vdd pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=2u
+X228 d08_esd_0.to_gate a_31944_15439# vss vss nfet_03v3 ad=1.2p pd=5.2u as=1.2p ps=5.2u w=2u l=1u
+D67 vss d08_esd_12.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X229 a_66358_159612# a_66358_159612# vdd vdd pfet_03v3 ad=2.8p pd=10.56u as=6p ps=21.2u w=10u l=1u
+D68 vss d08_gpt62sol_cmp_0.CLK diode_nd2ps_03v3 pj=40p area=99.99999p
+D69 vss d08_esd_10.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X230 d08_esd_9.to_gate d08_gpt62sol_cmp_0.OUTN vdd vdd pfet_03v3 ad=3.75p pd=11.5u as=3.75p ps=11.5u w=5u l=0.28u
+D70 neuro1b_0.VBN vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X231 vss vss vss vss nfet_03v3 ad=2.32p pd=9.16u as=0 ps=0 w=4u l=1u
+X232 vdd a_66358_159612# a_66358_159612# vdd pfet_03v3 ad=2.8p pd=10.56u as=2.8p ps=10.56u w=10u l=1u
+X233 a_40596_120915# d08_gpt62sol_cmp_0.CLK vdd vdd pfet_03v3 ad=1.125p pd=4.5u as=1.125p ps=4.5u w=1.5u l=0.28u
+D71 d08_gpt62sol_cmp_0.INN vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+D72 vss neuro1b_0.VBN diode_nd2ps_03v3 pj=40p area=99.99999p
+X234 a_79278_159820# a_79278_159820# vss vss nfet_03v3 ad=1.4p pd=5.56u as=3p ps=11.2u w=5u l=1u
+X235 d08_esd_8.to_gate d08_bias_source_3.IOUT vss vss nfet_03v3 ad=4.2p pd=15.2u as=4.2p ps=15.2u w=7u l=0.5u
+X236 vdd vdd vdd vdd pfet_03v3 ad=2.32p pd=9.16u as=0 ps=0 w=4u l=2u
+X237 a_66358_159612# d08_gpt62sol_cmp_0.INP a_71313_153784# vss nfet_03v3 ad=3.6p pd=13.2u as=3.6p ps=13.2u w=6u l=1u
+X238 d08_esd_2.to_gate a_66358_159612# vdd vdd pfet_03v3 ad=2.8p pd=10.56u as=6p ps=21.2u w=10u l=1u
+X239 d08_gemini4argon_cmp_0.OUTN d08_esd_12.to_gate vdd vdd pfet_03v3 ad=1.35p pd=5.1u as=1.35p ps=5.1u w=1.8u l=0.28u
+X240 deepseek_ota d08_gemini4argon_ota_0.OUT vdd ppolyf_u r_width=40u r_length=10u
+X241 vdd vdd vdd vdd pfet_03v3 ad=3.48p pd=13.16u as=0 ps=0 w=6u l=1u
+X242 vdd a_76586_188822# a_66570_175761# vdd pfet_03v3 ad=1.8p pd=7.2u as=0.84p ps=3.56u w=3u l=1.2u
+X243 vdd vdd vdd vdd pfet_03v3 ad=2.32p pd=9.16u as=0 ps=0 w=4u l=4u
+X244 a_76586_188822# d08_gpt62sol_cmp_0.INN a_79469_183394# vss nfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=2u
+X245 d08_gemini4argon_ota_0.IBIAS d08_gemini4argon_ota_0.IBIAS vss vss nfet_03v3 ad=0.56p pd=2.56u as=1.2p ps=5.2u w=2u l=2u
+X246 vss vss vss vss nfet_03v3 ad=2.7144p pd=10.52u as=0 ps=0 w=4.68u l=1u
+X247 a_80130_58971# d08_bias_source_4.IOUT d08_bias_source_4.IOUT vss nfet_03v3 ad=1.2p pd=5.2u as=0.56p ps=2.56u w=2u l=0.4u
+D73 vss d08_gemini4argon_ota_0.OUT diode_nd2ps_03v3 pj=40p area=99.99999p
+X248 vss vss vss vss nfet_03v3 ad=2.32p pd=9.16u as=0 ps=0 w=4u l=2u
+D74 d08_gpt62sol_cmp_0.INP vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+D75 vss d08_gemini4argon_ota_0.OUT diode_nd2ps_03v3 pj=40p area=99.99999p
+X249 vdd vdd vdd vdd pfet_03v3 ad=3.48p pd=13.16u as=0 ps=0 w=6u l=1u
+X250 d08_esd_12.to_gate d08_gemini4argon_cmp_0.OUTN a_92313_122220# vss nfet_03v3 ad=2.25p pd=7.5u as=2.25p ps=7.5u w=3u l=0.28u
+X251 d08_esd_2.to_gate a_66358_159612# vdd vdd pfet_03v3 ad=2.8p pd=10.56u as=2.8p ps=10.56u w=10u l=1u
+X252 gpt_vref d08_esd_7.to_gate vdd ppolyf_u r_width=40u r_length=10u
+X253 d08_bias_source_4.IOUT a_51638_73036# vdd vdd pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=2u
+X254 vss neuro1b_0.VBN a_31638_149836# vss nfet_03v3 ad=1.2p pd=5.2u as=0.56p ps=2.56u w=2u l=2u
+X255 a_66358_159612# a_66358_159612# vdd vdd pfet_03v3 ad=2.8p pd=10.56u as=2.8p ps=10.56u w=10u l=1u
+X256 a_67021_91987# d08_gpt62sol_cmp_0.INN a_66311_91987# vss nfet_03v3 ad=4.8p pd=17.2u as=4.8p ps=17.2u w=8u l=0.5u
+X257 vdd vdd vdd vdd pfet_03v3 ad=2.32p pd=9.16u as=0 ps=0 w=4u l=0.5u
+X258 vdd vdd vdd vdd pfet_03v3 ad=5.8p pd=21.16u as=0 ps=0 w=10u l=1u
+X259 a_31638_149836# a_31638_149836# vdd vdd pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=2u
+X260 a_79278_159820# a_72223_153784# vdd vdd pfet_03v3 ad=2.8p pd=10.56u as=2.8p ps=10.56u w=10u l=1u
+X261 a_79469_183394# d08_gemini4argon_ota_0.IBIAS vss vss nfet_03v3 ad=0.56p pd=2.56u as=1.2p ps=5.2u w=2u l=2u
+X262 vdd vdd vdd vdd pfet_03v3 ad=4.64p pd=17.16u as=0 ps=0 w=8u l=2u
+D76 d08_esd_7.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X263 a_44719_53656# a_44719_53656# vdd vdd pfet_03v3 ad=1.68p pd=6.8u as=1.68p ps=6.8u w=2.8u l=3.5u
+X264 d08_esd_2.to_gate a_66358_159612# vdd vdd pfet_03v3 ad=2.8p pd=10.56u as=2.8p ps=10.56u w=10u l=1u
+X265 vss d08_gemini4argon_ota_0.IBIAS a_79469_183394# vss nfet_03v3 ad=1.2p pd=5.2u as=0.56p ps=2.56u w=2u l=2u
+X266 d08_bias_source_1.IOUT d08_bias_source_1.IOUT vss vss nfet_03v3 ad=1.12p pd=4.56u as=2.4p ps=9.2u w=4u l=2u
+X267 a_50838_188236# a_50838_188236# vdd vdd pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=2u
+X268 a_80779_183394# d08_gpt62sol_cmp_0.INP a_79469_183394# vss nfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=2u
+X269 vdd vdd vdd vdd pfet_03v3 ad=5.8p pd=21.16u as=0 ps=0 w=10u l=1u
+D77 vss d08_gpt62sol_cmp_0.INP diode_nd2ps_03v3 pj=40p area=99.99999p
+D78 d08_esd_2.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X270 vss d08_gemini4argon_ota_0.IBIAS d08_gemini4argon_ota_0.IBIAS vss nfet_03v3 ad=1.2p pd=5.2u as=0.56p ps=2.56u w=2u l=2u
+X271 d08_opus55_cmp_0.OUTN d08_esd_3.to_gate vdd vdd pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=0.5u
+X272 vss vss vss vss nfet_03v3 ad=0.58p pd=3.16u as=0 ps=0 w=1u l=2u
+D79 d08_esd_1.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X273 vdd vdd vdd vdd pfet_03v3 ad=5.8p pd=21.16u as=0 ps=0 w=10u l=1u
+X274 vss vss vss vss nfet_03v3 ad=2.32p pd=9.16u as=0 ps=0 w=4u l=1u
+X275 a_79278_159820# a_72223_153784# vdd vdd pfet_03v3 ad=2.8p pd=10.56u as=6p ps=21.2u w=10u l=1u
+X276 ibias neuro1b_0.VBN vdd ppolyf_u r_width=40u r_length=10u
+X277 a_67021_91987# d08_gpt62sol_cmp_0.INN a_66311_91987# vss nfet_03v3 ad=4.8p pd=17.2u as=4.8p ps=17.2u w=8u l=0.5u
+X278 vss a_79278_159820# d08_esd_2.to_gate vss nfet_03v3 ad=2.808p pd=10.56u as=1.3104p ps=5.24u w=4.68u l=1u
+X279 d08_esd_7.to_gate a_44719_53656# vdd vdd pfet_03v3 ad=1.68p pd=6.8u as=1.68p ps=6.8u w=2.8u l=3.5u
+X280 d08_opus55_cmp_0.OUTN d08_esd_3.to_gate vdd vdd pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=0.5u
+X281 a_66570_175761# a_76586_188822# vdd vdd pfet_03v3 ad=0.84p pd=3.56u as=0.84p ps=3.56u w=3u l=1.2u
+X282 vdd vdd vdd vdd pfet_03v3 ad=4.64p pd=17.16u as=0 ps=0 w=8u l=2u
+X283 d08_esd_3.to_gate d08_opus55_cmp_0.OUTN vdd vdd pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=0.5u
+X284 a_79278_159820# a_79278_159820# vss vss nfet_03v3 ad=1.4p pd=5.56u as=1.4p ps=5.56u w=5u l=1u
+X285 a_66358_159612# d08_gpt62sol_cmp_0.INP a_71313_153784# vss nfet_03v3 ad=3.6p pd=13.2u as=3.6p ps=13.2u w=6u l=1u
+D80 vss d08_esd_0.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X286 d08_esd_10.to_gate a_82280_70418# vdd vdd pfet_03v3 ad=1.12p pd=4.56u as=1.12p ps=4.56u w=4u l=4u
+X287 a_56438_34636# neuro1b_0.VBN vss vss nfet_03v3 ad=0.56p pd=2.56u as=1.2p ps=5.2u w=2u l=2u
+X288 vdd vdd vdd vdd pfet_03v3 ad=3.48p pd=13.16u as=0 ps=0 w=6u l=1u
+X289 vss vss vss vss nfet_03v3 ad=2.32p pd=9.16u as=0 ps=0 w=4u l=0.5u
+D81 d08_gpt62sol_cmp_0.INN vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X290 vdd a_72223_153784# a_72223_153784# vdd pfet_03v3 ad=2.8p pd=10.56u as=2.8p ps=10.56u w=10u l=1u
+X291 vss vss vss vss nfet_03v3 ad=1.16p pd=5.16u as=0 ps=0 w=2u l=2u
+X292 d08_esd_3.to_gate d08_opus55_cmp_0.OUTN vdd vdd pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=0.5u
+X293 d08_gemini4argon_ota_0.OUT a_80779_183394# vdd vdd pfet_03v3 ad=0.84p pd=3.56u as=0.84p ps=3.56u w=3u l=1.2u
+X294 vdd a_72223_153784# a_79278_159820# vdd pfet_03v3 ad=6p pd=21.2u as=2.8p ps=10.56u w=10u l=1u
+X295 a_76586_188822# d08_gpt62sol_cmp_0.INN a_79469_183394# vss nfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=2u
+X296 d08_esd_0.to_gate neuro1b_0.VBN a_31210_13119# vss nfet_03v3 ad=0.3p pd=2.2u as=0.3p ps=2.2u w=0.5u l=10u
+X297 a_43696_107285# d08_gpt62sol_cmp_0.INN a_42968_107285# vss nfet_03v3 ad=3.6p pd=13.2u as=3.6p ps=13.2u w=6u l=0.55u
+X298 a_82280_70418# a_82280_70418# vdd vdd pfet_03v3 ad=1.12p pd=4.56u as=1.12p ps=4.56u w=4u l=4u
+X299 vdd a_82280_70418# d08_esd_10.to_gate vdd pfet_03v3 ad=1.12p pd=4.56u as=1.12p ps=4.56u w=4u l=4u
+X300 a_31638_41836# a_31638_41836# vdd vdd pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=2u
+X301 vss vss vss vss nfet_03v3 ad=2.32p pd=9.16u as=0 ps=0 w=4u l=2u
+X302 d08_esd_12.to_gate d08_gpt62sol_cmp_0.CLK vdd vdd pfet_03v3 ad=0.215p pd=1.36u as=0.375p ps=2.5u w=0.5u l=0.28u
+X303 a_43696_107285# d08_gpt62sol_cmp_0.CLK vdd vdd pfet_03v3 ad=1.125p pd=4.5u as=1.125p ps=4.5u w=1.5u l=0.28u
+D82 d08_esd_12.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X304 vdd vdd vdd vdd pfet_03v3 ad=1.74p pd=7.16u as=0 ps=0 w=3u l=1.2u
+X305 d08_esd_10.to_gate a_82280_70418# vdd vdd pfet_03v3 ad=1.12p pd=4.56u as=2.4p ps=9.2u w=4u l=4u
+D83 d08_esd_10.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+D84 d08_esd_9.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X306 vss vss vss vss nfet_03v3 ad=2.9p pd=11.16u as=0 ps=0 w=5u l=1u
+X307 a_66358_159612# d08_gpt62sol_cmp_0.INP a_71313_153784# vss nfet_03v3 ad=3.6p pd=13.2u as=3.6p ps=13.2u w=6u l=1u
+X308 d08_gemini4argon_cmp_0.OUTN d08_esd_12.to_gate vdd vdd pfet_03v3 ad=1.35p pd=5.1u as=1.35p ps=5.1u w=1.8u l=0.28u
+X309 a_76537_33657# d08_bias_source_0.IOUT vss vss nfet_03v3 ad=1.12p pd=4.56u as=2.4p ps=9.2u w=4u l=2u
+D85 d08_esd_0.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+D86 d08_esd_9.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X310 vss vss vss vss nfet_03v3 ad=1.16p pd=5.16u as=0 ps=0 w=2u l=0.4u
+D87 d08_esd_3.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+D88 vss d08_esd_12.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X311 vss d08_bias_source_4.IOUT a_87998_58971# vss nfet_03v3 ad=0.28p pd=1.56u as=0.28p ps=1.56u w=1u l=2u
+D89 vss neuro1b_0.VBN diode_nd2ps_03v3 pj=40p area=99.99999p
+X312 d08_esd_1.to_gate d08_esd_1.to_gate vss vss nfet_03v3 ad=0.75p pd=3.7u as=0.75p ps=3.7u w=1.25u l=0.5u
+X313 a_64996_106469# d08_gpt62sol_cmp_0.INP a_66311_91987# vss nfet_03v3 ad=4.8p pd=17.2u as=4.8p ps=17.2u w=8u l=0.5u
+D90 d08_esd_10.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X314 d08_opus55_cmp_0.OUTN d08_esd_3.to_gate a_64996_106469# vss nfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=0.5u
+D91 vss d08_gpt62sol_cmp_0.INN diode_nd2ps_03v3 pj=40p area=99.99999p
+X315 vss vss vss vss nfet_03v3 ad=3.48p pd=13.16u as=0 ps=0 w=6u l=1u
+D92 vss d08_esd_10.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X316 vss neuro1b_0.VBN a_51638_73036# vss nfet_03v3 ad=1.2p pd=5.2u as=0.56p ps=2.56u w=2u l=2u
+X317 vdd vdd vdd vdd pfet_03v3 ad=2.32p pd=9.16u as=0 ps=0 w=4u l=4u
+X318 vss vss vss vss nfet_03v3 ad=3.65p pd=11.46u as=0 ps=0 w=5u l=0.28u
+X319 d08_gemini4argon_ota_0.OUT a_66570_175761# vss vss nfet_03v3 ad=0.84p pd=3.56u as=1.8p ps=7.2u w=3u l=1.2u
+X320 vss vss vss vss nfet_03v3 ad=2.32p pd=9.16u as=0 ps=0 w=4u l=2u
+X321 a_31744_15231# d08_esd_0.to_gate vdd vdd pfet_03v3 ad=0.6p pd=3.2u as=0.6p ps=3.2u w=1u l=10u
+X322 a_31210_13119# neuro1b_0.VBN a_34182_13119# vss nfet_03v3 ad=0.3p pd=2.2u as=0.3p ps=2.2u w=0.5u l=10u
+X323 d08_opus55_cmp_0.OUTN d08_esd_3.to_gate a_64996_106469# vss nfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=0.5u
+X324 d08_esd_3.to_gate d08_opus55_cmp_0.OUTN a_67021_91987# vss nfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=0.5u
+X325 vss vss vss vss nfet_03v3 ad=1.0324p pd=4.72u as=0 ps=0 w=1.78u l=1.2u
+X326 vss vss vss vss nfet_03v3 ad=2.19p pd=7.46u as=0 ps=0 w=3u l=0.28u
+D93 d08_gemini4argon_ota_0.OUT vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+D94 vss d08_esd_1.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X327 a_91685_122220# d08_gpt62sol_cmp_0.CLK vss vss nfet_03v3 ad=0.14p pd=1.06u as=0.3p ps=2.2u w=0.5u l=1.1u
+X328 d08_esd_3.to_gate d08_opus55_cmp_0.OUTN a_67021_91987# vss nfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=0.5u
+X329 vdd d08_gpt62sol_cmp_0.CLK a_90436_128817# vdd pfet_03v3 ad=0.375p pd=2.5u as=0.215p ps=1.36u w=0.5u l=0.28u
+D95 d08_esd_8.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+D96 d08_gpt62sol_cmp_0.INP vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X330 vss d08_gpt62sol_cmp_0.CLK a_42968_107285# vss nfet_03v3 ad=5.625p pd=16.5u as=3.225p ps=8.36u w=7.5u l=0.28u
+X331 vdd vdd vdd vdd pfet_03v3 ad=3.65p pd=11.46u as=0 ps=0 w=5u l=0.28u
+D97 vss d08_esd_9.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+D98 d08_gpt62sol_cmp_0.CLK vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X332 a_64996_106469# d08_gpt62sol_cmp_0.INP a_66311_91987# vss nfet_03v3 ad=4.8p pd=17.2u as=4.8p ps=17.2u w=8u l=0.5u
+D99 d08_esd_8.to_gate vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X333 vss d08_gpt62sol_cmp_0.CLK a_66311_91987# vss nfet_03v3 ad=1.72p pd=4.86u as=1.72p ps=4.86u w=4u l=0.28u
+D100 vss d08_gpt62sol_cmp_0.INP diode_nd2ps_03v3 pj=40p area=99.99999p
+D101 vss d08_esd_7.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X334 a_67021_91987# d08_gpt62sol_cmp_0.INN a_66311_91987# vss nfet_03v3 ad=4.8p pd=17.2u as=4.8p ps=17.2u w=8u l=0.5u
+D102 vss d08_gemini4argon_ota_0.OUT diode_nd2ps_03v3 pj=40p area=99.99999p
+X335 d08_bias_source_4.IOUT a_51638_73036# vdd vdd pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=2u
+X336 d08_esd_1.to_gate a_76537_33657# vdd vdd pfet_03v3 ad=2.24p pd=8.56u as=4.8p ps=17.2u w=8u l=2u
+X337 vss vss vss vss nfet_03v3 ad=0.58p pd=3.16u as=0 ps=0 w=1u l=1.4u
+D103 vss d08_esd_1.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X338 vss vss vss vss nfet_03v3 ad=4.06p pd=15.16u as=0 ps=0 w=7u l=0.5u
+D104 vss d08_esd_0.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X339 vss d08_gpt62sol_cmp_0.CLK a_66311_91987# vss nfet_03v3 ad=1.72p pd=4.86u as=1.72p ps=4.86u w=4u l=0.28u
+X340 vdd vdd vdd vdd pfet_03v3 ad=2.32p pd=9.16u as=0 ps=0 w=4u l=2u
+X341 vss vss vss vss nfet_03v3 ad=4.64p pd=17.16u as=0 ps=0 w=8u l=0.5u
+X342 vdd a_72223_153784# a_72223_153784# vdd pfet_03v3 ad=6p pd=21.2u as=2.8p ps=10.56u w=10u l=1u
+X343 d08_esd_2.to_gate a_79278_159820# vss vss nfet_03v3 ad=1.3104p pd=5.24u as=2.808p ps=10.56u w=4.68u l=1u
+X344 vss vss vss vss nfet_03v3 ad=1.16p pd=5.16u as=0 ps=0 w=2u l=2u
+X345 oxa_ota d08_esd_2.to_gate vdd ppolyf_u r_width=40u r_length=10u
+X346 vss vss vss vss nfet_03v3 ad=1.16p pd=5.16u as=0 ps=0 w=2u l=0.4u
+D105 d08_gpt62sol_cmp_0.INN vdd diode_pd2nw_03v3 pj=40p area=99.99999p
+X347 vss vss vss vss nfet_03v3 ad=2.32p pd=9.16u as=0 ps=0 w=4u l=2u
+X348 a_67021_91987# d08_gpt62sol_cmp_0.INN a_66311_91987# vss nfet_03v3 ad=4.8p pd=17.2u as=4.8p ps=17.2u w=8u l=0.5u
+D106 vss d08_esd_3.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X349 vss vss vss vss nfet_03v3 ad=3.48p pd=13.16u as=0 ps=0 w=6u l=1u
+X350 a_31638_149836# neuro1b_0.VBN vss vss nfet_03v3 ad=0.56p pd=2.56u as=1.2p ps=5.2u w=2u l=2u
+X351 vdd vdd vdd vdd pfet_03v3 ad=1.624p pd=6.76u as=0 ps=0 w=2.8u l=3.5u
+X352 a_72223_153784# a_72223_153784# vdd vdd pfet_03v3 ad=2.8p pd=10.56u as=6p ps=21.2u w=10u l=1u
+D107 vss d08_esd_8.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+D108 vss d08_esd_2.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X353 a_87998_58971# d08_bias_source_4.IOUT a_82280_70418# vss nfet_03v3 ad=0.56p pd=2.56u as=0.56p ps=2.56u w=2u l=0.4u
+X354 a_40596_120915# d08_gpt62sol_cmp_0.INP a_42968_107285# vss nfet_03v3 ad=3.6p pd=13.2u as=3.6p ps=13.2u w=6u l=0.55u
+D109 vss d08_esd_2.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X355 vdd vdd vdd vdd pfet_03v3 ad=1.74p pd=7.16u as=0 ps=0 w=3u l=1.2u
+X356 a_64996_106469# d08_gpt62sol_cmp_0.INP a_66311_91987# vss nfet_03v3 ad=4.8p pd=17.2u as=4.8p ps=17.2u w=8u l=0.5u
+X357 a_72223_153784# d08_gpt62sol_cmp_0.INN a_71313_153784# vss nfet_03v3 ad=3.6p pd=13.2u as=3.6p ps=13.2u w=6u l=1u
+X358 a_79469_183394# d08_gemini4argon_ota_0.IBIAS vss vss nfet_03v3 ad=0.56p pd=2.56u as=0.56p ps=2.56u w=2u l=2u
+D110 vss d08_esd_3.to_gate diode_nd2ps_03v3 pj=40p area=99.99999p
+X359 a_76586_188822# d08_gpt62sol_cmp_0.INN a_79469_183394# vss nfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=2u
+X360 vdd a_76586_188822# a_76586_188822# vdd pfet_03v3 ad=1.8p pd=7.2u as=0.84p ps=3.56u w=3u l=1.5u
+X361 d08_gpt62sol_cmp_0.OUTN d08_gpt62sol_cmp_0.CLK vdd vdd pfet_03v3 ad=1.5p pd=5.5u as=1.5p ps=5.5u w=2u l=0.28u
+X362 a_66358_159612# a_66358_159612# vdd vdd pfet_03v3 ad=2.8p pd=10.56u as=2.8p ps=10.56u w=10u l=1u
+X363 vdd vdd vdd vdd pfet_03v3 ad=1.74p pd=7.16u as=0 ps=0 w=3u l=1.2u
+X364 a_76586_188822# d08_gpt62sol_cmp_0.INN a_79469_183394# vss nfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=2u
+D111 vss d08_gpt62sol_cmp_0.INN diode_nd2ps_03v3 pj=40p area=99.99999p
+X365 a_42608_174955# a_39928_174747# vdd vdd pfet_03v3 ad=3.6p pd=13.2u as=3.6p ps=13.2u w=6u l=1u
+X366 vss neuro1b_0.VBN neuro1b_0.VBN vss nfet_03v3 ad=1.2p pd=5.2u as=0.56p ps=2.56u w=2u l=2u
+X367 a_82280_70418# a_82280_70418# vdd vdd pfet_03v3 ad=1.12p pd=4.56u as=2.4p ps=9.2u w=4u l=4u
+X368 vdd a_82280_70418# d08_esd_10.to_gate vdd pfet_03v3 ad=2.4p pd=9.2u as=1.12p ps=4.56u w=4u l=4u
+X369 vdd vdd vdd vdd pfet_03v3 ad=3.65p pd=11.46u as=0 ps=0 w=5u l=0.28u
+X370 vdd a_76586_188822# a_66570_175761# vdd pfet_03v3 ad=0.84p pd=3.56u as=0.84p ps=3.56u w=3u l=1.2u
+X371 a_56438_34636# a_56438_34636# vdd vdd pfet_03v3 ad=2.4p pd=9.2u as=2.4p ps=9.2u w=4u l=2u
+X372 d08_esd_12.to_gate d08_gemini4argon_cmp_0.OUTN vdd vdd pfet_03v3 ad=1.35p pd=5.1u as=1.35p ps=5.1u w=1.8u l=0.28u
+C0 m5_72400_7200r# m5_73600_7200# 0.28715f
+C1 a_42968_107285# a_43696_107285# 2.6022f
+C2 d08_gpt62sol_cmp_0.INP a_43696_107285# 0.04103f
+C3 m5_57040_12400# m5_58720_12400r# 0.25843f
+C4 a_43696_107285# vdd 1.80161f
+C5 d08_esd_2.to_gate d08_bias_source_3.IOUT 0.0507f
+C6 d08_gpt62sol_cmp_0.OUTN d08_gpt62sol_cmp_0.CLK 0.45904f
+C7 d08_gpt62sol_cmp_0.INN d08_bias_source_3.IOUT 0.82991f
+C8 d08_gemini4argon_ota_0.OUT neuro1b_0.VBN 0.88413f
+C9 m5_62800_7200# m5_61600_7200r# 0.14932f
+C10 d08_gpt62sol_cmp_0.CLK d08_esd_9.to_gate 0.46569f
+C11 m5_89200_7200# m5_90400_7200# 0.17995f
+C12 a_37154_13119# a_31744_15231# 0.01327f
+C13 d08_bias_source_2.IOUT d08_esd_7.to_gate 0.10592f
+C14 a_92313_122220# d08_gpt62sol_cmp_0.CLK 0.22343f
+C15 d08_gpt62sol_cmp_0.INP d08_gemini4argon_ota_0.IBIAS 0.24018f
+C16 a_91685_122220# a_92313_122220# 4.05576f
+C17 m5_79600_7200# m5_78400_7200# 0.22972f
+C18 a_76586_188822# a_80779_183394# 0.30057f
+C19 m5_62500_12400# m5_63760_12400r# 0.09572f
+C20 d08_gemini4argon_ota_0.OUT a_80779_183394# 0.93462f
+C21 d08_gemini4argon_ota_0.IBIAS vdd 5.08112f
+C22 oxa_ota vdd 15.5665f
+C23 d08_bias_source_4.IOUT d08_esd_10.to_gate 0.0568f
+C24 d08_gpt62sol_cmp_0.INP a_90436_128817# 0.33296f
+C25 vdd a_56438_34636# 10.517f
+C26 d08_gpt62sol_cmp_0.INN a_66311_91987# 1.38303f
+C27 m5_92800_8400# m5_91600_7200# 0.10529f
+C28 d08_esd_12.to_gate a_90436_128817# 0.86857f
+C29 vdd a_90436_128817# 1.35383f
+C30 vdd a_31944_15439# 2.78613f
+C31 gpt_vref vdd 15.5665f
+C32 vdd ibias 15.5454f
+C33 vdd deepseek_vref 15.5665f
+C34 d08_gpt62sol_cmp_0.INN a_39698_172336# 0.14514f
+C35 d08_esd_3.to_gate d08_opus55_cmp_0.OUTN 4.86507f
+C36 neuro1b_0.VBN d08_bias_source_4.IOUT 0.04654f
+C37 m5_52000_7200# m5_53200_7200r# 0.22972f
+C38 a_42968_107285# d08_gpt62sol_cmp_0.CLK 0.40156f
+C39 d08_gpt62sol_cmp_0.INP d08_gpt62sol_cmp_0.CLK 0.47271f
+C40 vdd d08_esd_0.to_gate 47.8056f
+C41 a_34182_13119# d08_esd_0.to_gate 0.03263f
+C42 m5_65200_7200# m5_66400_7200# 0.17995f
+C43 a_31944_15439# a_31744_15231# 0.14692f
+C44 d08_gpt62sol_cmp_0.INN a_92313_122220# 0.19768f
+C45 d08_gpt62sol_cmp_0.INP a_91685_122220# 0.74369f
+C46 vdd a_44719_53656# 6.02826f
+C47 d08_gpt62sol_cmp_0.CLK a_64996_106469# 0.40209f
+C48 d08_esd_12.to_gate d08_gpt62sol_cmp_0.CLK 7.63364f
+C49 vdd d08_gpt62sol_cmp_0.CLK 66.73389f
+C50 a_39698_172336# d08_bias_source_3.IOUT 0.21965f
+C51 a_67021_91987# d08_gpt62sol_cmp_0.CLK 0.29138f
+C52 d08_gemini4argon_ota_0.OUT d08_gemini4argon_ota_0.IBIAS 0.06931f
+C53 d08_gpt62sol_cmp_0.INP a_66358_159612# 0.87152f
+C54 a_56438_34636# d08_bias_source_0.IOUT 0.87699f
+C55 d08_esd_2.to_gate a_42608_174955# 0.74986f
+C56 neuro1b_0.VBN d08_esd_10.to_gate 0.38128f
+C57 a_66570_175761# d08_gpt62sol_cmp_0.INP 0.06622f
+C58 neuro1b_0.VBN a_31638_41836# 0.25846f
+C59 a_66358_159612# vdd 17.1906f
+C60 d08_gpt62sol_cmp_0.INN a_42608_174955# 0.30498f
+C61 a_31744_15231# d08_esd_0.to_gate 0.98394f
+C62 d08_gpt62sol_cmp_0.INP a_79469_183394# 1.16294f
+C63 m5_90400_7200# m5_91600_7200# 0.18952f
+C64 vdd a_31210_13119# 0.02623f
+C65 a_31210_13119# a_34182_13119# 0.7529f
+C66 a_66570_175761# vdd 2.7516f
+C67 m5_80800_7200r# m5_79600_7200# 0.05743f
+C68 a_50838_188236# vdd 10.517f
+C69 vdd a_51638_73036# 10.517f
+C70 d08_esd_3.to_gate neuro1b_0.VBN 0.05051f
+C71 a_79469_183394# vdd 0.0791f
+C72 gpt_ota vdd 15.5665f
+C73 m5_61600_7200r# m5_60700_7200# 0.09572f
+C74 d08_gpt62sol_cmp_0.INN a_39928_174747# 0.04854f
+C75 d08_gpt62sol_cmp_0.INP d08_esd_2.to_gate 2.24028f
+C76 a_42608_174955# d08_bias_source_3.IOUT 0.1363f
+C77 a_42968_107285# d08_gpt62sol_cmp_0.INN 0.57646f
+C78 d08_gpt62sol_cmp_0.INP d08_gpt62sol_cmp_0.INN 14.1355f
+C79 m5_62500_12400# m5_60400_12400# 0.03446f
+C80 d08_esd_2.to_gate vdd 52.8299f
+C81 a_44719_53656# d08_bias_source_2.IOUT 0.24519f
+C82 a_66358_159612# a_71313_153784# 5.12953f
+C83 d08_gpt62sol_cmp_0.INN a_64996_106469# 0.02777f
+C84 d08_esd_2.to_gate d08_esd_8.to_gate 1.65312f
+C85 a_49238_147436# vdd 10.517f
+C86 a_31210_13119# a_31744_15231# 0.01306f
+C87 d08_gpt62sol_cmp_0.INN d08_esd_12.to_gate 0.04936f
+C88 d08_gpt62sol_cmp_0.INN vdd 53.6982f
+C89 d08_gpt62sol_cmp_0.OUTN d08_esd_9.to_gate 1.37416f
+C90 d08_gpt62sol_cmp_0.INN d08_esd_8.to_gate 0.04623f
+C91 neuro1b_0.VBN d08_esd_7.to_gate 0.09597f
+C92 d08_gpt62sol_cmp_0.INN a_67021_91987# 1.21582f
+C93 m5_75520_12400# m5_73840_12400# 0.22972f
+C94 d08_esd_3.to_gate a_40596_120915# 0.04954f
+C95 m5_67120_12400# m5_65440_12400r# 0.34458f
+C96 d08_gpt62sol_cmp_0.INP d08_bias_source_3.IOUT 0.06233f
+C97 vdd a_87998_58971# 0.68461f
+C98 a_31638_149836# d08_bias_source_3.IOUT 0.87699f
+C99 vdd d08_bias_source_3.IOUT 4.52462f
+C100 d08_esd_3.to_gate a_43696_107285# 0.0493f
+C101 a_66570_175761# a_76586_188822# 0.53961f
+C102 d08_esd_8.to_gate d08_bias_source_3.IOUT 0.5484f
+C103 neuro1b_0.VBN a_37154_13119# 0.52335f
+C104 a_66570_175761# d08_gemini4argon_ota_0.OUT 0.27663f
+C105 a_76586_188822# a_79469_183394# 4.73545f
+C106 d08_gpt62sol_cmp_0.INN a_71313_153784# 0.98515f
+C107 d08_gemini4argon_ota_0.OUT a_79469_183394# 0.57361f
+C108 d08_esd_2.to_gate a_79278_159820# 0.91244f
+C109 a_66358_159612# a_72223_153784# 0.2851f
+C110 d08_gpt62sol_cmp_0.INP a_66311_91987# 1.68292f
+C111 a_39698_172336# a_42608_174955# 0.55808f
+C112 vdd d08_esd_1.to_gate 44.8192f
+C113 a_66311_91987# a_64996_106469# 13.3376f
+C114 m5_86800_7200# m5_85600_7200r# 0.24121f
+C115 vdd a_66311_91987# 0.37419f
+C116 a_76586_188822# d08_gpt62sol_cmp_0.INN 0.88796f
+C117 d08_gemini4argon_cmp_0.OUTN a_90436_128817# 2.06989f
+C118 a_87998_58971# a_82280_70418# 1.18643f
+C119 a_66311_91987# a_67021_91987# 12.185f
+C120 d08_gemini4argon_ota_0.OUT d08_gpt62sol_cmp_0.INN 4.17217f
+C121 a_39698_172336# a_39928_174747# 0.3482f
+C122 m5_76000_7200r# m5_78400_7200# 0.01641f
+C123 d08_esd_2.to_gate a_72223_153784# 0.32072f
+C124 temp_out vdd 15.5454f
+C125 d08_gpt62sol_cmp_0.INP a_39698_172336# 0.10865f
+C126 d08_gpt62sol_cmp_0.INN a_72223_153784# 0.79259f
+C127 vdd d08_gpt62sol_cmp_0.OUTN 6.10917f
+C128 d08_gpt62sol_cmp_0.INP d08_esd_9.to_gate 0.05051f
+C129 a_40596_120915# a_43696_107285# 0.13898f
+C130 m5_66400_7200# m5_67600_7200# 0.12635f
+C131 neuro1b_0.VBN a_56438_34636# 0.25846f
+C132 m5_68800_7200r# m5_67600_7200# 0.06509f
+C133 d08_opus55_cmp_0.OUTN d08_gpt62sol_cmp_0.CLK 0.91275f
+C134 d08_gpt62sol_cmp_0.INP a_92313_122220# 0.12944f
+C135 d08_esd_12.to_gate d08_esd_9.to_gate 0.25558f
+C136 vdd d08_esd_9.to_gate 49.2085f
+C137 neuro1b_0.VBN a_31944_15439# 0.06055f
+C138 d08_esd_12.to_gate a_92313_122220# 2.24301f
+C139 a_51638_73036# d08_bias_source_4.IOUT 0.87699f
+C140 vdd a_92313_122220# 1.49898f
+C141 d08_gemini4argon_cmp_0.OUTN d08_gpt62sol_cmp_0.CLK 0.8107f
+C142 m5_58720_12400r# m5_60400_12400# 0.34458f
+C143 a_42608_174955# a_39928_174747# 0.42304f
+C144 m5_62800_7200# m5_64000_7200r# 0.1608f
+C145 d08_esd_3.to_gate d08_gpt62sol_cmp_0.CLK 0.53964f
+C146 d08_gpt62sol_cmp_0.INP a_42608_174955# 0.43337f
+C147 m5_72160_12400r# m5_70480_12400# 0.34458f
+C148 vdd deepseek_cmp 15.5665f
+C149 neuro1b_0.VBN d08_esd_0.to_gate 0.26084f
+C150 a_42608_174955# vdd 2.90611f
+C151 m5_88000_7200# m5_86800_7200# 0.17995f
+C152 a_42608_174955# d08_esd_8.to_gate 6.36353f
+C153 neuro1b_0.VBN d08_gpt62sol_cmp_0.CLK 0.05051f
+C154 vdd inp 15.5454f
+C155 a_44719_53656# d08_esd_7.to_gate 0.25208f
+C156 a_87998_58971# d08_bias_source_4.IOUT 0.60244f
+C157 vdd a_39928_174747# 3.80758f
+C158 d08_gpt62sol_cmp_0.INP a_42968_107285# 0.55694f
+C159 d08_gpt62sol_cmp_0.INP a_64996_106469# 1.36765f
+C160 m5_92800_8400# m5_94000_7200r# 0.09572f
+C161 d08_gpt62sol_cmp_0.INP d08_esd_12.to_gate 0.05051f
+C162 d08_gpt62sol_cmp_0.INP vdd 52.1426f
+C163 a_31638_149836# vdd 10.517f
+C164 neuro1b_0.VBN a_31210_13119# 0.6159f
+C165 d08_gpt62sol_cmp_0.INP d08_esd_8.to_gate 0.49071f
+C166 vdd a_64996_106469# 1.98639f
+C167 d08_gpt62sol_cmp_0.INP a_67021_91987# 0.16524f
+C168 a_50838_188236# neuro1b_0.VBN 0.25846f
+C169 d08_esd_12.to_gate vdd 51.9236f
+C170 m5_59200_7200# m5_60700_7200# 0.14166f
+C171 neuro1b_0.VBN a_51638_73036# 0.25846f
+C172 a_67021_91987# a_64996_106469# 1.22853f
+C173 vdd d08_esd_8.to_gate 44.6206f
+C174 a_40596_120915# d08_gpt62sol_cmp_0.CLK 0.7337f
+C175 vdd a_67021_91987# 1.83458f
+C176 d08_esd_3.to_gate d08_gpt62sol_cmp_0.INN 0.04936f
+C177 a_76537_33657# d08_esd_1.to_gate 0.82214f
+C178 m5_63760_12400r# m5_65440_12400r# 0.22972f
+C179 d08_bias_source_1.IOUT a_49238_147436# 0.87699f
+C180 d08_bias_source_1.IOUT d08_gpt62sol_cmp_0.INN 2.36646f
+C181 m5_65200_7200# m5_64000_7200r# 0.28715f
+C182 d08_esd_2.to_gate neuro1b_0.VBN 0.04912f
+C183 a_43696_107285# d08_gpt62sol_cmp_0.CLK 0.18676f
+C184 a_79469_183394# a_80779_183394# 3.38261f
+C185 neuro1b_0.VBN a_49238_147436# 0.2638f
+C186 inn vdd 15.5454f
+C187 d08_gpt62sol_cmp_0.INP a_71313_153784# 1.167f
+C188 d08_gpt62sol_cmp_0.INN neuro1b_0.VBN 0.0913f
+C189 vdd a_31744_15231# 4.0514f
+C190 vdd oxa_vref 15.5665f
+C191 m5_75100_7200# m5_73600_7200# 0.14166f
+C192 m5_71200_7200# m5_72400_7200r# 0.1608f
+C193 a_71313_153784# vdd 0.3753f
+C194 vdd a_82280_70418# 20.8296f
+C195 vdd a_79278_159820# 5.46276f
+C196 d08_gpt62sol_cmp_0.INN a_80779_183394# 0.65614f
+C197 d08_gpt62sol_cmp_0.INP a_76586_188822# 0.02477f
+C198 neuro1b_0.VBN d08_bias_source_3.IOUT 0.12707f
+C199 d08_gpt62sol_cmp_0.INP d08_gemini4argon_ota_0.OUT 0.88595f
+C200 vdd d08_bias_source_2.IOUT 6.37412f
+C201 m5_70000_8400# m5_68800_7200r# 0.0629f
+C202 a_76586_188822# vdd 7.64748f
+C203 m5_88000_7200# m5_89200_7200# 0.40201f
+C204 a_31944_15439# d08_esd_0.to_gate 2.90195f
+C205 vdd d08_bias_source_0.IOUT 6.76535f
+C206 d08_gemini4argon_ota_0.OUT vdd 52.9981f
+C207 a_40596_120915# d08_gpt62sol_cmp_0.INN 0.10978f
+C208 d08_gpt62sol_cmp_0.CLK a_90436_128817# 0.75468f
+C209 a_91685_122220# a_90436_128817# 5.38886f
+C210 d08_gpt62sol_cmp_0.INP a_72223_153784# 0.23759f
+C211 m5_94000_7200r# m5_95200_7200# 0.28715f
+C212 neuro1b_0.VBN d08_esd_1.to_gate 0.15229f
+C213 d08_gpt62sol_cmp_0.INN a_43696_107285# 0.63216f
+C214 vdd a_72223_153784# 17.5502f
+C215 a_50838_188236# d08_gemini4argon_ota_0.IBIAS 0.87699f
+C216 a_79469_183394# d08_gemini4argon_ota_0.IBIAS 0.54223f
+C217 gpt_cmp vdd 15.5665f
+C218 vdd a_80130_58971# 0.13375f
+C219 a_92313_122220# d08_gemini4argon_cmp_0.OUTN 1.14762f
+C220 d08_esd_3.to_gate d08_esd_9.to_gate 2.11552f
+C221 m5_54400_7200r# m5_53200_7200r# 0.22972f
+C222 a_91685_122220# d08_gpt62sol_cmp_0.CLK 0.24347f
+C223 d08_gpt62sol_cmp_0.INN d08_gemini4argon_ota_0.IBIAS 0.59502f
+C224 a_71313_153784# a_72223_153784# 3.95395f
+C225 vdd a_76537_33657# 7.83641f
+C226 a_76586_188822# d08_gemini4argon_ota_0.OUT 0.07077f
+C227 vdd d08_bias_source_4.IOUT 5.4447f
+C228 a_72223_153784# a_79278_159820# 2.05507f
+C229 d08_gpt62sol_cmp_0.INN a_90436_128817# 0.01284f
+C230 a_31210_13119# d08_esd_0.to_gate 1.66105f
+C231 d08_opus55_cmp_0.OUTN a_64996_106469# 3.60313f
+C232 a_40596_120915# d08_gpt62sol_cmp_0.OUTN 0.68447f
+C233 vdd d08_opus55_cmp_0.OUTN 14.1823f
+C234 m5_57040_12400# m5_55360_14080# 0.10529f
+C235 d08_opus55_cmp_0.OUTN a_67021_91987# 2.55413f
+C236 vdd clk 15.5454f
+C237 a_40596_120915# d08_esd_9.to_gate 0.07506f
+C238 vdd d08_esd_10.to_gate 50.6669f
+C239 m5_53600_7700# m5_53200_7200r# 0.30629f
+C240 vdd a_31638_41836# 10.517f
+C241 a_43696_107285# d08_gpt62sol_cmp_0.OUTN 0.77153f
+C242 deepseek_ota vdd 15.5665f
+C243 d08_esd_12.to_gate d08_gemini4argon_cmp_0.OUTN 1.38955f
+C244 d08_esd_3.to_gate d08_gpt62sol_cmp_0.INP 0.09987f
+C245 vdd d08_gemini4argon_cmp_0.OUTN 7.87731f
+C246 m5_75100_7200# m5_76000_7200r# 0.09572f
+C247 d08_gpt62sol_cmp_0.INN d08_gpt62sol_cmp_0.CLK 0.25555f
+C248 a_43696_107285# d08_esd_9.to_gate 0.89826f
+C249 d08_esd_3.to_gate a_64996_106469# 1.56115f
+C250 a_82280_70418# d08_bias_source_4.IOUT 0.21371f
+C251 d08_gpt62sol_cmp_0.INN a_91685_122220# 0.25082f
+C252 d08_esd_3.to_gate vdd 57.886f
+C253 d08_bias_source_1.IOUT vdd 4.39526f
+C254 d08_esd_3.to_gate a_67021_91987# 4.06809f
+C255 d08_esd_2.to_gate a_66358_159612# 2.31f
+C256 d08_gpt62sol_cmp_0.INP neuro1b_0.VBN 0.51668f
+C257 a_76537_33657# d08_bias_source_0.IOUT 0.75417f
+C258 a_31638_149836# neuro1b_0.VBN 0.25846f
+C259 neuro1b_0.VBN d08_esd_12.to_gate 0.05051f
+C260 neuro1b_0.VBN vdd 48.6057f
+C261 neuro1b_0.VBN a_34182_13119# 0.70183f
+C262 vdd oxa_cmp 15.5665f
+C263 m5_82000_7200r# m5_83200_7200# 0.14932f
+C264 neuro1b_0.VBN d08_esd_8.to_gate 0.56362f
+C265 m5_82000_7200r# m5_80800_7200r# 0.28715f
+C266 a_82280_70418# d08_esd_10.to_gate 1.20942f
+C267 d08_gpt62sol_cmp_0.INN a_79469_183394# 1.4789f
+C268 d08_gpt62sol_cmp_0.INP a_80779_183394# 0.7999f
+C269 vdd d08_esd_7.to_gate 46.2145f
+C270 d08_bias_source_1.IOUT a_71313_153784# 0.21848f
+C271 vdd a_80779_183394# 7.76749f
+C272 m5_72160_12400r# m5_73840_12400# 0.34458f
+C273 a_31638_41836# d08_bias_source_2.IOUT 0.87699f
+C274 a_80130_58971# d08_bias_source_4.IOUT 0.97155f
+C275 a_42968_107285# a_40596_120915# 2.77965f
+C276 d08_gpt62sol_cmp_0.INP a_40596_120915# 0.28551f
+C277 d08_esd_2.to_gate d08_gpt62sol_cmp_0.INN 0.68996f
+C278 neuro1b_0.VBN a_31744_15231# 0.10143f
+C279 a_92313_122220# a_90436_128817# 0.88482f
+C280 a_66311_91987# d08_gpt62sol_cmp_0.CLK 1.15073f
+C281 a_37154_13119# a_34182_13119# 0.55198f
+C282 a_40596_120915# vdd 1.07176f
+C283 m5_71200_7200# m5_70000_8400# 0.17229f
+C284 temp_out vss 13.7878f
+C285 oxa_vref vss 14.5612f
+C286 gpt_vref vss 14.5612f
+C287 deepseek_vref vss 14.5612f
+C288 oxa_cmp vss 14.5612f
+C289 gpt_cmp vss 14.5612f
+C290 deepseek_cmp vss 14.5612f
+C291 oxa_ota vss 14.5612f
+C292 gpt_ota vss 14.5612f
+C293 deepseek_ota vss 14.5612f
+C294 clk vss 11.0672f
+C295 inn vss 11.0672f
+C296 inp vss 11.0672f
+C297 ibias vss 11.0672f
+C298 vdd vss 5.06521p
+C299 m5_95200_7200# vss 0.80818f
+C300 m5_94000_7200r# vss 0.68265f
+C301 m5_92800_8400# vss 0.45763f
+C302 m5_91600_7200# vss 0.66261f
+C303 m5_90400_7200# vss 0.71871f
+C304 m5_89200_7200# vss 0.54558f
+C305 m5_88000_7200# vss 0.60291f
+C306 m5_86800_7200# vss 0.55786f
+C307 m5_85600_7200r# vss 0.77451f
+C308 m5_83200_7200# vss 0.79004f
+C309 m5_82000_7200r# vss 0.64193f
+C310 m5_80800_7200r# vss 0.70109f
+C311 m5_79600_7200# vss 0.4557f
+C312 m5_78400_7200# vss 0.8565f
+C313 m5_76000_7200r# vss 0.74573f
+C314 m5_75100_7200# vss 0.28465f
+C315 m5_73600_7200# vss 0.59896f
+C316 m5_72400_7200r# vss 0.66688f
+C317 m5_71200_7200# vss 0.70983f
+C318 m5_70000_8400# vss 0.47406f
+C319 m5_68800_7200r# vss 0.69546f
+C320 m5_67600_7200# vss 0.59751f
+C321 m5_66400_7200# vss 0.48245f
+C322 m5_65200_7200# vss 0.54993f
+C323 m5_64000_7200r# vss 0.66688f
+C324 m5_62800_7200# vss 0.71252f
+C325 m5_56900_7800# vss 0.31051f ; **FLOATING
+C326 m5_61600_7200r# vss 0.66315f
+C327 m5_60700_7200# vss 0.28465f
+C328 m5_59200_7200# vss 0.76178f
+C329 m5_54400_7200r# vss 0.92706f
+C330 m5_53600_7700# vss 0.02719f
+C331 m5_53200_7200r# vss 0.63354f
+C332 m5_52000_7200# vss 0.84973f
+C333 m5_75520_12400# vss 1.21585f
+C334 m5_73840_12400# vss 1.03491f
+C335 m5_72160_12400r# vss 0.84965f
+C336 m5_70480_12400# vss 1.09831f
+C337 m5_67120_12400# vss 0.88284f
+C338 m5_65440_12400r# vss 0.8559f
+C339 m5_63760_12400r# vss 1.22631f
+C340 m5_62500_12400# vss 0.64033f
+C341 m5_60400_12400# vss 0.88341f
+C342 m5_58720_12400r# vss 0.85678f
+C343 m5_57040_12400# vss 1.04634f
+C344 m5_55360_14080# vss 0.93314f
+C345 m5_52000_12400# vss 1.4179f ; **FLOATING
+C346 a_37154_13119# vss 2.87903f ; **FLOATING
+C347 a_34182_13119# vss 1.99669f ; **FLOATING
+C348 a_31210_13119# vss 3.47707f ; **FLOATING
+C349 a_31944_15439# vss 13.4917f ; **FLOATING
+C350 a_31744_15231# vss 5.34176f ; **FLOATING
+C351 d08_esd_0.to_gate vss 0.1869p ; **FLOATING
+C352 a_76537_33657# vss 4.78686f ; **FLOATING
+C353 d08_bias_source_0.IOUT vss 22.7003f ; **FLOATING
+C354 a_56438_34636# vss 2.38758f ; **FLOATING
+C355 d08_esd_1.to_gate vss 0.18599p ; **FLOATING
+C356 a_31638_41836# vss 2.3568f ; **FLOATING
+C357 a_87998_58971# vss 5.3668f ; **FLOATING
+C358 a_80130_58971# vss 4.63258f ; **FLOATING
+C359 a_82280_70418# vss 3.28715f ; **FLOATING
+C360 a_44719_53656# vss 3.22967f ; **FLOATING
+C361 d08_bias_source_2.IOUT vss 21.9312f ; **FLOATING
+C362 d08_esd_7.to_gate vss 0.17068p ; **FLOATING
+C363 d08_bias_source_4.IOUT vss 40.5519f ; **FLOATING
+C364 a_51638_73036# vss 2.3568f ; **FLOATING
+C365 d08_esd_10.to_gate vss 0.18859p ; **FLOATING
+C366 a_66311_91987# vss 11.9929f ; **FLOATING
+C367 a_67021_91987# vss 12.0824f ; **FLOATING
+C368 d08_opus55_cmp_0.OUTN vss 7.84395f ; **FLOATING
+C369 a_64996_106469# vss 10.8248f ; **FLOATING
+C370 a_91685_122220# vss 4.99418f ; **FLOATING
+C371 a_92313_122220# vss 7.06305f ; **FLOATING
+C372 a_90436_128817# vss 3.34781f ; **FLOATING
+C373 d08_gemini4argon_cmp_0.OUTN vss 5.6074f ; **FLOATING
+C374 a_42968_107285# vss 6.40207f ; **FLOATING
+C375 a_43696_107285# vss 3.91199f ; **FLOATING
+C376 a_40596_120915# vss 5.30537f ; **FLOATING
+C377 d08_gpt62sol_cmp_0.OUTN vss 5.71938f ; **FLOATING
+C378 d08_esd_3.to_gate vss 0.18023p ; **FLOATING
+C379 d08_esd_9.to_gate vss 0.16773p ; **FLOATING
+C380 d08_esd_12.to_gate vss 0.17502p ; **FLOATING
+C381 a_71313_153784# vss 7.70856f ; **FLOATING
+C382 a_79278_159820# vss 15.8982f ; **FLOATING
+C383 a_72223_153784# vss 5.39869f ; **FLOATING
+C384 a_66358_159612# vss 4.16169f ; **FLOATING
+C385 d08_bias_source_1.IOUT vss 28.9264f ; **FLOATING
+C386 a_49238_147436# vss 2.35259f ; **FLOATING
+C387 a_31638_149836# vss 2.3568f ; **FLOATING
+C388 d08_esd_2.to_gate vss 0.1855p ; **FLOATING
+C389 a_79469_183394# vss 9.42775f ; **FLOATING
+C390 a_80779_183394# vss 5.28872f ; **FLOATING
+C391 a_66570_175761# vss 12.3677f ; **FLOATING
+C392 a_76586_188822# vss 3.81385f ; **FLOATING
+C393 d08_bias_source_3.IOUT vss 18.8852f ; **FLOATING
+C394 a_39698_172336# vss 4.55783f ; **FLOATING
+C395 a_42608_174955# vss 21.6158f ; **FLOATING
+C396 a_39928_174747# vss 1.88238f ; **FLOATING
+C397 d08_esd_8.to_gate vss 0.17087p ; **FLOATING
+C398 d08_gemini4argon_ota_0.IBIAS vss 31.0504f ; **FLOATING
+C399 a_50838_188236# vss 2.3568f ; **FLOATING
+C400 d08_gemini4argon_ota_0.OUT vss 0.17657p ; **FLOATING
+C401 d08_gpt62sol_cmp_0.CLK vss 0.22367p ; **FLOATING
+C402 d08_gpt62sol_cmp_0.INN vss 0.25629p ; **FLOATING
+C403 d08_gpt62sol_cmp_0.INP vss 0.26785p ; **FLOATING
+C404 neuro1b_0.VBN vss 0.28182p ; **FLOATING
+.ends

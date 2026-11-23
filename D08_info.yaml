@@ -15,34 +15,44 @@ project:
   title: "MBG-D08: AI-generated analog block array"
   team: "D08 Microelectronic Block Generator"
   discord: ""
-  description: "Integrated top-level GDS combining nine AI/LLM-generated analog blocks (3x 5T-OTA, 3x StrongArm comparator, 3x 1.2V reference) plus a relaxation-oscillator temperature sensor, behind 14 secondary-ESD analog pads (gLayout track, GF180MCU-D)"
+  description: "Integrated top-level GDS combining nine AI/LLM-generated analog blocks (3x 5T-OTA, 3x StrongArm comparator, 3x 1.2V reference) and the NEURO1B spiking temperature sensor (designed with Opus 5.5), which replaces the earlier relaxation-oscillator sensor on the temp_out pin (pin name unchanged), behind 14 secondary-ESD analog pads (gLayout track, GF180MCU-D)"
   lvs_config: "lvs_config_mbg_d08.json"
+  # Readiness fields below are carried from MBG-Public/info.yaml (your published values) and
+  # were NOT re-decided here. Evidence for this layout: DRC and LVS pass (verify-*.json),
+  # landing matches the committee D08_BV.def. ws_def_ready is true by D08 team decision: the D08 team is
+  # responsible for the block area only; wafer.space frame confirmation is handled by the Chipathon committee.
+  gf_def_ready: true
+  ws_def_ready: true 
+  drc_ready: true
+  lvs_ready: true
+  export_control: "Export_Control_GF_Rev8.2_signed.docx"
 
 # ======================================================
 # Pin connections to the external pads.
 #
-# Verified against mbg-toplevel/layout/mbg-d08.gds (sha256 c24b19ff...,
-# 2026-09-04): order matches the pin geometry 16/16, with vss at W22 and
-# vdd at N01 (NW corner). The block is placed at origin - DIEAREA and the
-# layer-0/0 boundary are both (0,0)-(550,1110) um - and all 16 pin
-# rectangles touch the die edge, so every DEF landing strip is covered.
+# Current layout: mbg_d08 (sha256 229ad297...), block 605 x 1110 um,
+# orientation NORMAL (mirror_x=false, mirror_y=false), matching the committee D08_BV.def
+# (pin map used as the block DEF). Pin coordinates below are from the GDS labels
+# (mbg-toplevel/floorplan/pin_positions_normal.json).
 #
-# Sign-off on that GDS: Magic DRC 0 violations; KLayout DRC 0 violations
-# over 728 rules / 168 decks, 0 exceptions; netgen LVS circuits match
-# uniquely, 94/94 devices, 60/60 nets, no property errors. Metal2 corner
-# obstruction clear (0 overlap exact and +5 um, nearest Metal2 39.340 um).
+# Sign-off on this GDS (mbg-toplevel/verification/):
+#   Magic DRC 0, KLayout DRC 0 (dual-engine PASS); netgen LVS match against
+#   mbg-d08_lvs.spice; coupled PEX 318 C / 0 R (same as normal orientation).
+#   Full-RC PEX: FAIL (Magic stops; open).
 #
 # OPEN with the organizer (@d-m-bailey):
-#   1. D08_BV.def still carries the OLD pin assignment and must be
-#      regenerated from this list. A proposed replacement generated from
-#      the layout is in mbg-toplevel/def/D08_BV_proposed.def.
-#   2. W22/N01 hold gf180mcu_fd_io__asig_5p0 signal cells today, while
-#      gf180mcu_fd_io__dvss/__dvdd sit at W12/W13. The pad cell types must
-#      be swapped for power at the NW corner, and the "first quadrant pin
-#      is a fixed down-bonded ground" rule re-checked - W12 now carries
-#      temp_out.
-#   3. The GDS top cell is now at origin; the frame recorded in
-#      D08_selected_variants.json was [2009000, 1449000, 2559000, 2559000].
+# Author name drawn on the top metal (Metal5, 81/0, floating): "M Taufiqul Huda", "D08 - Microelectronic Block Generator".
+#
+#   1. Orientation: DECIDED by the D08 team: NORMAL, matching the committee D08_BV.def.
+#      (The floorplanner lists D08 as mirror_x/mirror_y; the organizers should be told.)
+#   2. PR boundary: DECIDED: follows the committee D08_BV.def DIEAREA, 605 x 1110 um
+#      (the 550 um figure in D08_BV_interface.yaml is the old GDS size record).
+#   3. temp_out / W12: DECIDED by the D08 team: NEURO1B replaces the earlier temperature sensor on this pin (it is not an overlay);
+#      the pin name temp_out is kept on purpose.
+#   4. Pad cells: no dvdd/dvss/vdd/vss pad instances in the GDS. The pad rule
+#      needs organizer confirmation.
+#   5. Double ESD: the block's io_secondary_3p3 cells sit behind the pad's
+#      asig_5p0 secondary ESD. Confirm this is intended.
 #
 # Slot order is W12..W22 up the west edge, then N01..N05 left-to-right
 # along the north edge. Coordinates are the label positions, measured from
@@ -52,7 +62,7 @@ project:
 # secondary-ESD cell. vdd/vss are power/ground: secondary_esd is analog-only.
 # ======================================================
 pins:
-  #    *** PIN MAP (target, NW-corner power) ***
+  #    *** PIN MAP (normal orientation; coordinates below are from the GDS labels) ***
   #                                     clk
   #                                 inn |
   #                             inp |   |
@@ -74,51 +84,51 @@ pins:
   #      temp_out   ====== |_____________|
   #
   # --- west edge, bottom -> top (slots W12..W22) -------------------------
-  - name: temp_out            # W12  (  2.50,   42.50)  RO temp sensor (claude-opus-5)
+  - name: temp_out            # W12  (   0.50,   42.50)  NEURO1B spiking temp sensor, designed with Opus 5.5 (via temp_out_core)
     io_type: analog
     secondary_esd: true
-  - name: oxa_vref            # W13  (  2.50,  142.50)  1.2 V reference, ox_alpha
+  - name: oxa_vref            # W13  (   0.50,  142.50)  1.2 V reference, Opus 5.5
     io_type: analog
     secondary_esd: true
-  - name: gpt_vref            # W14  (  2.50,  242.50)  1.2 V reference, gpt-5.6-luna
+  - name: gpt_vref            # W14  (   0.50,  242.50)  1.2 V reference, GPT-6.2 Sol
     io_type: analog
     secondary_esd: true
-  - name: deepseek_vref       # W15  (  2.50,  342.50)  1.2 V reference, deepseek
+  - name: deepseek_vref       # W15  (   0.50,  342.50)  1.2 V reference, Gemini 4 Argon (neon fallback)
     io_type: analog
     secondary_esd: true
-  - name: oxa_cmp             # W16  (  2.50,  442.50)  comparator OUTP, ox_alpha (OUTN internal)
+  - name: oxa_cmp             # W16  (   0.50,  442.50)  comparator OUTP, Opus 5.5 (OUTN internal)
     io_type: analog
     secondary_esd: true
-  - name: gpt_cmp             # W17  (  2.50,  542.50)  comparator OUTP, gpt-5.6-luna (OUTN internal)
+  - name: gpt_cmp             # W17  (   0.50,  542.50)  comparator OUTP, GPT-6.2 Sol (OUTN internal)
     io_type: analog
     secondary_esd: true
-  - name: deepseek_cmp        # W18  (  2.50,  642.50)  comparator OUTP, deepseek (OUTN internal)
+  - name: deepseek_cmp        # W18  (   0.50,  642.50)  comparator OUTP, Gemini 4 Argon (neon fallback) (OUTN internal)
     io_type: analog
     secondary_esd: true
-  - name: oxa_ota             # W19  (  2.50,  742.50)  5T-OTA OUT, ox_alpha
+  - name: oxa_ota             # W19  (   0.50,  742.50)  5T-OTA OUT, Opus 5.5
     io_type: analog
     secondary_esd: true
-  - name: gpt_ota             # W20  (  2.50,  842.50)  5T-OTA OUT, gpt-5.6-luna
+  - name: gpt_ota             # W20  (   0.50,  842.50)  5T-OTA OUT, GPT-6.2 Sol
     io_type: analog
     secondary_esd: true
-  - name: deepseek_ota        # W21  (  2.50,  942.50)  5T-OTA OUT, deepseek
+  - name: deepseek_ota        # W21  (   0.50,  942.50)  5T-OTA OUT, Gemini 4 Argon (neon fallback)
     io_type: analog
     secondary_esd: true
-  - name: vss                 # W22  (  6.50, 1042.50)  quiet ground (NW corner)
+  - name: vss                 # W22  (   0.50, 1042.50)  quiet ground (mirrored)
     io_type: ground
 
   # --- north edge, left -> right (slots N01..N05) ------------------------
-  - name: vdd                 # N01  ( 63.39, 1100.59)  3.3 V rail (NW corner)
+  - name: vdd                 # N01  (  67.50, 1109.50)  3.3 V rail (mirrored)
     io_type: power
-  - name: ibias               # N02  (164.50, 1106.09)  bias current -> ibias_core (3 OTAs + 3 VREFs)
+  - name: ibias               # N02  ( 167.50, 1109.50)  bias current -> ibias_core (3 OTAs + 3 VREFs)
     io_type: analog
     secondary_esd: true
-  - name: inp                 # N03  (264.50, 1106.09)  differential input + -> inp_core
+  - name: inp                 # N03  ( 267.50, 1109.50)  differential input + -> inp_core
     io_type: analog
     secondary_esd: true
-  - name: inn                 # N04  (364.50, 1106.09)  differential input - -> inn_core
+  - name: inn                 # N04  ( 367.50, 1109.50)  differential input - -> inn_core
     io_type: analog
     secondary_esd: true
-  - name: clk                 # N05  (464.50, 1106.59)  comparator sampling clock -> clk_core
+  - name: clk                 # N05  ( 467.50, 1109.50)  comparator sampling clock -> clk_core
     io_type: analog
     secondary_esd: true

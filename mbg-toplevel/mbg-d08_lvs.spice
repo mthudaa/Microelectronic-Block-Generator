@@ -1,166 +1,186 @@
-* LVS source topology for mbg-d08.gds.
-*
-* The simulation modules in spice/ use X records because the GF180 model
-* library exposes MOS devices as subcircuits.  KLayout LVS compares native
-* MOS records, so this file is the LVS-normalized form of those same module
-* topologies.  The pre-simulation deck remains mbg-d08_pre_sim.spice and
-* directly includes the supplied files from spice/.
-
-.subckt deepseek_ota VDD VSS INP INN OUT IBIAS
-M1 net1 INP net2 VSS nfet_03v3 L=1u W=4u nf=4
-M2 OUT INN net2 VSS nfet_03v3 L=1u W=4u nf=4
-M3 net1 net1 VDD VDD pfet_03v3 L=1u W=2.4u nf=4
-M4 OUT net1 VDD VDD pfet_03v3 L=1u W=2.4u nf=4
-M5 net2 IBIAS VSS VSS nfet_03v3 L=1u W=8u nf=4
-M6 IBIAS IBIAS VSS VSS nfet_03v3 L=1u W=4u nf=4
-.ends deepseek_ota
-
-.subckt gpt_luna_ota VDD VSS INP INN OUT IBIAS
-M1 NLEFT INP NTAIL VSS nfet_03v3 L=0.6u W=4u nf=4
-M2 OUT INN NTAIL VSS nfet_03v3 L=0.6u W=4u nf=4
-M3 NLEFT NLEFT VDD VDD pfet_03v3 L=0.8u W=6u nf=4
-M4 OUT NLEFT VDD VDD pfet_03v3 L=0.8u W=6u nf=4
-M5 NTAIL IBIAS VSS VSS nfet_03v3 L=1u W=4u nf=4
-M6 IBIAS IBIAS VSS VSS nfet_03v3 L=1u W=4u nf=4
-.ends gpt_luna_ota
-
-.subckt ox_alpha_ota VDD VSS INP INN OUT IBIAS
-M1 IBIAS IBIAS VSS VSS nfet_03v3 W=2.0u L=2.0u nf=1
-M2 tail IBIAS VSS VSS nfet_03v3 W=12.0u L=4.0u nf=2
-M3 n1 INN tail VSS nfet_03v3 W=6.0u L=2.0u nf=1
-M4 OUT INP tail VSS nfet_03v3 W=6.0u L=2.0u nf=1
-M5 n1 n1 VDD VDD pfet_03v3 W=30.0u L=4.0u nf=4
-M6 OUT n1 VDD VDD pfet_03v3 W=30.0u L=4.0u nf=4
-.ends ox_alpha_ota
-
-.subckt deepseek_strongarm_comparator VDD VSS INP INN CLK OUTP OUTN
-M1 TAIL CLK VSS VSS nfet_03v3 L=0.5u W=2u nf=1
-M2 D1 INP TAIL VSS nfet_03v3 L=0.6u W=16u nf=8
-M3 D2 INN TAIL VSS nfet_03v3 L=0.6u W=16u nf=8
-M4 OUTN OUTP D1 VSS nfet_03v3 L=0.5u W=6u nf=3
-M5 OUTP OUTN D2 VSS nfet_03v3 L=0.5u W=6u nf=3
-M6 OUTN OUTP VDD VDD pfet_03v3 L=0.5u W=6u nf=3
-M7 OUTP OUTN VDD VDD pfet_03v3 L=0.5u W=6u nf=3
-M8 OUTN CLK VDD VDD pfet_03v3 L=0.5u W=2u nf=1
-M9 OUTP CLK VDD VDD pfet_03v3 L=0.5u W=2u nf=1
-M10 D1 CLK VDD VDD pfet_03v3 L=0.5u W=2u nf=1
-M11 D2 CLK VDD VDD pfet_03v3 L=0.5u W=2u nf=1
-.ends deepseek_strongarm_comparator
-
-.subckt gpt_luna_strongarm_comparator VDD VSS INP INN CLK OUTP OUTN
-M1 TAIL CLK VSS VSS nfet_03v3 L=0.6u W=4u nf=4
-M2 D1 INP TAIL VSS nfet_03v3 L=0.6u W=3u nf=3
-M3 D2 INN TAIL VSS nfet_03v3 L=0.6u W=3u nf=3
-M4 OUTN OUTP D1 VSS nfet_03v3 L=0.6u W=5u nf=5
-M5 OUTP OUTN D2 VSS nfet_03v3 L=0.6u W=5u nf=5
-M6 OUTN OUTP VDD VDD pfet_03v3 L=0.6u W=3u nf=3
-M7 OUTP OUTN VDD VDD pfet_03v3 L=0.6u W=3u nf=3
-M8 OUTN CLK VDD VDD pfet_03v3 L=0.6u W=3u nf=3
-M9 OUTP CLK VDD VDD pfet_03v3 L=0.6u W=3u nf=3
-M10 D1 CLK VDD VDD pfet_03v3 L=0.6u W=3u nf=3
-M11 D2 CLK VDD VDD pfet_03v3 L=0.6u W=3u nf=3
-.ends gpt_luna_strongarm_comparator
-
-.subckt ox_alpha_strongarm_comparator VDD VSS INP INN CLK OUTP OUTN
-M1 SN CLK VSS VSS nfet_03v3 L=0.5u W=9.1u nf=1
-M2 SN_P INN SN VSS nfet_03v3 L=0.7u W=3u nf=1
-M3 SN_N INP SN VSS nfet_03v3 L=0.7u W=3u nf=1
-M4 OUTN OUTP SN_N VSS nfet_03v3 L=0.5u W=2.3u nf=1
-M5 OUTP OUTN SN_P VSS nfet_03v3 L=0.5u W=2.3u nf=1
-M6 OUTN OUTP VDD VDD pfet_03v3 L=0.5u W=3u nf=1
-M7 OUTP OUTN VDD VDD pfet_03v3 L=0.5u W=3u nf=1
-M8 SN_N CLK VDD VDD pfet_03v3 L=0.5u W=0.8u nf=1
-M9 SN_P CLK VDD VDD pfet_03v3 L=0.5u W=0.8u nf=1
-M10 OUTN CLK VDD VDD pfet_03v3 L=0.5u W=1.6u nf=1
-M11 OUTP CLK VDD VDD pfet_03v3 L=0.5u W=1.6u nf=1
-.ends ox_alpha_strongarm_comparator
-
-.subckt deepseek_vref_1v2 VDD VSS VREF IBIAS
-M1 IBIAS IBIAS VSS VSS nfet_03v3 L=2u W=4u nf=2
-M2 pm IBIAS VSS VSS nfet_03v3 L=2u W=4u nf=2
-M3 pm pm VDD VDD pfet_03v3 L=2u W=4u nf=2
-M4 VREF pm VDD VDD pfet_03v3 L=2u W=8u nf=2
-M5 VREF VREF VSS VSS nfet_03v3 L=0.5u W=1.2u nf=1
-.ends deepseek_vref_1v2
-
-.subckt gpt_luna_vref_1v2 VDD VSS VREF IBIAS
-M1 IBIAS IBIAS VDD VDD pfet_03v3 L=8u W=2u nf=1
-M2 VREF IBIAS VDD VDD pfet_03v3 L=8u W=2u nf=1
-M3 VREF VREF VMB VSS nfet_03v3 L=0.28u W=9.5u nf=1
-M4 VMB VREF VSS VSS nfet_03v3 L=8u W=9.5u nf=1
-.ends gpt_luna_vref_1v2
-
-.subckt ox_alpha_vref_1v2 VDD VSS VREF IBIAS
-M1 IBIAS IBIAS VDD VDD pfet_03v3 W=2u L=8u nf=1
-M2 VREF IBIAS VDD VDD pfet_03v3 W=2u L=8u nf=1
-M3 VREF VREF VMB VSS nfet_03v3 W=9.6u L=0.35u nf=12
-M4 VMB VREF VSS VSS nfet_03v3 W=9.5u L=7.45u nf=1
-.ends ox_alpha_vref_1v2
-
-* LVS-native representation of spice/claude-opus-5_temp_sensor.spice.
-* The GF180 KLayout LVS runset does not emit the MIM timing capacitor into
-* its comparison netlist, so this topology mirrors the extracted devices.
-.subckt claude_opus_5_temp_sensor VDD VSS TEMP_OUT
-M1  NB1 NBP VDD VDD pfet_03v3 L=4u W=4u nf=1
-M2  NBP NBP VDD VDD pfet_03v3 L=4u W=4u nf=1
-M3  NB1 NB1 VSS VSS nfet_03v3 L=4u W=1u nf=1
-M4  NBP NB1 NRS VSS nfet_03v3 L=4u W=4u nf=1
-R1  NRS VSS VSS 35000 ppolyf_u L=100u W=1u
-M5  NSU VSS VDD VDD pfet_03v3 L=9.5u W=0.6u nf=1
-M6  NSU NB1 VSS VSS nfet_03v3 L=0.6u W=4u nf=1
-M7  NBP NSU VSS VSS nfet_03v3 L=1u W=1u nf=1
-M8  NCAP NBP VDD VDD pfet_03v3 L=4u W=4u nf=1
-M9  NCAP TEMP_OUT NSK VSS nfet_03v3 L=0.6u W=4u nf=1
-M10 NSK NB1 VSS VSS nfet_03v3 L=4u W=2u nf=1
-M11 NPA NCAP VDD VDD pfet_03v3 L=4u W=2u nf=1
-M12 NST NCAP NPA VDD pfet_03v3 L=4u W=2u nf=1
-M13 VSS NST NPA VDD pfet_03v3 L=4u W=4u nf=1
-M14 NNB NCAP VSS VSS nfet_03v3 L=4u W=1u nf=1
-M15 NST NCAP NNB VSS nfet_03v3 L=4u W=1u nf=1
-M16 VDD NST NNB VSS nfet_03v3 L=4u W=2u nf=1
-M17 TEMP_OUT NST VDD VDD pfet_03v3 L=1u W=6u nf=1
-M18 TEMP_OUT NST VSS VSS nfet_03v3 L=1u W=3u nf=1
-.ends claude_opus_5_temp_sensor
-
-* The current 3p3 GDS pad uses the 40um x 10um pad geometry and four
-* parallel diode fingers.  ASIG5V is the internal label present in this GDS.
-.subckt io_secondary_3p3 VDD TO_GATE ASIG5V VSS
-R1 TO_GATE ASIG5V VDD 87.5 ppolyf_u L=10u W=40u
-D2 VSS TO_GATE diode_nd2ps_03v3 area=100p pj=40u m=4
-D1 TO_GATE VDD diode_pd2nw_03v3 area=100p pj=40u m=4
-.ends io_secondary_3p3
-
-* Topology reconstructed from mbg-d08.gds.  Pin order follows the extracted
-* top-level labels: temp_out clk inp inn ibias vdd vss, then nine outputs.
-.subckt mbg_d08 temp_out clk inp inn ibias vdd vss
-+ deepseek_ota gpt_ota oxa_ota
-+ deepseek_cmp gpt_cmp oxa_cmp
-+ deepseek_vref gpt_vref oxa_vref
-
-XIO_CLK vdd clk_core clk vss io_secondary_3p3
-XIO_INP vdd inp_core inp vss io_secondary_3p3
-XIO_INN vdd inn_core inn vss io_secondary_3p3
-XIO_IBIAS vdd ibias_core ibias vss io_secondary_3p3
-XIO_TEMP vdd temp_out_core temp_out vss io_secondary_3p3
-
-XOTA_DS vdd vss inp_core inn_core deepseek_ota_core ibias_core deepseek_ota
-XOTA_GPT vdd vss inp_core inn_core gpt_ota_core ibias_core gpt_luna_ota
-XOTA_OXA vdd vss inp_core inn_core oxa_ota_core ibias_core ox_alpha_ota
-XCMP_DS vdd vss inp_core inn_core clk_core deepseek_cmp_core deepseek_cmp_n deepseek_strongarm_comparator
-XCMP_GPT vdd vss inp_core inn_core clk_core gpt_cmp_core gpt_cmp_n gpt_luna_strongarm_comparator
-XCMP_OXA vdd vss inp_core inn_core clk_core oxa_cmp_core oxa_cmp_n ox_alpha_strongarm_comparator
-XVREF_DS vdd vss deepseek_vref_core ibias_core deepseek_vref_1v2
-XVREF_GPT vdd vss gpt_vref_core ibias_core gpt_luna_vref_1v2
-XVREF_OXA vdd vss oxa_vref_core ibias_core ox_alpha_vref_1v2
-XTEMP_CLAUDE vdd vss temp_out_core claude_opus_5_temp_sensor
-
-XIO_DS_OTA vdd deepseek_ota_core deepseek_ota vss io_secondary_3p3
-XIO_GPT_OTA vdd gpt_ota_core gpt_ota vss io_secondary_3p3
-XIO_OXA_OTA vdd oxa_ota_core oxa_ota vss io_secondary_3p3
-XIO_DS_CMP vdd deepseek_cmp_core deepseek_cmp vss io_secondary_3p3
-XIO_GPT_CMP vdd gpt_cmp_core gpt_cmp vss io_secondary_3p3
-XIO_OXA_CMP vdd oxa_cmp_core oxa_cmp vss io_secondary_3p3
-XIO_DS_VREF vdd deepseek_vref_core deepseek_vref vss io_secondary_3p3
-XIO_GPT_VREF vdd gpt_vref_core gpt_vref vss io_secondary_3p3
-XIO_OXA_VREF vdd oxa_vref_core oxa_vref vss io_secondary_3p3
+* D08 top level: GPT-6.2 Sol, Opus 5.5 and Gemini 4 Argon blocks, six local bias sources, NEURO1B sensor (designed with Opus 5.5)
+.subckt mbg_d08 temp_out oxa_vref gpt_vref deepseek_vref oxa_cmp gpt_cmp deepseek_cmp oxa_ota gpt_ota deepseek_ota vss vdd ibias inp inn clk
+Xu_gpt62sol_ota vdd vss inp_core inn_core gpt62sol_ota_core gpt62sol_ota_ibias d08_gpt62sol_ota
+Xu_gpt62sol_cmp vdd vss inp_core inn_core clk_core gpt62sol_cmp_core gpt62sol_cmp_outn d08_gpt62sol_cmp
+Xu_gpt62sol_vref vdd vss gpt62sol_vref_core gpt62sol_vref_ibias d08_gpt62sol_vref
+Xu_opus55_ota vdd vss inp_core inn_core opus55_ota_core opus55_ota_ibias d08_opus55_ota
+Xu_opus55_cmp vdd vss inp_core inn_core clk_core opus55_cmp_core opus55_cmp_outn d08_opus55_cmp
+Xu_opus55_vref vdd vss opus55_vref_core opus55_vref_ibias d08_opus55_vref
+Xu_gemini4argon_ota vdd vss inp_core inn_core gemini4argon_ota_core gemini4argon_ota_ibias d08_gemini4argon_ota
+Xu_gemini4argon_cmp vdd vss inp_core inn_core clk_core gemini4argon_cmp_core gemini4argon_cmp_outn d08_gemini4argon_cmp
+Xu_gemini4argon_vref vdd vss gemini4argon_vref_core gemini4argon_vref_ibias d08_gemini4argon_vref
+Xesd_temp_out vdd temp_out_core temp_out vss d08_esd
+Xesd_opus55_vref vdd opus55_vref_core oxa_vref vss d08_esd
+Xesd_gpt62sol_vref vdd gpt62sol_vref_core gpt_vref vss d08_esd
+Xesd_gemini4argon_vref vdd gemini4argon_vref_core deepseek_vref vss d08_esd
+Xesd_opus55_cmp vdd opus55_cmp_core oxa_cmp vss d08_esd
+Xesd_gpt62sol_cmp vdd gpt62sol_cmp_core gpt_cmp vss d08_esd
+Xesd_gemini4argon_cmp vdd gemini4argon_cmp_core deepseek_cmp vss d08_esd
+Xesd_opus55_ota vdd opus55_ota_core oxa_ota vss d08_esd
+Xesd_gpt62sol_ota vdd gpt62sol_ota_core gpt_ota vss d08_esd
+Xesd_gemini4argon_ota vdd gemini4argon_ota_core deepseek_ota vss d08_esd
+Xesd_ibias vdd ibias_core ibias vss d08_esd
+Xesd_inp vdd inp_core inp vss d08_esd
+Xesd_inn vdd inn_core inn vss d08_esd
+Xesd_clk vdd clk_core clk vss d08_esd
+Xu_bias_reference vss ibias_core vdd d08_bias_reference
+Xu_bias_gpt62sol_ota vdd vss ibias_core gpt62sol_ota_ibias d08_bias_source
+Xu_bias_gpt62sol_vref vdd vss ibias_core gpt62sol_vref_ibias d08_bias_source
+Xu_bias_opus55_ota vdd vss ibias_core opus55_ota_ibias d08_bias_source
+Xu_bias_opus55_vref vdd vss ibias_core opus55_vref_ibias d08_bias_source
+Xu_bias_gemini4argon_ota vdd vss ibias_core gemini4argon_ota_ibias d08_bias_source
+Xu_bias_gemini4argon_vref vdd vss ibias_core gemini4argon_vref_ibias d08_bias_source
+Xu_neuro1b temp_out_core vdd vss ibias_core neuro1b
 .ends mbg_d08
+
+.subckt d08_gpt62sol_ota VDD VSS INP INN OUT IBIAS
+XMREF IBIAS IBIAS VSS VSS nfet_03v3 w=4u l=1u
+XMTAIL TAIL IBIAS VSS VSS nfet_03v3 w=4u l=1u
+XMINN MIR INN TAIL VSS nfet_03v3 w=1.0u l=1.4u
+XMINP FIRST INP TAIL VSS nfet_03v3 w=1.0u l=1.4u
+XMPL MIR MIR VDD VDD pfet_03v3 w=6u l=1u
+XMPR FIRST MIR VDD VDD pfet_03v3 w=6u l=1u
+XMOUTN OUT IBIAS VSS VSS nfet_03v3 w=7.0u l=.5u
+XMOUTP OUT FIRST VDD VDD pfet_03v3 w=5.8050u l=0.28u
+XCC FIRST OUT cap_mim_2f0_m4m5_noshield c_width=36.0u c_length=36.0u
+.ends d08_gpt62sol_ota
+
+.subckt d08_gpt62sol_cmp VDD VSS INP INN CLK OUTP OUTN
+XMIP DP INP TAIL VSS nfet_03v3 W=12u L=0.55u nf=2
+XMIN DN INN TAIL VSS nfet_03v3 W=12u L=0.55u nf=2
+XMTAIL TAIL CLK VSS VSS nfet_03v3 W=15u L=0.28u nf=2
+XMRN OUTN OUTP DP VSS nfet_03v3 W=5u L=0.28u nf=1
+XMRP OUTP OUTN DN VSS nfet_03v3 W=5u L=0.28u nf=1
+XMPN OUTN OUTP VDD VDD pfet_03v3 W=5u L=0.28u nf=1
+XMPP OUTP OUTN VDD VDD pfet_03v3 W=5u L=0.28u nf=1
+XMON OUTN CLK VDD VDD pfet_03v3 W=2u L=0.28u nf=1
+XMOP OUTP CLK VDD VDD pfet_03v3 W=2u L=0.28u nf=1
+XMDP DP CLK VDD VDD pfet_03v3 W=1.5u L=0.28u nf=1
+XMDN DN CLK VDD VDD pfet_03v3 W=1.5u L=0.28u nf=1
+.ends d08_gpt62sol_cmp
+
+.subckt d08_gpt62sol_vref VDD VSS VREF IBIAS
+XMNI IBIAS IBIAS VSS VSS nfet_03v3 W=2.000u L=1.20u nf=1
+XMNO PG IBIAS VSS VSS nfet_03v3 W=1.780u L=1.20u nf=1
+XMPI PG PG VDD VDD pfet_03v3 W=2.800u L=3.50u nf=1
+XMPO VREF PG VDD VDD pfet_03v3 W=2.800u L=3.50u nf=1
+XMR VREF VREF VSS VSS nfet_03v3 W=0.600u L=0.56u nf=1
+.ends d08_gpt62sol_vref
+
+.subckt d08_opus55_ota VDD VSS INP INN OUT IBIAS
+XM0 IBIAS IBIAS VSS VSS nfet_03v3 W=8u L=2u nf=2
+XM1 TAIL IBIAS VSS VSS nfet_03v3 W=4u L=2u nf=1
+XM2 DL INP TAIL VSS nfet_03v3 W=24u L=1u nf=4
+XM3 DR INN TAIL VSS nfet_03v3 W=24u L=1u nf=4
+XM4 DL DL VDD VDD pfet_03v3 W=60u L=1u nf=6
+XM5 DR DR VDD VDD pfet_03v3 W=60u L=1u nf=6
+XM6 OUT DL VDD VDD pfet_03v3 W=60u L=1u nf=6
+XM7 NM DR VDD VDD pfet_03v3 W=60u L=1u nf=6
+XM8 NM NM VSS VSS nfet_03v3 W=20u L=1u nf=4
+XM9 OUT NM VSS VSS nfet_03v3 W=18.7u L=1u nf=4
+.ends d08_opus55_ota
+
+.subckt d08_opus55_cmp VDD VSS INP INN CLK OUTP OUTN
+XMTAIL TAIL CLK VSS VSS nfet_03v3 W=24u L=0.28u nf=6
+XMINP X INP TAIL VSS nfet_03v3 W=64u L=0.5u nf=8
+XMINN Y INN TAIL VSS nfet_03v3 W=64u L=0.5u nf=8
+XMNL1 OUTN OUTP X VSS nfet_03v3 W=16u L=0.5u nf=4
+XMNL2 OUTP OUTN Y VSS nfet_03v3 W=16u L=0.5u nf=4
+XMPL1 OUTN OUTP VDD VDD pfet_03v3 W=16u L=0.5u nf=4
+XMPL2 OUTP OUTN VDD VDD pfet_03v3 W=16u L=0.5u nf=4
+XMRST1 OUTP CLK VDD VDD pfet_03v3 W=4u L=0.28u nf=1
+XMRST2 OUTN CLK VDD VDD pfet_03v3 W=4u L=0.28u nf=1
+XMRST3 X CLK VDD VDD pfet_03v3 W=4u L=0.28u nf=1
+XMRST4 Y CLK VDD VDD pfet_03v3 W=4u L=0.28u nf=1
+.ends d08_opus55_cmp
+
+.subckt d08_opus55_vref VDD VSS VREF IBIAS
+XM1 IBIAS IBIAS VSS VSS nfet_03v3 W=4u L=2u nf=1
+XM2 PG IBIAS VSS VSS nfet_03v3 W=8u L=2u nf=2
+XM3 PG PG VDD VDD pfet_03v3 W=16u L=2u nf=2
+XM4 VREF PG VDD VDD pfet_03v3 W=16u L=2u nf=2
+XM5 VREF VREF VSS VSS nfet_03v3 W=1.25u L=0.5u nf=1
+.ends d08_opus55_vref
+
+.subckt d08_gemini4argon_ota VDD VSS INP INN OUT IBIAS
+XM0 IBIAS IBIAS VSS VSS nfet_03v3 L=2u W=4u nf=2
+XM1 TAIL IBIAS VSS VSS nfet_03v3 L=2u W=8u nf=4
+XM2 N1 INN TAIL VSS nfet_03v3 L=2u W=16u nf=4
+XM3 N2 INP TAIL VSS nfet_03v3 L=2u W=16u nf=4
+XM4 N1 N1 VDD VDD pfet_03v3 L=1.5u W=6u nf=2
+XM5 N2 N2 VDD VDD pfet_03v3 L=1.5u W=6u nf=2
+XM6 N3 N1 VDD VDD pfet_03v3 L=1.2u W=12u nf=4
+XM7 OUT N2 VDD VDD pfet_03v3 L=1.2u W=12u nf=4
+XM8 N3 N3 VSS VSS nfet_03v3 L=1.2u W=6.08u nf=2
+XM9 OUT N3 VSS VSS nfet_03v3 L=1.2u W=6u nf=2
+.ends d08_gemini4argon_ota
+
+.subckt d08_gemini4argon_cmp VDD VSS INP INN CLK OUTP OUTN
+* Current-limiting tail switch (W/L = 0.91 -> maximizes input-pair gm/Id across VCM = 1.0..2.3V)
+XM_TAIL TAIL CLK VSS VSS nfet_03v3 W=1.0u L=1.10u nf=2
+
+* Wide, short-channel input differential pair (W/L = 32.0, nf=4 -> 8-unit A B B A B A A B common-centroid array)
+XM_INP DN INP TAIL VSS nfet_03v3 W=9.6u L=0.30u nf=4
+XM_INN DP INN TAIL VSS nfet_03v3 W=9.6u L=0.30u nf=4
+
+* Fast symmetric cross-coupled NMOS regenerative pair (W/L = 21.4, nf=2 -> A B B A array)
+XM_LNP OUTP OUTN DP VSS nfet_03v3 W=6.0u L=0.28u nf=2
+XM_LNN OUTN OUTP DN VSS nfet_03v3 W=6.0u L=0.28u nf=2
+
+* Fast symmetric cross-coupled PMOS regenerative pair (W/L = 12.9, nf=2 -> A B B A array)
+XM_LPP OUTP OUTN VDD VDD pfet_03v3 W=3.6u L=0.28u nf=2
+XM_LPN OUTN OUTP VDD VDD pfet_03v3 W=3.6u L=0.28u nf=2
+
+* Compact PMOS precharge switches (minimizes CLK->OUT/DP/DN overlap capacitance while resetting in <0.5 ns)
+XM_R_OUTP OUTP CLK VDD VDD pfet_03v3 W=1.0u L=0.28u nf=2
+XM_R_OUTN OUTN CLK VDD VDD pfet_03v3 W=1.0u L=0.28u nf=2
+XM_R_DP   DP   CLK VDD VDD pfet_03v3 W=1.0u L=0.28u nf=2
+XM_R_DN   DN   CLK VDD VDD pfet_03v3 W=1.0u L=0.28u nf=2
+.ends d08_gemini4argon_cmp
+
+.subckt d08_gemini4argon_vref VDD VSS VREF IBIAS
+XM1 NCAS1 IBIAS VSS VSS nfet_03v3 W=2.0u L=2.0u nf=2
+XM2 IBIAS IBIAS NCAS1 VSS nfet_03v3 W=4.0u L=0.40u nf=2
+XM3 NCAS2 IBIAS VSS VSS nfet_03v3 W=4.0u L=2.0u nf=4
+XM4 PG IBIAS NCAS2 VSS nfet_03v3 W=8.0u L=0.40u nf=4
+XM5 PG PG VDD VDD pfet_03v3 W=16.0u L=4.0u nf=4
+XM6 VREF PG VDD VDD pfet_03v3 W=16.0u L=4.0u nf=4
+XM7 VREF VREF VSS VSS nfet_03v3 W=1.27u L=0.50u nf=1
+.ends d08_gemini4argon_vref
+
+.subckt d08_esd VDD to_gate ASIG3V3 VSS
+*.PININFO VSS:B VDD:B to_gate:B ASIG3V3:B
+XR1 to_gate ASIG3V3 VDD ppolyf_u r_width=40e-6 r_length=10e-6
+D2 VSS to_gate diode_nd2ps_03v3 area='10u * 10u ' pj='2*10u + 2*10u ' m=4
+D1 to_gate VDD diode_pd2nw_03v3 area='10u * 10u ' pj='2*10u + 2*10u ' m=4
+.ends d08_esd
+
+* The external 20 uA source is connected to VBN through the existing ESD.
+.subckt d08_bias_reference VSS VBN VDD
+XMREF VBN VBN VSS VSS nfet_03v3 w=4u l=2u nf=2
+* VDD is the physical guard-ring supply and is added by the macro flow.
+.ends d08_bias_reference
+
+* Unity nominal high-side current replica. VBN is a high-impedance input.
+.subckt d08_bias_source VDD VSS VBN IOUT
+XMN PBIAS VBN VSS VSS nfet_03v3 w=4u l=2u nf=2
+XMPREF PBIAS PBIAS VDD VDD pfet_03v3 w=8u l=2u nf=2
+XMPOUT IOUT PBIAS VDD VDD pfet_03v3 w=8u l=2u nf=2
+.ends d08_bias_source
+
+* NEURO1B: Axon-Hillock neuron for the D08 frame. Leak is biased from the shared VBN.
+* VBN is a gate-only load. IO connects to temp_out_core behind the W12 ESD cell.
+.subckt neuro1b IO VDD VSS VBN
+XM1 N1 IO VDD VDD pfet_03v3 L=10u W=1u nf=1
+XM2 N1 IO VSS VSS nfet_03v3 L=10u W=0.5u nf=1
+XM3 SPK N1 VDD VDD pfet_03v3 L=1u W=1u nf=1
+XM4 SPK N1 VSS VSS nfet_03v3 L=1u W=0.5u nf=1
+XM5 IO SPK VSS VSS nfet_03v3 L=1u W=2u nf=1
+* Four series long devices: about 1/160 of the 20 uA reference
+XM6 IO VBN L1 VSS nfet_03v3 L=10u W=0.5u nf=1
+XM7 L1 VBN L2 VSS nfet_03v3 L=10u W=0.5u nf=1
+XM8 L2 VBN L3 VSS nfet_03v3 L=10u W=0.5u nf=1
+XM9 L3 VBN VSS VSS nfet_03v3 L=10u W=0.5u nf=1
+XC1 IO VSS cap_mim_2f0_m4m5_noshield c_width=30u c_length=30u
+XC2 SPK IO cap_mim_2f0_m4m5_noshield c_width=22u c_length=22u
+.ends

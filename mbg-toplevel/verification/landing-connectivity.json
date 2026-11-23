@@ -1,0 +1,69 @@
+{
+  "status": "PASS",
+  "pins": {
+    "temp_out": {
+      "metal_cluster": 2,
+      "rectangles": 8
+    },
+    "oxa_vref": {
+      "metal_cluster": 57,
+      "rectangles": 8
+    },
+    "gpt_vref": {
+      "metal_cluster": 64,
+      "rectangles": 8
+    },
+    "deepseek_vref": {
+      "metal_cluster": 69,
+      "rectangles": 8
+    },
+    "oxa_cmp": {
+      "metal_cluster": 74,
+      "rectangles": 8
+    },
+    "gpt_cmp": {
+      "metal_cluster": 82,
+      "rectangles": 8
+    },
+    "deepseek_cmp": {
+      "metal_cluster": 92,
+      "rectangles": 8
+    },
+    "oxa_ota": {
+      "metal_cluster": 95,
+      "rectangles": 8
+    },
+    "gpt_ota": {
+      "metal_cluster": 105,
+      "rectangles": 8
+    },
+    "deepseek_ota": {
+      "metal_cluster": 111,
+      "rectangles": 8
+    },
+    "vss": {
+      "metal_cluster": 3,
+      "rectangles": 6
+    },
+    "vdd": {
+      "metal_cluster": 1,
+      "rectangles": 6
+    },
+    "ibias": {
+      "metal_cluster": 116,
+      "rectangles": 8
+    },
+    "inp": {
+      "metal_cluster": 117,
+      "rectangles": 8
+    },
+    "inn": {
+      "metal_cluster": 118,
+      "rectangles": 8
+    },
+    "clk": {
+      "metal_cluster": 119,
+      "rectangles": 8
+    }
+  }
+}
